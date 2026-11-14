@@ -1,0 +1,73 @@
+import { expect, test } from "@playwright/test";
+
+test.describe("Measured cases page", () => {
+  test("filtering by a question leaves only the cases that ask it", async ({ page }) => {
+    await page.goto("/cases");
+    const cards = page.locator("[data-testid^=case-card-]");
+    await expect(cards).toHaveCount(5);
+
+    const flood = page.getByTestId("cases-filter-flood_wetland");
+    await expect(flood).toHaveText(/Did it flood\?/);
+    await flood.click();
+    await expect(flood).toHaveAttribute("aria-pressed", "true");
+    await expect(cards).toHaveCount(3);
+    for (const id of ["qadirabad", "chokwe", "richmond"]) {
+      await expect(page.getByTestId(`case-card-${id}`)).toBeVisible();
+    }
+
+    await page.getByTestId("cases-filter-wildfire").click();
+    await expect(page.getByTestId("cases-empty")).toBeVisible();
+
+    await page.getByTestId("cases-filter-all").click();
+    await expect(cards).toHaveCount(5);
+  });
+
+  test("a case card opens that case in the explorer", async ({ page }) => {
+    await page.goto("/cases");
+    const card = page.getByTestId("case-card-qadirabad");
+    await expect(card).toContainText("64.3% vs 1.0%");
+    await expect(card.getByTestId("prov-real")).toBeVisible();
+    await card.getByTestId("case-open-qadirabad").click();
+    await expect(page).toHaveURL(/\/explore\?case=qadirabad$/);
+  });
+
+  test("Chocó names its coherence-only state and opens on the globe like the others", async ({
+    page,
+  }) => {
+    await page.goto("/cases");
+    const choco = page.getByTestId("case-card-choco");
+    await expect(choco.getByTestId("prov-coherence-only")).toHaveText("Coherence only · 0.247");
+    await expect(choco).not.toContainText("Pending");
+    await expect(choco.getByTestId("prov-real")).toHaveCount(0);
+    await expect(choco.getByTestId("case-open-choco")).toHaveText("Open on the globe");
+    await expect(choco).not.toContainText("See the event");
+  });
+
+  test("ground-motion cases read as measured, not as missing radar", async ({ page }) => {
+    await page.goto("/cases");
+    for (const id of ["kumamoto", "choco"]) {
+      const card = page.getByTestId(`case-card-${id}`);
+      await expect(card).toContainText("Measured, not a verdict");
+      await expect(card).not.toContainText("Not enough radar yet");
+    }
+    const kumamoto = page.getByTestId("case-card-kumamoto");
+    await expect(kumamoto).toContainText("39,584 of 62,500");
+    await expect(kumamoto).toContainText("Did the ground keep its echo?");
+  });
+
+  test("the bottom card asks the radar instead of promising landslides", async ({ page }) => {
+    await page.goto("/cases");
+    await expect(
+      page.getByRole("heading", { name: "Your place isn't here? Ask the radar." }),
+    ).toBeVisible();
+    await expect(page.getByText("ANY PLACE ON LAND")).toBeVisible();
+    await expect(page.locator("[data-testid^=ask-icon-]")).toHaveCount(4);
+    await expect(page.getByTestId("ask-icon-landslide")).toHaveCount(0);
+    await expect(page.getByTestId("ask-icon-earthquake")).toHaveCount(0);
+    const body = page.locator("body");
+    await expect(body).not.toContainText("Landslides");
+    await expect(body).not.toContainText("No measured case yet");
+    await page.getByTestId("cases-ask-cta").click();
+    await expect(page).toHaveURL(/\/explore$/);
+  });
+});
