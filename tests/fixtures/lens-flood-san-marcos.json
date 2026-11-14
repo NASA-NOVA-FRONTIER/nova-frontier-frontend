@@ -1,0 +1,599 @@
+{
+  "job_id": "cf3e5f2dcbae4318bac3ccf81547cf35",
+  "lens": {
+    "id": "flood_wetland",
+    "version": "1.0",
+    "status": "evaluated",
+    "reason": null,
+    "target_date": "2026-10-15",
+    "baseline_dates": ["2026-08-28", "2026-09-09", "2026-09-21"],
+    "radar": {
+      "polarizations": ["HH", "HV"],
+      "posting_m": 10.0,
+      "grid_cells": 4096,
+      "common_cells": 4096,
+      "comparator": "Target minus median of the prior measured dates",
+      "diagnostic_half_width_db": "max(3, 3 \u00d7 max(1.4826 \u00d7 MAD, 1))",
+      "cells": 4096,
+      "median_target_minus_baseline_db": {
+        "HH": -0.010768890380859375,
+        "HV": 0.2890357971191406
+      },
+      "mad_departure_cells": 1550,
+      "dual_darkening_cells": 410,
+      "co_pol_brightening_cells": 701,
+      "dual_darkening_max_delta_db": {
+        "HH": -3.0,
+        "HV": -1.5
+      },
+      "co_pol_brightening_min_delta_db": 3.0,
+      "grid": {
+        "epsg": 32618,
+        "bounds_native": [488230.0, 956620.0, 488870.0, 957260.0],
+        "pixel_spacing_m": [10.0, 10.0],
+        "width": 64,
+        "height": 64
+      },
+      "layer": {
+        "role": "target_minus_observed_baseline_db",
+        "dates": ["2026-10-15"],
+        "polarizations": ["HH", "HV"],
+        "units": "dB",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/baseline_change.tif"
+      },
+      "layers": [
+        {
+          "role": "flood_signature_flags",
+          "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/flood_signature_flags.tif",
+          "units": "diagnostic flag",
+          "bands": ["dual_darkening", "co_pol_brightening"],
+          "legend": {
+            "0": "absent_on_sampled_support",
+            "1": "supports"
+          },
+          "resampling": "nearest",
+          "sha256": "7581c2aeff9a343cc2e5599e8ba624f084c16c503197a4b461c83392d135e431"
+        }
+      ]
+    },
+    "evidence": {
+      "status": "optical_comparison_available",
+      "source": "OPERA DSWx-HLS optical surface water",
+      "epochs": {
+        "pre": {
+          "status": "selected",
+          "radar_date": "2026-09-21",
+          "date": "2026-09-24",
+          "source_id": "OPERA_L3_DSWx-HLS_T18PVQ_20260924T152651Z_20260928T231505Z_S2C_30_v1.1",
+          "absolute_date_offset_days": 3,
+          "usable_fraction_of_common_radar_cells": 1.0
+        },
+        "post": {
+          "status": "selected",
+          "radar_date": "2026-10-15",
+          "date": "2026-10-19",
+          "source_id": "OPERA_L3_DSWx-HLS_T18PVQ_20261019T154001Z_20261022T063325Z_S2A_30_v1.1",
+          "absolute_date_offset_days": 4,
+          "usable_fraction_of_common_radar_cells": 0.9296875
+        }
+      },
+      "max_offset_days": 4,
+      "min_joint_usable_fraction": 0.25,
+      "joint_usable_cells": 238,
+      "radar_denominator_cells": 256,
+      "joint_usable_fraction": 0.9296875,
+      "groups": {
+        "stable_nonwater": {
+          "cells": 221,
+          "median_target_minus_baseline_db": {
+            "HH": 0.033751487731933594,
+            "HV": 0.4848060607910156
+          },
+          "mad_departure_cells": 33,
+          "dual_darkening_cells": 12,
+          "co_pol_brightening_cells": 9
+        },
+        "new_open_water": {
+          "cells": 0,
+          "median_target_minus_baseline_db": {
+            "HH": null,
+            "HV": null
+          },
+          "mad_departure_cells": 0,
+          "dual_darkening_cells": 0,
+          "co_pol_brightening_cells": 0
+        },
+        "stable_open_water": {
+          "cells": 0,
+          "median_target_minus_baseline_db": {
+            "HH": null,
+            "HV": null
+          },
+          "mad_departure_cells": 0,
+          "dual_darkening_cells": 0,
+          "co_pol_brightening_cells": 0
+        },
+        "open_water_loss": {
+          "cells": 0,
+          "median_target_minus_baseline_db": {
+            "HH": null,
+            "HV": null
+          },
+          "mad_departure_cells": 0,
+          "dual_darkening_cells": 0,
+          "co_pol_brightening_cells": 0
+        },
+        "mixed_or_partial": {
+          "cells": 17,
+          "median_target_minus_baseline_db": {
+            "HH": 0.7802953720092773,
+            "HV": 0.4128227233886719
+          },
+          "mad_departure_cells": 0,
+          "dual_darkening_cells": 0,
+          "co_pol_brightening_cells": 0
+        }
+      },
+      "resolved_groups": [
+        "stable_nonwater",
+        "new_open_water",
+        "stable_open_water",
+        "open_water_loss"
+      ],
+      "interpretation": "Groups compare optical water classes at two snapshots. Mixed cells are descriptive.",
+      "comparison": {
+        "status": "evaluated",
+        "reason": null,
+        "claim": "New strict open water between the two optical snapshots in the comparison cell containing the point.",
+        "point_new_open_water_state": "contradicts",
+        "point_group_code": 0,
+        "point_selection": "requested_point",
+        "grid": {
+          "epsg": 32618,
+          "width": 16,
+          "height": 16,
+          "pixel_spacing_m": [40.0, 40.0]
+        },
+        "matched_new_water_comparison": {
+          "status": "insufficient_data",
+          "reason": "insufficient_reference_groups_or_matches",
+          "matches": {
+            "positive_pixels": 0,
+            "matched_control_pixels": 0,
+            "matched_positive_pixels": 0,
+            "matched_fraction": null
+          },
+          "channels": {
+            "HH": {
+              "status": "unavailable",
+              "reason": "Both comparison groups require measured support"
+            },
+            "HV": {
+              "status": "unavailable",
+              "reason": "Both comparison groups require measured support"
+            }
+          }
+        }
+      },
+      "grid": {
+        "epsg": 32618,
+        "bounds_native": [488230.0, 956620.0, 488870.0, 957260.0],
+        "pixel_spacing_m": [40.0, 40.0],
+        "width": 16,
+        "height": 16
+      },
+      "radar_aggregation_pixels_per_side": 4,
+      "point_group": "stable_nonwater",
+      "layer": {
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/optical_groups.tif",
+        "role": "optical_water_class_comparison",
+        "units": "optical class code",
+        "legend": {
+          "0": "stable_nonwater",
+          "1": "new_open_water",
+          "2": "stable_open_water",
+          "3": "open_water_loss",
+          "4": "mixed_or_partial"
+        }
+      }
+    },
+    "point": {
+      "status": "within_observed_baseline",
+      "target_minus_baseline_db": {
+        "HH": 0.34606170654296875,
+        "HV": 2.996396064758301
+      },
+      "diagnostic_half_width_db": {
+        "HH": 5.065488258934021,
+        "HV": 19.522420432662962
+      }
+    },
+    "evaluation": {
+      "contract_version": "1.0",
+      "policy_id": "explore_flood_observations_v1",
+      "status": "evaluated",
+      "reason": null,
+      "target_date": "2026-10-15",
+      "baseline_dates": ["2026-08-28", "2026-09-09", "2026-09-21"],
+      "signature_policy": {
+        "dual_darkening_max_change_db": {
+          "co": -3.0,
+          "cross": -1.5
+        },
+        "co_pol_brightening_min_change_db": 3.0,
+        "interpretation": "Evidence states refer to measured signatures or the explicitly named optical claim."
+      },
+      "grid": {
+        "epsg": 32618,
+        "width": 64,
+        "height": 64,
+        "pixel_spacing_m": [10.0, 10.0]
+      },
+      "point": {
+        "selection": "requested_point",
+        "inside_grid": true,
+        "x": 488558.3752180149,
+        "y": 956932.9642541282,
+        "row": 32,
+        "column": 32,
+        "status": "evaluated",
+        "reason": null,
+        "signature_states": {
+          "dual_darkening": "absent_on_sampled_support",
+          "co_pol_brightening": "absent_on_sampled_support"
+        },
+        "baseline_db": {
+          "HH": -9.015619277954102,
+          "HV": -18.732561111450195
+        },
+        "baseline_scaled_mad_db": {
+          "HH": 1.6884960863113403,
+          "HV": 6.507473477554321
+        },
+        "change_db": {
+          "HH": 0.34606170654296875,
+          "HV": 2.996396064758301
+        },
+        "cross_minus_co_change_db": 1.5114593505859375,
+        "observation_bracket": ["2026-09-21", "2026-10-15"],
+        "series": [
+          {
+            "date": "2026-08-28",
+            "db": {
+              "HH": -9.015619277954102,
+              "HV": -13.70720100402832
+            }
+          },
+          {
+            "date": "2026-09-09",
+            "db": {
+              "HH": -7.816259860992432,
+              "HV": -23.12179183959961
+            }
+          },
+          {
+            "date": "2026-09-21",
+            "db": {
+              "HH": -10.154494285583496,
+              "HV": -18.732561111450195
+            }
+          },
+          {
+            "date": "2026-10-15",
+            "db": {
+              "HH": -8.669557571411133,
+              "HV": -15.736165046691895
+            }
+          }
+        ]
+      },
+      "grid_signatures": {
+        "dual_darkening": {
+          "state": "supports",
+          "signature_cells": 410,
+          "supported_cells": 4096,
+          "fraction": 0.10009765625
+        },
+        "co_pol_brightening": {
+          "state": "supports",
+          "signature_cells": 701,
+          "supported_cells": 4096,
+          "fraction": 0.171142578125
+        }
+      },
+      "surrounding_comparison": {
+        "status": "evaluated",
+        "reason": null,
+        "definition": "Change in a 60 m focal patch minus change in unique baseline-level matched cells 120\u2013300 m away.",
+        "focal_radius_m": 60,
+        "comparison_annulus_m": [120, 300],
+        "minimum_cells": 5,
+        "minimum_supported_fraction": 0.5,
+        "minimum_matched_fraction": 0.5,
+        "independently_stable_controls": false,
+        "focal_cells": 112,
+        "surrounding_cells": 2374,
+        "focal_grid_cells": 112,
+        "surrounding_grid_cells": 2374,
+        "matches": {
+          "positive_pixels": 112,
+          "matched_control_pixels": 112,
+          "matched_positive_pixels": 112,
+          "matched_fraction": 1.0,
+          "baseline_mean_positive_minus_control_db_by_channel": [
+            -0.005584921155657087, -0.004587301186152867
+          ],
+          "criterion": "unique baseline co-/cross-pol levels within declared dB tolerance; at most 128 nearest candidates; contrast uses matched positives only; not causal matching on all confounders"
+        },
+        "channels": {
+          "HH": {
+            "status": "conditional_spatial_resampling",
+            "positive_pixels": 112,
+            "control_pixels": 112,
+            "positive_mean_db": -0.4732446585382734,
+            "control_mean_db": -0.05488671149526324,
+            "positive_median_db": -0.2399749755859375,
+            "control_median_db": 0.21347379684448242,
+            "mean_contrast_db": -0.41835794704301016,
+            "spatial_resampling_95_interval_db": [-1.2598843392870753, 0.5958430259947385],
+            "positive_blocks": 4,
+            "control_blocks": 41,
+            "valid_resampling_draws": 391,
+            "interval_limit": "Conditional resampling of fixed spatial blocks; spatial independence, measurement errors, reference errors and causal identification are not established"
+          },
+          "HV": {
+            "status": "conditional_spatial_resampling",
+            "positive_pixels": 112,
+            "control_pixels": 112,
+            "positive_mean_db": -0.6456164121627808,
+            "control_mean_db": 0.4574392778532846,
+            "positive_median_db": -0.6464328765869141,
+            "control_median_db": 0.15404987335205078,
+            "mean_contrast_db": -1.1030556900160653,
+            "spatial_resampling_95_interval_db": [-3.451927061731338, 1.2764219498107412],
+            "positive_blocks": 4,
+            "control_blocks": 41,
+            "valid_resampling_draws": 391,
+            "interval_limit": "Conditional resampling of fixed spatial blocks; spatial independence, measurement errors, reference errors and causal identification are not established"
+          }
+        },
+        "spatial_block_size_m": [80.0, 80.0],
+        "series": [
+          {
+            "date": "2026-08-28",
+            "focal_mean_db": {
+              "HH": -11.946584701538086,
+              "HV": -19.683765411376953
+            },
+            "control_mean_db": {
+              "HH": -11.778746604919434,
+              "HV": -19.558225631713867
+            }
+          },
+          {
+            "date": "2026-09-09",
+            "focal_mean_db": {
+              "HH": -11.64603328704834,
+              "HV": -19.242626190185547
+            },
+            "control_mean_db": {
+              "HH": -11.382149696350098,
+              "HV": -19.01461410522461
+            }
+          },
+          {
+            "date": "2026-09-21",
+            "focal_mean_db": {
+              "HH": -10.37534236907959,
+              "HV": -17.70383644104004
+            },
+            "control_mean_db": {
+              "HH": -11.107667922973633,
+              "HV": -18.385284423828125
+            }
+          },
+          {
+            "date": "2026-10-15",
+            "focal_mean_db": {
+              "HH": -11.743547439575195,
+              "HV": -19.595529556274414
+            },
+            "control_mean_db": {
+              "HH": -11.31960391998291,
+              "HV": -18.487884521484375
+            }
+          }
+        ],
+        "differential_darkening": {
+          "state": "absent_on_sampled_support",
+          "reason": null,
+          "claim": "Focal-minus-control mean change is at most -3 dB co-pol and -1.5 dB cross-pol."
+        }
+      },
+      "water_comparison": {
+        "status": "evaluated",
+        "reason": null,
+        "claim": "New strict open water between the two optical snapshots in the comparison cell containing the point.",
+        "point_new_open_water_state": "contradicts",
+        "point_group_code": 0,
+        "point_selection": "requested_point",
+        "grid": {
+          "epsg": 32618,
+          "width": 16,
+          "height": 16,
+          "pixel_spacing_m": [40.0, 40.0]
+        },
+        "matched_new_water_comparison": {
+          "status": "insufficient_data",
+          "reason": "insufficient_reference_groups_or_matches",
+          "matches": {
+            "positive_pixels": 0,
+            "matched_control_pixels": 0,
+            "matched_positive_pixels": 0,
+            "matched_fraction": null
+          },
+          "channels": {
+            "HH": {
+              "status": "unavailable",
+              "reason": "Both comparison groups require measured support"
+            },
+            "HV": {
+              "status": "unavailable",
+              "reason": "Both comparison groups require measured support"
+            }
+          }
+        },
+        "epochs": {
+          "pre": {
+            "status": "selected",
+            "radar_date": "2026-09-21",
+            "date": "2026-09-24",
+            "source_id": "OPERA_L3_DSWx-HLS_T18PVQ_20260924T152651Z_20260928T231505Z_S2C_30_v1.1",
+            "absolute_date_offset_days": 3,
+            "usable_fraction_of_common_radar_cells": 1.0
+          },
+          "post": {
+            "status": "selected",
+            "radar_date": "2026-10-15",
+            "date": "2026-10-19",
+            "source_id": "OPERA_L3_DSWx-HLS_T18PVQ_20261019T154001Z_20261022T063325Z_S2A_30_v1.1",
+            "absolute_date_offset_days": 4,
+            "usable_fraction_of_common_radar_cells": 0.9296875
+          }
+        },
+        "groups": {
+          "stable_nonwater": {
+            "cells": 221,
+            "median_target_minus_baseline_db": {
+              "HH": 0.033751487731933594,
+              "HV": 0.4848060607910156
+            },
+            "mad_departure_cells": 33,
+            "dual_darkening_cells": 12,
+            "co_pol_brightening_cells": 9
+          },
+          "new_open_water": {
+            "cells": 0,
+            "median_target_minus_baseline_db": {
+              "HH": null,
+              "HV": null
+            },
+            "mad_departure_cells": 0,
+            "dual_darkening_cells": 0,
+            "co_pol_brightening_cells": 0
+          },
+          "stable_open_water": {
+            "cells": 0,
+            "median_target_minus_baseline_db": {
+              "HH": null,
+              "HV": null
+            },
+            "mad_departure_cells": 0,
+            "dual_darkening_cells": 0,
+            "co_pol_brightening_cells": 0
+          },
+          "open_water_loss": {
+            "cells": 0,
+            "median_target_minus_baseline_db": {
+              "HH": null,
+              "HV": null
+            },
+            "mad_departure_cells": 0,
+            "dual_darkening_cells": 0,
+            "co_pol_brightening_cells": 0
+          },
+          "mixed_or_partial": {
+            "cells": 17,
+            "median_target_minus_baseline_db": {
+              "HH": 0.7802953720092773,
+              "HV": 0.4128227233886719
+            },
+            "mad_departure_cells": 0,
+            "dual_darkening_cells": 0,
+            "co_pol_brightening_cells": 0
+          }
+        },
+        "source": "OPERA DSWx-HLS optical surface water"
+      },
+      "uncertainty": {
+        "observation": {
+          "status": "unavailable",
+          "reason": "Sensor error and speckle uncertainty are unestimated."
+        },
+        "spatial_heterogeneity": {
+          "kind": "cell_distribution",
+          "scope": "common_radar_grid",
+          "units": "dB",
+          "cells": 4096,
+          "change_quantiles_25_50_75": {
+            "HH": [-2.296241521835327, -0.010768890380859375, 2.1770241260528564],
+            "HV": [-1.9241511821746826, 0.2890357971191406, 2.43837833404541]
+          }
+        },
+        "model": {
+          "status": "unavailable",
+          "reason": "Diagnostic thresholds have no fitted probability model."
+        }
+      },
+      "confounders": [
+        {
+          "id": "existing_water",
+          "status": "observed",
+          "evidence": 0
+        },
+        {
+          "id": "rain_or_soil_moisture",
+          "status": "unavailable"
+        },
+        {
+          "id": "freeze_thaw",
+          "status": "unavailable"
+        },
+        {
+          "id": "wind",
+          "status": "unavailable"
+        },
+        {
+          "id": "incidence_and_track",
+          "status": "unavailable"
+        },
+        {
+          "id": "speckle_and_noise",
+          "status": "unavailable"
+        },
+        {
+          "id": "layover_or_shadow",
+          "status": "unavailable"
+        }
+      ],
+      "questions": [
+        "Did both radar channels darken relative to this pixel's observed baseline?",
+        "Did a baseline-matched surrounding population change differently from the focal patch?",
+        "Do independently dated optical snapshots show new water or water already present?"
+      ],
+      "phenomenon_class": null,
+      "phenomenon_probability": null,
+      "causal_attribution": null,
+      "displacement_cm": null
+    },
+    "observation_bracket": ["2026-09-21", "2026-10-15"],
+    "temporal_analysis": {
+      "dates": ["2026-08-28", "2026-09-09", "2026-09-21", "2026-10-15"],
+      "elapsed_days": [0.0, 12.0, 24.0, 48.0],
+      "acquisition_gaps_days": [12.0, 12.0, 24.0],
+      "common_cells": 4096,
+      "spectral": {
+        "status": "insufficient_temporal_support",
+        "reason": "Need at least six observed dates"
+      },
+      "stochastic": {
+        "status": "insufficient_data",
+        "reason": "Need five measured dates for a lens GP",
+        "calibrated": false
+      },
+      "observation_noise_db": null
+    },
+    "excluded_unusable_dates": [],
+    "requested_baseline_end_date": "2026-09-21"
+  }
+}
