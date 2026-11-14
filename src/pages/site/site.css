@@ -1,0 +1,672 @@
+@import url("https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/*
+ * The site's shared system (landing, cases, method and about): tokens, type, pills, chips, nav
+ * and footer. Deep space blacks and blues with starlight ink; gold is the only accent. Page
+ * layouts live next to each page (landing/landing.css, cases/cases.css, method/method.css).
+ */
+
+.site {
+  --space: #04070e;
+  --deep: #08101f;
+  --night: #0e1930;
+  --ink: #ebe9e4;
+  --ink-2: #d4d2cc;
+  --muted: #a9a69e;
+  --gold: #c9b48b;
+  --gold-hover: #dccaa3;
+  --gold-ink: #16120a;
+  --demo: #fcd34d;
+  --hairline: rgba(235, 233, 228, 0.12);
+  --glass: rgba(8, 16, 31, 0.78);
+
+  --text: "Albert Sans", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --step-small: 0.875rem;
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-lead: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  --step-title: clamp(1.75rem, 1.3rem + 1.2vw, 2.5rem);
+  --step-head: clamp(2.5rem, 1.4rem + 3.6vw, 5rem);
+  --step-display: clamp(3.25rem, 1rem + 7vw, 8.5rem);
+
+  --margin: clamp(1rem, 0.5rem + 2vw, 2rem);
+  --gap-section: clamp(6rem, 4rem + 6vw, 11rem);
+  --gap-section-wide: clamp(7rem, 5rem + 6vw, 12rem);
+  --radius: clamp(14px, 1.6vw, 28px);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  background: var(--space);
+  color: var(--ink);
+  font-family: var(--text);
+  font-size: var(--step-body);
+  line-height: 1.55;
+  /* clip, not hidden: hidden would break the sticky story and events. */
+  overflow-x: clip;
+}
+
+/* Base resets use :where() (zero specificity) so every component class below can override them. */
+:where(.site) :where(h1, h2, h3) {
+  font-weight: 500;
+  margin: 0;
+  text-wrap: balance;
+}
+
+:where(.site) :where(p, figure, ol, ul) {
+  margin: 0;
+}
+
+:where(.site) :where(ol, ul) {
+  padding: 0;
+  list-style: none;
+}
+
+:where(.site) a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 160ms var(--ease-out);
+}
+
+:where(.site) a:hover {
+  color: var(--gold-hover);
+}
+
+.site :focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.s-skip {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 40;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--gold-ink);
+  transform: translateY(-200%);
+}
+
+.s-skip:focus {
+  transform: none;
+}
+
+/* Type */
+.s-display {
+  font-size: var(--step-display);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+}
+
+.s-head {
+  font-size: var(--step-head);
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+.s-subhead {
+  font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.75rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.s-mono-label {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.s-caption {
+  font-size: var(--step-small);
+  color: var(--muted);
+}
+
+/* Actions: a gold pill, and a gold text link. */
+.s-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.85em 1.6em;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--gold-ink);
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background-color 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.site .s-button:hover {
+  background: var(--gold-hover);
+  color: var(--gold-ink);
+}
+
+.s-button:active {
+  transform: scale(0.97);
+}
+
+.s-button--large {
+  padding: 0.95em 1.9em;
+  font-size: 1.0625rem;
+}
+
+.s-gold-link {
+  display: inline-flex;
+  font-weight: 500;
+  color: var(--gold);
+}
+
+.s-chip {
+  padding: 0.35em 0.8em;
+  border-radius: 999px;
+  background: rgba(4, 7, 14, 0.6);
+  backdrop-filter: blur(8px);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+/* Nav */
+.s-nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem var(--margin);
+}
+
+.s-nav--glass {
+  background: rgba(4, 7, 14, 0.7);
+  backdrop-filter: blur(14px);
+}
+
+.site .s-nav__link[aria-current="page"] {
+  color: var(--ink);
+}
+
+.s-nav__mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.s-nav__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 2rem);
+  font-size: 0.9375rem;
+}
+
+.site .s-nav__link {
+  color: var(--muted);
+}
+
+.site .s-nav__link:hover {
+  color: var(--ink);
+}
+
+.s-nav__pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55em 1.1em;
+  border-radius: 999px;
+  background: rgba(235, 233, 228, 0.1);
+  backdrop-filter: blur(12px);
+  white-space: nowrap;
+  transition: background-color 160ms var(--ease-out);
+}
+
+.s-nav__pill-short {
+  display: none;
+}
+
+.site .s-nav__pill:hover {
+  background: rgba(235, 233, 228, 0.18);
+  color: var(--ink);
+}
+
+/* Sections */
+.s-section {
+  padding: var(--gap-section) var(--margin) 0;
+}
+
+.s-section--wide {
+  padding: var(--gap-section-wide) var(--margin) 0;
+}
+
+.s-container {
+  max-width: 76rem;
+  margin: 0 auto;
+}
+
+/* Footer: a Colombian place seen from orbit, the page's links and the team's signature. */
+.s-foot {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid rgba(235, 233, 228, 0.08);
+  background: var(--space);
+}
+
+.s-foot__flag {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  height: 4px;
+  background: linear-gradient(#fcd116 0 50%, #003893 50% 75%, #ce1126 75%);
+}
+
+.s-foot__orbit {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.s-foot__earth {
+  position: absolute;
+  width: 4096px;
+  height: 2048px;
+  background: url("/landing/earth-day.jpg") 0 0 / 100% 100%;
+  filter: saturate(0.85) brightness(0.85);
+}
+
+.s-foot__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      var(--space) 0%,
+      rgba(4, 7, 14, 0.9) 36%,
+      rgba(4, 7, 14, 0.25) 62%,
+      rgba(4, 7, 14, 0.45) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(4, 7, 14, 0.6) 0%,
+      transparent 30%,
+      transparent 70%,
+      var(--space) 100%
+    );
+}
+
+.s-foot__marker {
+  position: absolute;
+  left: 72%;
+  top: 36%;
+  width: 44px;
+  height: 44px;
+  translate: -50% -50%;
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  box-shadow: 0 0 0 10px rgba(201, 180, 139, 0.12);
+}
+
+.s-foot__marker::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.s-foot__coord {
+  position: absolute;
+  left: calc(72% + 34px);
+  top: 36%;
+  translate: 0 -50%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  text-shadow: 0 1px 6px var(--space);
+}
+
+.s-foot__body {
+  position: relative;
+  z-index: 2;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(4.5rem, 3rem + 5vw, 7rem) var(--margin) 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 2rem + 3vw, 5rem);
+}
+
+.s-foot__lead {
+  max-width: 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.s-foot__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.s-foot__kicker {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+}
+
+.s-foot__headline {
+  font-size: clamp(1.75rem, 1rem + 2vw, 2.75rem);
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.s-foot__lede {
+  max-width: 34rem;
+  color: var(--ink-2);
+  font-size: 1.0625rem;
+  text-wrap: pretty;
+}
+
+.s-foot__actions {
+  margin-top: 0.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.site .s-foot__button {
+  display: inline-flex;
+  padding: 0.6em 1.2em;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--space);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: background-color 160ms var(--ease-out);
+}
+
+.site .s-foot__button:hover {
+  background: #fff;
+  color: var(--space);
+}
+
+.site .s-foot__button--ghost {
+  border: 1px solid rgba(235, 233, 228, 0.2);
+  background: transparent;
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.site .s-foot__button--ghost:hover {
+  background: rgba(235, 233, 228, 0.08);
+  color: var(--ink);
+}
+
+.s-foot__signature {
+  padding-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  font-size: var(--step-small);
+  color: var(--muted);
+}
+
+.site .s-foot__team {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink-2);
+}
+
+.site .s-foot__team:hover {
+  color: var(--ink);
+}
+
+.s-foot__team img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(235, 233, 228, 0.16);
+}
+
+.s-foot__divider {
+  width: 1px;
+  height: 32px;
+  background: rgba(235, 233, 228, 0.16);
+}
+
+/* The Space Apps logo is black ink, so it needs a light plate on the dark footer. */
+.s-foot__spaceapps {
+  display: flex;
+  padding: 7px 14px;
+  border-radius: 12px;
+  background: var(--ink);
+  transition: background-color 160ms var(--ease-out);
+}
+
+.s-foot__spaceapps:hover {
+  background: #fff;
+}
+
+.s-foot__spaceapps img {
+  display: block;
+  width: auto;
+  height: 34px;
+}
+
+.s-foot__place {
+  align-self: flex-start;
+  max-width: 28rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem 0.75rem 0.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: 2.75rem;
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+}
+
+.s-foot__place img {
+  flex: none;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--night);
+}
+
+.s-foot__place figcaption {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: var(--step-small);
+}
+
+.s-foot__place-tag {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.s-foot__place-title {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.s-foot__place-sub {
+  color: #c4c1ba;
+  text-wrap: pretty;
+}
+
+.site .s-foot__place-credit {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.site .s-foot__place-credit:hover {
+  color: var(--ink);
+}
+
+.s-foot__cols {
+  padding-top: 2rem;
+  border-top: 1px solid rgba(235, 233, 228, 0.1);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: 2rem;
+  font-size: 0.9375rem;
+}
+
+.s-foot__col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.s-foot__col-title {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.site .s-foot__col a {
+  color: var(--ink-2);
+}
+
+.site .s-foot__col a:hover {
+  color: var(--ink);
+}
+
+.s-foot__note {
+  max-width: 64rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.s-foot__wordmark {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 -0.18em;
+  padding: 0 var(--margin);
+  font-size: clamp(3rem, 0.5rem + 10vw, 13rem);
+  font-weight: 600;
+  letter-spacing: -0.06em;
+  line-height: 0.8;
+  text-align: center;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(235, 233, 228, 0.22);
+}
+
+.s-foot__base {
+  position: relative;
+  z-index: 2;
+  padding: 1.25rem var(--margin);
+  border-top: 1px solid rgba(235, 233, 228, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  background: var(--space);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.s-foot__credit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.s-foot__version {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  color: #8d8a83;
+}
+
+.s-foot__disclaimer {
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+/* On phones the coordinate label sits left of the marker so it stays on screen. */
+@media (max-width: 30rem) {
+  .s-foot__coord {
+    left: auto;
+    right: calc(28% + 34px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site *,
+  .site *::before,
+  .site *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Phones: the wordmark stays on one line; the explorer pill takes its short label. */
+@media (max-width: 30rem) {
+  .s-nav {
+    gap: 0.5rem;
+  }
+
+  .s-nav__mark {
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+
+  /* Smaller mark so the Explore pill still fits at 390 px. */
+  .s-nav__mark .brand-mark {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Tighter so four page links (Learn added) and the pill still fit next to the mark at 390 px. */
+  .s-nav__links {
+    gap: 0.3125rem;
+    font-size: 0.75rem;
+  }
+
+  .s-nav__pill {
+    padding: 0.45em 0.6em;
+  }
+
+  .s-nav__pill-long {
+    display: none;
+  }
+
+  .s-nav__pill-short {
+    display: inline;
+  }
+}
+
+/* Very narrow phones: the page links give way to the globe; the footer still lists them. */
+@media (max-width: 24rem) {
+  .s-nav__link {
+    display: none;
+  }
+}
