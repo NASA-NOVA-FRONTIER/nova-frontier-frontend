@@ -1,0 +1,421 @@
+/*
+ * Method §04 echo simulator, §05 wavelengths, §06 interferometry (Method v8 reference). Section head classes
+ * (m-section, m-kicker, m-h2, m-lead) come from method.css; tokens from site/site.css.
+ */
+
+.m-section__head--wide {
+  max-width: 800px;
+}
+
+/* §04 Echo simulator */
+
+.m-echo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 24px;
+  padding: 24px;
+  border-radius: 28px;
+  background: rgba(235, 233, 228, 0.035);
+  border: 1px solid rgba(235, 233, 228, 0.08);
+}
+
+.m-echo__stage {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.m-echo__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.m-echo__option {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(235, 233, 228, 0.18);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease;
+}
+
+.m-echo__option:hover {
+  border-color: rgba(235, 233, 228, 0.45);
+}
+
+.m-echo__option[aria-checked="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--space);
+}
+
+.m-echo__option:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.m-echo__diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  background: var(--deep);
+}
+
+.m-echo__pulse,
+.m-echo__ray {
+  animation: m-echo-flow 0.9s linear infinite;
+}
+
+.m-echo__caption {
+  fill: var(--muted);
+  font:
+    11px "JetBrains Mono",
+    monospace;
+  letter-spacing: 0.06em;
+}
+
+.m-echo__read {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.m-echo__mech {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+}
+
+.m-echo__title {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.m-echo__body {
+  font-size: 15px;
+  line-height: 1.55;
+  color: #c4c1ba;
+  text-wrap: pretty;
+}
+
+.m-echo__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.m-echo__bar {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 10px;
+}
+
+.m-echo__bar-key,
+.m-echo__value {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.m-echo__value {
+  color: var(--ink-2);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.m-echo__track {
+  position: relative;
+  height: 10px;
+  border-radius: 2px;
+  background: rgba(235, 233, 228, 0.08);
+}
+
+.m-echo__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 2px;
+  transition: width 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.m-echo__scale {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 74px 0 38px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #8d8a83;
+}
+
+.m-echo__chip {
+  align-self: flex-start;
+}
+
+@keyframes m-echo-flow {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+/* §05 Wavelengths */
+
+.m-waves {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 24px;
+  border-radius: 28px;
+  border: 1px solid rgba(235, 233, 228, 0.1);
+}
+
+.m-wave {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 220px;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(235, 233, 228, 0.06);
+}
+
+.m-wave__name,
+.m-wave__reach {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.m-wave__band {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.m-wave__len {
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.m-wave__track {
+  position: relative;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(8, 16, 31, 0), rgba(14, 25, 48, 0.6));
+}
+
+.m-wave__svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  animation: m-wave-slide var(--m-wave-loop, 6s) linear infinite;
+}
+
+.m-wave__scale {
+  position: absolute;
+  left: 12px;
+  bottom: 4px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.m-wave__scale-bar {
+  flex: none;
+  height: 2px;
+  background: var(--ink);
+}
+
+.m-wave__scale-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.m-wave__reach-text {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.m-wave__who {
+  font-size: 12.5px;
+  color: #8d8a83;
+}
+
+.m-waves__note {
+  padding-top: 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #8d8a83;
+}
+
+@keyframes m-wave-slide {
+  to {
+    transform: translateX(var(--m-wave-shift, 0));
+  }
+}
+
+/* §06 Interferometry */
+
+.m-insar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.m-insar__figure {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  min-width: 0;
+}
+
+.m-insar__frame {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--night);
+}
+
+.m-insar__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.m-insar__tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(4, 7, 14, 0.8);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.m-insar__caption {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.m-insar__bar {
+  height: 8px;
+  border-radius: 2px;
+}
+
+.m-insar__ends {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: #8d8a83;
+  white-space: nowrap;
+}
+
+.m-insar__text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #c4c1ba;
+  text-wrap: pretty;
+}
+
+.m-insar__stat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 18px;
+  background: rgba(235, 233, 228, 0.035);
+}
+
+.m-insar__stat-num {
+  font-family: var(--mono);
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.m-insar__stat-text {
+  font-size: 14px;
+  color: #c4c1ba;
+}
+
+.m-insar__spacer {
+  flex: 1;
+}
+
+.m-insar__note {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #8d8a83;
+}
+
+@media (max-width: 720px) {
+  .m-echo {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
+
+  .m-waves {
+    padding: 16px;
+  }
+
+  .m-wave {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .m-insar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .m-insar__spacer {
+    display: none;
+  }
+
+  /* The long REAL chip wraps instead of pushing the page sideways. */
+  .m-insar__stat .c-prov {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-echo__pulse,
+  .m-echo__ray,
+  .m-wave__svg {
+    animation: none;
+  }
+
+  .m-echo__fill,
+  .m-echo__option {
+    transition: none;
+  }
+}
