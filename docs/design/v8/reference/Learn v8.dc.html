@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>NISAR Hazard Watch · Learn</title>
+<meta name="ext-resource-dependency" content="docs/cases/qadirabad-base-gray.png" data-resource-id="docs_cases_qadirabad_base_gray_png">
+<meta name="ext-resource-dependency" content="docs/cases/chokwe-change.png" data-resource-id="docs_cases_chokwe_change_png">
+<meta name="ext-resource-dependency" content="docs/insar/kumamoto-wrapped-phase.png" data-resource-id="docs_insar_kumamoto_wrapped_phase_png">
+<meta name="ext-resource-dependency" content="public/landing/reflector-deployment.jpg" data-resource-id="public_landing_reflector_deployment_jpg">
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<style>
+html,body{margin:0;background:#04070e;color-scheme:dark}
+a{color:#c9b48b;text-decoration:none}
+a:hover{color:#dccaa3}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{font-weight:500}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="background:#04070e;color:#ebe9e4;font-family:'Albert Sans',system-ui,sans-serif;font-size:16px;line-height:1.55;overflow-x:clip">
+  <header style="position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;padding:16px clamp(16px,3vw,32px);background:linear-gradient(180deg,#04070e 60%,rgba(4,7,14,0))">
+    <a href="Landing v8.dc.html" style="height:40px;display:flex;align-items:center;padding:0 16px;border-radius:999px;background:rgba(8,16,31,0.78);border:1px solid rgba(235,233,228,0.1);font-weight:600;color:#ebe9e4;white-space:nowrap">NISAR Hazard Watch</a>
+    <div style="flex:1"></div>
+    <nav style="display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(8,16,31,0.78);border:1px solid rgba(235,233,228,0.1)">
+      <a href="Cases v8.dc.html" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#d4d2cc;font-size:14px" style-hover="color:#ebe9e4;background:rgba(235,233,228,0.06)">Cases</a>
+      <a href="Method v8.dc.html" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#d4d2cc;font-size:14px" style-hover="color:#ebe9e4;background:rgba(235,233,228,0.06)">Method</a>
+      <a href="Learn v8.dc.html" aria-current="page" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#ebe9e4;background:rgba(235,233,228,0.1);font-size:14px">Learn</a>
+      <a href="About v8.dc.html" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#d4d2cc;font-size:14px" style-hover="color:#ebe9e4;background:rgba(235,233,228,0.06)">About</a>
+      <a href="Explorer v8 v2.dc.html" style="height:32px;display:flex;align-items:center;padding:0 16px;border-radius:999px;background:#ebe9e4;color:#04070e;font-size:14px;font-weight:500" style-hover="color:#04070e;background:#ffffff">Explorer</a>
+    </nav>
+  </header>
+
+  <main style="max-width:1200px;margin:0 auto;padding:56px clamp(20px,4vw,48px) 120px;box-sizing:border-box;display:flex;flex-direction:column;gap:clamp(88px,10vw,140px)">
+    <section data-screen-label="See like a radar" style="display:flex;flex-direction:column;gap:14px;margin-top:-24px">
+      <div ref="{{ frameRef }}" onPointerDown="{{ down }}" onPointerMove="{{ move }}" onPointerUp="{{ up }}" onPointerCancel="{{ up }}" style="position:relative;aspect-ratio:21 / 9;min-height:340px;border-radius:clamp(18px,2vw,32px);overflow:hidden;background:#0e1930;cursor:ew-resize;touch-action:pan-y;user-select:none">
+        <img src="public/landing/radar-north-dakota.jpg" alt="NISAR radar image of farmland in North Dakota" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <img src="public/landing/optical-north-dakota.jpg" alt="Optical image of the same farmland" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;clip-path:inset(0 {{ clipR }} 0 0)">
+        <div style="position:absolute;top:0;bottom:0;left:{{ splitPct }};width:2px;margin-left:-1px;background:#ebe9e4;pointer-events:none"></div>
+        <div style="position:absolute;top:50%;left:{{ splitPct }};width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;background:#ebe9e4;display:grid;place-items:center;box-shadow:0 8px 32px rgba(4,7,14,0.5);pointer-events:none"><svg width="22" height="22" viewBox="0 0 24 24" style="fill:none;stroke:#04070e;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6"></path></svg></div>
+        <span style="position:absolute;left:16px;top:16px;padding:4px 10px;border-radius:999px;background:rgba(4,7,14,0.75);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.06em;pointer-events:none">WHAT YOUR EYES SEE</span>
+        <span style="position:absolute;right:16px;top:16px;padding:4px 10px;border-radius:999px;background:rgba(4,7,14,0.75);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.06em;color:#c9b48b;pointer-events:none">WHAT THE RADAR SEES</span>
+      </div>
+      <p style="font-size:12.5px;color:#8d8a83">The same farmland in North Dakota, optical and NISAR radar. Drag to compare. NASA/JPL-Caltech.</p>
+    </section>
+
+    <section data-screen-label="Learn hero" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:end">
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <p data-intro="1" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.08em;color:#c9b48b">LEARN · FROM THE APP TO YOUR OWN ANALYSIS</p>
+        <h1 data-intro="1" style="font-size:clamp(44px,6.4vw,96px);letter-spacing:-0.05em;line-height:0.94;text-wrap:balance">Learn to read radar.</h1>
+        <p data-intro="1" style="font-size:19px;color:#c4c1ba;text-wrap:pretty;max-width:52ch">Four steps from the free courses and tools NASA and its partners publish. By the end you can download a NISAR scene and measure change yourself.</p>
+      </div>
+      <ol data-intro="1" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid rgba(235,233,228,0.1)">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+          <li><a href="#{{ s.anchor }}" style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid rgba(235,233,228,0.1);color:#ebe9e4" style-hover="color:#c9b48b"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#c9b48b">{{ s.n }}</span><span style="font-size:18px;letter-spacing:-0.01em">{{ s.title }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8d8a83">{{ s.count }}</span></a></li>
+        </sc-for>
+      </ol>
+    </section>
+
+    <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+      <section id="{{ s.anchor }}" data-section="1" data-screen-label="{{ s.title }}" style="display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,2fr);gap:clamp(24px,4vw,64px);align-items:start;scroll-margin-top:96px">
+        <div style="position:sticky;top:96px;display:flex;flex-direction:column;gap:14px">
+          <figure data-reveal="1" style="position:relative;margin:0;aspect-ratio:4 / 5;border-radius:24px;overflow:hidden;background:#0e1930">
+            <img data-src="{{ s.img }}" alt="{{ s.alt }}" data-zoom="1" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,14,0) 45%,rgba(4,7,14,0.92))"></div>
+            <p style="position:absolute;left:18px;top:14px;font-family:'JetBrains Mono',monospace;font-size:clamp(48px,5.4vw,80px);letter-spacing:-0.04em;line-height:1;color:#ebe9e4;text-shadow:0 2px 24px rgba(4,7,14,0.6)">{{ s.n }}</p>
+            <div style="position:absolute;left:18px;right:18px;bottom:16px;display:flex;flex-direction:column;gap:6px">
+              <h2 style="font-size:clamp(30px,3vw,42px);letter-spacing:-0.04em;line-height:1.02">{{ s.title }}</h2>
+              <p style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.05em;color:#a9a69e">{{ s.cap }}</p>
+            </div>
+          </figure>
+          <p data-reveal="1" style="font-size:15.5px;color:#c4c1ba;text-wrap:pretty">{{ s.why }}</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px">
+          <sc-for list="{{ s.items }}" as="r" hint-placeholder-count="3">
+            <a data-reveal="1" href="{{ r.href }}" target="_blank" rel="noopener" style="position:relative;display:flex;flex-direction:column;gap:12px;padding:22px;border-radius:24px;background:rgba(235,233,228,0.035);border:1px solid rgba(235,233,228,0.08);color:#ebe9e4;min-height:190px;box-sizing:border-box;transition:background 250ms,border-color 250ms,transform 250ms" style-hover="background:rgba(235,233,228,0.06);border-color:rgba(201,180,139,0.5);transform:translateY(-3px);color:#ebe9e4">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+                <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.06em;color:#a9a69e">{{ r.by }}</span>
+                <span style="flex:none;display:flex;gap:4px"><sc-for list="{{ r.tags }}" as="g" hint-placeholder-count="1"><span style="padding:2px 7px;border-radius:999px;border:1px solid rgba(235,233,228,0.25);font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.05em;color:#d4d2cc">{{ g }}</span></sc-for></span>
+              </div>
+              <h3 style="font-size:21px;letter-spacing:-0.02em;line-height:1.15">{{ r.name }}</h3>
+              <p style="font-size:14.5px;color:#a9a69e;text-wrap:pretty">{{ r.what }}</p>
+              <span style="margin-top:auto;display:flex;align-items:center;gap:6px;font-size:14px;color:#c9b48b">{{ r.cta }}<svg width="14" height="14" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M7 17L17 7M9 7h8v8"></path></svg></span>
+            </a>
+          </sc-for>
+        </div>
+      </section>
+    </sc-for>
+
+    <section data-section="1" data-screen-label="Other radars" style="display:flex;flex-direction:column;gap:28px">
+      <div data-reveal="1" style="display:flex;flex-direction:column;gap:10px;max-width:760px">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.08em;color:#a9a69e">OTHER RADARS IN ORBIT</p>
+        <h2 style="font-size:clamp(30px,3.4vw,48px);letter-spacing:-0.04em;line-height:1.04">NISAR isn't alone up there.</h2>
+        <p style="font-size:16px;color:#c4c1ba;text-wrap:pretty">Partner agencies of the challenge fly their own radars. Comparing bands is how you learn what each wavelength sees.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px">
+        <sc-for list="{{ others }}" as="o" hint-placeholder-count="3">
+          <a data-reveal="1" href="{{ o.href }}" target="_blank" rel="noopener" style="display:flex;flex-direction:column;gap:14px;padding:22px;border-radius:24px;border:1px solid rgba(235,233,228,0.1);color:#ebe9e4;transition:border-color 250ms" style-hover="border-color:rgba(201,180,139,0.5);color:#ebe9e4">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><span style="font-family:'JetBrains Mono',monospace;font-size:28px;letter-spacing:-0.02em;color:{{ o.c }}">{{ o.band }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8d8a83">{{ o.wave }}</span></div>
+            <svg viewBox="0 0 300 40" preserveAspectRatio="none" style="width:100%;height:40px;display:block"><path d="{{ o.d }}" style="fill:none;stroke:{{ o.c }};stroke-width:2"></path></svg>
+            <h3 style="font-size:20px;letter-spacing:-0.02em">{{ o.name }}</h3>
+            <p style="font-size:14px;color:#a9a69e;text-wrap:pretty">{{ o.what }}</p>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.06em;color:#a9a69e">{{ o.by }}</span>
+          </a>
+        </sc-for>
+      </div>
+      <p data-reveal="1" style="font-size:12.5px;color:#8d8a83;max-width:90ch;text-wrap:pretty">NASA does not endorse any non-U.S. Government entity and is not responsible for information contained on non-U.S. Government websites. For non-U.S. Government websites, participants must comply with any data use parameters of that specific website.</p>
+    </section>
+
+    <section data-section="1" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px">
+      <h2 data-reveal="1" style="font-size:clamp(40px,6vw,88px);letter-spacing:-0.045em;line-height:0.94">Now try it on a place you know.</h2>
+      <a data-reveal="1" href="Explorer v8 v2.dc.html" style="height:52px;display:inline-flex;align-items:center;padding:0 26px;border-radius:999px;background:#c9b48b;color:#16120a;font-weight:500;font-size:16px" style-hover="background:#dccaa3;color:#16120a">Open the explorer</a>
+    </section>
+  </main>
+
+  <dc-import name="Site Footer" lon="-74.07" lat="4.71" coord-label="BOGOTÁ · 4.71° N, 74.07° W" kicker="HECHO EN COLOMBIA · MADE IN COLOMBIA" headline="Everything here is free to learn and open to use." hint-size="100%,900px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  async componentDidMount() {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    await new Promise((r) => { let n = 0; const t = () => (window.gsap && window.ScrollTrigger ? r() : n++ > 100 ? r() : setTimeout(t, 50)); t(); });
+    this.syncImgs(); const { gsap, ScrollTrigger } = window; const root = this.rootRef.current; if (!gsap || !root || reduced) return;
+    gsap.registerPlugin(ScrollTrigger); this.syncImgs();
+    setTimeout(() => {
+      this.ctx = gsap.context(() => {
+        gsap.from(root.querySelectorAll("[data-intro]"), { y: 28, opacity: 0, duration: 1, ease: "power3.out", stagger: 0.09, delay: 0.1 });
+        root.querySelectorAll("[data-section]").forEach((s) => gsap.from(s.querySelectorAll("[data-reveal]"), { y: 32, opacity: 0, duration: 0.9, ease: "power3.out", stagger: 0.07, scrollTrigger: { trigger: s, start: "top 80%", once: true } }));
+      }, root);
+    }, 300);
+  }
+  componentWillUnmount() { this.ctx?.revert(); }
+  state = { split: 50 };
+  frameRef = React.createRef();
+  setSplit(e) { const r = this.frameRef.current?.getBoundingClientRect(); if (!r) return; this.setState({ split: Math.max(2, Math.min(98, ((e.clientX - r.left) / r.width) * 100)) }); }
+  componentDidUpdate() { this.syncImgs(); }
+  syncImgs() { const RU = (p) => (window.__resources && window.__resources[p.replace(/[^a-z0-9]/gi, "_")]) || p; this.rootRef.current?.querySelectorAll("img[data-src]").forEach((i) => { const u = i.getAttribute("data-src"); if (u && !u.includes("{{") && !i.dataset.set) { i.setAttribute("src", RU(u)); i.dataset.set = "1"; } }); }
+  renderVals() {
+    const IMG = { understand: ["docs/cases/qadirabad-base-gray.png", "A radar image of the Chenab River, Pakistan", "RADAR ECHO · CHENAB RIVER, PAKISTAN"], practise: ["docs/cases/chokwe-change.png", "A radar change map of Chókwè, Mozambique", "CHANGE MAP · CHÓKWÈ, MOZAMBIQUE"], data: ["docs/insar/kumamoto-wrapped-phase.png", "An interferogram over Kumamoto, Japan", "INTERFEROGRAM · KUMAMOTO, JAPAN"], apply: ["public/landing/reflector-deployment.jpg", "Mission control room during NISAR's reflector deployment", "MISSION OPERATIONS, REFLECTOR DEPLOYMENT · NASA/JPL-CALTECH"] };
+    const wave = (cm) => { const px = cm * 6, p = []; for (let x = 0; x <= 300; x += 3) p.push(`${x},${(20 + 14 * Math.sin((x / px) * Math.PI * 2)).toFixed(1)}`); return `M${p.join(" L")}`; };
+    const S = [
+      ["understand", "Understand", "What a radar measures, and why it sees through cloud. Start here if 'backscatter' is a new word.", [
+        ["NASA Earthdata", "Intro to Remote Sensing", "Instruments, resolution and processing: the basics behind every Earth-observation image.", "https://www.earthdata.nasa.gov/learn/earth-observation-data-basics/remote-sensing", ["EN"], "Read"],
+        ["NASA Earthdata", "Intro to Synthetic Aperture Radar", "Frequency and wavelength, polarization and scattering: the four ideas behind HH and HV.", "https://www.earthdata.nasa.gov/learn/earth-observation-data-basics/sar", ["EN"], "Read"],
+        ["NISAR · NASA/JPL", "NISAR StoryMaps", "Interactive stories on floods, wildfires, land subsidence, oil slicks and glacier motion.", "https://nisar.jpl.nasa.gov/", ["EN"], "Explore"],
+      ]],
+      ["practise", "Practise", "Guided training, from first steps to full workflows. Several courses come in Spanish.", [
+        ["NASA ARSET", "ARSET trainings", "Online courses on disasters, agriculture, water and ecology, with introductions to SAR and NISAR.", "https://arset.gsfc.nasa.gov/", ["EN", "ES"], "Take a course"],
+        ["CSA · Canada", "SAR tutorial in Python and QGIS", "Practical steps to open, process and visualize SAR imagery on your own computer.", "https://www.asc-csa.gc.ca/eng/satellites/radarsat/", ["EN", "FR"], "Follow along"],
+      ]],
+      ["data", "Get the data", "The same archives our backend reads. NISAR data are free and open; downloads need a free Earthdata login.", [
+        ["NASA Earthdata", "Earthdata Search", "Discover, compare and download across all of NASA's Earth science holdings.", "https://search.earthdata.nasa.gov/", ["EN"], "Search"],
+        ["ASF DAAC", "ASF Data Search Vertex", "The NASA archive of SAR data: find NISAR GCOV and GUNW scenes by place and date.", "https://search.asf.alaska.edu/", ["EN"], "Search"],
+        ["ASF DAAC", "NISAR Data User Guide", "Everything about NISAR products in one place: formats, layers, corrections and access.", "https://nisar-docs.asf.alaska.edu/", ["EN"], "Read the guide"],
+      ]],
+      ["apply", "Apply", "What NISAR is for, from the people who will use it.", [
+        ["NISAR · NASA/JPL", "Applications white papers", "Two-page overviews of how NISAR data serve society, from past NISAR Applications Workshops.", "https://nisar.jpl.nasa.gov/", ["EN"], "Read"],
+        ["UAVSAR · NASA/JPL", "UAVSAR postcards", "False-colour composites from NASA's airborne radar, showing the Earth processes NISAR now sees from orbit.", "https://uavsar.jpl.nasa.gov/", ["EN"], "Browse"],
+      ]],
+    ];
+    const sp = this.state.split;
+    return {
+      rootRef: this.rootRef, frameRef: this.frameRef, splitPct: `${sp}%`, clipR: `${100 - sp}%`,
+      down: (e) => { this.drag = true; e.currentTarget.setPointerCapture?.(e.pointerId); this.setSplit(e); },
+      move: (e) => { if (this.drag) this.setSplit(e); },
+      up: () => { this.drag = false; },
+      steps: S.map(([anchor, title, why, items], i) => ({ anchor, title, why, img: IMG[anchor][0], alt: IMG[anchor][1], cap: IMG[anchor][2], n: String(i + 1).padStart(2, "0"), count: `${items.length} RESOURCES`, items: items.map(([by, name, what, href, tags, cta]) => ({ by: by.toUpperCase(), name, what, href, tags, cta })) })),
+      others: [
+        { band: "L", wave: "≈ 23 cm", c: "#c9b48b", name: "SAOCOM", by: "CONAE · ARGENTINA", what: "Argentina's L-band radar pair, the same long wave as NISAR. Catalogue access with a free ONE CLICK profile.", href: "https://www.argentina.gob.ar/ciencia/conae/misiones-espaciales/saocom", d: wave(23) },
+        { band: "C", wave: "≈ 5.6 cm", c: "#a9a69e", name: "RADARSAT Constellation", by: "CSA · CANADA", what: "Three satellites for maritime surveillance, disaster management and ecosystem monitoring, day or night.", href: "https://www.asc-csa.gc.ca/eng/satellites/radarsat/", d: wave(5.6) },
+        { band: "C", wave: "≈ 5.6 cm", c: "#a9a69e", name: "RADARSAT-1 archive", by: "CSA · CANADA", what: "Radar images from 1995 onward, released under an open licence: decades of history to compare against.", href: "https://www.asc-csa.gc.ca/eng/satellites/radarsat1/", d: wave(5.6) },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

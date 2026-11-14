@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>NISAR Hazard Watch · See how the ground changed</title>
+<meta name="ext-resource-dependency" content="docs/atlas/forest-river.png" data-resource-id="docs_atlas_forest_river_png">
+<meta name="ext-resource-dependency" content="docs/atlas/deliblato.png" data-resource-id="docs_atlas_deliblato_png">
+<meta name="ext-resource-dependency" content="docs/atlas/chenab.png" data-resource-id="docs_atlas_chenab_png">
+<meta name="ext-resource-dependency" content="docs/atlas/niscemi.png" data-resource-id="docs_atlas_niscemi_png">
+<meta name="ext-resource-dependency" content="docs/atlas/okavango.png" data-resource-id="docs_atlas_okavango_png">
+<meta name="ext-resource-dependency" content="docs/atlas/amazon.png" data-resource-id="docs_atlas_amazon_png">
+<meta name="ext-resource-dependency" content="docs/atlas/murray.png" data-resource-id="docs_atlas_murray_png">
+<meta name="ext-resource-dependency" content="public/landing/earth-day.jpg" data-resource-id="public_landing_earth_day_jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+<style>
+html,body{margin:0;background:#04070e;color-scheme:dark}
+a{color:inherit;text-decoration:none}
+a:hover{color:#dccaa3}
+h1,h2,h3{margin:0;font-weight:500;text-wrap:balance}
+p,figure{margin:0}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="background:#04070e;color:#ebe9e4;font-family:'Albert Sans',system-ui,sans-serif;font-size:clamp(1.0625rem,1rem + 0.25vw,1.1875rem);line-height:1.55;overflow-x:clip">
+
+  <nav style="position:fixed;inset:0 0 auto;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem clamp(1rem,0.5rem + 2vw,2rem)">
+    <a href="#" style="font-weight:600;letter-spacing:-0.01em;font-size:1.0625rem;color:#ebe9e4">NISAR Hazard Watch</a>
+    <div style="display:flex;align-items:center;gap:clamp(1rem,2vw,2rem);font-size:0.9375rem">
+      <a href="Cases v8.dc.html" style="color:#a9a69e" style-hover="color:#ebe9e4">Cases</a>
+      <a href="Method v8.dc.html" style="color:#a9a69e" style-hover="color:#ebe9e4">Method</a>
+      <a href="Learn v8.dc.html" style="color:#a9a69e" style-hover="color:#ebe9e4">Learn</a>
+      <a href="About v8.dc.html" style="color:#a9a69e" style-hover="color:#ebe9e4">About</a>
+      <a href="Explorer v8 v2.dc.html" style="display:inline-flex;align-items:center;padding:0.55em 1.1em;border-radius:999px;background:rgba(235,233,228,0.1);color:#ebe9e4;backdrop-filter:blur(12px);transition:background 160ms" style-hover="background:rgba(235,233,228,0.18);color:#ebe9e4">Open the explorer</a>
+    </div>
+  </nav>
+
+  <section data-story="1" data-screen-label="01 Story" style="position:relative;height:520vh">
+    <div style="position:sticky;top:0;height:100svh;overflow:hidden">
+      <div ref="{{ spaceRef }}" style="position:absolute;inset:0"></div>
+
+      <div data-l="hero" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;text-align:center;padding:clamp(6.5rem,16svh,9rem) clamp(1rem,0.5rem + 2vw,2rem) 0;pointer-events:none">
+        <h1 data-intro="1" style="font-size:clamp(3.25rem,1rem + 7vw,8.5rem);font-weight:500;letter-spacing:-0.045em;line-height:0.92;max-width:11ch;text-shadow:0 2px 30px rgba(4,7,14,0.7)">Earth, without the clouds.</h1>
+        <p data-intro="1" style="margin-top:1.5rem;max-width:38ch;font-size:clamp(1.125rem,1rem + 0.5vw,1.375rem);line-height:1.45;color:#ebe9e4;text-shadow:0 1px 18px rgba(4,7,14,0.95),0 0 4px rgba(4,7,14,0.8)">NASA-ISRO's NISAR radar sees through cloud and at night. Pick a place: we compare its latest pass with its own history, check a second satellite, and say plainly what the radar can't tell.</p>
+        <div data-intro="1" style="margin-top:2rem;display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap;justify-content:center;pointer-events:auto">
+          <a href="Explorer v8 v2.dc.html" style="display:inline-flex;align-items:center;padding:0.85em 1.6em;border-radius:999px;background:#c9b48b;color:#16120a;font-weight:500;transition:background 160ms,transform 160ms" style-hover="background:#dccaa3;color:#16120a" style-active="transform:scale(0.97)">Open the explorer</a>
+          <a href="Explorer v8 v2.dc.html?story=1" style="display:inline-flex;align-items:center;gap:0.6em;padding:0.85em 1.4em;border-radius:999px;border:1px solid rgba(235,233,228,0.3);background:rgba(4,7,14,0.35);backdrop-filter:blur(10px);color:#ebe9e4;font-weight:500" style-hover="background:rgba(4,7,14,0.55);color:#ebe9e4"><svg width="12" height="12" viewBox="0 0 24 24" style="fill:currentColor"><path d="M8 5.5v13l10.5-6.5z"></path></svg>The Chenab flood · 1 min</a>
+        </div>
+      </div>
+
+      <div data-l="a" style="position:absolute;left:0;right:0;bottom:clamp(3rem,10svh,6rem);display:flex;flex-direction:column;align-items:center;text-align:center;padding-inline:1.5rem;opacity:0;pointer-events:none">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:0.8125rem;letter-spacing:0.06em;color:#a9a69e">L-BAND · 24 CM WAVELENGTH</p>
+        <h2 style="margin-top:0.75rem;font-size:clamp(2.5rem,1.4rem + 3.6vw,5rem);letter-spacing:-0.035em;line-height:0.98;max-width:14ch">Radar brings its own light.</h2>
+        <p style="margin-top:1rem;max-width:40ch;color:#a9a69e">So NISAR sees the ground at night and through clouds and smoke.</p>
+      </div>
+
+      <div data-l="b" style="position:absolute;left:clamp(1rem,0.5rem + 2vw,2rem);top:50%;transform:translateY(-50%);max-width:min(30rem,44vw);opacity:0;pointer-events:none">
+        <p style="font-size:clamp(7rem,3rem + 12vw,15rem);font-weight:300;letter-spacing:-0.06em;line-height:0.8;color:#c9b48b;font-variant-numeric:tabular-nums"><span ref="{{ countRef }}">0</span><span style="font-size:0.22em;letter-spacing:-0.02em;margin-left:0.15em;font-weight:400">days</span></p>
+        <h2 style="margin-top:1.5rem;font-size:clamp(1.75rem,1.2rem + 1.6vw,2.75rem);letter-spacing:-0.03em;line-height:1.05">Every place, every twelve days.</h2>
+        <p style="margin-top:1rem;max-width:34ch;color:#a9a69e">NISAR maps almost all of Earth's land and ice on a twelve-day cycle, day or night, from 747 km up.</p>
+      </div>
+
+      <div data-l="c" style="position:absolute;left:clamp(1rem,0.5rem + 2vw,2rem);top:50%;transform:translateY(-50%);max-width:min(30rem,44vw);opacity:0;pointer-events:none">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:0.8125rem;letter-spacing:0.06em;color:#a9a69e">QADIRABAD, PAKISTAN · 26 JUL 2026</p>
+        <h2 style="margin-top:0.75rem;font-size:clamp(2.5rem,1.4rem + 3.6vw,5rem);letter-spacing:-0.035em;line-height:0.98">When the river rose, the radar went dark.</h2>
+        <p style="margin-top:1.25rem;max-width:36ch;color:#a9a69e">Calm water bounces radar away. Where an optical satellite saw new water, NISAR had flagged 64% of cells; on dry land, 1%. It also flagged 17% of water that was already there, and we say so.</p>
+        <a href="Explorer v8 v2.dc.html?case=qadirabad" style="display:inline-flex;margin-top:1.75rem;font-weight:500;color:#c9b48b;pointer-events:auto" style-hover="color:#dccaa3">Open this event on the globe →</a>
+      </div>
+
+      <div ref="{{ calloutRef }}" style="position:absolute;left:0;top:0;opacity:0;pointer-events:none;will-change:transform">
+        <div style="position:absolute;left:0;top:0;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;border:1.5px solid #c9b48b;box-shadow:0 0 0 6px rgba(201,180,139,0.15)"></div>
+        <div style="position:absolute;left:28px;top:-96px;width:15rem;padding:0.75rem;border-radius:16px;background:rgba(8,16,31,0.78);border:1px solid rgba(235,233,228,0.12);backdrop-filter:blur(16px)">
+          <div style="display:flex;gap:0.75rem;align-items:center">
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <p style="font-size:0.8125rem;color:#a9a69e">Cells flagged by the radar</p>
+              <div style="display:grid;grid-template-columns:5.2rem 1fr 3rem;align-items:center;gap:8px;font-size:0.8125rem"><span>New water</span><span style="height:8px;border-radius:2px;background:rgba(235,233,228,0.08);position:relative"><span style="position:absolute;inset:0 auto 0 0;width:64%;border-radius:2px;background:#0072b2"></span></span><span style="font-family:'JetBrains Mono',monospace;text-align:right">64.3%</span></div>
+              <div style="display:grid;grid-template-columns:5.2rem 1fr 3rem;align-items:center;gap:8px;font-size:0.8125rem"><span>Stayed dry</span><span style="height:8px;border-radius:2px;background:rgba(235,233,228,0.08);position:relative"><span style="position:absolute;inset:0 auto 0 0;width:1%;border-radius:2px;background:#a8997a"></span></span><span style="font-family:'JetBrains Mono',monospace;text-align:right">1.0%</span></div>
+            </div>
+          </div>
+          <div style="margin-top:0.625rem;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:0.6875rem;letter-spacing:0.04em;color:#a9a69e"><span>332 / 516 · 38 / 3,866</span><span>NOVA-FRONTIER-MODEL</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="compare" data-section="1" data-screen-label="02 Compare" style="padding:clamp(6rem,4rem + 6vw,11rem) clamp(1rem,0.5rem + 2vw,2rem) 0">
+    <div style="max-width:76rem;margin:0 auto">
+      <div style="text-align:center">
+        <h2 data-reveal="1" style="font-size:clamp(2.5rem,1.4rem + 3.6vw,5rem);letter-spacing:-0.035em;line-height:0.98">Same fields. One day apart.</h2>
+        <p data-reveal="1" style="margin:1.25rem auto 0;max-width:46ch;color:#a9a69e">Drag across the image. An optical satellite saw cloud over these fields; a day earlier, NISAR's 24 cm radar waves went straight through to the ground.</p>
+      </div>
+      <div data-reveal="1" ref="{{ frameRef }}" onPointerDown="{{ dragStart }}" onPointerMove="{{ dragMove }}" onPointerUp="{{ dragEnd }}" onPointerLeave="{{ dragEnd }}" style="position:relative;margin-top:clamp(2rem,1rem + 3vw,3.5rem);aspect-ratio:2048 / 1103;border-radius:clamp(14px,1.6vw,28px);overflow:hidden;background:#08101f;cursor:ew-resize;touch-action:pan-y;user-select:none">
+        <img src="public/landing/optical-north-dakota.jpg" alt="Sentinel-2 view of farmland along the Forest River, North Dakota, mostly hidden under cumulus cloud" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <img src="public/landing/radar-north-dakota.jpg" alt="NISAR radar image of the same farmland, every field visible" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;clip-path:{{ radarClip }}">
+        <div style="position:absolute;top:0;bottom:0;left:{{ splitPct }};width:2px;margin-left:-1px;background:#ebe9e4">
+          <div style="position:absolute;top:50%;left:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:#ebe9e4;color:#04070e;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:600;letter-spacing:-0.1em">◂ ▸</div>
+        </div>
+        <span style="position:absolute;left:1rem;top:1rem;padding:0.35em 0.8em;border-radius:999px;background:rgba(4,7,14,0.6);backdrop-filter:blur(8px);font-family:'JetBrains Mono',monospace;font-size:0.75rem;letter-spacing:0.05em">NISAR RADAR · 23 AUG 2025</span>
+        <span style="position:absolute;right:1rem;top:1rem;padding:0.35em 0.8em;border-radius:999px;background:rgba(4,7,14,0.6);backdrop-filter:blur(8px);font-family:'JetBrains Mono',monospace;font-size:0.75rem;letter-spacing:0.05em">SENTINEL-2 · 24 AUG 2025</span>
+      </div>
+      <p style="margin-top:1rem;font-size:0.875rem;color:#a9a69e">Farmland along the Forest River, North Dakota. Centre-pivot fields show as gold circles on the radar side. Labels by NASA.</p>
+    </div>
+  </section>
+
+  <section data-pipeline="1" data-screen-label="03 Pipeline" style="padding:clamp(7rem,5rem + 6vw,12rem) clamp(1rem,0.5rem + 2vw,2rem) 0">
+    <div style="max-width:76rem;margin:0 auto">
+      <h2 data-reveal="1" style="font-size:clamp(2.5rem,1.4rem + 3.6vw,5rem);letter-spacing:-0.035em;line-height:0.98;max-width:12ch">From orbit to your map.</h2>
+      <p data-reveal="1" style="margin-top:1.25rem;max-width:44ch;color:#a9a69e">Every answer needs a history: earlier passes tell us what's normal for that exact spot. Then one new pass is checked against it, and a second satellite is asked to agree or not.</p>
+      <div style="position:relative;margin-top:clamp(3rem,2rem + 3vw,5rem)">
+        <div style="position:absolute;left:0;right:0;top:7px;height:2px;background:rgba(235,233,228,0.12)"></div>
+        <div data-bar="1" style="position:absolute;left:0;right:0;top:7px;height:2px;background:#c9b48b;transform-origin:0 50%;transform:scaleX(0)"></div>
+        <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:2rem 1.5rem">
+          <sc-for list="{{ steps }}" as="s" hint-placeholder-count="5">
+            <div data-step="1" style="opacity:0.3">
+              <div style="width:16px;height:16px;border-radius:50%;background:#04070e;border:2px solid #c9b48b"></div>
+              <p style="margin-top:1.25rem;font-size:clamp(1.75rem,1.3rem + 1.2vw,2.5rem);font-weight:500;letter-spacing:-0.03em;line-height:1">{{ s.when }}</p>
+              <p style="margin-top:0.625rem;color:#a9a69e;max-width:20ch">{{ s.what }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <p data-reveal="1" style="margin-top:clamp(2.5rem,2rem + 2vw,4rem);display:flex;flex-wrap:wrap;gap:0.5rem 1.5rem;align-items:baseline;font-size:clamp(1.25rem,1.1rem + 0.6vw,1.5rem)"><span>An answer, with its limits</span><span style="color:#c9b48b;font-weight:500">About a minute once the pass is archived</span></p>
+    </div>
+  </section>
+
+  <section id="cases" data-events="1" data-screen-label="04 Events" style="position:relative;height:300vh;margin-top:clamp(6rem,4rem + 6vw,10rem)">
+    <div style="position:sticky;top:0;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center">
+      <div style="padding-inline:clamp(1rem,0.5rem + 2vw,2rem);display:flex;justify-content:space-between;align-items:flex-end;gap:1rem 2rem;flex-wrap:wrap">
+        <h2 style="font-size:clamp(2.5rem,1.4rem + 3.6vw,5rem);letter-spacing:-0.035em;line-height:0.98">Measured cases, real passes.</h2>
+        <p style="max-width:40ch;color:#a9a69e;font-size:0.9375rem">Each number comes from the science team's published reports, failures included. <a href="Cases v8.dc.html" style="color:#c9b48b">All cases →</a></p>
+      </div>
+      <div data-track="1" style="margin-top:clamp(2rem,1rem + 3vw,3.5rem);display:flex;gap:clamp(1rem,2vw,1.5rem);padding-inline:clamp(1rem,0.5rem + 2vw,2rem);width:max-content;will-change:transform">
+        <sc-for list="{{ events }}" as="e" hint-placeholder-count="4">
+          <a href="{{ e.href }}" style="position:relative;display:block;width:min(78vw,34rem);aspect-ratio:4 / 5;max-height:62svh;border-radius:clamp(14px,1.6vw,28px);overflow:hidden;background:#0e1930;color:#ebe9e4" style-hover="color:#ebe9e4">
+            <img data-src="{{ e.img }}" alt="{{ e.alt }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 600ms cubic-bezier(0.22,1,0.36,1)">
+            <sc-if value="{{ e.isPlace }}" hint-placeholder-val="{{ false }}">
+              <div aria-hidden="true" style="position:absolute;left:50%;top:30%;width:56px;height:56px;transform:translate(-50%,-50%);border-radius:50%;border:1.5px solid #c9b48b;box-shadow:0 0 0 8px rgba(201,180,139,0.14),0 0 0 1px rgba(4,7,14,0.4) inset"></div>
+              <div aria-hidden="true" style="position:absolute;left:50%;top:30%;width:6px;height:6px;transform:translate(-50%,-50%);border-radius:50%;background:#c9b48b"></div>
+            </sc-if>
+            <span style="position:absolute;left:1rem;top:1rem;padding:0.35em 0.8em;border-radius:999px;background:rgba(4,7,14,0.72);backdrop-filter:blur(10px);font-family:'JetBrains Mono',monospace;font-size:0.6875rem;letter-spacing:0.05em;color:{{ e.chipInk }}">{{ e.chip }}</span>
+            <div style="position:absolute;inset:auto 0 0 0;padding:1.5rem;background:linear-gradient(to top,rgba(4,7,14,0.92),rgba(4,7,14,0))">
+              <p style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;letter-spacing:0.05em;color:#a9a69e">{{ e.meta }}</p>
+              <h3 style="margin-top:0.5rem;font-size:clamp(1.75rem,1.3rem + 1.2vw,2.5rem);letter-spacing:-0.03em;line-height:1">{{ e.name }}</h3>
+              <p style="margin-top:0.5rem;font-size:0.9375rem;color:#d4d2cc;max-width:36ch">{{ e.summary }}</p>
+              <p style="margin-top:1rem;font-weight:500;color:#c9b48b">{{ e.cta }}</p>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section data-section="1" data-screen-label="05 Honesty" style="padding:clamp(6rem,4rem + 6vw,11rem) clamp(1rem,0.5rem + 2vw,2rem) 0">
+    <div style="max-width:76rem;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,26rem),1fr));gap:clamp(2rem,4vw,4rem);align-items:center">
+      <div>
+        <p data-reveal="1" style="font-family:'JetBrains Mono',monospace;font-size:0.8125rem;letter-spacing:0.06em;color:#a9a69e">WHERE IT FAILS, IN THE OPEN</p>
+        <h2 data-reveal="1" style="margin-top:1rem;font-size:clamp(2.25rem,1.2rem + 3.2vw,4.25rem);letter-spacing:-0.035em;line-height:1">We publish where the method gets it wrong.</h2>
+        <p data-reveal="1" style="margin-top:1.25rem;max-width:40ch;color:#a9a69e">At Barh, India, the rule that caught 87.5% of new water also flagged 32.6% of water that was already there. A radar change is evidence, not a verdict. We never guess a cause, a probability or a depth.</p>
+        <a data-reveal="1" href="Method v8.dc.html" style="display:inline-flex;margin-top:1.5rem;font-weight:500;color:#c9b48b" style-hover="color:#dccaa3">Where it works and where it fails →</a>
+      </div>
+      <div data-reveal="1" style="padding:1.5rem;border-radius:24px;background:rgba(8,16,31,0.8);border:1px solid rgba(235,233,228,0.1)">
+        <dc-import name="Contrast Bars" groups="{{ barhGroups }}" hint-size="100%,200px"></dc-import>
+      </div>
+    </div>
+  </section>
+
+  <section data-section="1" data-screen-label="06 Atlas" style="padding:clamp(6rem,4rem + 6vw,11rem) clamp(1rem,0.5rem + 2vw,2rem) 0">
+    <div style="max-width:76rem;margin:0 auto;display:flex;flex-direction:column;gap:clamp(1.5rem,3vw,2.5rem)">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:1rem 2rem">
+        <div style="max-width:40rem">
+          <p data-reveal="1" style="font-family:'JetBrains Mono',monospace;font-size:0.8125rem;letter-spacing:0.06em;color:#a9a69e">SIX CONTINENTS OF REAL NISAR DATA</p>
+          <h2 data-reveal="1" style="margin-top:1rem;font-size:clamp(2.25rem,1.2rem + 3.2vw,4.25rem);letter-spacing:-0.035em;line-height:1">How each place's echo behaves over time.</h2>
+          <p data-reveal="1" style="margin-top:1.25rem;max-width:44ch;color:#a9a69e">Months of measured passes compressed into colour by one shared model. Similar colours mean similar radar histories, not the same land cover.</p>
+        </div>
+        <span data-reveal="1" title="nova-frontier-model, global surface atlas: a fixed colour projection of a learned representation. Regional examples, not a validated classifier." style="padding:3px 9px;border-radius:999px;border:1px dashed rgba(235,233,228,0.45);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.06em;color:#a9a69e">EXPERIMENTAL · NOVA-FRONTIER-MODEL</span>
+      </div>
+      <div data-reveal="1" style="display:flex;gap:10px;height:clamp(300px,34vw,460px)">
+        <sc-for list="{{ atlas }}" as="a" hint-placeholder-count="7">
+          <button onMouseEnter="{{ a.pick }}" onFocus="{{ a.pick }}" onClick="{{ a.pick }}" aria-pressed="{{ a.on }}" aria-label="{{ a.name }}" style="position:relative;flex:{{ a.flex }};min-width:0;padding:0;border:0;border-radius:20px;overflow:hidden;background:#0e1930;cursor:pointer;transition:flex 700ms cubic-bezier(.2,.8,.2,1)">
+            <img data-src="{{ a.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;transform:scale({{ a.zoom }});transition:transform 900ms cubic-bezier(.2,.8,.2,1)">
+            <span style="position:absolute;inset:auto 0 0 0;padding:18px 16px 14px;background:linear-gradient(0deg,rgba(4,7,14,0.88),rgba(4,7,14,0));display:flex;flex-direction:column;gap:2px;text-align:left;opacity:{{ a.labelOp }};transition:opacity 400ms">
+              <span style="font-size:1.125rem;font-weight:500;color:#ebe9e4;white-space:nowrap">{{ a.name }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:0.6875rem;letter-spacing:0.05em;color:#c9b48b;white-space:nowrap">{{ a.meta }}</span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section data-section="1" data-screen-label="07 Sources" style="padding:clamp(5rem,3rem + 5vw,9rem) clamp(1rem,0.5rem + 2vw,2rem) 0">
+    <div style="max-width:76rem;margin:0 auto">
+      <p data-reveal="1" style="font-family:'JetBrains Mono',monospace;font-size:0.8125rem;letter-spacing:0.06em;color:#a9a69e">THE DATA WE USE</p>
+      <div style="margin-top:1.25rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));border-top:1px solid rgba(235,233,228,0.1)">
+        <sc-for list="{{ sources }}" as="s" hint-placeholder-count="5">
+          <a data-reveal="1" href="{{ s.href }}" target="_blank" rel="noopener" style="padding:1.25rem 1.25rem 1.25rem 0;border-bottom:1px solid rgba(235,233,228,0.1);display:flex;flex-direction:column;gap:0.375rem;color:#ebe9e4" style-hover="color:#ebe9e4">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:0.6875rem;letter-spacing:0.05em;color:#c9b48b">{{ s.tag }}</span>
+            <span style="font-size:1.0625rem;font-weight:500">{{ s.name }} ↗</span>
+            <span style="font-size:0.875rem;color:#a9a69e;text-wrap:pretty">{{ s.what }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section data-section="1" data-screen-label="08 Mission" style="padding:clamp(6rem,4rem + 6vw,11rem) clamp(1rem,0.5rem + 2vw,2rem) 0">
+    <div style="max-width:76rem;margin:0 auto">
+      <figure data-reveal="1" style="position:relative;margin:0;border-radius:clamp(14px,1.6vw,28px);overflow:hidden;aspect-ratio:16 / 9;background:#0e1930">
+        <img src="public/landing/nisar-concept.jpg" alt="Artist's concept of NISAR above Earth, its 12 m gold mesh reflector open on a long boom" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <h2 style="position:absolute;left:clamp(1.25rem,3vw,3rem);bottom:clamp(1.25rem,3vw,3rem);font-size:clamp(2.25rem,1.2rem + 3.4vw,4.75rem);letter-spacing:-0.035em;line-height:0.98;max-width:10ch;text-shadow:0 2px 24px rgba(4,7,14,0.5)">Twelve metres of gold mesh.</h2>
+        <a href="Method v8.dc.html" style="position:absolute;right:clamp(1.25rem,3vw,3rem);bottom:clamp(1.25rem,3vw,3rem);height:44px;display:inline-flex;align-items:center;padding:0 20px;border-radius:999px;background:rgba(4,7,14,0.72);border:1px solid rgba(235,233,228,0.25);backdrop-filter:blur(10px);color:#ebe9e4;font-weight:500;white-space:nowrap" style-hover="background:#ebe9e4;color:#04070e">See how it works →</a>
+      </figure>
+      <p style="margin-top:0.75rem;font-size:0.875rem;color:#a9a69e">Artist's concept, NASA/JPL-Caltech.</p>
+      <div style="margin-top:clamp(2.5rem,2rem + 2vw,4rem);display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:2rem clamp(1.5rem,3vw,3rem)">
+        <div data-reveal="1"><h3 style="font-size:clamp(1.25rem,1.1rem + 0.6vw,1.5rem);letter-spacing:-0.02em;line-height:1.2">Two radars, one mission</h3><p style="margin-top:0.625rem;color:#a9a69e">NISAR carries an L-band radar built by NASA's JPL and an S-band radar from ISRO. It launched from Sriharikota on 30 July 2025.</p></div>
+        <div data-reveal="1"><h3 style="font-size:clamp(1.25rem,1.1rem + 0.6vw,1.5rem);letter-spacing:-0.02em;line-height:1.2">A dish the width of a house</h3><p style="margin-top:0.625rem;color:#a9a69e">Its 12 m reflector of gold-plated wire mesh unfolded in orbit in August 2025. It focuses the radar on a strip of ground about 240 km wide.</p></div>
+        <div data-reveal="1"><h3 style="font-size:clamp(1.25rem,1.1rem + 0.6vw,1.5rem);letter-spacing:-0.02em;line-height:1.2">Open data, every pass</h3><p style="margin-top:0.625rem;color:#a9a69e">Every product goes to NASA's archive at the Alaska Satellite Facility, free for anyone. NISAR Hazard Watch reads that archive and turns it into maps.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-section="1" data-screen-label="09 Close" style="padding:clamp(7rem,5rem + 6vw,12rem) clamp(1rem,0.5rem + 2vw,2rem) clamp(5rem,4rem + 4vw,8rem);text-align:center">
+    <p data-reveal="1" style="font-family:'JetBrains Mono',monospace;font-size:0.8125rem;letter-spacing:0.06em;color:#a9a69e">FOUR MEASURED CASES · ANY POINT ON LAND</p>
+    <h2 data-reveal="1" style="margin-top:1rem;font-size:clamp(3rem,1rem + 6vw,7rem);letter-spacing:-0.045em;line-height:0.92">Ask the radar.</h2>
+    <p data-reveal="1" style="margin:1.25rem auto 0;max-width:40ch;color:#a9a69e">Open a measured case, or click any land and get an honest answer in about a minute.</p>
+    <div data-reveal="1" style="margin-top:2rem"><a href="Explorer v8 v2.dc.html" style="display:inline-flex;align-items:center;padding:0.95em 1.9em;border-radius:999px;background:#c9b48b;color:#16120a;font-weight:500;font-size:1.0625rem;transition:background 160ms,transform 160ms" style-hover="background:#dccaa3;color:#16120a" style-active="transform:scale(0.97)">Open the explorer</a></div>
+  </section>
+
+  <dc-import name="Site Footer" lon="-72.81" lat="0.7" coord-label="CHIRIBIQUETE · 0.70° N, 72.81° W" kicker="HECHO EN COLOMBIA · UNDER THE CLOUDS" headline="Colombia's rainforest sits under cloud most days. NISAR's radar sees through." slot-id="footer-landing" photo="https://commons.wikimedia.org/wiki/Special:FilePath/Chiribiquete_view.jpg?width=320" card-tag="PATRIMONIO UNESCO" card-title="Serranía de Chiribiquete" card-sub="Tepuis in the Colombian Amazon. L-band's 24 cm waves reach through the canopy." credit="Photo: Carlos Castaño Uribe · Wikimedia Commons" credit-href="https://commons.wikimedia.org/wiki/File:Chiribiquete_view.jpg" note="Pictures: NISAR first image of North Dakota and artist's concept of NISAR (NASA/JPL-Caltech); Blue Marble and cloud imagery (NASA Visible Earth), all public domain. Optical view: NASA HLS, contains modified Copernicus Sentinel-2 data (2025), via NASA Worldview." columns="{{ footerCols }}" hint-size="100%,760px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;eventImagery&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;place&quot;,&quot;demo&quot;],&quot;default&quot;:&quot;place&quot;,&quot;tsType&quot;:&quot;\&quot;place\&quot; | \&quot;demo\&quot;&quot;,&quot;section&quot;:&quot;Events carousel&quot;}}">
+class Component extends DCLogic {
+  state = { split: 50, D: null, atlas: 2 };
+  rootRef = React.createRef(); spaceRef = React.createRef(); calloutRef = React.createRef(); countRef = React.createRef(); frameRef = React.createRef();
+  cloud = { current: 1 };
+
+  async componentDidMount() {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const [THREE, N] = await Promise.all([import("https://esm.sh/three@0.170.0"), import("./nisar.js")]);
+    if (!this.spaceRef.current) return;
+    import("./v7-cases.js").then((D) => this.setState({ D }));
+    const ven = { focus: [73.713, 32.329] };
+
+    const E = N.createEarth(THREE, this.spaceRef.current, { cloudCover: this.cloud, reducedMotion: reduced, layout: "free" });
+    this.earth = E; E.state.spin = false;
+    const home = N.facingRotation(-74, 4), target = N.facingRotation(ven.focus[0], ven.focus[1]);
+    const P = { offX: 0, offY: -0.56, z: 3.6, rx: home.x + 0.25, ry: home.y, ring: 0, drift: 1, callout: 0 };
+    this.P = P;
+
+    const ringGroup = new THREE.Group(); ringGroup.rotation.set(0.14, 1.2, 0.1);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xc9b48b, transparent: true, opacity: 0 });
+    const trailMat = new THREE.MeshBasicMaterial({ color: 0xf1e6cc, transparent: true, opacity: 0 });
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.34, 0.0022, 8, 360), ringMat);
+    const trail = new THREE.Mesh(new THREE.TorusGeometry(1.34, 0.0055, 8, 120, 0.9), trailMat);
+    const sat = new THREE.Mesh(new THREE.SphereGeometry(0.018, 16, 16), trailMat);
+    ringGroup.add(ring, trail, sat); E.scene.add(ringGroup);
+    const marker = N.lonLatToVec(THREE, ven.focus[0], ven.focus[1], 1.003);
+    let a = 0; const t0 = performance.now(); const v = new THREE.Vector3();
+    E.state.extra.push(() => {
+      const t = (performance.now() - t0) / 1000;
+      E.state.offsetX = P.offX; E.state.offsetY = P.offY; E.camera.position.z = P.z;
+      E.planet.rotation.set(P.rx, P.ry + (reduced ? 0 : t * 0.025 * P.drift), 0);
+      E.cloudShell.rotation.y = reduced ? 0 : t * 0.006;
+      ringMat.opacity = 0.55 * P.ring; trailMat.opacity = P.ring;
+      a += reduced ? 0 : 0.006; sat.position.set(1.34 * Math.cos(a), 1.34 * Math.sin(a), 0); trail.rotation.z = a - 0.9;
+      const el = this.calloutRef.current;
+      if (el) {
+        E.planet.updateMatrixWorld(); v.copy(marker).applyMatrix4(E.planet.matrixWorld).project(E.camera);
+        const host = this.spaceRef.current; const x = (v.x * 0.5 + 0.5) * host.clientWidth, y = (-v.y * 0.5 + 0.5) * host.clientHeight;
+        el.style.transform = `translate(${x}px, ${y}px)`; el.style.opacity = P.callout;
+      }
+    });
+
+    await new Promise((r) => { const t = () => (window.gsap && window.ScrollTrigger && window.Lenis ? r() : setTimeout(t, 50)); t(); });
+    const { gsap, ScrollTrigger, Lenis } = window; gsap.registerPlugin(ScrollTrigger);
+    const root = this.rootRef.current; const $ = (s) => root.querySelector(s);
+    if (!reduced) {
+      this.lenis = new Lenis({ lerp: 0.1 }); this.lenis.on("scroll", ScrollTrigger.update);
+      this.tick = (t) => this.lenis.raf(t * 1000); gsap.ticker.add(this.tick); gsap.ticker.lagSmoothing(0);
+    }
+    const count = { n: 0 };
+    this.ctx = gsap.context(() => {
+      gsap.from(root.querySelectorAll("[data-intro]"), { y: 28, opacity: 0, duration: 1.1, ease: "power3.out", stagger: 0.1, delay: 0.15 });
+      gsap.from(P, { z: 6.5, duration: 2.2, ease: "power3.out" });
+
+      const tl = gsap.timeline({ defaults: { ease: "none" }, scrollTrigger: { trigger: $("[data-story]"), start: "top top", end: "bottom bottom", scrub: 0.6 } });
+      tl.to($('[data-l="hero"]'), { opacity: 0, y: -60, duration: 0.1 }, 0)
+        .to(this.cloud, { current: 0, duration: 0.28 }, 0.02)
+        .to(P, { offY: 0, z: 4.9, rx: home.x + 0.1, duration: 0.28, ease: "power1.inOut" }, 0)
+        .fromTo($('[data-l="a"]'), { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.07 }, 0.12)
+        .to($('[data-l="a"]'), { opacity: 0, y: -30, duration: 0.06 }, 0.3)
+        .to(P, { offX: -0.2, z: 4.4, duration: 0.12, ease: "power1.inOut" }, 0.32)
+        .to(P, { ring: 1, duration: 0.08 }, 0.36)
+        .fromTo($('[data-l="b"]'), { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.07 }, 0.38)
+        .to(count, { n: 12, duration: 0.14, ease: "power2.out", onUpdate: () => { if (this.countRef.current) this.countRef.current.textContent = Math.round(count.n); } }, 0.38)
+        .to($('[data-l="b"]'), { opacity: 0, x: -30, duration: 0.06 }, 0.6)
+        .to(P, { ring: 0, duration: 0.08 }, 0.62)
+        .to(P, { rx: target.x, ry: target.y, drift: 0, z: 2.45, offX: -0.16, duration: 0.2, ease: "power2.inOut" }, 0.64)
+        .fromTo($('[data-l="c"]'), { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.07 }, 0.8)
+        .to(P, { callout: 1, duration: 0.06 }, 0.84)
+        .to({}, { duration: 0.1 }, 0.9);
+
+      gsap.fromTo(this.state, { split: 92 }, { split: 50, duration: 1.6, ease: "power3.inOut", scrollTrigger: { trigger: $("#compare"), start: "top 55%", once: true }, onUpdate: () => { if (!this.dragging) this.forceUpdate(); } });
+
+      const pipe = $("[data-pipeline]"); const steps = pipe.querySelectorAll("[data-step]");
+      const ptl = gsap.timeline({ scrollTrigger: { trigger: pipe, start: "top 70%", end: "bottom 60%", scrub: 0.5 } });
+      ptl.to(pipe.querySelector("[data-bar]"), { scaleX: 1, ease: "none", duration: 1 }, 0);
+      steps.forEach((s, i) => ptl.to(s, { opacity: 1, duration: 0.12 }, (i / steps.length) * 0.9));
+
+      const ev = $("[data-events]"); const track = ev.querySelector("[data-track]");
+      gsap.to(track, { x: () => -Math.max(0, track.scrollWidth - window.innerWidth), ease: "none", scrollTrigger: { trigger: ev, start: "top top", end: "bottom bottom", scrub: 0.6, invalidateOnRefresh: true } });
+
+
+      for (const s of root.querySelectorAll("[data-section], [data-pipeline]")) {
+        gsap.from(s.querySelectorAll("[data-reveal]"), { y: 28, opacity: 0, duration: 0.9, ease: "power3.out", stagger: 0.08, scrollTrigger: { trigger: s, start: "top 78%", once: true } });
+      }
+    }, root);
+  }
+  componentWillUnmount() { this.earth?.dispose(); this.ctx?.revert(); if (this.tick) window.gsap.ticker.remove(this.tick); this.lenis?.destroy(); }
+
+  setSplit(e) { const r = this.frameRef.current.getBoundingClientRect(); const pct = Math.max(0, Math.min(100, ((e.clientX - r.left) / r.width) * 100)); this.state.split = pct; this.forceUpdate(); }
+
+  syncImgs() { document.querySelectorAll("img[data-src]").forEach((i) => { const u = i.getAttribute("data-src"); if (u && !u.includes("{{") && i.getAttribute("src") !== u) i.setAttribute("src", u); }); }
+  componentDidUpdate() { this.syncImgs(); }
+  renderVals() {
+    const split = this.state.split;
+    const place = (this.props.eventImagery ?? "place") === "place";
+    const FOC = { "venezuela-2026": [-67.221, 10.595], "kumamoto-2026": [130.66, 32.618], "panama-2026": [-80.769, 7.587], "andes-fire-demo": [-74.75, 2.89] };
+    const esri = ([lon, lat]) => { const dx = 0.32, dy = 0.4; return `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=${lon - dx},${lat - dy * 1.4},${lon + dx},${lat + dy * 0.6}&bboxSR=4326&imageSR=3857&size=680,850&format=jpg&f=image`; };
+    const EV = [
+      { id: "venezuela-2026", name: "Venezuela", meta: "M7.5 · 2026-06-24 · TRACK 162 A", summary: "Shallow (10 km) quake on the Caribbean coast. NISAR passed one day after it." },
+      { id: "kumamoto-2026", name: "Kumamoto, Japan", meta: "M6.8 · 2026-07-28 · TRACK 24 A", summary: "8 km deep. Ascending and descending pairs exist, so motion can be split in 2D." },
+      { id: "panama-2026", name: "Pitaloza Arriba, Panama", meta: "M7.7 · 2026-10-09 · TRACK 76 A", summary: "The strongest of the three, 13 km deep. NISAR imaged it eight days later." },
+      { id: "andes-fire-demo", name: "Colombian Andes", meta: "WILDFIRE · DEMO SITE · TRACK 47 A", summary: "Placeholder until the team picks a real fire with FIRMS detections in the window." },
+    ];
+    const RU = (p) => (window.__resources && window.__resources[p.replace(/[^a-z0-9]/gi, "_")]) || p;
+    const ATLAS = [["forest-river", "Forest River, USA", "10 DATES · FIELDS"], ["deliblato", "Deliblato, Serbia", "8 DATES · SANDS & FARMS"], ["chenab", "Chenab River, Pakistan", "8 DATES · RIVER PLAIN"], ["niscemi", "Niscemi, Italy", "8 DATES · HILLS"], ["okavango", "Okavango, Botswana", "8 DATES · DELTA"], ["amazon", "Amazon floodplain, Brazil", "8 DATES · HOLDOUT"], ["murray", "Murray Basin, Australia", "16 DATES · HOLDOUT"]];
+    return {
+      atlas: ATLAS.map(([id, name, meta], i) => { const on = i === this.state.atlas; return { name, meta, img: RU(`docs/atlas/${id}.png`), on: on ? "true" : "false", flex: on ? "5 1 0" : "1 1 0", zoom: on ? "1" : "1.6", labelOp: on ? 1 : 0, pick: () => this.state.atlas !== i && this.setState({ atlas: i }) }; }),
+      rootRef: this.rootRef, spaceRef: this.spaceRef, calloutRef: this.calloutRef, countRef: this.countRef, frameRef: this.frameRef,
+      barhGroups: [{ title: "Barh · flagged by the baseline rule", sub: "Ganga floodplain · 12 Sep 2026", rows: [{ label: "New water", k: 2363, n: 2702, color: "#0072b2" }, { label: "Already water", k: 165, n: 506, color: "#56b4e9" }, { label: "Stayed dry", k: 75, n: 1226, color: "#a8997a" }] }],
+      sources: this.state.D?.DATA_SOURCES || [],
+      radarClip: `inset(0 ${100 - split}% 0 0)`, splitPct: `${split}%`,
+      dragStart: (e) => { this.dragging = true; e.currentTarget.setPointerCapture?.(e.pointerId); this.setSplit(e); },
+      dragMove: (e) => { if (this.dragging) this.setSplit(e); },
+      dragEnd: () => { this.dragging = false; },
+      steps: [
+        { when: "Months", what: "Earlier passes set each spot's normal range" },
+        { when: "Day 0", what: "NISAR passes again after the event" },
+        { when: "A few days", what: "ASF publishes the radar products" },
+        { when: "A minute", what: "The new pass is checked against the range" },
+        { when: "Same day", what: "An optical satellite is asked to agree" },
+      ],
+      events: (this.state.D?.CASES || []).map((c) => { const L = this.state.D.LENSES.find((l) => l.id === c.lens); return { name: `${c.name}, ${c.place.split(",").pop().trim()}`, meta: `${c.region} · ${c.when.toUpperCase()} · ${L.chip.toUpperCase()}`, summary: `${c.stat} ${c.statLine}.`, isPlace: true, img: esri(c.focus), alt: `Satellite view around ${c.name}`, chip: c.coherenceOnly ? "COHERENCE ONLY · 0.247" : "MEASURED CASE · ESRI WORLD IMAGERY", chipInk: c.coherenceOnly ? "#a9a69e" : "#d4d2cc", cta: c.pending ? "See the event →" : "Open on the globe →", href: `Explorer v8 v2.dc.html?case=${c.id}` }; }),
+      footerCols: [{ title: "DATA", items: [["NISAR Observation Plan","https://nisar.jpl.nasa.gov/mission/get-to-know-sar/observation-plan/"],["ASF DAAC","https://search.asf.alaska.edu/"],["OPERA products","https://www.jpl.nasa.gov/go/opera/products/dist-product-suite/"],["Science backend","https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model"]] }, { title: "BUILD", items: [["Source code","https://github.com/NASA-NOVA-FRONTIER/nova-frontier-frontend"],["API contract","https://github.com/NASA-NOVA-FRONTIER/nova-frontier-frontend/blob/main/docs/analysis-api.md"],["NISAR mission","https://science.nasa.gov/mission/nisar/"],["CesiumJS","https://cesium.com/platform/cesiumjs/"]] }].map((c) => ({ title: c.title, items: c.items.map(([label, href]) => ({ label, href })) })),
+      credits: [
+        { role: "Frames and passes", name: "NISAR Observation Plan", href: "https://nisar.jpl.nasa.gov/mission/get-to-know-sar/observation-plan/" },
+        { role: "Radar products", name: "ASF DAAC", href: "https://search.asf.alaska.edu/" },
+        { role: "Earthquakes", name: "USGS catalogue", href: "https://earthquake.usgs.gov/earthquakes/search/" },
+        { role: "Optical", name: "NASA HLS / Sentinel-2", href: "https://hls.gsfc.nasa.gov/" },
+        { role: "Earth", name: "NASA Blue Marble", href: "https://visibleearth.nasa.gov/collection/1484/blue-marble" },
+        { role: "Globe", name: "CesiumJS", href: "https://cesium.com/platform/cesiumjs/" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

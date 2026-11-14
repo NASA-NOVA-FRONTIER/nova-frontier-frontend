@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>NISAR Hazard Watch · Measured cases</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#04070e;color-scheme:dark}
+a{color:#c9b48b;text-decoration:none}
+a:hover{color:#dccaa3}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{font-weight:500}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="background:#04070e;color:#ebe9e4;font-family:'Albert Sans',system-ui,sans-serif;font-size:16px;line-height:1.55">
+  <header style="position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;padding:16px clamp(16px,3vw,32px);background:linear-gradient(180deg,#04070e 60%,rgba(4,7,14,0))">
+    <a href="Landing v8.dc.html" style="height:40px;display:flex;align-items:center;padding:0 16px;border-radius:999px;background:rgba(8,16,31,0.78);border:1px solid rgba(235,233,228,0.1);font-weight:600;color:#ebe9e4;white-space:nowrap">NISAR Hazard Watch</a>
+    <div style="flex:1"></div>
+    <nav style="display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(8,16,31,0.78);border:1px solid rgba(235,233,228,0.1)">
+      <a href="Cases v8.dc.html" aria-current="page" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#ebe9e4;background:rgba(235,233,228,0.1);font-size:14px">Cases</a>
+      <a href="Method v8.dc.html" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#d4d2cc;font-size:14px" style-hover="color:#ebe9e4;background:rgba(235,233,228,0.06)">Method</a>
+      <a href="Learn v8.dc.html" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#d4d2cc;font-size:14px" style-hover="color:#ebe9e4;background:rgba(235,233,228,0.06)">Learn</a>
+      <a href="About v8.dc.html" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#d4d2cc;font-size:14px" style-hover="color:#ebe9e4;background:rgba(235,233,228,0.06)">About</a>
+      <a href="Explorer v8 v2.dc.html" style="height:32px;display:flex;align-items:center;padding:0 16px;border-radius:999px;background:#ebe9e4;color:#04070e;font-size:14px;font-weight:500" style-hover="color:#04070e;background:#ffffff">Open the explorer</a>
+    </nav>
+  </header>
+
+  <main style="max-width:1200px;margin:0 auto;padding:48px clamp(20px,4vw,48px) 96px;box-sizing:border-box;display:flex;flex-direction:column;gap:36px">
+    <div data-intro="1" style="display:flex;flex-direction:column;gap:14px;max-width:760px">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.08em;color:#c9b48b">MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED</p>
+      <h1 style="font-size:clamp(40px,5vw,68px);letter-spacing:-0.045em;line-height:1">Four places, measured honestly.</h1>
+      <p style="font-size:18px;color:#c4c1ba;text-wrap:pretty">Each case compares real radar passes with the place's own history and, where it exists, a second witness. Numbers come from the science team's published reports. Open any case to see it on the globe.</p>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+      <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6">
+        <button onClick="{{ f.pick }}" aria-pressed="{{ f.on }}" style="display:flex;align-items:center;gap:7px;height:36px;padding:0 14px 0 10px;border-radius:999px;border:{{ f.bd }};background:{{ f.bg }};color:{{ f.ink }};font:inherit;font-size:14px;cursor:pointer;white-space:nowrap"><svg width="15" height="15" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;display:{{ f.iconDisplay }}"><path d="{{ f.d }}"></path></svg>{{ f.label }}<span style="font-family:'JetBrains Mono',monospace;font-size:11px;opacity:0.7">{{ f.n }}</span></button>
+      </sc-for>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:16px">
+      <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+        <article data-card="1" style="padding:22px;border-radius:24px;background:rgba(235,233,228,0.035);border:1px solid {{ c.border }};display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <span style="width:40px;height:40px;flex:none;box-sizing:border-box;border-radius:50%;background:#0e1a33;border:{{ c.ring }};display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" style="fill:none;stroke:#ebe9e4;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round"><path d="{{ c.d }}"></path></svg></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <p style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.05em;color:#a9a69e">{{ c.region }} · {{ c.when }}</p>
+              <h2 style="font-size:22px;letter-spacing:-0.025em;line-height:1.15">{{ c.title }}</h2>
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="height:28px;display:flex;align-items:center;padding:0 11px;border-radius:999px;border:1px solid rgba(235,233,228,0.18);font-size:13px;color:#d4d2cc">{{ c.chip }}</span>
+            <span style="height:28px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:rgba(235,233,228,0.05);font-size:13px"><span style="width:9px;height:9px;box-sizing:border-box;transform:{{ c.v.rot }};border-radius:{{ c.v.r }};background:{{ c.v.fill }};border:{{ c.v.bd }}"></span>{{ c.v.label }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <p style="font-family:'JetBrains Mono',monospace;font-size:26px;letter-spacing:-0.02em">{{ c.stat }}</p>
+            <p style="font-size:13.5px;color:#a9a69e;text-wrap:pretty">{{ c.statLine }}</p>
+          </div>
+          <sc-if value="{{ c.hasGroups }}" hint-placeholder-val="{{ true }}"><dc-import name="Contrast Bars" groups="{{ c.groups }}" compact="{{ true }}" hint-size="100%,56px"></dc-import></sc-if>
+          <p style="font-size:13.5px;color:#c4c1ba;text-wrap:pretty">{{ c.limit }}</p>
+          <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:14px;border-top:1px solid rgba(235,233,228,0.08)">
+            <a href="{{ c.source.href }}" target="_blank" rel="noopener" style="font-size:12.5px;color:#a9a69e;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" style-hover="color:#ebe9e4">{{ c.source.label }}</a>
+            <a href="{{ c.href }}" style="flex:none;height:36px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;background:{{ c.ctaBg }};color:{{ c.ctaInk }};font-size:14px;font-weight:500" style-hover="opacity:0.9">{{ c.cta }}</a>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+
+    <section data-card="1" style="margin-top:24px;padding:28px;border-radius:28px;border:1px solid rgba(235,233,228,0.1);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:28px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.08em;color:#c9b48b">ANY PLACE ON LAND</p>
+        <h2 style="font-size:clamp(26px,2.6vw,36px);letter-spacing:-0.03em;line-height:1.1">Your place isn't here? Ask the radar.</h2>
+        <p style="font-size:15px;color:#a9a69e;text-wrap:pretty">Search any place in the explorer and read its last five NISAR passes in one to four minutes, through the same four questions.</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:flex-end">
+        <sc-for list="{{ hazards }}" as="h" hint-placeholder-count="4">
+          <span title="{{ h.label }}" style="width:48px;height:48px;box-sizing:border-box;border-radius:50%;background:#0e1a33;border:1.5px solid rgba(235,233,228,0.55);display:grid;place-items:center"><svg width="22" height="22" viewBox="0 0 24 24" style="fill:none;stroke:#ebe9e4;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round"><path d="{{ h.d }}"></path></svg></span>
+        </sc-for>
+        <a href="Explorer v8 v2.dc.html" style="height:48px;display:inline-flex;align-items:center;padding:0 22px;border-radius:999px;background:#c9b48b;color:#16120a;font-weight:500" style-hover="background:#dccaa3;color:#16120a">Open the explorer</a>
+      </div>
+    </section>
+  </main>
+
+  <dc-import name="Site Footer" lon="73.713" lat="32.329" coord-label="QADIRABAD · 32.33° N, 73.71° E" kicker="HECHO EN COLOMBIA · MADE IN COLOMBIA" headline="Every number here links back to the report it came from." hint-size="100%,900px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const VERD = {
+  departure: { label: "Changed beyond its normal range", rot: "rotate(45deg)", r: "0", fill: "#c9b48b", bd: "0" },
+  within: { label: "Within its normal range", rot: "none", r: "50%", fill: "transparent", bd: "1.5px solid #ebe9e4" },
+  insufficient: { label: "Not enough radar yet", rot: "none", r: "50%", fill: "transparent", bd: "1.5px dashed #a9a69e" },
+};
+class Component extends DCLogic {
+  state = { D: null, f: "all" };
+  rootRef = React.createRef();
+  componentDidMount() { import("./v7-cases.js").then((D) => this.setState({ D }, () => this.animate(true))); }
+  componentDidUpdate(_, ps) { if (ps.f !== this.state.f) this.animate(false); }
+  componentWillUnmount() { this.ctx?.revert(); }
+  animate(first) {
+    const g = window.gsap, root = this.rootRef.current; if (!g || !root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.ScrollTrigger) g.registerPlugin(window.ScrollTrigger);
+    requestAnimationFrame(() => { this.ctx?.revert(); this.ctx = g.context(() => {
+      if (first) g.from(root.querySelectorAll("[data-intro]"), { y: 24, opacity: 0, duration: 0.9, ease: "power3.out" });
+      root.querySelectorAll("[data-card]").forEach((el, i) => g.from(el, { y: 32, opacity: 0, duration: 0.8, ease: "power3.out", delay: first ? 0.15 + (i % 3) * 0.08 : (i % 3) * 0.05, scrollTrigger: window.ScrollTrigger ? { trigger: el, start: "top 92%", once: true } : undefined }));
+    }, root); });
+  }
+  renderVals() {
+    const D = this.state.D, f = this.state.f, C = D?.CASES || [];
+    const lens = (id) => (D?.LENSES || []).find((l) => l.id === id) || {};
+    const opts = [["all", "All", null], ...(D?.LENSES || []).map((l) => [l.id, l.chip, D.IC[l.icon]])];
+    return {
+      rootRef: this.rootRef,
+      filters: opts.map(([id, label, d]) => { const on = f === id; return { label, d: d || "", iconDisplay: d ? "block" : "none", n: id === "all" ? C.length : C.filter((c) => c.lens === id).length, on: on ? "true" : "false", bd: on ? "1px solid #ebe9e4" : "1px solid rgba(235,233,228,0.16)", bg: on ? "#ebe9e4" : "transparent", ink: on ? "#04070e" : "#d4d2cc", pick: () => this.setState({ f: id }) }; }),
+      cards: C.filter((c) => f === "all" || c.lens === f).map((c) => ({
+        title: `${c.name}, ${c.place}`, region: c.region, when: c.when.toUpperCase(), d: D.IC[c.hazard], ring: c.pending ? "1.5px dashed rgba(235,233,228,0.55)" : "1.5px solid rgba(235,233,228,0.55)",
+        border: c.pending ? "rgba(235,233,228,0.06)" : "rgba(235,233,228,0.09)", chip: c.coherenceOnly ? "Coherence only" : lens(c.lens).chip, v: VERD[c.state], stat: c.stat, statLine: c.statLine,
+        hasGroups: !!c.groups, groups: c.groups ? [c.groups[0]] : [], limit: c.plainLimit, source: c.sources[0],
+        href: `Explorer v8 v2.dc.html?case=${c.id}`, cta: c.pending ? "See the event" : "Open on the globe", ctaBg: c.pending ? "transparent" : "#ebe9e4", ctaInk: c.pending ? "#ebe9e4" : "#04070e",
+      })),
+      hazards: (D?.HAZARDS || []).filter((h) => h.id !== "landslide" && h.id !== "earthquake"),
+    };
+  }
+}
+</script>
+</body>
+</html>
