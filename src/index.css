@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  font-family: "Albert Sans", system-ui, sans-serif;
+  background: #04070e;
+  color-scheme: dark;
+}
+
+@layer base {
+  /* One visible focus ring for every control, keyboard only (no ring on mouse click). */
+  :focus-visible {
+    outline: 2px solid #c9b48b; /* the site's gold */
+    outline-offset: 2px;
+  }
+
+  /* Removes the double-tap zoom delay on touch screens. */
+  a,
+  button,
+  label {
+    touch-action: manipulation;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}

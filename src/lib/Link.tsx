@@ -1,0 +1,29 @@
+import type { MouseEvent, ReactNode } from "react";
+
+import { navigate } from "@/lib/navigation";
+
+type LinkProps = {
+  to: string;
+  className?: string;
+  children: ReactNode;
+  testId?: string | undefined;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+};
+
+export const Link = ({ to, className, children, testId, ...handlers }: LinkProps) => {
+  const onClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    // Let the browser handle new-tab and new-window clicks.
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+    event.preventDefault();
+    navigate(to);
+    window.scrollTo(0, 0);
+  };
+  return (
+    <a href={to} onClick={onClick} className={className} data-testid={testId} {...handlers}>
+      {children}
+    </a>
+  );
+};
