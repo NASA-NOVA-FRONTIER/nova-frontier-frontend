@@ -1,7 +1,8 @@
 import { useEffect, useState, type RefObject } from "react";
 
-// The bottom cards on a phone: the start card, a searched place and the result panel (the sheet).
-const BOTTOM_CARDS = ".x-start, .x-place, .x-panel";
+// What sits at the bottom of a phone: the sheet (start card, picked spot, panel, wait modal) and
+// the compact timeline above it (#31), so the bubble clears both.
+const BOTTOM_CARDS = ".x-start, .x-place, .x-panel, .x-jobmodal, .x-timeline-wrap";
 const NARROW = "(max-width: 760px)";
 const GAP_PX = 12;
 

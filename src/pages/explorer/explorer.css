@@ -114,6 +114,10 @@
 }
 
 /* Top bar */
+.x-top__row2 {
+  display: none;
+}
+
 .x-top {
   position: absolute;
   top: var(--inset);
@@ -3061,10 +3065,81 @@
 
 /* Phones: the panel sits over the lower half, the sheet is a full page (SPECS §4 next round). */
 @media (max-width: 760px) {
-  /* No room for the tools in the top bar: they stack under it, on the free left edge. */
+  /* #31 · SPECS-v8 Mobile. One bottom sheet for steps 2–6 and 8; its height is the step's share
+     of the screen (sheetStep.ts publishes --x-sheet-frac), and the timeline and Nova sit above it. */
+  .explorer {
+    --x-sheet-h: calc(100dvh * var(--x-sheet-frac, 0.5));
+  }
+
+  /* Header: search and Help on the first row; Asc/Desc and the layer pills on the second. */
+  .x-top {
+    top: 12px;
+    left: 8px;
+    right: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .x-pill--mark,
+  .x-top__fill,
+  .x-switches,
+  .x-top__globe,
+  .x-top__download,
+  .x-top__fullscreen {
+    display: none;
+  }
+
+  .x-top__search {
+    flex: 1 1 0;
+  }
+
+  .x-top__search .x-searchpill__field {
+    height: 44px;
+  }
+
+  .x-top__help .x-icon-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .x-top__row2 {
+    flex: 1 1 100%;
+    order: 10;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .x-top__row2:empty {
+    display: none;
+  }
+
+  .x-top__row2 .x-source {
+    height: 36px;
+    padding: 3px;
+    gap: 3px;
+  }
+
+  .x-top__row2 .x-source button {
+    height: 28px;
+    min-width: 44px;
+    padding: 0 10px;
+    font-size: 12.5px;
+  }
+
+  .x-layerpills button {
+    cursor: pointer;
+  }
+
+  .x-layerpills button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* No room for the tools in the top bar: they stack under the header, on the free left edge. */
   .x-tools {
     position: absolute;
-    top: 48px;
+    top: calc(100% + 8px);
     left: 0;
     height: auto;
     flex-direction: column;
@@ -3072,10 +3147,46 @@
   }
 
   .x-guide {
-    top: 64px;
+    top: 112px;
     left: 64px;
     transform: none;
     width: calc(100vw - 80px);
+  }
+
+  /* The sheet: whichever step's panel is open takes the same place and size. */
+  .x-start,
+  .x-place,
+  .x-panel,
+  .x-jobmodal {
+    top: auto;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+    max-width: none;
+    transform: none;
+    height: var(--x-sheet-h);
+    max-height: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 26px 16px 20px;
+    border-radius: 24px;
+  }
+
+  /* A grabber says "sheet"; dragging stays out (the panel's own collapse button does that). */
+  .x-start::before,
+  .x-place::before,
+  .x-panel::before,
+  .x-jobmodal::before {
+    content: "";
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    width: 36px;
+    height: 4px;
+    margin-left: -18px;
+    border-radius: 2px;
+    background: rgba(235, 233, 228, 0.28);
   }
 
   .x-pill--mark {
@@ -3095,25 +3206,8 @@
     gap: 6px;
   }
 
-  .x-start {
-    top: auto;
-    bottom: var(--inset);
-    max-height: 62dvh;
-  }
-
-  .x-place {
-    top: auto;
-    bottom: var(--inset);
-  }
-
   .x-menu--search {
-    width: calc(100vw - 32px);
-  }
-
-  .x-panel {
-    top: auto;
-    bottom: var(--inset);
-    max-height: 52dvh;
+    width: calc(100vw - 16px);
   }
 
   .x-edge {
@@ -3121,7 +3215,27 @@
     bottom: 120px;
   }
 
+  /* Compact timeline above the sheet on steps 3–6 of a live answer: no head (so no time-lapse
+     button) and no bracket. Cases keep the sheet alone. */
   .x-timeline-wrap {
+    display: none;
+  }
+
+  .explorer[data-timeline="true"] .x-timeline-wrap {
+    display: flex;
+    left: 8px;
+    right: 8px;
+    bottom: calc(var(--x-sheet-h) + 16px);
+  }
+
+  .explorer[data-timeline="true"] .x-timeline {
+    padding: 6px 12px 4px;
+  }
+
+  .explorer[data-timeline="true"] .x-tl__head,
+  .explorer[data-timeline="true"] .x-tl__bracket,
+  .explorer[data-timeline="true"] .x-tl__bracket-label,
+  .explorer[data-timeline="true"] .x-tl__legend {
     display: none;
   }
 

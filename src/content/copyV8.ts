@@ -152,6 +152,12 @@ export const STEP_4 = {
   dockHV: "HV backscatter",
   dockChange: "Change",
   dockRule: "Flood rule cells",
+  // Mobile layer pills (#31): the design's short labels (v8-data.js `layers`, Explorer v8 v2).
+  pillHH: "HH",
+  pillHV: "HV",
+  pillChange: "Δ dB",
+  pillRule: "Rule",
+  pillsAria: "Layer",
   dockCoherence: "Coherence",
   dockNoPair: "NO PAIR",
   dockLandCover: "Land cover",

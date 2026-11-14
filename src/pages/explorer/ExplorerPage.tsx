@@ -5,7 +5,7 @@ import "@/pages/explorer/story.css";
 import "@/features/lenses/lenses.css";
 
 import type { Viewer } from "cesium";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { CasePanel } from "@/features/case-panel/CasePanel";
 import { PendingSummary, ResultSummary } from "@/features/case-panel/CaseSummary";
@@ -55,6 +55,7 @@ import { insarFromParams } from "@/features/insar/insarLink";
 import { explorationCsv, explorationJson } from "@/features/explore/exploreExport";
 import {
   defaultView,
+  dockRows,
   measuredPasses,
   nextStep,
   playStart,
@@ -97,6 +98,12 @@ import { placeFraming } from "@/features/search/placeFraming";
 import type { Place } from "@/features/search/placesApi";
 import { fetchCoverage } from "@/features/spot/coverageApi";
 import { nearestCase, squareSideKm } from "@/features/spot/spot";
+import {
+  hasCompactTimeline,
+  hasLayerPills,
+  SHEET_FRACTION,
+  sheetStep,
+} from "@/features/mobile/sheetStep";
 import { StoryMode } from "@/features/story/StoryMode";
 import { PassTimeline } from "@/features/timeline/PassTimeline";
 import { formatDay } from "@/features/timeline/timelineLayout";
@@ -109,6 +116,7 @@ import { SpotCard } from "@/pages/explorer/SpotCard";
 import { LEGEND, type DrapeKind } from "@/pages/explorer/drapeLegend";
 import { LayerDock } from "@/pages/explorer/LayerDock";
 import { LiveLayerDock } from "@/pages/explorer/LiveLayerDock";
+import { MobileLayerPills } from "@/pages/explorer/MobileLayerPills";
 import { SourceSwitch } from "@/pages/explorer/SourceSwitch";
 import { HintPill, StartCard } from "@/pages/explorer/StartCard";
 import { TopBar, type DownloadItem } from "@/pages/explorer/TopBar";
@@ -793,6 +801,29 @@ export const ExplorerPage = () => {
   const showDock = item?.crops !== undefined && !sheetOpen;
   const showLiveDock = layers.length > 0 && !sheetOpen;
 
+  // Phones (SPECS-v8 Mobile): one bottom sheet for steps 2–6 and 8, sized per step by CSS.
+  const liveFailed =
+    liveRuns &&
+    (phase === "error" ||
+      (phase === "done" && exploredView !== undefined && exploredView.result === null));
+  const step = sheetStep({
+    fullScreen: story || sheetOpen,
+    view:
+      selection === undefined
+        ? place === undefined
+          ? "start"
+          : "spot"
+        : selection.kind === "case"
+          ? "case"
+          : "live",
+    noCoverage: coverage?.status === "success" && coverage.data.plan.status === "noCoverage",
+    ...(live !== undefined && {
+      live: { running, lensSwitch: live.lensSwitch, failed: liveFailed, result: showLensCard },
+    }),
+  });
+  const compactTimeline = showLiveTimeline && hasCompactTimeline(step);
+  const sheetStyle = { "--x-sheet-frac": SHEET_FRACTION[step] } as CSSProperties;
+
   const lensId = item?.lens ?? live?.lens;
   const lensChip = lensId === undefined ? "" : (findLens(lensId)?.chip ?? "");
   // Nova reads the v8 lens card through the same pure functions the card draws with.
@@ -963,6 +994,9 @@ export const ExplorerPage = () => {
         className="site explorer"
         data-frames={framesState?.status ?? "loading"}
         data-reduce-motion={reduceMotion}
+        data-sheet={step}
+        data-timeline={compactTimeline}
+        style={sheetStyle}
       >
         {unavailable ? (
           <div className="x-nogl" data-testid="no-webgl">
@@ -996,6 +1030,22 @@ export const ExplorerPage = () => {
                 <DirectionSwitch direction={direction} onChange={setDirection} />
               )}
             </div>
+          }
+          mobileRow={
+            DIRECTION_CHOICE_READY || (hasLayerPills(step) && layers.length > 0) ? (
+              <>
+                {DIRECTION_CHOICE_READY && (
+                  <DirectionSwitch direction={direction} onChange={setDirection} />
+                )}
+                {hasLayerPills(step) && layers.length > 0 && (
+                  <MobileLayerPills
+                    rows={dockRows(layers, dockView.date, dockView.pick)}
+                    withRule={step === "result"}
+                    onPick={pickDock}
+                  />
+                )}
+              </>
+            ) : undefined
           }
           tools={<AreaTools tool={draw.tool} disabledWhy={toolsOffWhy} onTool={chooseTool} />}
           cases={CASES}

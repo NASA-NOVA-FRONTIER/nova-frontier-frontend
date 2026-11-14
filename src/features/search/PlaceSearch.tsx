@@ -23,6 +23,8 @@ type PlaceSearchProps = {
   onPick: (place: Place) => void;
   onOpenCase: (item: Case) => void;
   inputRef?: Ref<HTMLInputElement>;
+  // COPY-v8 gives phones a shorter placeholder.
+  short?: boolean;
 };
 
 const tidy = (text: string): string => text.trim().replace(/\s+/g, " ");
@@ -39,6 +41,7 @@ export const PlaceSearch = ({
   onPick,
   onOpenCase,
   inputRef,
+  short = false,
 }: PlaceSearchProps) => {
   const [text, setText] = useState("");
   const [submitted, setSubmitted] = useState<string>();
@@ -103,7 +106,7 @@ export const PlaceSearch = ({
           spellCheck={false}
           maxLength={100}
           enterKeyHint="search"
-          placeholder={TOP_BAR.searchPlaceholder}
+          placeholder={short ? TOP_BAR.searchPlaceholderMobile : TOP_BAR.searchPlaceholder}
           value={text}
           onChange={(event) => setText(event.target.value)}
           onFocus={() => onOpen(true)}

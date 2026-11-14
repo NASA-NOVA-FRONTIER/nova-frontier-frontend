@@ -6,6 +6,7 @@ import type { Case } from "@/features/cases/cases";
 import { PlaceSearch } from "@/features/search/PlaceSearch";
 import type { Place } from "@/features/search/placesApi";
 import { BrandMark } from "@/lib/BrandMark";
+import { PHONE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import { Link } from "@/lib/Link";
 import { VERSION } from "@/pages/explorer/StartCard";
 
@@ -21,6 +22,8 @@ export type DownloadItem = {
 type TopBarProps = {
   // L | S and Ascending / Descending, right after the search pill (SPECS-v8 top bar).
   switches: ReactNode;
+  // Phones only (CSS): the second header row, the layer pills of steps 4–6 (SPECS-v8 Mobile).
+  mobileRow?: ReactNode;
   // The area tools sit between the mode switch and the page links.
   tools: ReactNode;
   cases: readonly Case[];
@@ -51,6 +54,7 @@ const toggleFullScreen = () => {
 
 export const TopBar = ({
   switches,
+  mobileRow,
   tools,
   cases,
   searchInputRef,
@@ -72,6 +76,7 @@ export const TopBar = ({
   onReduceMotion,
   onWholeGlobe,
 }: TopBarProps) => {
+  const phone = useMediaQuery(PHONE_QUERY);
   const helpRef = useRef<HTMLDivElement>(null);
   const downloadRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -104,10 +109,12 @@ export const TopBar = ({
             onPick={onPickPlace}
             onOpenCase={onOpenCase}
             inputRef={searchInputRef}
+            short={phone}
           />
         </div>
       )}
       {switches}
+      {mobileRow != null && <div className="x-top__row2">{mobileRow}</div>}
       <span className="x-top__fill" />
       <div role="group" aria-label="Mode" className="x-mode">
         <button
@@ -137,7 +144,7 @@ export const TopBar = ({
       </Link>
       <button
         type="button"
-        className="x-icon-button"
+        className="x-icon-button x-top__globe"
         onClick={onWholeGlobe}
         aria-label={TOP_BAR.wholeGlobe}
         title={TOP_BAR.wholeGlobe}
@@ -145,7 +152,7 @@ export const TopBar = ({
       >
         <Icon name="globe" size={18} />
       </button>
-      <div className="x-help" ref={helpRef}>
+      <div className="x-help x-top__help" ref={helpRef}>
         <button
           type="button"
           className="x-icon-button"
@@ -205,7 +212,7 @@ export const TopBar = ({
           </div>
         )}
       </div>
-      <div className="x-help" ref={downloadRef}>
+      <div className="x-help x-top__download" ref={downloadRef}>
         <button
           type="button"
           className="x-icon-button"
