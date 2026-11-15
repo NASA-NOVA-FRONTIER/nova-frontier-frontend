@@ -1,8 +1,11 @@
 import { readFileSync } from "node:fs";
 
-import type { Locator, Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
+import type { BBox, LonLat } from "@/features/frames/frame.types";
 import { OBSERVATION_PLAN_QUERY_URL } from "@/features/frames/observationPlanApi";
+import type { DrawEvent, Pointer } from "@/features/geo/drawMachine";
+import "@/features/globe/globeHooks";
 import { ONBOARDING_KEY } from "@/features/onboarding/onboardingState";
 import { ExplorationMock, INSAR_PAIRS } from "./explorationMock";
 
@@ -28,6 +31,29 @@ const FREE_CENTRE = { x: 392 + (1440 - 392 - 288) / 2, y: 72 + (900 - 72 - 200) 
 const OFF_CENTRE_PX = 90;
 
 type Offset = { dx: number; dy: number };
+
+// What the stub globe shows in data-scene: GlobeView's `scene` prop as JSON (undefined keys drop out).
+export type SceneJson = {
+  target?: { key: string; box: BBox; zoom: number };
+  outline?: { ring: LonLat[]; label: string; processing: boolean; spot?: boolean };
+  point?: LonLat;
+  frame?: { id: string };
+  selectedCaseId?: string;
+  drape?: { url: string; bounds: BBox };
+  drapeAlpha: number;
+  stamp?: { date: string; pass: string; target: boolean; box: BBox };
+};
+
+// Stub twins of the pixel clicks: same outcome as the pixel they replace on the real globe.
+const LAND: LonLat = [-74.75, 2.89]; // inside frame 47-3, where clickLand lands with 47-3 open
+const OCEAN: LonLat = [-20, 18]; // the home view's centre, open ocean
+// Roughly what one pixel spans: at the whole-globe view (21,000 km up) and framed on a 10 km chip.
+const DEG_PER_PX_HOME = 0.1;
+const DEG_PER_PX_CLOSE = 0.0005;
+
+// The last path segment of a layer URL, e.g. ".../display_2026-09-12_HH" → "display_2026-09-12_HH".
+export const layerIdOf = (url: string): string =>
+  new URL(url, "http://x").pathname.split("/").filter(Boolean).at(-1) ?? "";
 
 export class GlobePage {
   private readonly page: Page;
@@ -77,7 +103,6 @@ export class GlobePage {
   readonly insarCard: Locator;
   // Every pair list the page asked for, in order.
   readonly pairRequests: string[] = [];
-  private limitsRouted = false;
 
   constructor(page: Page) {
     this.page = page;
@@ -228,27 +253,71 @@ export class GlobePage {
     });
   }
 
-  // Backend #2's daily limits. Every page gets an answer, so E2E never reaches a backend; without
-  // this mock it is a 404 (the endpoint isn't deployed yet) and the quota line stays hidden.
+  // Backend #2's daily limits. Without this mock every page gets the fixture's 404 (the endpoint
+  // isn't deployed yet, see fixtures.ts) and the quota line stays hidden.
   async mockLimits(limits: {
     remainingApp: number | null;
     remainingClient: number | null;
     resetsAt?: string;
   }): Promise<void> {
-    this.limitsRouted = true;
     await this.page.route(LIMITS_URL, (route) => route.fulfill({ json: limits }));
   }
 
-  private async limitsNotDeployed(): Promise<void> {
-    if (this.limitsRouted) return;
-    this.limitsRouted = true;
-    await this.page.route(LIMITS_URL, (route) =>
-      route.fulfill({
-        status: 404,
-        contentType: "application/problem+json",
-        body: JSON.stringify({ title: "Not found", reasonCode: "NOT_FOUND", detail: "no route" }),
-      }),
-    );
+  // "stub" in the ui project's stub build, "real" for @globe tests and on pushes to main.
+  get stub(): boolean {
+    return test.info().project.metadata["globe"] === "stub";
+  }
+
+  // GlobeView's scene as the stub globe received it.
+  async scene(): Promise<SceneJson> {
+    const json = await this.page.getByTestId("globe").getAttribute("data-scene");
+    return JSON.parse(json ?? "{}") as SceneJson;
+  }
+
+  // Asserts what the app asked the globe to show. Only the stub exposes it; on the real globe the
+  // @globe tests and the main-branch run cover the picture, so this is noted and skipped.
+  async expectScene(check: (scene: SceneJson) => void): Promise<void> {
+    if (!this.stub) {
+      test
+        .info()
+        .annotations.push({ type: "scene", description: "checked on the stub globe only" });
+      return;
+    }
+    await expect(async () => check(await this.scene())).toPass({ timeout: 10_000 });
+  }
+
+  // The stub globe's test hooks (GlobeView.stub.tsx); each calls the callback a real gesture would.
+  private async stubClick([lon, lat]: LonLat, px?: Pointer["px"]): Promise<void> {
+    await this.page.evaluate((at) => window.__globe?.click(at.lon, at.lat, at.px), {
+      lon,
+      lat,
+      px,
+    });
+  }
+
+  private async stubHover([lon, lat]: LonLat): Promise<void> {
+    await this.page.evaluate((at) => window.__globe?.hover(at.lon, at.lat), { lon, lat });
+  }
+
+  // The lon/lat under a pixel offset from the free-screen centre, as the camera would frame it.
+  private async lonLatAt({ dx, dy }: Offset): Promise<LonLat> {
+    const { target } = await this.scene();
+    if (target === undefined)
+      return [OCEAN[0] + dx * DEG_PER_PX_HOME, OCEAN[1] - dy * DEG_PER_PX_HOME];
+    const [west, south, east, north] = target.box;
+    const centre: LonLat = [(west + east) / 2, (south + north) / 2];
+    return [centre[0] + dx * DEG_PER_PX_CLOSE, centre[1] - dy * DEG_PER_PX_CLOSE];
+  }
+
+  private async pointerAt(offset: Offset): Promise<Pointer> {
+    return {
+      lonLat: await this.lonLatAt(offset),
+      px: [FREE_CENTRE.x + offset.dx, FREE_CENTRE.y + offset.dy],
+    };
+  }
+
+  private async stubDraw(events: DrawEvent[]): Promise<void> {
+    await this.page.evaluate((list) => window.__globe?.draw(list), events);
   }
 
   // Marks the quick tour as seen before the page loads, as on any visit after the first.
@@ -258,26 +327,38 @@ export class GlobePage {
 
   // Hover and live questions need the frames snapshot, so every test waits for it.
   async goto(query = ""): Promise<void> {
-    await this.limitsNotDeployed();
     await this.page.goto(`/explore${query}`);
     await this.page.locator('main[data-frames="success"]').waitFor({ timeout: 30_000 });
+    if (this.stub) await this.page.waitForFunction(() => window.__globe !== undefined);
   }
 
   async hoverLand(): Promise<void> {
+    if (this.stub) return this.stubHover(LAND);
     await this.page.mouse.move(FREE_CENTRE.x + OFF_CENTRE_PX, FREE_CENTRE.y);
   }
 
   // With nothing open the camera rests over the Atlantic (−20°, 18°): its centre is open ocean.
   async clickOcean(): Promise<void> {
+    if (this.stub) return this.stubClick(OCEAN);
     await this.page.mouse.click(FREE_CENTRE.x, FREE_CENTRE.y);
   }
 
   async clickLand(): Promise<void> {
+    if (this.stub) return this.stubClick(LAND);
     await this.page.mouse.click(FREE_CENTRE.x + OFF_CENTRE_PX, FREE_CENTRE.y);
   }
 
   // Drawing offsets are in pixels from the free-screen centre, where a close-up chip sits.
   async dragFromCentre(from: Offset, to: Offset): Promise<void> {
+    if (this.stub) {
+      const start = await this.pointerAt(from);
+      const end = await this.pointerAt(to);
+      return this.stubDraw([
+        { type: "down", pointer: start },
+        { type: "move", pointer: end },
+        { type: "up", pointer: end },
+      ]);
+    }
     const { mouse } = this.page;
     await mouse.move(FREE_CENTRE.x + from.dx, FREE_CENTRE.y + from.dy);
     await mouse.down();
@@ -290,10 +371,19 @@ export class GlobePage {
   }
 
   async clickFromCentre({ dx, dy }: Offset): Promise<void> {
+    if (this.stub) {
+      const { lonLat, px } = await this.pointerAt({ dx, dy });
+      return this.stubClick(lonLat, px);
+    }
     await this.page.mouse.click(FREE_CENTRE.x + dx, FREE_CENTRE.y + dy);
   }
 
+  // On the stub: the last corner's click, then the finish a double-click sends.
   async doubleClickFromCentre({ dx, dy }: Offset): Promise<void> {
+    if (this.stub) {
+      await this.clickFromCentre({ dx, dy });
+      return this.stubDraw([{ type: "finish" }]);
+    }
     await this.page.mouse.dblclick(FREE_CENTRE.x + dx, FREE_CENTRE.y + dy);
   }
 }

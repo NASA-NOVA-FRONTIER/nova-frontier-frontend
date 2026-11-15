@@ -19,6 +19,7 @@ describe("CHIPS", () => {
       experimental: ["EXPERIMENTAL", "prov-experimental"],
       hypothesis: ["HYPOTHESIS · NOT A RESULT", "prov-hypothesis"],
       instant: ["INSTANT", "prov-instant"],
+      offline: ["OFFLINE", "prov-offline"],
       illustrative: ["TYPICAL VALUES · ILLUSTRATIVE", "prov-illustrative"],
     });
   });

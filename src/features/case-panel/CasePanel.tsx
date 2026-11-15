@@ -7,6 +7,8 @@ type CasePanelProps = {
   meta: string;
   title: string;
   lens: LensId;
+  // Beside the kicker: the OFFLINE chip of a demo case (issue #28).
+  chip?: ReactNode;
   collapsed: boolean;
   // The lens buttons (LensPicker): the grid, or tabs above a lens result.
   picker: ReactNode;
@@ -22,6 +24,7 @@ export const CasePanel = ({
   meta,
   title,
   lens,
+  chip,
   collapsed,
   picker,
   result = false,
@@ -54,9 +57,12 @@ export const CasePanel = ({
     >
       <div className="x-panel__head">
         <div className="x-panel__heading">
-          <p className="x-kicker" data-testid="panel-meta">
-            {meta}
-          </p>
+          <div className="x-panel__kicker">
+            <p className="x-kicker" data-testid="panel-meta">
+              {meta}
+            </p>
+            {chip}
+          </div>
           <h2 className="x-panel__title" data-testid="panel-title">
             {title}
           </h2>

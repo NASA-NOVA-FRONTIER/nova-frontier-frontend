@@ -18,8 +18,9 @@ Pages (`src/App.tsx` switches on the pathname; no router dependency):
 - `/report?case=<id>` a printable one-page report for a measured case; `/report?exploration=<id>`
   the same for a live answer, fetched from the backend (`src/pages/report/`).
 
-Design source of truth: `docs/design/` (reading order in `docs/design/README.md`: `v8/` specs, copy
-and provenance on top of `v7/`; its team decisions win over the handoff). Visual system as built:
+Design source of truth: `docs/design/` (reading order in `docs/design/README.md`: the `v9/` explorer
+flow on top of `v8/` specs, copy and provenance, on top of `v7/`; its team decisions and v9 corrections
+win over the handoffs). Visual system as built:
 `DESIGN.md`.
 
 ## v8 foundations
@@ -31,7 +32,7 @@ Shared pieces every v8 issue builds on:
   `formatCount`. Strings that a team decision overrides carry a comment naming it. Never write new
   copy in a component.
 - **Chips:** `ProvenanceChip` kinds `real`, `realDates`, `demo`, `demoDates`, `todo`, `pending`,
-  `unavailable`, `experimental`, `hypothesis`, `instant`, from the pure table in
+  `unavailable`, `experimental`, `hypothesis`, `instant`, `offline`, from the pure table in
   `src/lib/provenanceChips.ts` (text, testid, default title). Only `real` can be hidden.
 - **Motion:** `src/lib/motion.ts` (GSAP core, no ScrollTrigger/Lenis): `revealBlocks`, `popIn`,
   `countUp`, `pulse`, each with `reduce` (pass the explorer's `reduceMotion`) and a cleanup; it owns
@@ -110,7 +111,8 @@ is asked of the radar until a pair is chosen (`needsPair` in `ExplorerPage`). Th
 verdict, so the subject's verdict is `measured` ("Measured, not a verdict"); `InsarCard` shows what
 the pair measured and always states "Displacement: not reported" because the phase is wrapped and
 uncorrected. Layers are `coherence` (opens first) and `phase` (cyclic palette, legend says the
-colours repeat every 2π). The Kumamoto case offers "Measure a live NISAR pair here".
+colours repeat every 2π). Ground motion runs live only on a picked spot or a shared link: the
+Chocó demo case keeps its lens (issue #28).
 
 Wildfire: the backend adds `result.fireContext` (NASA FIRMS active-fire detections between the
 baseline and target passes) apart from the radar `lens`. `exploreFire.ts` maps it to a
@@ -138,7 +140,15 @@ or hectares).
 - **Measured cases:** `src/features/cases/cases.ts` (`CASES`, `LENSES`, `OPTICAL`). Every number is
   copied from the science backend's reports (github.com/NASA-NOVA-FRONTIER/nova-frontier-model); layer crops and
   report figures are static files in `public/cases/`. Pass timeline dates in `cases.ts` are DEMO
-  (12-day spacing) until the backend serves real ones.
+  (12-day spacing) until the backend serves real ones. **One demo case per phenomenon** (issue #28,
+  `Case.hazard`): Qadirabad (flood), Chocó (earthquake), Bug Fire (wildfire), Rowe Creek
+  (vegetation) and Sköllersta (agriculture). They are copied from the gateway's precomputed cases,
+  which the backend relays at `/api/v1/cases` (52 today); the frontend doesn't fetch them at run time.
+  `tests/fixtures/gateway-cases.json` records that answer and `gatewayCases.test.ts` checks the copy
+  against it. Bug Fire, Rowe Creek and Sköllersta are `radar_evaluated` (layers, no comparator), so
+  they read "Measured, not a verdict" with only the cells, passes and limit the gateway returns. Each
+  case shows the `offline` chip (OFFLINE, never hidden) and its lens is fixed: `LensPicker` gets
+  `locked` with the reason and `chooseLens` never turns a case into a live question.
 - **Demo values:** the band chart series of the measured cases (`src/features/cases/demoBand.ts`,
   with the backend's band rule; a case's series sits on its own timeline dates up to the target via
   `caseBandPasses`) stay DEMO. A live answer has no demo value: what the backend did not measure is
@@ -230,9 +240,11 @@ Mirrors the conventions used at work (consoles-ui-monorepo), kept as simple as t
 - **Guided story** (`/explore?story=1`, `src/features/story/`): six chapters on the case marked
   `tour` (Qadirabad, Chenab flood). Card per chapter plus a caption bar (Back / Play / Next, ← →,
   Esc exits); Play advances every 9 s; optional Web Speech voice reads the captions. Numbers are the
-  case's REAL values. **TO FILL:** chapter 1 "Areas affected" / "People affected" (PMD/FFD
-  bulletin, official figures only) and chapter 5 photos and news; they stay bracketed slots with a
-  TO FILL chip until credited, linked material is copied in.
+  case's REAL values. **TO FILL:** chapter 1 "Areas affected" / "People affected" (official PDMA
+  or NDMA figures only; the PMD/FFD bulletin reports flows, not impacts) and chapter 5 photos (no
+  freely licensed photo of this flood yet); they stay bracketed slots with a TO FILL chip until
+  credited, linked material is copied in. Chapter 5 news links real articles
+  (`src/features/story/storyNews.ts`).
 - **Quick onboarding** (`src/features/onboarding/`): four spotlight steps (start card, panel,
   layer dock, timeline), once per browser (`localStorage`, guarded); Help → "Replay the quick tour".
 - **Nova** (`src/features/nova/`): rule-based, DEMO chip, says so in the chat. It only rephrases

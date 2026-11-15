@@ -3,6 +3,7 @@ import { HazardIcon } from "@/features/cases/HazardIcon";
 import { CASES, coherenceOnlyLabel, findLens, type Case } from "@/features/cases/cases";
 import type { Frame } from "@/features/frames/frame.types";
 import { Link } from "@/lib/Link";
+import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import type { AsyncState } from "@/lib/useAsync";
 
 export const VERSION = "Design v7 · 0.7.0";
@@ -43,8 +44,9 @@ export const StartCard = ({ frames, onOpen, onRetryFrames, onStory, onSearch }: 
               <HazardIcon id={item.hazard} size={14} />
             </span>
             <span className="x-case__text">
-              <span>
+              <span className="x-case__name">
                 {item.name}, {country(item)}
+                <ProvenanceChip kind="offline" />
               </span>
               <span className="x-case__q">{findLens(item.lens)?.chip}</span>
             </span>

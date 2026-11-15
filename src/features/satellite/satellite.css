@@ -39,39 +39,69 @@
   pointer-events: none;
 }
 
+/*
+ * The button is a 44 px target (WCAG 2.5.8 asks 24) around the 26 px ring drawn by ::before. Hover
+ * styles live on the pseudo-elements: a `scale` on the button itself would also scale the per-frame
+ * `transform: translate(...)` and throw the dot ~100 px away from the pointer.
+ */
 .s-sat__hotspot {
   position: absolute;
   top: 0;
   left: 0;
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
-  margin: -13px 0 0 -13px;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
   padding: 0;
-  border: 1.5px solid var(--gold, #c9b48b);
+  border: 0;
   border-radius: 50%;
-  background: rgba(4, 7, 14, 0.6);
+  background: transparent;
   cursor: pointer;
   opacity: 0;
+  outline: none;
+  transition: opacity 0.35s;
+}
+
+/* Where two targets overlap (L- and S-band sit ~28 px apart), the one in use stays on top. */
+.s-sat__hotspot:hover,
+.s-sat__hotspot:focus-visible {
+  z-index: 1;
+}
+
+.s-sat__hotspot::before,
+.s-sat__hotspot::after {
+  content: "";
+  grid-area: 1 / 1;
+  border-radius: 50%;
   transition:
-    opacity 0.35s,
     background 0.2s,
     scale 0.2s;
 }
 
-.s-sat__hotspot::after {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gold, #c9b48b);
-  transition: background 0.2s;
+.s-sat__hotspot::before {
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid var(--gold, #c9b48b);
+  background: rgba(4, 7, 14, 0.6);
 }
 
-.s-sat__hotspot:hover,
-.s-sat__hotspot[aria-pressed="true"] {
+.s-sat__hotspot::after {
+  width: 6px;
+  height: 6px;
+  background: var(--gold, #c9b48b);
+}
+
+.s-sat__hotspot:hover::before,
+.s-sat__hotspot:hover::after,
+.s-sat__hotspot[aria-pressed="true"]::before,
+.s-sat__hotspot[aria-pressed="true"]::after {
   scale: 1.18;
+}
+
+.s-sat__hotspot:hover::before,
+.s-sat__hotspot[aria-pressed="true"]::before {
   background: var(--gold, #c9b48b);
 }
 
@@ -80,7 +110,7 @@
   background: var(--space, #04070e);
 }
 
-.s-sat__hotspot:focus-visible {
+.s-sat__hotspot:focus-visible::before {
   outline: 2px solid var(--ink, #ebe9e4);
   outline-offset: 3px;
 }
@@ -158,6 +188,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .s-sat__hotspot,
+  .s-sat__hotspot::before,
+  .s-sat__hotspot::after,
   .s-sat__tip,
   .s-sat__hint {
     transition: none;

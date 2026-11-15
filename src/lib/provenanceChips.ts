@@ -1,4 +1,4 @@
-import { CHIP_COPY } from "@/content/copyV8";
+import { CASE_LOCK, CHIP_COPY } from "@/content/copyV8";
 
 export type Provenance = keyof typeof CHIP_COPY;
 
@@ -51,6 +51,13 @@ export const CHIPS: Record<Provenance, ChipSpec> = {
     hideable: false,
   },
   instant: { text: CHIP_COPY.instant, testId: "prov-instant", look: "instant", hideable: false },
+  offline: {
+    text: CHIP_COPY.offline,
+    testId: "prov-offline",
+    look: "offline",
+    title: CASE_LOCK.chipTitle,
+    hideable: false,
+  },
   // Same amber as DEMO (SPECS-content-pages-v8 §0); it never hides, so it can't be mistaken for REAL.
   illustrative: {
     text: CHIP_COPY.illustrative,

@@ -960,10 +960,11 @@
   }
 }
 
-/* The satellite: a 340vh track with a sticky stage; <NisarSatellite> reads the track's scroll. */
+/* The satellite: a 700vh track (100vh per teardown step) with a sticky stage; <NisarSatellite>
+   reads the track's scroll and takes the model apart. */
 .m-sat {
   position: relative;
-  height: 340vh;
+  height: 700vh;
   margin-top: clamp(24px, 4vw, 56px);
 }
 
@@ -1001,43 +1002,67 @@
 .m-sat__steps {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 10px;
 }
 
 .m-sat__step {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  opacity: 0.28;
-  transform: translateX(-8px);
-  transition:
-    opacity 500ms ease,
-    transform 500ms ease;
+  gap: 8px;
 }
 
-.m-sat__step--on {
-  opacity: 1;
-  transform: none;
-}
-
+/* Each step's kicker is the button that scrolls to it; the active one opens its text. */
 .m-sat__step-kicker {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.06em;
+  text-align: left;
   color: #8d8a83;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color 300ms ease;
+}
+
+.m-sat__step-kicker:hover {
+  color: var(--ink-2);
 }
 
 .m-sat__step-kicker span {
   width: 18px;
   height: 1px;
   background: currentColor;
+  transition: width 300ms ease;
 }
 
 .m-sat__step--on .m-sat__step-kicker {
   color: var(--gold);
+}
+
+.m-sat__step--on .m-sat__step-kicker span {
+  width: 32px;
+}
+
+.m-sat__step--on > :not(.m-sat__step-kicker) {
+  animation: m-sat-in 500ms ease both;
+}
+
+@keyframes m-sat-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.m-sat__item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .m-sat__step-title {
@@ -1050,6 +1075,27 @@
   font-size: 15px;
   color: #c4c1ba;
   text-wrap: pretty;
+}
+
+.m-sat__sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  pointer-events: auto;
+}
+
+/* Read by screen readers only: the step the scroll landed on. */
+.m-sat__live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .m-sat__foot {
@@ -1065,39 +1111,52 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .m-sat__step {
+  .m-sat__step-kicker,
+  .m-sat__step-kicker span {
     transition: none;
+  }
+
+  .m-sat__step--on > :not(.m-sat__step-kicker) {
+    animation: none;
   }
 }
 
-/* Phones: the text sits over the model at the bottom; only the active step keeps its body. */
-@media (max-width: 720px) {
-  .m-sat__text {
-    left: 0;
-    right: 0;
-    top: auto;
-    bottom: 0;
-    transform: none;
-    width: auto;
-    gap: 14px;
-    padding: 64px 16px 96px;
-    background: linear-gradient(180deg, transparent, rgba(4, 7, 14, 0.88) 38%);
-  }
+/* Phones: no 3D model; the steps read as a list with the two NASA/JPL photos. */
+.m-sat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: min(100% - 32px, 640px);
+  margin: clamp(24px, 4vw, 56px) auto 0;
+}
 
-  .m-sat__steps {
-    gap: 10px;
-  }
+.m-sat-list__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
 
-  .m-sat__step:not(.m-sat__step--on) :is(.m-sat__step-title, .m-sat__step-body) {
-    display: none;
-  }
+.m-sat-list .m-sat__step-kicker {
+  padding: 0;
+  color: var(--gold);
+  cursor: auto;
+}
 
-  /* Under the nav, clear of the reading-level switch at the bottom. */
-  .m-sat__foot {
-    left: 16px;
-    right: 16px;
-    top: 76px;
-    bottom: auto;
-    text-align: left;
-  }
+.m-sat-list__photo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.m-sat-list__photo img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.m-sat-list__photo figcaption {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: #8d8a83;
 }

@@ -860,6 +860,12 @@
   image-rendering: pixelated;
 }
 
+.x-facts-carousel__credit {
+  margin: -2px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+
 .x-facts-carousel__title {
   margin: 0;
   font-size: 15px;
@@ -1388,6 +1394,15 @@
 /* Panel */
 .x-panel--result {
   --x-panel-w: 400px;
+}
+
+/* Issue #28: the OFFLINE chip sits beside a demo case's kicker and name. */
+.x-panel__kicker,
+.x-case__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
 }
 
 .x-panel {

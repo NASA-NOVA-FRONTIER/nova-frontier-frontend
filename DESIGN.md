@@ -12,13 +12,13 @@ the question → the measurement → the verdict in plain words → the second w
 can't tell you. Three words: **calm, scientific, honest**. Colour is reserved for **data** and the
 one gold accent; chrome stays ink on deep blue.
 
-| Page       | Layout file                       | Prefix | What it is                                                                                                                                                                                   |
-| ---------- | --------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`        | `src/pages/landing/landing.css`   | `l-`   | Scroll story over a fixed three.js Earth, compare slider, pipeline, cases carousel, "where it fails", data sources, mission, close                                                           |
-| `/explore` | `src/pages/explorer/explorer.css` | `x-`   | Full-screen Cesium globe with glass cards: start card, case panel, layer dock, pass timeline, "More information" sheet                                                                       |
-| `/cases`   | `src/pages/cases/cases.css`       | `k-`   | The measured cases as cards, filtered by question, plus the five-hazard icon row                                                                                                             |
-| `/method`  | `src/pages/method/method.css`     | `m-`   | NISAR satellite stage, Qadirabad scroll sequence, six steps, band chart in three states, lenses, echo simulator, wavelengths, interferometry, works / fails, experimental models, colour key |
-| `/about`   | `src/pages/about/about.css`       | `a-`   | Crew orbit round the team logo, crew manifest, project links                                                                                                                                 |
+| Page       | Layout file                       | Prefix | What it is                                                                                                                                                                                                                             |
+| ---------- | --------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`        | `src/pages/landing/landing.css`   | `l-`   | Scroll story over a fixed three.js Earth, compare slider, pipeline, cases carousel, "where it fails", data sources, mission, close                                                                                                     |
+| `/explore` | `src/pages/explorer/explorer.css` | `x-`   | Full-screen Cesium globe with glass cards: start card, case panel, layer dock, pass timeline, "More information" sheet                                                                                                                 |
+| `/cases`   | `src/pages/cases/cases.css`       | `k-`   | The measured cases as cards, filtered by question, plus the five-hazard icon row                                                                                                                                                       |
+| `/method`  | `src/pages/method/method.css`     | `m-`   | NISAR satellite teardown (seven scroll steps, a list on phones), Qadirabad scroll sequence, six steps, band chart in three states, lenses, echo simulator, wavelengths, interferometry, works / fails, experimental models, colour key |
+| `/about`   | `src/pages/about/about.css`       | `a-`   | Crew orbit round the team logo, crew manifest, project links                                                                                                                                                                           |
 
 ### One system
 
