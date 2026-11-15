@@ -374,6 +374,8 @@ test.describe("Explorer: pick a spot (step 2)", () => {
     "an ocean click shows No NISAR data here and the nearest known case",
     { tag: "@globe" },
     async ({ page }) => {
+      // Every click now flies the camera to its square, and close-up tiles render slowly in software WebGL.
+      test.slow();
       await globe.mockCoverage({ mock: "coverage-open-ocean" });
       await globe.goto();
       await globe.clickOcean();
