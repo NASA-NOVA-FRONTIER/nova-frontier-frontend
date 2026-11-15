@@ -169,6 +169,25 @@ test.describe("Landing and about pages", () => {
       await expect.poll(width).toBe(400);
     }
   });
+
+  // #29: the footer holds on a desktop and on a phone, with its image credits.
+  for (const screen of [
+    { width: 1440, height: 900 },
+    { width: 390, height: 844 },
+  ]) {
+    test(`the footer fits a ${screen.width} px screen on every site page`, async ({ page }) => {
+      await page.setViewportSize(screen);
+      for (const path of ["/", "/cases", "/method", "/learn", "/about"]) {
+        await page.goto(path);
+        const footer = page.getByTestId("site-footer");
+        await footer.scrollIntoViewIfNeeded();
+        await expect(footer).toContainText("Earth: NASA Blue Marble");
+        expect((await footer.boundingBox())?.width, path).toBe(screen.width);
+        const pageWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+        expect(pageWidth, path).toBe(screen.width);
+      }
+    });
+  }
 });
 
 // The mission model under reduced motion: deployed and still, so a hotspot stays where it was drawn.

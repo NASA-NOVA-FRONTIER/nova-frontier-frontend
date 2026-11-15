@@ -18,8 +18,9 @@ Pages (`src/App.tsx` switches on the pathname; no router dependency):
 - `/report?case=<id>` a printable one-page report for a measured case; `/report?exploration=<id>`
   the same for a live answer, fetched from the backend (`src/pages/report/`).
 
-Design source of truth: `docs/design/` (reading order in `docs/design/README.md`: `v8/` specs, copy
-and provenance on top of `v7/`; its team decisions win over the handoff). Visual system as built:
+Design source of truth: `docs/design/` (reading order in `docs/design/README.md`: the `v9/` explorer
+flow on top of `v8/` specs, copy and provenance, on top of `v7/`; its team decisions and v9 corrections
+win over the handoffs). Visual system as built:
 `DESIGN.md`.
 
 ## v8 foundations
@@ -239,9 +240,11 @@ Mirrors the conventions used at work (consoles-ui-monorepo), kept as simple as t
 - **Guided story** (`/explore?story=1`, `src/features/story/`): six chapters on the case marked
   `tour` (Qadirabad, Chenab flood). Card per chapter plus a caption bar (Back / Play / Next, ← →,
   Esc exits); Play advances every 9 s; optional Web Speech voice reads the captions. Numbers are the
-  case's REAL values. **TO FILL:** chapter 1 "Areas affected" / "People affected" (PMD/FFD
-  bulletin, official figures only) and chapter 5 photos and news; they stay bracketed slots with a
-  TO FILL chip until credited, linked material is copied in.
+  case's REAL values. **TO FILL:** chapter 1 "Areas affected" / "People affected" (official PDMA
+  or NDMA figures only; the PMD/FFD bulletin reports flows, not impacts) and chapter 5 photos (no
+  freely licensed photo of this flood yet); they stay bracketed slots with a TO FILL chip until
+  credited, linked material is copied in. Chapter 5 news links real articles
+  (`src/features/story/storyNews.ts`).
 - **Quick onboarding** (`src/features/onboarding/`): four spotlight steps (start card, panel,
   layer dock, timeline), once per browser (`localStorage`, guarded); Help → "Replay the quick tour".
 - **Nova** (`src/features/nova/`): rule-based, DEMO chip, says so in the chat. It only rephrases

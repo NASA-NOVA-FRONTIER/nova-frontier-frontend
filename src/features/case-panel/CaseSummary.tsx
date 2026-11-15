@@ -14,6 +14,9 @@ import { ContrastBars } from "@/features/charts/ContrastBars";
 
 const PANEL_CHART_PX = 108;
 
+// A bracketed value ("[Report]") is still a slot to fill; anything else was copied from its source.
+const isSlot = (value: string): boolean => value.startsWith("[");
+
 type SummaryProps = { subject: Subject; mode: ChartMode; onMore: () => void };
 
 // The five facts of a result: verdict, chart, whole-area bars, headline stat and quality.
@@ -89,7 +92,11 @@ export const PendingSummary = ({ item }: { item: Case }) => (
           <span>{fact.k}</span>
           <span className="x-facts__v">
             {fact.v}
-            <Prov kind="todo" source={`${fact.why} ${SOURCE.todo}`} />
+            {isSlot(fact.v) ? (
+              <Prov kind="todo" source={`${fact.why} ${SOURCE.todo}`} />
+            ) : (
+              <Prov kind="real" source={fact.why} />
+            )}
           </span>
         </li>
       ))}
