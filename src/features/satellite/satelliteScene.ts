@@ -47,7 +47,14 @@ import {
 } from "three";
 
 import type { SatellitePartId } from "@/features/satellite/satelliteParts";
-import { pixelRatioFor, type SatellitePose, type Vec3 } from "@/features/satellite/satelliteMotion";
+import {
+  EXPLODE_VECTORS,
+  pixelRatioFor,
+  type SatellitePose,
+  TEARDOWN_PARTS,
+  type TeardownPart,
+  type Vec3,
+} from "@/features/satellite/satelliteMotion";
 
 export type FrameInput = {
   pose: SatellitePose;
@@ -478,6 +485,61 @@ export const createSatelliteScene = (
     new Vector3(1, 0, 0),
   );
 
+  // Teardown (Method only): each piece slides along its explode vector, and pieces out of focus
+  // fade. The reflector lives in the boom tip's frame, so its vector is turned into that frame.
+  const pieceRoot: Record<TeardownPart, Object3D> = {
+    reflector: refl,
+    boom: boomRoot,
+    radars: inst,
+    bus,
+    solar,
+  };
+  const home = new Map<Object3D, Vector3>();
+  for (const part of TEARDOWN_PARTS) {
+    if (part !== "reflector") home.set(pieceRoot[part], pieceRoot[part].position.clone());
+  }
+  const explodeOf = (part: TeardownPart) => new Vector3(...EXPLODE_VECTORS[part]);
+  const reflExplode = explodeOf("reflector").applyQuaternion(
+    tip.getWorldQuaternion(new Quaternion()).invert(),
+  );
+  const lookAnchor: Record<TeardownPart, SatellitePartId> = {
+    reflector: "reflector",
+    boom: "boom",
+    radars: "lband",
+    bus: "bus",
+    solar: "solar",
+  };
+  // Materials are shared between pieces, so fading needs per-piece copies. They're made on the
+  // first faded frame only: the Landing never fades, so its scene stays exactly as built.
+  type Fade = { material: Material; opacity: number };
+  let fades: Map<TeardownPart, Fade[]> | undefined;
+  const replaced = new Set<Material>();
+  const buildFades = (): Map<TeardownPart, Fade[]> => {
+    const map = new Map<TeardownPart, Fade[]>();
+    for (const part of TEARDOWN_PARTS) {
+      const list: Fade[] = [];
+      const visit = (object: Object3D) => {
+        // The reflector hangs under the boom tip but fades on its own.
+        if (object === refl && part !== "reflector") return;
+        if (object instanceof Mesh || object instanceof LineSegments) {
+          const own = (m: Material): Material => {
+            replaced.add(m);
+            const copy = m.clone();
+            copy.transparent = true;
+            list.push({ material: copy, opacity: m.opacity });
+            return copy;
+          };
+          const current: Material | Material[] = object.material;
+          object.material = Array.isArray(current) ? current.map(own) : own(current);
+        }
+        for (const child of object.children) visit(child);
+      };
+      visit(pieceRoot[part]);
+      map.set(part, list);
+    }
+    return map;
+  };
+
   // Earth, atmosphere, stars, and the side-looking beam with its swath.
   const ER = 70;
   const earthC = new Vector3(0, -88, 0);
@@ -598,6 +660,15 @@ export const createSatelliteScene = (
 
   let lastOffset: number | undefined;
   const point = new Vector3();
+  const lookTarget = new Vector3();
+  const lookFrom = new Vector3();
+  const lookTo = new Vector3();
+  const leanFrom = (part: TeardownPart | null, target: Vector3, out: Vector3): Vector3 => {
+    if (part === null) return out.set(0, 0, 0);
+    const o = anchors.get(lookAnchor[part]);
+    if (o === undefined) return out.set(0, 0, 0);
+    return o.getWorldPosition(out).sub(target).multiplyScalar(0.6);
+  };
 
   const render = ({ pose, camera: pose3, offsetX, time }: FrameInput) => {
     segments.forEach((s, k) => {
@@ -606,11 +677,41 @@ export const createSatelliteScene = (
     dish.scale.set(pose.dishScale, 1, pose.dishScale);
     refl.position.lerpVectors(reflStowedP, reflDeployedP, pose.reflectorT);
     refl.quaternion.slerpQuaternions(reflStowedQ, reflDeployedQ, pose.reflectorT);
+    refl.position.addScaledVector(reflExplode, pose.explode);
+    for (const [root, at] of home) root.position.copy(at);
+    if (pose.explode > 0) {
+      for (const part of TEARDOWN_PARTS) {
+        if (part !== "reflector") {
+          pieceRoot[part].position.addScaledVector(explodeOf(part), pose.explode);
+        }
+      }
+    }
+    const fading = TEARDOWN_PARTS.some((part) => pose.parts[part] < 1);
+    if (fading && fades === undefined) fades = buildFades();
+    if (fades !== undefined) {
+      for (const [part, list] of fades) {
+        for (const fade of list) fade.material.opacity = fade.opacity * pose.parts[part];
+      }
+    }
     beamMat.opacity = 0.11 * pose.beam;
     swathMat.opacity = 0.7 * pose.beam;
     if (time !== undefined) earth.rotation.y = 2.2 + time * 0.006;
     camera.position.set(...pose3.position);
-    camera.lookAt(...pose3.target);
+    const target = lookTarget.set(...pose3.target);
+    const { from, to, t } = pose.look;
+    if (from !== null || to !== null) {
+      // Lean towards the piece in focus and move in, keeping the viewing direction.
+      sat.updateMatrixWorld(true);
+      const shift = leanFrom(from, target, lookFrom).lerp(leanFrom(to, target, lookTo), t);
+      const lean = (from === null ? 0 : 1 - t) + (to === null ? 0 : t);
+      camera.position
+        .sub(target)
+        .multiplyScalar(1 - 0.45 * lean)
+        .add(target)
+        .add(shift);
+      target.add(shift);
+    }
+    camera.lookAt(target);
     const off = offsetX * size.width;
     if (off !== lastOffset) {
       lastOffset = off;
@@ -648,6 +749,7 @@ export const createSatelliteScene = (
     });
     for (const geometry of geometries) geometry.dispose();
     for (const material of materials) material.dispose();
+    for (const material of replaced) material.dispose();
     for (const texture of textures) texture.dispose();
     scene.environment?.dispose();
     renderer.dispose();

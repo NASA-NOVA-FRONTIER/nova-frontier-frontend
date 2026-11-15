@@ -22,6 +22,7 @@ import {
   orbitByDrag,
   orbitByKey,
   satellitePose,
+  type StagePose,
   tipPosition,
   toScreen,
   trackProgress,
@@ -52,6 +53,9 @@ export type NisarSatelliteProps = {
   caption?: string;
   className?: string;
   onProgress?: (progress: number) => void;
+  /** Page-driven pose for each scroll progress (the Method teardown); replaces the built-in
+   * deploy/beam/zoom mapping and adds explode and focus. Omitted, the model behaves as before. */
+  stage?: (progress: number, reduced: boolean) => StagePose;
   onPart?: (id: SatellitePartId | null) => void;
   /** Average fps over the first ~2 s of running frames, once (never under reduced motion). */
   onFps?: (fps: number) => void;
@@ -179,6 +183,7 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
           scrollDriven,
           progress,
           reduced,
+          stage: p.stage?.(progress, reduced),
         });
         const o = orbit.current;
         if (p.autorotate && !o.touched && !reduced) {
@@ -243,8 +248,11 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
       );
       visibility.observe(element);
       // Without motion nothing scrubs, but the page can still follow the scroll through onProgress.
+      // A staged model changes its pose with the scroll, so it also redraws (one frame, no loop).
       const onScroll = () => {
-        if (reduced) readProgress();
+        if (!reduced) return;
+        readProgress();
+        if (latest.current.stage !== undefined) loop.invalidate();
       };
       window.addEventListener("scroll", onScroll, { passive: true });
       const onContextLost = (event: Event) => {
