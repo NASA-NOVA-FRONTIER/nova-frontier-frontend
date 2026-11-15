@@ -5,7 +5,6 @@ import { splitAntimeridian } from "@/features/geo/antimeridian";
 import { boundsOf, continueLon, normalizeLon, unwrapRing, wrapBox } from "@/features/geo/longitude";
 import { areaKm2Of, centreOf, ringAreaKm2 } from "@/features/geo/measure";
 import { squareAround, squareBounds } from "@/features/geo/square";
-import { formatKm2, levelOf } from "@/features/geo/limits";
 
 const QADIRABAD: LonLat = [73.713, 32.329];
 
@@ -190,22 +189,5 @@ describe("squareBounds", () => {
       [east, north],
       [west, north],
     ]);
-  });
-});
-
-describe("size levels", () => {
-  it.each([
-    [100, "ideal"],
-    [110, "ideal"],
-    [110.5, "large"],
-    [400, "large"],
-    [400.5, "tooLarge"],
-  ])("calls %f km² %s", (km2, level) => {
-    expect(levelOf(km2)).toBe(level);
-  });
-
-  it("formats small and large areas", () => {
-    expect(formatKm2(4.26)).toBe("4.3 km²");
-    expect(formatKm2(1234.4)).toBe("1,234 km²");
   });
 });

@@ -2,9 +2,10 @@ import { useEffect, useState, type RefObject } from "react";
 
 import { PHONE_QUERY } from "@/lib/useMediaQuery";
 
-// What sits at the bottom on a phone: the start card, the sheet (spot, waiting, panel) and the
-// compact timeline over it.
-const BOTTOM_CARDS = ".x-start, .x-place, .x-panel, .x-jobmodal, .x-timeline-wrap .x-timeline";
+// What sits at the bottom on a phone: the start card, the placed square's bar, the sheet (spot,
+// waiting, panel) and the compact timeline over it.
+const BOTTOM_CARDS =
+  ".x-start, .x-square-bar, .x-place, .x-panel, .x-jobmodal, .x-timeline-wrap .x-timeline";
 const GAP_PX = 12;
 
 /*
