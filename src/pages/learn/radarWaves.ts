@@ -48,6 +48,9 @@ export const RADAR_WAVES_COPY = {
   steeper: "33° · STEEPER",
   shallower: "47° · SHALLOWER",
   chip: "ILLUSTRATIVE · WAVELENGTHS TO SCALE",
+  // New (PR #60 review): the chip's tooltip says what the drawing is and where its numbers come from.
+  chipSource:
+    "A diagram, not a measurement. Wavelengths: L-band 24 cm and S-band 9.4 cm from NASA Science's NISAR pages; C-band about 5.6 cm from NASA Earthdata.",
   sent: "SENT",
   echo: { HH: "ECHO · HH", HV: "ECHO · HV" } satisfies Record<PolId, string>,
   scaleBar: "24 cm",

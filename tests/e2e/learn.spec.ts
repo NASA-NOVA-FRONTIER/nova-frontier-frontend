@@ -74,7 +74,9 @@ test.describe("Learn radar waves", () => {
     await expect(waves.getByRole("heading", { level: 2 })).toHaveText(
       "Change the wave, change what comes back.",
     );
-    await expect(waves).toContainText("ILLUSTRATIVE · WAVELENGTHS TO SCALE");
+    const chip = waves.getByTestId("prov-illustrative");
+    await expect(chip).toHaveText("ILLUSTRATIVE · WAVELENGTHS TO SCALE");
+    await expect(chip).toHaveAttribute("title", /^A diagram, not a measurement\./);
     const canvas = page.getByTestId("learn-waves-canvas");
     const readout = page.getByTestId("learn-waves-readout");
     await expect(readout).toContainText("The long wave reaches deepest");

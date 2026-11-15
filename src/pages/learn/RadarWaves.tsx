@@ -1,7 +1,10 @@
+import "@/features/charts/charts.css";
+
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 
 import { createRenderLoop } from "@/features/satellite/renderLoop";
 import { pixelRatioFor } from "@/features/satellite/satelliteMotion";
+import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 import { drawFrame, drawStatic } from "@/pages/learn/drawRadarWaves";
 import {
@@ -214,7 +217,9 @@ export const RadarWaves = () => {
               data-testid="learn-waves-canvas"
             />
           </div>
-          <span className="lr-waves__chip">{copy.chip}</span>
+          <span className="lr-waves__chip">
+            <ProvenanceChip kind="illustrative" label={copy.chip} source={copy.chipSource} />
+          </span>
           <span className="lr-waves__legend" aria-hidden="true">
             <span className="lr-waves__key">
               <span className="lr-waves__swatch lr-waves__swatch--sent" />
