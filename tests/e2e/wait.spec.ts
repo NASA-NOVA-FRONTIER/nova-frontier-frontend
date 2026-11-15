@@ -1,5 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
-
+import { expect, test, type Page } from "./fixtures";
 import { runningView, succeededView } from "./pom/explorationMock";
 import { GlobePage, LIVE_FRAME } from "./pom/GlobePage";
 

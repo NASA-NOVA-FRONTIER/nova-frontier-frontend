@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-
+import { expect, test } from "./fixtures";
 import { succeededView } from "./pom/explorationMock";
 import { GlobePage, LIVE_FRAME } from "./pom/GlobePage";
 
@@ -22,7 +21,7 @@ test.describe("Explorer: measured cases", () => {
     await expect(globe.startCard.getByTestId("intro-team")).toHaveAttribute("href", "/about");
   });
 
-  test("a case link opens its panel with the real numbers", async ({ page }) => {
+  test("a case link opens its panel with the real numbers", { tag: "@globe" }, async ({ page }) => {
     await globe.goto("?case=qadirabad");
     await expect(globe.panelTitle).toHaveText("Qadirabad, Pakistan");
     await expect(globe.panelMeta).toContainText("Measured case");
@@ -49,6 +48,9 @@ test.describe("Explorer: measured cases", () => {
   test("the layer dock drapes only real crops; HV waits for the API", async () => {
     await globe.goto("?case=qadirabad");
     await expect(globe.dock).toBeVisible();
+    await globe.expectScene((scene) =>
+      expect(scene.drape?.url).toBe("/cases/qadirabad-change.png"),
+    );
     await expect(globe.dock.getByTestId("channel-HV")).toBeDisabled();
     await expect(globe.dock.getByTestId("channel-HV")).toHaveAttribute(
       "title",
@@ -56,6 +58,7 @@ test.describe("Explorer: measured cases", () => {
     );
     await globe.dock.getByTestId("layer-baseline").click();
     await expect(globe.dock.getByTestId("layer-baseline")).toHaveAttribute("aria-pressed", "true");
+    await globe.expectScene((scene) => expect(scene.drape?.url).toBe("/cases/qadirabad-base.png"));
     await expect(globe.dock.getByTestId("channel-ratio")).toBeDisabled();
   });
 
@@ -64,6 +67,12 @@ test.describe("Explorer: measured cases", () => {
     await globe.caseRow("chokwe").click();
     await expect(globe.panelTitle).toHaveText("Chókwè, Mozambique");
     await expect(page).toHaveURL(/\?case=chokwe$/);
+    // The globe flies to the case and draws its measured footprint in solid gold.
+    await globe.expectScene((scene) => {
+      expect(scene.selectedCaseId).toBe("chokwe");
+      expect(scene.target?.key).toBe("chokwe");
+      expect(scene.outline?.processing).toBe(false);
+    });
   });
 
   test("More information opens the sheet; Technical adds the limits; Esc closes", async ({
@@ -235,31 +244,33 @@ test.describe("Explorer: live questions", () => {
     await expect(globe.panelTitle).toHaveText("Qadirabad, Pakistan");
   });
 
-  test("hovering land shows its NISAR frame; a click picks the spot and Analyze asks about it", async ({
-    page,
-  }) => {
-    // Close-up imagery tiles render slowly in software WebGL.
-    test.slow();
-    const globe = new GlobePage(page);
-    await globe.mockObservationPlan();
-    await globe.mockCoverage();
-    await globe.mockExplorations({ first: succeededView() });
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(globe.panelMeta).toContainText(LIVE_FRAME.title);
+  test(
+    "hovering land shows its NISAR frame; a click picks the spot and Analyze asks about it",
+    { tag: "@globe" },
+    async ({ page }) => {
+      // Close-up imagery tiles render slowly in software WebGL.
+      test.slow();
+      const globe = new GlobePage(page);
+      await globe.mockObservationPlan();
+      await globe.mockCoverage();
+      await globe.mockExplorations({ first: succeededView() });
+      await globe.goto(`?frame=${LIVE_FRAME.id}`);
+      await expect(globe.panelMeta).toContainText(LIVE_FRAME.title);
 
-    await globe.hoverLand();
-    await expect(globe.tooltip).toContainText(`${LIVE_FRAME.title} · HH+HV`);
-    await expect(globe.tooltip).toContainText("click to ask the radar");
+      await globe.hoverLand();
+      await expect(globe.tooltip).toContainText(`${LIVE_FRAME.title} · HH+HV`);
+      await expect(globe.tooltip).toContainText("click to ask the radar");
 
-    const before = await globe.panelTitle.textContent();
-    await globe.clickLand();
-    // Step 2: the click only checks the catalog; nothing runs until Analyze.
-    await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
-    await expect(globe.panel).toBeHidden();
-    await globe.placeAnalyse.click();
-    await expect(globe.panelTitle).not.toHaveText(before ?? "");
-    await expect(globe.panelMeta).toContainText(LIVE_FRAME.title);
-  });
+      const before = await globe.panelTitle.textContent();
+      await globe.clickLand();
+      // Step 2: the click only checks the catalog; nothing runs until Analyze.
+      await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
+      await expect(globe.panel).toBeHidden();
+      await globe.placeAnalyse.click();
+      await expect(globe.panelTitle).not.toHaveText(before ?? "");
+      await expect(globe.panelMeta).toContainText(LIVE_FRAME.title);
+    },
+  );
 });
 
 test.describe("Explorer: v8 top bar", () => {
@@ -338,29 +349,33 @@ test.describe("Explorer: pick a spot (step 2)", () => {
     await expect(globe.startCard).toBeVisible();
   });
 
-  test("an ocean click shows No NISAR data here and the nearest known case", async ({ page }) => {
-    await globe.mockCoverage({ mock: "coverage-open-ocean" });
-    await globe.goto();
-    await globe.clickOcean();
+  test(
+    "an ocean click shows No NISAR data here and the nearest known case",
+    { tag: "@globe" },
+    async ({ page }) => {
+      await globe.mockCoverage({ mock: "coverage-open-ocean" });
+      await globe.goto();
+      await globe.clickOcean();
 
-    await expect(globe.placeCard).toHaveAttribute("data-state", "noCoverage");
-    await expect(globe.placeCard).toContainText("CLICKED POINT · NO COVERAGE");
-    await expect(page.getByTestId("place-title")).toHaveText("No NISAR data here");
-    await expect(page.getByTestId("spot-nodata")).toHaveText(
-      "The catalog has no compatible passes at this point. Over open ocean NISAR data isn't analyzed here.",
-    );
-    await expect(globe.spotNearest).toContainText(/Nearest known case · about [\d,]+ km/);
-    expect(globe.coverageRequests).toHaveLength(1);
+      await expect(globe.placeCard).toHaveAttribute("data-state", "noCoverage");
+      await expect(globe.placeCard).toContainText("CLICKED POINT · NO COVERAGE");
+      await expect(page.getByTestId("place-title")).toHaveText("No NISAR data here");
+      await expect(page.getByTestId("spot-nodata")).toHaveText(
+        "The catalog has no compatible passes at this point. Over open ocean NISAR data isn't analyzed here.",
+      );
+      await expect(globe.spotNearest).toContainText(/Nearest known case · about [\d,]+ km/);
+      expect(globe.coverageRequests).toHaveLength(1);
 
-    await page.getByTestId("spot-another").click();
-    await expect(globe.placeCard).toBeHidden();
-    await expect(globe.startCard).toBeVisible();
+      await page.getByTestId("spot-another").click();
+      await expect(globe.placeCard).toBeHidden();
+      await expect(globe.startCard).toBeVisible();
 
-    await globe.clickOcean();
-    await globe.spotNearest.click();
-    await expect(globe.panel).toBeVisible();
-    await expect(globe.placeCard).toBeHidden();
-  });
+      await globe.clickOcean();
+      await globe.spotNearest.click();
+      await expect(globe.panel).toBeVisible();
+      await expect(globe.placeCard).toBeHidden();
+    },
+  );
 
   test("a catalog that doesn't answer says so and Try again asks once more", async ({ page }) => {
     await globe.mockCoverage({ failures: 1 });

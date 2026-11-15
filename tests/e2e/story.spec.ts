@@ -1,7 +1,6 @@
 import { readFile } from "node:fs/promises";
 
-import { expect, test } from "@playwright/test";
-
+import { expect, test } from "./fixtures";
 import { GlobePage } from "./pom/GlobePage";
 
 test.describe("Explorer: guided story", () => {
@@ -165,7 +164,7 @@ test.describe("Explorer: Nova and downloads", () => {
     expect(first).toMatch(/^qadirabad,flood_wetland,\d{4}-\d{2}-\d{2},\w+,.*,(true|false),true$/);
   });
 
-  test("the PNG download carries the context strip", async ({ page }) => {
+  test("the PNG download carries the context strip", { tag: "@globe" }, async ({ page }) => {
     await globe.goto("?case=qadirabad");
     await page.getByTestId("download-button").click();
     const downloading = page.waitForEvent("download");
