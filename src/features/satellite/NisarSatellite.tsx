@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { prefersReducedMotion } from "@/lib/motion";
+import { createHoverIntent, type HoverIntent } from "@/features/satellite/hoverIntent";
 import { createFpsMeter, createRenderLoop } from "@/features/satellite/renderLoop";
 import {
   AUTOROTATE_STEP,
@@ -101,6 +102,16 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
   const [pinned, setPinned] = useState<SatellitePartId | null>(null);
   const tipFor = useRef<SatellitePartId | null>(null);
   const pinnedRef = useRef<SatellitePartId | null>(null);
+  // The pointer's hotspot, built on first use. Closing waits a moment, and only clears the card it
+  // opened (a focused or pinned hotspot may own it by then).
+  const intentRef = useRef<HoverIntent<SatellitePartId> | undefined>(undefined);
+  const hoverIntent = (): HoverIntent<SatellitePartId> => {
+    intentRef.current ??= createHoverIntent<SatellitePartId>((id, previous) => {
+      if (id !== null) setTip(id);
+      else if (tipFor.current === previous) setTip(pinnedRef.current);
+    });
+    return intentRef.current;
+  };
 
   // The loop reads props from a ref, so a new deploy or beam value never rebuilds the scene.
   useLayoutEffect(() => {
@@ -116,6 +127,8 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
     pinnedRef.current = pinned;
     invalidate.current();
   }, [tip, pinned]);
+
+  useEffect(() => () => intentRef.current?.cancel(), []);
 
   // Loading and ready are one phase, so becoming ready doesn't rebuild the scene.
   const phase = status === "loading" || status === "ready" ? "live" : status;
@@ -368,8 +381,13 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
                   aria-pressed={pinned === id}
                   tabIndex={-1}
                   data-testid={`nisar-hotspot-${id}`}
-                  onPointerEnter={() => setTip(id)}
-                  onPointerLeave={() => leave(id)}
+                  // Touch has no hover: a tap toggles the card through onClick.
+                  onPointerEnter={(event) => {
+                    if (event.pointerType !== "touch") hoverIntent().enter(id);
+                  }}
+                  onPointerLeave={(event) => {
+                    if (event.pointerType !== "touch") hoverIntent().leave(id);
+                  }}
                   onFocus={() => setTip(id)}
                   onBlur={() => leave(id)}
                   onClick={() => togglePin(id)}
