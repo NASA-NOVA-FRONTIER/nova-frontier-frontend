@@ -57,6 +57,7 @@ const CaseCard = ({ item }: { item: Case }) => {
 
       <div className="k-card__chips">
         <span className="k-chip">{findLens(item.lens)?.chip}</span>
+        <ProvenanceChip kind="offline" />
         <span className="k-chip k-chip--verdict">
           <VerdictGlyph verdict={item.verdict} />
           {VERDICT_LABEL[item.verdict]}

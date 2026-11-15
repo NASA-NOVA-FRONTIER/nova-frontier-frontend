@@ -296,8 +296,8 @@ test.describe("Explorer v8: errors and limits", () => {
       await expect(quota).toHaveAttribute("data-category", "quotaOut");
       await expect(quota).toContainText("They reset at 00:00 UTC");
       await expect(globe.placeAnalyse).toHaveCount(0);
-      await quota.getByRole("button", { name: /Chókwè/ }).click();
-      await expect(globe.panelTitle).toContainText("Chókwè");
+      await quota.getByRole("button", { name: /Qadirabad/ }).click();
+      await expect(globe.panelTitle).toContainText("Qadirabad");
     });
   });
 });

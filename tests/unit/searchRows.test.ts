@@ -43,7 +43,7 @@ describe("coordinatePlace", () => {
 
 describe("caseHits", () => {
   it("finds a known case by name, ignoring accents and case", () => {
-    expect(caseHits("chokwe", CASES).map(({ id }) => id)).toEqual(["chokwe"]);
+    expect(caseHits("choco", CASES).map(({ id }) => id)).toEqual(["choco"]);
     expect(caseHits("Qadirabad Pakistan", CASES).map(({ id }) => id)).toEqual(["qadirabad"]);
     expect(caseHits("Chenab", CASES).map(({ id }) => id)).toEqual(["qadirabad"]);
   });
