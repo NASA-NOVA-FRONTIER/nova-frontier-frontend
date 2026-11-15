@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#04070e;color-scheme:dark}
+a{color:#c9b48b;text-decoration:none}
+a:hover{color:#dccaa3}
+h2,h3,p{margin:0}
+button{font:inherit}
+input[type=range]{accent-color:#c9b48b}
+</style>
+</helmet>
+<section ref="{{ rootRef }}" aria-label="Radar waves" style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:20px;padding:20px;border-radius:28px;background:rgba(235,233,228,0.035);border:1px solid rgba(235,233,228,0.08);color:#ebe9e4;font-family:'Albert Sans',system-ui,sans-serif;font-size:15px;line-height:1.45;box-sizing:border-box">
+  <div style="position:relative;min-width:0;border-radius:20px;overflow:hidden;background:#08101f;aspect-ratio:16 / 10">
+    <canvas ref="{{ canvasRef }}" role="img" aria-label="{{ aria }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+    <span style="position:absolute;left:12px;bottom:12px;padding:2px 8px;border-radius:999px;background:rgba(245,158,11,0.18);font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.05em;color:#fcd34d;white-space:nowrap">ILLUSTRATIVE · WAVELENGTHS TO SCALE</span>
+    <span style="position:absolute;right:12px;top:12px;display:flex;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#d4d2cc"><span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:#c9b48b"></span>SENT</span><span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:{{ retInk }}"></span>{{ retLabel }}</span></span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <p id="rw-band" style="font-size:13px;font-weight:500;color:#d4d2cc">Wavelength</p>
+      <div role="radiogroup" aria-labelledby="rw-band" style="display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(235,233,228,0.06)">
+        <sc-for list="{{ bands }}" as="b" hint-placeholder-count="3"><button role="radio" aria-checked="{{ b.on }}" onClick="{{ b.pick }}" onKeyDown="{{ b.key }}" tabIndex="{{ b.tab }}" style="flex:1;height:36px;border-radius:999px;border:0;background:{{ b.bg }};color:{{ b.ink }};font-size:13.5px;font-weight:500;cursor:pointer;white-space:nowrap">{{ b.label }}</button></sc-for>
+      </div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#a9a69e">{{ bandMeta }}</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <p id="rw-pol" style="font-size:13px;font-weight:500;color:#d4d2cc">Polarization</p>
+      <div role="radiogroup" aria-labelledby="rw-pol" style="display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(235,233,228,0.06)">
+        <sc-for list="{{ pols }}" as="p" hint-placeholder-count="2"><button role="radio" aria-checked="{{ p.on }}" onClick="{{ p.pick }}" onKeyDown="{{ p.key }}" tabIndex="{{ p.tab }}" style="flex:1;height:36px;border-radius:999px;border:0;background:{{ p.bg }};color:{{ p.ink }};font-size:13.5px;font-weight:500;cursor:pointer;white-space:nowrap">{{ p.label }}</button></sc-for>
+      </div>
+    </div>
+    <label style="display:flex;flex-direction:column;gap:8px">
+      <span style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;color:#d4d2cc"><span>Incidence angle</span><span style="font-family:'JetBrains Mono',monospace;font-weight:400">{{ incLabel }}</span></span>
+      <input type="range" min="33" max="47" step="1" value="{{ inc }}" onChange="{{ setInc }}" aria-valuetext="{{ incLabel }}" style="width:100%">
+      <span style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;color:#8d8a83"><span>33° · STEEPER</span><span>47° · SHALLOWER</span></span>
+    </label>
+    <div style="display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:16px;background:rgba(235,233,228,0.04)">
+      <p style="font-size:15px;font-weight:500">{{ readTitle }}</p>
+      <p style="font-size:13.5px;color:#c4c1ba;text-wrap:pretty">{{ readBody }}</p>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100,&quot;height&quot;:560}}">
+class Component extends DCLogic {
+  state = { band: "L", pol: "HH", inc: 40 };
+  rootRef = React.createRef(); canvasRef = React.createRef();
+  componentDidMount() {
+    this.rm = window.matchMedia("(prefers-reduced-motion: reduce)");
+    this.visible = true; this.t = 0; this.last = performance.now();
+    this.io = new IntersectionObserver(([e]) => { this.visible = e.isIntersecting; this.kick(); });
+    this.io.observe(this.rootRef.current);
+    this.onVis = () => this.kick(); document.addEventListener("visibilitychange", this.onVis);
+    this.ro = new ResizeObserver(() => this.draw()); this.ro.observe(this.canvasRef.current);
+    this.kick();
+  }
+  componentDidUpdate() { this.draw(); }
+  componentWillUnmount() { cancelAnimationFrame(this.raf); this.io?.disconnect(); this.ro?.disconnect(); document.removeEventListener("visibilitychange", this.onVis); }
+  running() { return this.visible && !document.hidden && !this.rm.matches; }
+  kick() { cancelAnimationFrame(this.raf); this.last = performance.now(); if (this.running()) this.loop(); else this.draw(); }
+  loop() { const now = performance.now(); this.t += (now - this.last) / 1000; this.last = now; this.draw(); if (this.running()) this.raf = requestAnimationFrame(() => this.loop()); }
+  build(W, H) {
+    let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const groundY = H * 0.8, canopyTop = H * 0.5, canopyH = groundY - canopyTop;
+    const trees = [], pts = [];
+    const add = (x, scale, depth) => {
+      const cy = canopyTop + canopyH * (0.3 + (1 - scale) * 0.25), rx = W / 15 * scale, ry = canopyH * 0.34 * scale, trunkTop = cy + ry * 0.5;
+      trees.push({ x, cy, trunkTop, scale, depth, branches: [[-1, 0.7], [1, 0.55], [-1, 0.38], [1, 0.25]].map(([d, k]) => ({ d, y: groundY - (groundY - trunkTop) * k })) });
+      const n = Math.round(260 * scale * (depth ? 0.6 : 1));
+      for (let i = 0; i < n; i++) { const th = rnd() * Math.PI * 2, r = Math.sqrt(rnd()); const px = x + Math.cos(th) * r * rx * (0.8 + rnd() * 0.3), py = cy + Math.sin(th) * r * ry; pts.push({ x: px, y: py, r: (depth ? 0.7 : 0.9) + rnd() * 0.9, a: depth ? 0.22 + rnd() * 0.2 : 0.45 + rnd() * 0.45, tw: rnd() * 6.28, depth }); }
+    };
+    for (let i = 0; i < 9; i++) add((i + 0.1) * W / 8.5, 0.75, 1);
+    for (let i = 0; i < 6; i++) add((i + 0.5) * W / 6, 1, 0);
+    const grains = []; for (let i = 0; i < 160; i++) grains.push({ x: rnd() * W, y: groundY + 6 + rnd() * (H - groundY - 8), a: 0.1 + rnd() * 0.25 });
+    const stars = []; for (let i = 0; i < 60; i++) stars.push({ x: rnd() * W, y: rnd() * H * 0.38, r: 0.3 + rnd() * 0.8, a: 0.12 + rnd() * 0.3 });
+    return { W, H, groundY, canopyTop, canopyH, trees, pts, grains, stars };
+  }
+  draw() {
+    const c = this.canvasRef.current; if (!c) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1), W = c.clientWidth, H = c.clientHeight;
+    if (c.width !== Math.round(W * dpr) || c.height !== Math.round(H * dpr)) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+    if (!this.sc || this.sc.W !== W || this.sc.H !== H) this.sc = this.build(W, H);
+    const S = this.sc, g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const t = this.t, band = this.state.band, hv = this.state.pol === "HV", reduced = this.rm && this.rm.matches;
+    const MONO = "500 10px 'JetBrains Mono', monospace";
+    const { groundY, canopyTop, canopyH } = S;
+    // ground plate
+    const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, "#040814"); bg.addColorStop(0.55, "#0a1428"); bg.addColorStop(1, "#060b16");
+    g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    const glow = g.createRadialGradient(W * 0.8, 0, 0, W * 0.8, 0, W * 0.7); glow.addColorStop(0, "rgba(111,179,232,0.10)"); glow.addColorStop(1, "rgba(111,179,232,0)");
+    g.fillStyle = glow; g.fillRect(0, 0, W, H);
+    g.strokeStyle = "rgba(235,233,228,0.035)"; g.lineWidth = 1; g.beginPath();
+    for (let x = 0; x <= W; x += 32) { g.moveTo(x + 0.5, 0); g.lineTo(x + 0.5, H); } for (let y = 0; y <= H; y += 32) { g.moveTo(0, y + 0.5); g.lineTo(W, y + 0.5); } g.stroke();
+    S.stars.forEach((s) => { g.fillStyle = "rgba(220,228,245," + s.a + ")"; g.beginPath(); g.arc(s.x, s.y, s.r, 0, 6.283); g.fill(); });
+    // soil section
+    const soil = g.createLinearGradient(0, groundY, 0, H); soil.addColorStop(0, "#1f1810"); soil.addColorStop(1, "#0c0906");
+    g.fillStyle = soil; g.fillRect(0, groundY, W, H - groundY);
+    g.strokeStyle = "rgba(201,180,139,0.14)"; g.lineWidth = 1;
+    for (let y = groundY + 5, i = 0; y < H; y += 5, i++) { g.setLineDash([12 + (i % 3) * 8, 4 + (i % 4) * 3]); g.lineDashOffset = i * 7; g.beginPath(); g.moveTo(0, y + 0.5); g.lineTo(W, y + 0.5); g.stroke(); }
+    g.setLineDash([]);
+    S.grains.forEach((p) => { g.fillStyle = "rgba(201,180,139," + p.a + ")"; g.fillRect(p.x, p.y, 1.2, 1.2); });
+    g.strokeStyle = "rgba(235,233,228,0.5)"; g.beginPath(); g.moveTo(0, groundY + 0.5); g.lineTo(W, groundY + 0.5); g.stroke();
+    // geometry of the pulse
+    const reach = { L: 1, S: 0.45, C: 0.14 }[band];
+    const hitY = band === "L" ? groundY + 2 : canopyTop + canopyH * reach;
+    const inc = (this.state.inc * Math.PI) / 180, hx = W * 0.6, sy = H * 0.2, sx = Math.max(112, hx - Math.tan(inc) * (hitY - sy));
+    const ex = sx + 30, ey = sy - 10;
+    const L = Math.hypot(hx - ex, hitY - ey), ux = (hx - ex) / L, uy = (hitY - ey) / L, nx = -uy, ny = ux;
+    // trees: trunks
+    S.trees.forEach((tr) => { const al = tr.depth ? 0.25 : 0.6; g.strokeStyle = "rgba(160,132,92," + al + ")"; g.lineWidth = tr.depth ? 1 : 1.4; g.beginPath(); g.moveTo(tr.x, groundY); g.lineTo(tr.x, tr.trunkTop); tr.branches.forEach((br) => { g.moveTo(tr.x, br.y); g.lineTo(tr.x + br.d * 16 * tr.scale, br.y - 14 * tr.scale); }); g.stroke(); });
+    // canopy particles, lit where the pulse scatters
+    const distToRay = (x, y) => { const dx = x - ex, dy = y - ey, along = dx * ux + dy * uy; return { d: Math.abs(dx * nx + dy * ny), along }; };
+    const litDepth = band === "L" ? groundY : hitY + 6;
+    S.pts.forEach((p) => {
+      const tw = reduced ? 1 : 0.75 + 0.25 * Math.sin(t * 1.4 + p.tw);
+      const { d } = distToRay(p.x, p.y);
+      const inBeam = d < 26 && p.y <= litDepth && (band === "L" ? true : p.y >= canopyTop + canopyH * (reach - 0.25));
+      if (inBeam && !p.depth) { const k = 1 - d / 26; g.fillStyle = "rgba(233,207,149," + Math.min(1, 0.4 + k * 0.8) + ")"; g.beginPath(); g.arc(p.x, p.y, p.r + 0.6 * k, 0, 6.283); g.fill(); }
+      else { g.fillStyle = (p.depth ? "rgba(98,150,110," : "rgba(126,190,138,") + p.a * tw + ")"; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 6.283); g.fill(); }
+    });
+    // beam envelope
+    g.strokeStyle = "rgba(233,207,149,0.12)"; g.lineWidth = 1; g.setLineDash([2, 6]);
+    [-1, 1].forEach((s2) => { g.beginPath(); g.moveTo(ex + nx * 6 * s2, ey + ny * 6 * s2); g.lineTo(hx + nx * 26 * s2, hitY + ny * 26 * s2); g.stroke(); });
+    g.setLineDash([]);
+    // satellite, line drawing
+    g.save(); g.translate(sx, sy); g.strokeStyle = "rgba(235,233,228,0.85)"; g.lineWidth = 1.2;
+    g.strokeRect(-98, -4, 66, 8); for (let k = -90; k < -32; k += 8) { g.beginPath(); g.moveTo(k, -4); g.lineTo(k, 4); g.stroke(); }
+    g.beginPath(); g.moveTo(-32, 0); g.lineTo(-12, 0); g.stroke();
+    const foil = g.createLinearGradient(-12, -10, 12, 10); foil.addColorStop(0, "#e0c27a"); foil.addColorStop(1, "#9c7636"); g.fillStyle = foil; g.fillRect(-12, -10, 24, 20); g.strokeRect(-12, -10, 24, 20);
+    g.strokeRect(-8, -20, 16, 10);
+    g.beginPath(); g.moveTo(8, -12); g.lineTo(30, -10); g.stroke();
+    g.translate(30, -10); g.rotate(Math.atan2(uy, ux) - Math.PI / 2);
+    g.strokeStyle = "#e9cf95"; g.lineWidth = 2; g.beginPath(); g.moveTo(-34, 0); g.quadraticCurveTo(0, 16, 34, 0); g.stroke();
+    g.strokeStyle = "rgba(233,207,149,0.45)"; g.lineWidth = 0.8; for (let k = -24; k <= 24; k += 8) { g.beginPath(); g.moveTo(k, (1 - (k / 34) ** 2) * 8); g.lineTo(0, -6); g.stroke(); }
+    g.restore();
+    // waves
+    const px = Math.max(10, ({ L: 24, S: 9.4, C: 5.6 })[band] * 2.4 * (W / 900));
+    const amp = Math.min(11, 4 + px * 0.12), k = (2 * Math.PI) / px, ph = t * 6;
+    const wave = (ax, ay, dx, dy, len, col, phase, perp, alpha) => {
+      g.save(); g.globalCompositeOperation = "lighter"; g.globalAlpha = alpha; g.shadowColor = col; g.shadowBlur = 10; g.strokeStyle = col; g.lineWidth = 1.8; g.beginPath();
+      for (let s = 0; s <= len; s += 1.5) { const q = Math.sin(k * s - phase) * amp, x = ax + dx * s + (perp ? 0 : nx * q), y = ay + dy * s + (perp ? 0 : ny * q); s ? g.lineTo(x, y) : g.moveTo(x, y); }
+      g.stroke();
+      if (perp) for (let s = 0; s <= len; s += Math.max(10, px / 2)) { const q = Math.abs(Math.sin(k * s - phase)); g.globalAlpha = alpha * (0.25 + 0.75 * q); g.beginPath(); g.arc(ax + dx * s, ay + dy * s, 1.2 + 2.6 * q, 0, 6.283); g.stroke(); }
+      g.restore();
+    };
+    wave(ex, ey, ux, uy, L, "#e9cf95", ph, false, 1);
+    const strength = hv ? ({ L: 0.6, S: 0.45, C: 0.32 })[band] : ({ L: 0.85, S: 0.65, C: 0.5 })[band];
+    const off = 18; wave(hx + nx * off, hitY + ny * off, -ux, -uy, L * 0.88, hv ? "#6fb3e8" : "#e8894a", ph + Math.PI, hv, 0.45 + 0.55 * strength);
+    const pulse = reduced ? 0.6 : 0.5 + 0.5 * Math.sin(t * 5);
+    const fl = g.createRadialGradient(hx, hitY, 0, hx, hitY, 18 + 8 * pulse); fl.addColorStop(0, "rgba(255,240,210,0.85)"); fl.addColorStop(1, "rgba(255,240,210,0)");
+    g.fillStyle = fl; g.beginPath(); g.arc(hx, hitY, 28, 0, 6.283); g.fill();
+    // annotations
+    g.font = MONO;
+    const leader = (x1, y1, x2, y2, label, alignRight) => { g.strokeStyle = "rgba(235,233,228,0.4)"; g.lineWidth = 1; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); const tw2 = g.measureText(label).width; g.fillStyle = "rgba(4,7,14,0.85)"; g.fillRect(alignRight ? x2 - 8 - tw2 : x2 + 1, y2 - 8, tw2 + 8, 15); g.fillStyle = "#d4d2cc"; g.textAlign = alignRight ? "right" : "left"; g.fillText(label, x2 + (alignRight ? -4 : 4), y2 + 3); g.textAlign = "left"; };
+    const lx = Math.max(8, sx - 98);
+    const lbl2 = "12 m REFLECTOR · SIDE-LOOKING", lw = Math.max(g.measureText("NISAR").width, g.measureText(lbl2).width), ly = Math.max(16, sy - 64);
+    g.fillStyle = "rgba(4,7,14,0.85)"; g.fillRect(lx - 4, ly - 11, lw + 8, 28); g.fillStyle = "#ebe9e4"; g.fillText("NISAR", lx, ly); g.fillStyle = "#a9a69e"; g.fillText(lbl2, lx, ly + 12);
+    leader(W - 70, canopyTop + canopyH * 0.2, W - 90, canopyTop + canopyH * 0.2, "LEAVES", false);
+    leader(W - 70, canopyTop + canopyH * 0.62, W - 90, canopyTop + canopyH * 0.62, "BRANCHES", false);
+    leader(W - 70, groundY + (H - groundY) * 0.5, W - 90, groundY + (H - groundY) * 0.5, "SOIL", false);
+    g.setLineDash([3, 5]); g.strokeStyle = "rgba(235,233,228,0.35)"; g.beginPath(); g.moveTo(0, hitY + 0.5); g.lineTo(hx - 34, hitY + 0.5); g.stroke(); g.setLineDash([]);
+    const rl = band === "L" ? "REACHES THE GROUND" : band === "S" ? "SCATTERS IN THE BRANCHES" : "SCATTERS AT THE LEAVES"; g.fillStyle = "rgba(4,7,14,0.85)"; g.fillRect(8, hitY - 18, g.measureText(rl).width + 8, 15); g.fillStyle = "#ebe9e4"; g.fillText(rl, 12, hitY - 7);
+    g.strokeStyle = "rgba(235,233,228,0.5)"; g.beginPath(); g.moveTo(hx, hitY); g.lineTo(hx, hitY - 64); g.stroke(); g.beginPath(); g.arc(hx, hitY, 44, -Math.PI / 2 - inc, -Math.PI / 2); g.stroke();
+    g.fillStyle = "rgba(4,7,14,0.8)"; g.fillRect(hx + 8, hitY - 70, 30, 16); g.fillStyle = "#ebe9e4"; g.fillText(this.state.inc + "°", hx + 12, hitY - 58);
+    const bar = 24 * 2.4 * (W / 900); g.fillStyle = "#ebe9e4"; g.fillRect(W - bar - 16, H - 16, bar, 1.5); g.fillText("24 cm", W - bar - 16, H - 22);
+  }
+  renderVals() {
+    const { band, pol, inc } = this.state;
+    const BANDS = [["L", "L-band · 24 cm"], ["S", "S-band · 9.4 cm"], ["C", "C-band · 5.6 cm"]];
+    const META = { L: "1.26 GHz · NISAR (NASA/JPL), also SAOCOM", S: "3.2 GHz · NISAR (ISRO)", C: "≈ 5.4 GHz · Sentinel-1, RADARSAT Constellation" };
+    const radio = (list, cur, key) => list.map(([id, label], i) => ({
+      label, on: id === cur ? "true" : "false", tab: id === cur ? 0 : -1, bg: id === cur ? "#ebe9e4" : "transparent", ink: id === cur ? "#04070e" : "#d4d2cc",
+      pick: () => this.setState({ [key]: id }),
+      key: (e) => { const d = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0; if (!d) return; e.preventDefault(); const n = list[(i + d + list.length) % list.length][0]; this.setState({ [key]: n }); const btns = e.currentTarget.parentElement.querySelectorAll("button"); btns[(i + d + list.length) % list.length]?.focus(); },
+    }));
+    const T = {
+      L: ["The long wave reaches the ground", "At 24 cm the pulse slips past leaves and scatters off trunks, branches and soil. That is why NISAR's L-band sees under forest canopy."],
+      S: ["The middle wave stops in the branches", "At 9.4 cm the pulse responds more to leaves, small branches and the tops of crops."],
+      C: ["The short wave stops at the leaves", "At about 5.6 cm most of the echo comes from the top of the canopy."],
+    }[band];
+    const polText = pol === "HV" ? " In HV the echo comes back twisted to vertical, which mostly happens inside vegetation, so it is weaker and more about structure." : " In HH the echo returns in the same horizontal plane it was sent.";
+    const incText = inc <= 38 ? " A steeper angle looks more straight down and sees more of the ground." : inc >= 43 ? " A shallower angle crosses more canopy on the way down." : "";
+    return {
+      rootRef: this.rootRef, canvasRef: this.canvasRef,
+      bands: radio(BANDS, band, "band"), pols: radio([["HH", "HH · sent H, heard H"], ["HV", "HV · sent H, heard V"]], pol, "pol"),
+      bandMeta: META[band], inc, incLabel: `${inc}°`, setInc: (e) => this.setState({ inc: +e.target.value }),
+      retInk: pol === "HV" ? "#6fb3e8" : "#e8894a", retLabel: pol === "HV" ? "ECHO · HV" : "ECHO · HH",
+      readTitle: T[0], readBody: T[1] + polText + incText,
+      aria: `Diagram: ${BANDS.find((b) => b[0] === band)[1]} pulse at ${inc} degrees, ${pol} echo. ${T[0]}.`,
+    };
+  }
+}
+</script>
+</body>
+</html>
