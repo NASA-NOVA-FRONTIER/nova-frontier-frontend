@@ -195,15 +195,6 @@ test.describe("Report page", () => {
     );
   });
 
-  test("/report?case=kumamoto states a measured result, not a verdict", async ({ page }) => {
-    await page.goto("/report?case=kumamoto");
-    await expect(page.getByTestId("report-title")).toContainText("Kumamoto");
-    const body = page.locator("body");
-    await expect(body).toContainText("ResultMeasured, not a verdict");
-    await expect(body).not.toContainText("Not enough radar yet");
-    await expect(page.getByTestId("report-summary")).not.toContainText("Verdict:");
-  });
-
   test("an unknown case lists the measured ones", async ({ page }) => {
     await page.goto("/report?case=nowhere");
     await expect(page.getByTestId("report-empty")).toContainText("No measured case");

@@ -10,16 +10,26 @@ test.describe("Measured cases page", () => {
     await expect(flood).toHaveText(/Did it flood\?/);
     await flood.click();
     await expect(flood).toHaveAttribute("aria-pressed", "true");
-    await expect(cards).toHaveCount(3);
-    for (const id of ["qadirabad", "chokwe", "richmond"]) {
-      await expect(page.getByTestId(`case-card-${id}`)).toBeVisible();
-    }
+    await expect(cards).toHaveCount(1);
+    await expect(page.getByTestId("case-card-qadirabad")).toBeVisible();
 
+    // Issue #28: every question has exactly one demo case.
     await page.getByTestId("cases-filter-wildfire").click();
-    await expect(page.getByTestId("cases-empty")).toBeVisible();
+    await expect(cards).toHaveCount(1);
+    await expect(page.getByTestId("case-card-bug-fire")).toBeVisible();
 
     await page.getByTestId("cases-filter-all").click();
     await expect(cards).toHaveCount(5);
+  });
+
+  // Issue #28: one demo case per phenomenon, each marked as computed offline.
+  test("each demo case carries the OFFLINE chip", async ({ page }) => {
+    await page.goto("/cases");
+    for (const id of ["qadirabad", "choco", "bug-fire", "rowe-creek", "skollersta"]) {
+      const chip = page.getByTestId(`case-card-${id}`).getByTestId("prov-offline");
+      await expect(chip).toHaveText("OFFLINE");
+      await expect(chip).toHaveAttribute("title", /analysis is fixed/);
+    }
   });
 
   test("a case card opens that case in the explorer", async ({ page }) => {
@@ -43,16 +53,12 @@ test.describe("Measured cases page", () => {
     await expect(choco).not.toContainText("See the event");
   });
 
-  test("ground-motion cases read as measured, not as missing radar", async ({ page }) => {
+  test("the ground-motion case reads as measured, not as missing radar", async ({ page }) => {
     await page.goto("/cases");
-    for (const id of ["kumamoto", "choco"]) {
-      const card = page.getByTestId(`case-card-${id}`);
-      await expect(card).toContainText("Measured, not a verdict");
-      await expect(card).not.toContainText("Not enough radar yet");
-    }
-    const kumamoto = page.getByTestId("case-card-kumamoto");
-    await expect(kumamoto).toContainText("39,584 of 62,500");
-    await expect(kumamoto).toContainText("Did the ground keep its echo?");
+    const card = page.getByTestId("case-card-choco");
+    await expect(card).toContainText("Measured, not a verdict");
+    await expect(card).not.toContainText("Not enough radar yet");
+    await expect(card).toContainText("Did the ground keep its echo?");
   });
 
   test("the bottom card asks the radar instead of promising landslides", async ({ page }) => {
