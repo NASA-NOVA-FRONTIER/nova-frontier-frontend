@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-
+import { expect, test } from "./fixtures";
 import { succeededView } from "./pom/explorationMock";
 import { GlobePage, LIVE_FRAME } from "./pom/GlobePage";
 
@@ -17,26 +16,30 @@ test.describe("Explorer: choosing an area", () => {
     await globe.mockExplorations({ first: succeededView() });
   });
 
-  test("a rectangle of the right size asks the radar about that area", async ({ page }) => {
-    // Close-up imagery tiles render slowly in software WebGL.
-    test.slow();
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(globe.panelMeta).toContainText(LIVE_FRAME.title);
+  test(
+    "a rectangle of the right size asks the radar about that area",
+    { tag: "@globe" },
+    async ({ page }) => {
+      // Close-up imagery tiles render slowly in software WebGL.
+      test.slow();
+      await globe.goto(`?frame=${LIVE_FRAME.id}`);
+      await expect(globe.panelMeta).toContainText(LIVE_FRAME.title);
 
-    await globe.tool("rectangle").click();
-    await expect(globe.tool("rectangle")).toHaveAttribute("aria-pressed", "true");
-    await expect(globe.areaSize).toContainText("10 × 10 km ideal · max 20 × 20 km");
+      await globe.tool("rectangle").click();
+      await expect(globe.tool("rectangle")).toHaveAttribute("aria-pressed", "true");
+      await expect(globe.areaSize).toContainText("10 × 10 km ideal · max 20 × 20 km");
 
-    await globe.dragFromCentre({ dx: -70, dy: -50 }, { dx: 70, dy: 50 });
-    await expect(globe.panelTitle).toContainText("Rectangle ·");
-    await expect(globe.panelMeta).toContainText("Live question");
-    await expect(page).toHaveURL(/bbox=-?\d+\.?\d*,-?\d+\.?\d*,-?\d+\.?\d*,-?\d+\.?\d*/);
-    // One drawing, one question: the tool puts itself away.
-    await expect(globe.tool("rectangle")).toHaveAttribute("aria-pressed", "false");
-    await expect(globe.areaGuide).toBeHidden();
-  });
+      await globe.dragFromCentre({ dx: -70, dy: -50 }, { dx: 70, dy: 50 });
+      await expect(globe.panelTitle).toContainText("Rectangle ·");
+      await expect(globe.panelMeta).toContainText("Live question");
+      await expect(page).toHaveURL(/bbox=-?\d+\.?\d*,-?\d+\.?\d*,-?\d+\.?\d*,-?\d+\.?\d*/);
+      // One drawing, one question: the tool puts itself away.
+      await expect(globe.tool("rectangle")).toHaveAttribute("aria-pressed", "false");
+      await expect(globe.areaGuide).toBeHidden();
+    },
+  );
 
-  test("a polygon closes with a double-click", async ({ page }) => {
+  test("a polygon closes with a double-click", { tag: "@globe" }, async ({ page }) => {
     test.slow();
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
     await globe.tool("polygon").click();
@@ -69,24 +72,26 @@ test.describe("Explorer: choosing an area", () => {
     await expect(globe.panel).toBeVisible();
   });
 
-  test("an area over the limit is explained and the centred square is offered", async ({
-    page,
-  }) => {
-    await globe.goto();
-    await globe.tool("rectangle").click();
-    // At the whole-globe view a few pixels are hundreds of kilometres.
-    await globe.dragFromCentre({ dx: 60, dy: -40 }, { dx: 160, dy: 60 });
+  test(
+    "an area over the limit is explained and the centred square is offered",
+    { tag: "@globe" },
+    async ({ page }) => {
+      await globe.goto();
+      await globe.tool("rectangle").click();
+      // At the whole-globe view a few pixels are hundreds of kilometres.
+      await globe.dragFromCentre({ dx: 60, dy: -40 }, { dx: 160, dy: 60 });
 
-    await expect(globe.areaGuide).toContainText("is over the 400 km² limit");
-    await expect(globe.areaGuide).toContainText("10 × 10 km is ideal");
-    await expect(globe.panel).toBeHidden();
+      await expect(globe.areaGuide).toContainText("is over the 400 km² limit");
+      await expect(globe.areaGuide).toContainText("10 × 10 km is ideal");
+      await expect(globe.panel).toBeHidden();
 
-    await globe.useSquare.click();
-    await expect(globe.panelMeta).toContainText("Live question");
-    await expect(globe.panelTitle).not.toContainText("Rectangle");
-    await expect(page).toHaveURL(/frame=\d+-\d+/);
-    await expect(globe.areaGuide).toBeHidden();
-  });
+      await globe.useSquare.click();
+      await expect(globe.panelMeta).toContainText("Live question");
+      await expect(globe.panelTitle).not.toContainText("Rectangle");
+      await expect(page).toHaveURL(/frame=\d+-\d+/);
+      await expect(globe.areaGuide).toBeHidden();
+    },
+  );
 
   test("discarding an over-the-limit area leaves the globe as it was", async () => {
     await globe.goto();
@@ -95,6 +100,10 @@ test.describe("Explorer: choosing an area", () => {
     await globe.areaGuide.getByTestId("area-dismiss").click();
     await expect(globe.areaGuide).toBeHidden();
     await expect(globe.startCard).toBeVisible();
+    await globe.expectScene((scene) => {
+      expect(scene.target).toBeUndefined();
+      expect(scene.outline).toBeUndefined();
+    });
   });
 
   test("a shared ?bbox= link opens the question on that area", async ({ page }) => {

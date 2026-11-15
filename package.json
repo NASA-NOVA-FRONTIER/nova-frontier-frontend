@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:e2e-stub": "VITE_E2E_GLOBE=stub vite build --outDir dist-e2e-stub",
+    "check:no-stub": "tsx --tsconfig tsconfig.node.json scripts/check-no-globe-stub.ts",
     "lint": "oxlint",
     "preview": "vite preview",
     "frames:fetch": "tsx --tsconfig tsconfig.node.json scripts/fetch-frames.ts",

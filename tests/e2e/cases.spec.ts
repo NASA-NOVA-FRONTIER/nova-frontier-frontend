@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test.describe("Measured cases page", () => {
   test("filtering by a question leaves only the cases that ask it", async ({ page }) => {

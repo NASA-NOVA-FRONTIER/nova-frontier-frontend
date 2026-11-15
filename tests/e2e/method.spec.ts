@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-
+import { expect, test } from "./fixtures";
 import { MethodPage } from "./pom/MethodPage";
 
 test.describe("Method page", () => {

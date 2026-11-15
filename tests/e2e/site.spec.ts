@@ -1,4 +1,4 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Page, test } from "./fixtures";
 
 test.describe("Landing and about pages", () => {
   test("the landing compare slider moves with the arrow keys", async ({ page }) => {
