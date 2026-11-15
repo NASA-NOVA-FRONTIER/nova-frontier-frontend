@@ -153,6 +153,19 @@ test.describe("Landing and about pages", () => {
       await expect(linkedin).toHaveAttribute("target", "_blank");
     }
   });
+
+  test("every team card shows its member's 400 px photo, never initials", async ({ page }) => {
+    await page.goto("/about");
+    const cards = page.locator("[data-testid^=member-]");
+    await expect(cards).toHaveCount(6);
+    for (const card of await cards.all()) {
+      const photo = card.getByRole("img");
+      await expect(photo).toHaveAttribute("src", /^\/team\/[\w-]+\.(jpg|png)$/);
+      const width = () =>
+        photo.evaluate((img) => (img instanceof HTMLImageElement ? img.naturalWidth : 0));
+      await expect.poll(width).toBe(400);
+    }
+  });
 });
 
 // The mission model under reduced motion: deployed and still, so a hotspot stays where it was drawn.

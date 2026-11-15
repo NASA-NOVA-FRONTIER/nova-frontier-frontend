@@ -57,6 +57,18 @@ export const TOP_BAR = {
   fullScreen: "Full screen",
 } as const;
 
+// Phones (SPECS-v8 §1 Mobile). The pill labels are the short labels of `Explorer v8 v2.dc.html`;
+// the sheet handle's labels are new copy, needed because the handle is a button.
+export const MOBILE = {
+  pillsLabel: "Layer on the globe",
+  pillHH: "HH",
+  pillHV: "HV",
+  pillChange: "Δ dB",
+  pillRule: "Rule",
+  sheetExpand: "Show more of the panel",
+  sheetShrink: "Show more of the globe",
+} as const;
+
 // 1 · Find a place
 export const STEP_1 = {
   kicker: "KNOWN CASES · OPEN INSTANTLY",
