@@ -849,6 +849,7 @@
 .x-facts-carousel__img {
   width: 100%;
   aspect-ratio: 16 / 9;
+  max-height: 150px;
   object-fit: cover;
   border-radius: 14px;
   display: block;
@@ -1823,6 +1824,101 @@
   border: 1px dashed rgba(235, 233, 228, 0.22);
   font-size: 13.5px;
   color: var(--ink-2);
+}
+
+.x-problem__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.x-problem__icon {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1.5px solid rgba(235, 233, 228, 0.5);
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+
+.x-problem__icon svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The design's tones (Error States.dc.html): the ring and the ink of the icon. */
+.x-problem[data-tone="info"] .x-problem__icon,
+.x-problem[data-tone="block"] .x-problem__icon {
+  border-color: var(--gold);
+  color: var(--gold-hover);
+}
+
+.x-problem[data-tone="wait"] .x-problem__icon {
+  border-style: dashed;
+  color: var(--ink-3);
+}
+
+.x-problem[data-tone="empty"] .x-problem__icon {
+  border: 1.5px dashed var(--muted);
+  color: var(--muted);
+}
+
+.x-problem[data-tone="warn"] .x-problem__icon {
+  border-color: rgba(252, 211, 77, 0.6);
+  color: #fcd34d;
+}
+
+.x-problem__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.x-problem__kicker {
+  margin: 0;
+}
+
+.x-problem__cases {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.x-problem__case {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--fill);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.x-problem__case:hover {
+  border-color: rgba(235, 233, 228, 0.3);
+}
+
+.x-problem__instant {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--gold);
 }
 
 .x-problem__title {

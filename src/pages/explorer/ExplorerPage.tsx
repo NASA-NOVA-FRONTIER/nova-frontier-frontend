@@ -1175,6 +1175,14 @@ export const ExplorerPage = () => {
             onClose={close}
           >
             {item?.coherenceOnly === true && <PendingSummary item={item} />}
+            {/* SPECS-v8 §8 Partial result: said before the answer it qualifies. */}
+            {subject?.kind === "live" && partial !== undefined && partialSeenFor !== runKey && (
+              <LiveProblem
+                problem={partial}
+                reasonCode={exploredView?.error?.reasonCode ?? "PARTIAL"}
+                onAction={onProblemAction}
+              />
+            )}
             {showLensCard && subject !== undefined && exploredView !== undefined && (
               <LensResultCard
                 subject={subject}
@@ -1249,13 +1257,6 @@ export const ExplorerPage = () => {
                   onOpenCase={openCase}
                 />
               )}
-            {subject?.kind === "live" && partial !== undefined && partialSeenFor !== runKey && (
-              <LiveProblem
-                problem={partial}
-                reasonCode={exploredView?.error?.reasonCode ?? "PARTIAL"}
-                onAction={onProblemAction}
-              />
-            )}
             {subject?.kind === "live" && exploredView?.status === "partial" && (
               <p className="x-reason" data-testid="partial-note">
                 Partial answer: only some of the planned passes could be measured.

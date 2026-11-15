@@ -42,7 +42,8 @@ export const JobModal = ({
 
   useEffect(() => {
     const previous = document.activeElement;
-    keepRef.current?.focus();
+    // The panel opens at its top (kicker and title), not scrolled to the focused button.
+    keepRef.current?.focus({ preventScroll: true });
     return () => {
       if (previous instanceof HTMLElement) previous.focus();
     };
