@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 
+import { INFO_TIP } from "@/content/copyV9";
 import { InfoTip } from "@/lib/InfoTip";
 
 // E2E-only page (stub builds, /__e2e/infotip): mounts InfoTip in the spots that break popovers
-// before any real caller exists. The strings are test fixtures, not UI copy; production builds
-// drop this file (scripts/check-no-globe-stub.ts fails if `data-e2e-harness` ever ships).
-const LABEL = "What is this?";
+// before any real caller exists. The label is the real copy; titles and text are test fixtures.
+// Production builds drop this file (scripts/check-no-globe-stub.ts fails if `data-e2e-harness` ever ships).
+const LABEL = INFO_TIP.label;
 const TEXT = "Harness text for the popover. A second sentence makes it wrap onto a few lines.";
 
 // Counts the Esc presses that reach window, like ExplorerPage's "close the innermost thing" listener.
