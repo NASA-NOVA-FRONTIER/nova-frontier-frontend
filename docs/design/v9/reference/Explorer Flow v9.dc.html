@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>NISAR Hazard Watch · Explorer flow v9</title>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<meta name="ext-resource-dependency" content="public/landing/earth-day.jpg" data-resource-id="public_landing_earth_day_jpg">
+<meta name="ext-resource-dependency" content="docs/cases/qadirabad-base-gray.png" data-resource-id="docs_cases_qadirabad_base_gray_png">
+<meta name="ext-resource-dependency" content="docs/cases/qadirabad-change.png" data-resource-id="docs_cases_qadirabad_change_png">
+<meta name="ext-resource-dependency" content="docs/cases/qadirabad-signature.png" data-resource-id="docs_cases_qadirabad_signature_png">
+<meta name="ext-resource-dependency" content="docs/cases/richmond-base-gray.png" data-resource-id="docs_cases_richmond_base_gray_png">
+<meta name="ext-resource-dependency" content="docs/cases/chokwe-base-gray.png" data-resource-id="docs_cases_chokwe_base_gray_png">
+<meta name="ext-resource-dependency" content="docs/cases/richmond-change.png" data-resource-id="docs_cases_richmond_change_png">
+<meta name="ext-resource-dependency" content="docs/cases/kumamoto-coherence.png" data-resource-id="docs_cases_kumamoto_coherence_png">
+<meta name="ext-resource-dependency" content="docs/insar/kumamoto-wrapped-phase.png" data-resource-id="docs_insar_kumamoto_wrapped_phase_png">
+<meta name="ext-resource-dependency" content="public/landing/radar-north-dakota.jpg" data-resource-id="public_landing_radar_north_dakota_jpg">
+<meta name="ext-resource-dependency" content="public/landing/nisar-concept.jpg" data-resource-id="public_landing_nisar_concept_jpg">
+<meta name="ext-resource-dependency" content="public/landing/reflector-deployment.jpg" data-resource-id="public_landing_reflector_deployment_jpg">
+<meta name="ext-resource-dependency" content="docs/cases/chokwe-change.png" data-resource-id="docs_cases_chokwe_change_png">
+<meta name="ext-resource-dependency" content="docs/atlas/chenab.png" data-resource-id="docs_atlas_chenab_png">
+<style>
+html,body{margin:0;height:100%;background:#04070e;color-scheme:dark}
+a{color:#c9b48b;text-decoration:none}
+a:hover{color:#dccaa3}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{font-weight:500}
+button{font:inherit}
+input[type=range]{accent-color:#c9b48b}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="position:relative;width:100%;height:100%;min-height:600px;overflow:hidden;background:#04070e;color:#ebe9e4;font-family:'Albert Sans',system-ui,sans-serif;font-size:15px;line-height:1.4">
+
+  <sc-if value="{{ isGlobe }}" hint-placeholder-val="{{ true }}">
+    <div onClick="{{ placeSquare }}" style="position:absolute;inset:0;background:radial-gradient(circle at 50% 46%,rgba(14,25,48,0.95),#04070e 62%);cursor:crosshair">
+      <div style="position:absolute;left:50%;top:{{ globe.top }};width:{{ globe.size }};height:{{ globe.size }};transform:translate(-50%,-50%);border-radius:50%;background-image:url({{ globe.img }});background-size:200% 100%;background-position:68% 50%;box-shadow:inset -70px -40px 140px rgba(4,7,14,0.92),inset 10px 6px 40px rgba(111,179,232,0.15),0 0 0 1px rgba(111,179,232,0.14),0 0 90px rgba(111,179,232,0.16)"></div>
+      <sc-for list="{{ globeMarks }}" as="m" hint-placeholder-count="4">
+        <button onClick="{{ m.open }}" aria-label="{{ m.aria }}" style="position:absolute;left:{{ m.x }};top:{{ m.y }};transform:translate(-50%,-50%);width:30px;height:30px;padding:0;box-sizing:border-box;border-radius:50%;background:#0e1a33;border:1.5px solid rgba(235,233,228,0.6);box-shadow:0 2px 10px rgba(0,0,0,0.5);display:grid;place-items:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" style="fill:none;stroke:#ebe9e4;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round"><path d="{{ m.d }}"></path></svg></button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isMap }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;overflow:hidden;background:#0b1424">
+      <sc-if value="{{ map.ready }}" hint-placeholder-val="{{ false }}"><img data-src="{{ map.src }}" alt="Satellite basemap around the square" style="position:absolute;left:{{ map.l }};top:{{ map.t }};width:{{ map.w }};max-width:none;display:block;filter:saturate(0.75) brightness(0.8)"></sc-if>
+      <div style="position:absolute;inset:0;background:rgba(4,7,14,0.25)"></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasSq }}" hint-placeholder-val="{{ false }}">
+    <div onPointerDown="{{ sqDown }}" onPointerMove="{{ sqMove }}" onPointerUp="{{ sqUp }}" onPointerCancel="{{ sqUp }}" style="position:absolute;left:{{ sq.l }};top:{{ sq.t }};width:{{ sq.s }};height:{{ sq.s }};transform:translate(-50%,-50%);touch-action:none;box-sizing:border-box;border:{{ sq.bd }};box-shadow:0 0 0 1px rgba(4,7,14,0.6),0 0 0 9999px {{ sq.veil }};cursor:{{ sq.cursor }}">
+      <sc-if value="{{ sq.hasProto }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:8px;top:8px;z-index:2;padding:3px 8px;border-radius:999px;background:rgba(4,7,14,0.82);border:1px dashed rgba(252,211,77,0.6);font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.05em;color:#fcd34d;white-space:nowrap">{{ sq.protoText }}</span></sc-if>
+      <sc-for list="{{ sq.firms }}" as="d" hint-placeholder-count="0"><span style="position:absolute;left:{{ d.x }};top:{{ d.y }};width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#ff6b2c;border:1.5px solid #fff3e0;box-shadow:0 0 6px rgba(255,107,44,0.8);z-index:3"></span></sc-for>
+      <sc-if value="{{ sq.hasImg }}" hint-placeholder-val="{{ false }}"><img data-src="{{ sq.img }}" alt="{{ sq.alt }}" style="position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated"></sc-if>
+      <p style="position:absolute;left:-2px;bottom:calc(100% + 8px);display:flex;align-items:center;gap:8px;white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.04em;color:#ebe9e4;text-shadow:0 1px 4px #04070e">{{ sq.label }}</p>
+      <sc-for list="{{ sq.handles }}" as="h" hint-placeholder-count="0"><span style="position:absolute;left:{{ h.x }};top:{{ h.y }};width:10px;height:10px;margin:-5px 0 0 -5px;background:#ebe9e4;border-radius:2px"></span></sc-for>
+      <sc-if value="{{ sq.hasMove }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(4,7,14,0.78);font-size:12.5px;white-space:nowrap"><svg width="14" height="14" viewBox="0 0 24 24" style="fill:none;stroke:#ebe9e4;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"></path></svg>{{ copy.dragHint }}</span></sc-if>
+      <sc-if value="{{ sq.hasStamp }}" hint-placeholder-val="{{ false }}"><p style="position:absolute;left:-2px;top:calc(100% + 10px);display:flex;flex-direction:column;gap:2px;white-space:nowrap;text-shadow:0 1px 6px #04070e"><span style="font-family:'JetBrains Mono',monospace;font-size:{{ sq.stampSize }};letter-spacing:-0.02em;font-variant-numeric:tabular-nums">{{ stamp.date }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.05em;color:#c9b48b">{{ stamp.role }}</span></p></sc-if>
+    </div>
+  </sc-if>
+
+  <header style="position:absolute;top:16px;left:16px;right:16px;display:flex;align-items:center;gap:8px;z-index:20">
+    <a href="Landing v8.dc.html" style="height:40px;display:flex;align-items:center;gap:8px;padding:0 16px;border-radius:999px;background:rgba(8,16,31,0.82);border:1px solid rgba(235,233,228,0.1);backdrop-filter:blur(12px);font-weight:600;color:#ebe9e4;white-space:nowrap">NISAR Hazard Watch</a>
+    <div style="flex:1"></div>
+    <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+      <nav style="display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(8,16,31,0.82);border:1px solid rgba(235,233,228,0.1);backdrop-filter:blur(12px)">
+        <a href="Cases v8.dc.html" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#d4d2cc;font-size:14px">Cases</a>
+        <a href="Method v8.dc.html" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#d4d2cc;font-size:14px">Method</a>
+        <a href="Learn v8.dc.html" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#d4d2cc;font-size:14px">Learn</a>
+        <a href="About v8.dc.html" style="height:32px;display:flex;align-items:center;padding:0 14px;border-radius:999px;color:#d4d2cc;font-size:14px">About</a>
+      </nav>
+    </sc-if>
+    <sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+      <button aria-label="Menu" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(235,233,228,0.1);background:rgba(8,16,31,0.82);color:#ebe9e4;display:grid;place-items:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" style="fill:none;stroke:#ebe9e4;stroke-width:1.75;stroke-linecap:round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+    </sc-if>
+  </header>
+
+  <sc-if value="{{ showHint }}" hint-placeholder-val="{{ false }}">
+    <p style="position:absolute;left:50%;top:{{ hintTop }};transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:rgba(8,16,31,0.88);border:1px solid rgba(235,233,228,0.12);font-size:14px;white-space:nowrap;z-index:10;pointer-events:none"><span style="width:12px;height:12px;border:1.5px solid #c9b48b;border-radius:2px"></span>{{ hintText }}</p>
+  </sc-if>
+
+  <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ true }}">
+    <aside style="position:absolute;left:{{ cp.l }};right:{{ cp.r }};top:{{ cp.t }};bottom:{{ cp.b }};width:{{ cp.w }};max-height:{{ cp.mh }};overflow:auto;box-sizing:border-box;padding:20px;border-radius:{{ cp.rad }};background:rgba(8,16,31,0.9);border:1px solid rgba(235,233,228,0.1);backdrop-filter:blur(16px);display:flex;flex-direction:column;gap:14px;z-index:15">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#c9b48b">{{ copy.casesKicker }}</p>
+        <h2 style="display:flex;align-items:center;gap:8px;font-size:20px;letter-spacing:-0.02em"><span>{{ copy.casesTitle }}</span><button onClick="{{ tips.cases.toggle }}" onMouseEnter="{{ tips.cases.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ tips.cases.enter }}" onBlur="{{ hideTip }}" aria-expanded="{{ tips.cases.open }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid {{ tips.cases.bd }};background:{{ tips.cases.bg }};color:{{ tips.cases.ink }};font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button></h2>
+        <p style="font-size:13.5px;color:#a9a69e">{{ copy.casesBody }}</p>
+      </div>
+      <div style="display:grid;grid-template-columns:{{ cp.cols }};gap:8px">
+        <sc-for list="{{ featured }}" as="c" hint-placeholder-count="4">
+          <button onClick="{{ c.open }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:16px;border:1px solid rgba(235,233,228,0.1);background:rgba(235,233,228,0.04);color:#ebe9e4;text-align:left;cursor:pointer;min-width:0" style-hover="border-color:rgba(201,180,139,0.55);background:rgba(235,233,228,0.07)">
+            <span style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.06em;color:#c9b48b"><svg width="13" height="13" viewBox="0 0 24 24" style="fill:none;stroke:#c9b48b;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="{{ c.d }}"></path></svg>{{ c.phen }}</span>
+            <span style="font-size:15px;font-weight:500;line-height:1.2">{{ c.name }}</span>
+            <span style="font-size:12px;color:#a9a69e;line-height:1.35">{{ c.line }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column">
+          <p style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.06em;color:#8d8a83;padding:4px 0 8px">{{ copy.moreCases }}</p>
+          <sc-for list="{{ others }}" as="c" hint-placeholder-count="8">
+            <button onClick="{{ c.open }}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 4px;border:0;border-top:1px solid rgba(235,233,228,0.07);background:transparent;color:#ebe9e4;text-align:left;cursor:pointer" style-hover="color:#c9b48b"><span style="font-size:14px">{{ c.name }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.05em;color:#8d8a83">{{ c.phen }}</span></button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{ isPlaced }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:{{ pb.l }};right:{{ pb.r }};bottom:{{ pb.b }};transform:{{ pb.tx }};display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 12px 12px 20px;border-radius:{{ pb.rad }};background:rgba(8,16,31,0.92);border:1px solid rgba(235,233,228,0.12);backdrop-filter:blur(16px);z-index:15">
+      <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:180px"><span style="display:flex;align-items:center;gap:6px;font-size:15px;font-weight:500"><span>{{ copy.placedTitle }}</span><button onClick="{{ tips.square.toggle }}" onMouseEnter="{{ tips.square.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ tips.square.enter }}" onBlur="{{ hideTip }}" aria-expanded="{{ tips.square.open }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid {{ tips.square.bd }};background:{{ tips.square.bg }};color:{{ tips.square.ink }};font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#a9a69e">{{ copy.placedMeta }}</span></div>
+      <button onClick="{{ cancel }}" style="height:44px;padding:0 18px;border-radius:999px;border:1px solid rgba(235,233,228,0.2);background:transparent;color:#ebe9e4;cursor:pointer">{{ copy.cancel }}</button>
+      <button onClick="{{ toConfirm }}" style="height:44px;padding:0 20px;border-radius:999px;border:0;background:#c9b48b;color:#16120a;font-weight:500;cursor:pointer">{{ copy.useSquare }}</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showProto }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:16px;bottom:16px;display:flex;align-items:center;gap:6px;padding:6px 6px 6px 12px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px dashed rgba(252,211,77,0.5);z-index:13">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.06em;color:#fcd34d;white-space:nowrap">PROTOTYPE · THIS SQUARE HAS</span>
+      <sc-for list="{{ scens }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.pick }}" style="height:28px;padding:0 10px;border-radius:999px;border:0;background:{{ c.bg }};color:{{ c.ink }};font-size:12px;cursor:pointer;white-space:nowrap">{{ c.label }}</button></sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasPanel }}" hint-placeholder-val="{{ false }}">
+    <aside aria-label="{{ panelAria }}" style="position:absolute;left:{{ pn.l }};right:{{ pn.r }};top:{{ pn.t }};bottom:{{ pn.b }};width:{{ pn.w }};max-height:{{ pn.mh }};overflow:auto;box-sizing:border-box;border-radius:{{ pn.rad }};background:rgba(8,16,31,0.94);border:1px solid rgba(235,233,228,0.12);backdrop-filter:blur(18px);box-shadow:0 24px 60px rgba(0,0,0,0.45);display:flex;flex-direction:column;z-index:16">
+
+      <sc-if value="{{ isConfirm }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:18px;padding:20px">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0">
+              <sc-if value="{{ cf.locked }}" hint-placeholder-val="{{ false }}"><p style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#c9b48b">{{ cf.kicker }}</p></sc-if>
+              <h2 style="font-size:22px;letter-spacing:-0.025em;line-height:1.15">{{ cf.title }}</h2>
+              <p style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:12.5px;color:#a9a69e"><span style="width:12px;height:12px;border:1.5px solid #c9b48b;border-radius:2px;flex:none"></span><span>10 × 10 km</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px">{{ cf.coords }}</span><sc-if value="{{ cf.canMove }}" hint-placeholder-val="{{ true }}"><button onClick="{{ toPlaced }}" style="padding:0;border:0;background:transparent;color:#c9b48b;font-size:12.5px;cursor:pointer">{{ copy.edit }}</button></sc-if></p>
+            </div>
+            <button onClick="{{ cancel }}" aria-label="{{ copy.cancel }}" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(235,233,228,0.14);background:transparent;color:#ebe9e4;display:grid;place-items:center;cursor:pointer;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" style="fill:none;stroke:#ebe9e4;stroke-width:2;stroke-linecap:round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div role="radiogroup" aria-label="{{ copy.phenLabel }}" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">
+              <sc-for list="{{ phens }}" as="p" hint-placeholder-count="4">
+                <button role="radio" aria-checked="{{ p.on }}" disabled="{{ p.disabled }}" onClick="{{ p.pick }}" style="height:44px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:12px;border:1px solid {{ p.bd }};background:{{ p.bg }};color:{{ p.ink }};font-size:14px;cursor:{{ p.cursor }};opacity:{{ p.op }}"><svg width="16" height="16" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none"><path d="{{ p.d }}"></path></svg>{{ p.label }}</button>
+              </sc-for>
+            </div>
+            <p style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#d4d2cc"><span style="flex:1;min-width:0">{{ cf.lookFor }}</span><button onClick="{{ tips.phen.toggle }}" onMouseEnter="{{ tips.phen.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ tips.phen.enter }}" onBlur="{{ hideTip }}" aria-expanded="{{ tips.phen.open }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid {{ tips.phen.bd }};background:{{ tips.phen.bg }};color:{{ tips.phen.ink }};font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button></p>
+          </div>
+
+          <sc-if value="{{ cf.hasDates }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <p style="flex:1;min-width:0;font-size:13.5px;font-weight:500">{{ cf.dateSummary }}</p>
+                <button onClick="{{ tips.strip.toggle }}" onMouseEnter="{{ tips.strip.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ tips.strip.enter }}" onBlur="{{ hideTip }}" aria-expanded="{{ tips.strip.open }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid {{ tips.strip.bd }};background:{{ tips.strip.bg }};color:{{ tips.strip.ink }};font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button>
+                <sc-if value="{{ cf.canEdit }}" hint-placeholder-val="{{ true }}"><button onClick="{{ cf.toggleDates }}" aria-expanded="{{ cf.datesOpenAttr }}" style="height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(235,233,228,0.18);background:transparent;color:#ebe9e4;font-size:12.5px;cursor:pointer;white-space:nowrap">{{ cf.datesAction }}</button></sc-if>
+              </div>
+              <div style="position:relative;height:{{ cf.stripH }};margin:0 6px">
+                <sc-if value="{{ cf.isQuake }}" hint-placeholder-val="{{ false }}">
+                  <svg viewBox="0 0 1000 46" preserveAspectRatio="none" style="position:absolute;left:0;top:0;width:100%;height:46px;overflow:visible">
+                    <sc-for list="{{ cf.arcs }}" as="r" hint-placeholder-count="0">
+                      <path d="{{ r.d }}" onClick="{{ r.pick }}" style="fill:none;stroke:transparent;stroke-width:14;cursor:{{ r.cursor }};pointer-events:stroke" vector-effect="non-scaling-stroke"><title>{{ r.title }}</title></path>
+                      <path d="{{ r.d }}" style="fill:none;stroke:{{ r.stroke }};stroke-width:{{ r.w }};opacity:{{ r.op }};pointer-events:none" vector-effect="non-scaling-stroke"></path>
+                    </sc-for>
+                  </svg>
+                </sc-if>
+                <span style="position:absolute;left:0;right:0;top:{{ cf.lineT }};height:2px;background:rgba(235,233,228,0.12)"></span>
+                <span style="position:absolute;left:{{ cf.rangeL }};width:{{ cf.rangeW }};top:{{ cf.bandT }};height:10px;border-radius:3px;background:rgba(201,180,139,0.12)"></span>
+                <span style="position:absolute;left:{{ cf.linkL }};width:{{ cf.linkW }};top:{{ cf.lineT }};height:2px;background:#c9b48b"></span>
+                <sc-for list="{{ cf.ticks }}" as="k" hint-placeholder-count="12"><span title="{{ k.title }}" style="position:absolute;left:{{ k.x }};margin-top:{{ cf.tickOff }};top:{{ k.top }};width:{{ k.s }};height:{{ k.s }};transform:translateX(-50%);border-radius:50%;box-sizing:border-box;background:{{ k.bg }};border:1.5px solid {{ k.bd }}"></span></sc-for>
+                <span style="position:absolute;left:0;bottom:0;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#8d8a83">{{ cf.axisL }}</span><span style="position:absolute;right:0;bottom:0;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#8d8a83">{{ cf.axisR }}</span>
+              </div>
+              <sc-if value="{{ cf.quakeUser }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:12.5px;color:#a9a69e">
+                  <span style="flex:1;min-width:0">{{ cf.pairLine }}</span>
+                  <button onClick="{{ cf.toggleAdv }}" aria-expanded="{{ cf.advOpenAttr }}" style="padding:0;border:0;background:transparent;color:#c9b48b;font-size:12.5px;cursor:pointer;white-space:nowrap">{{ cf.advLabel }}</button>
+                </div>
+                <sc-if value="{{ cf.advOpen }}" hint-placeholder-val="{{ false }}">
+                  <label style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(235,233,228,0.04)">
+                    <span style="display:flex;align-items:center;gap:6px;font-size:13px">Coherence threshold<button onClick="{{ cf.thrTip.toggle }}" onMouseEnter="{{ cf.thrTip.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ cf.thrTip.enter }}" onBlur="{{ hideTip }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid rgba(235,233,228,0.35);background:transparent;color:#d4d2cc;font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button></span>
+                    <select value="{{ cf.thr }}" onChange="{{ cf.thrChange }}" style="height:32px;padding:0 8px;border-radius:8px;border:1px solid rgba(235,233,228,0.2);background:#0e1930;color:#ebe9e4;font-family:'JetBrains Mono',monospace;font-size:12px"><sc-for list="{{ cf.thrOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+                  </label>
+                </sc-if>
+              </sc-if>
+              <sc-if value="{{ cf.picking }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:12px;background:rgba(235,233,228,0.05)">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                    <button onClick="{{ cf.pickStart }}" aria-pressed="{{ cf.startOpen }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px 12px;border-radius:12px;border:1px solid {{ cf.startBd }};background:transparent;color:#ebe9e4;cursor:pointer;text-align:left"><span style="font-size:11px;color:#a9a69e">{{ copy.start }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:14px">{{ cf.start }}</span></button>
+                    <button onClick="{{ cf.pickEnd }}" aria-pressed="{{ cf.endOpen }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px 12px;border-radius:12px;border:1px solid {{ cf.endBd }};background:transparent;color:#ebe9e4;cursor:pointer;text-align:left"><span style="font-size:11px;color:#a9a69e">{{ copy.end }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:14px">{{ cf.end }}</span></button>
+                  </div>
+                  <p style="font-size:12px;color:#a9a69e">{{ cf.pickHint }}</p>
+                  <div style="display:flex;flex-wrap:wrap;gap:4px">
+                    <sc-for list="{{ cf.pickDates }}" as="d" hint-placeholder-count="8"><button onClick="{{ d.pick }}" disabled="{{ d.disabled }}" style="height:30px;padding:0 9px;border-radius:999px;border:1px solid {{ d.bd }};background:{{ d.bg }};color:{{ d.ink }};font-family:'JetBrains Mono',monospace;font-size:11.5px;cursor:pointer;opacity:{{ d.op }}">{{ d.label }}</button></sc-for>
+                  </div>
+                  <button onClick="{{ cf.resetPreset }}" style="align-self:flex-start;padding:0;border:0;background:transparent;color:#c9b48b;font-size:12.5px;cursor:pointer">{{ cf.resetLabel }}</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ cf.hasNote }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:14px;border:1px solid {{ cf.noteBd }};background:{{ cf.noteBg }}">
+              <p style="font-size:14px;font-weight:500">{{ cf.noteTitle }}</p>
+              <p style="font-size:13px;color:#c4c1ba;text-wrap:pretty">{{ cf.noteBody }}</p>
+              <sc-if value="{{ cf.hasNoteAction }}" hint-placeholder-val="{{ false }}"><button onClick="{{ cf.noteDo }}" style="align-self:flex-start;height:32px;margin-top:2px;padding:0 12px;border-radius:999px;border:1px solid rgba(235,233,228,0.22);background:transparent;color:#ebe9e4;font-size:13px;cursor:pointer">{{ cf.noteAction }}</button></sc-if>
+            </div>
+          </sc-if>
+
+          <div style="position:sticky;bottom:0;margin:0 -20px -20px;padding:12px 20px 20px;background:#0a1324;border-top:1px solid rgba(235,233,228,0.1);display:flex;flex-direction:column;gap:10px;z-index:2">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="padding:3px 9px;border-radius:999px;border:1px solid {{ cf.modeBd }};font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.06em;color:{{ cf.modeInk }};white-space:nowrap">{{ cf.mode }}</span>
+              <span style="flex:1;min-width:0;font-size:12.5px;color:#a9a69e">{{ cf.waitLine }}</span>
+              <button onClick="{{ tips.mode.toggle }}" onMouseEnter="{{ tips.mode.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ tips.mode.enter }}" onBlur="{{ hideTip }}" aria-expanded="{{ tips.mode.open }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid {{ tips.mode.bd }};background:{{ tips.mode.bg }};color:{{ tips.mode.ink }};font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button>
+            </div>
+            <sc-if value="{{ cf.startDisabled }}" hint-placeholder-val="{{ false }}"><p style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#f0b48a"><span style="width:6px;height:6px;border-radius:50%;background:#e8894a;flex:none"></span>{{ cf.blockWhy }}</p></sc-if>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onClick="{{ start }}" disabled="{{ cf.startDisabled }}" style="flex:1;height:48px;border-radius:999px;border:0;background:{{ cf.startBg }};color:{{ cf.startInk }};font-weight:500;font-size:15px;cursor:{{ cf.startCursor }}">{{ cf.startLabel }}</button>
+              <button onClick="{{ cancel }}" style="height:48px;padding:0 18px;border-radius:999px;border:1px solid rgba(235,233,228,0.18);background:transparent;color:#ebe9e4;cursor:pointer">{{ copy.cancel }}</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isProcessing }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:14px;padding:16px 18px 18px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="padding:3px 9px;border-radius:999px;border:1px solid {{ pr.modeBd }};font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.06em;color:{{ pr.modeInk }}">{{ pr.mode }}</span>
+            <p style="flex:1;font-size:15px;font-weight:500">{{ pr.title }}</p>
+            <button onClick="{{ toggleCollapse }}" aria-expanded="{{ pr.expanded }}" aria-label="{{ pr.collapseLabel }}" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(235,233,228,0.14);background:transparent;display:grid;place-items:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" style="fill:none;stroke:#ebe9e4;stroke-width:2;stroke-linecap:round;transform:rotate({{ pr.chev }})"><path d="M6 15l6-6 6 6"></path></svg></button>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:10px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:34px;letter-spacing:-0.03em;font-variant-numeric:tabular-nums">{{ pr.elapsed }}</span>
+            <span style="font-size:13px;color:#a9a69e">{{ pr.elapsedLabel }}</span>
+            <span style="flex:1"></span>
+            <span style="font-size:12.5px;color:{{ pr.estInk }};text-align:right">{{ pr.est }}</span>
+          </div>
+          <div style="position:relative;height:8px;border-radius:999px;background:rgba(235,233,228,0.08)">
+            <span style="position:absolute;left:{{ pr.bandL }};width:{{ pr.bandW }};top:0;bottom:0;border-radius:999px;background:rgba(201,180,139,0.22)"></span>
+            <span style="position:absolute;left:0;width:{{ pr.fill }};top:0;bottom:0;border-radius:999px;background:{{ pr.fillBg }}"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:-8px;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#8d8a83"><span>0</span><span>{{ pr.axisMid }}</span><span>{{ pr.axisEnd }}</span></div>
+          <p style="display:flex;align-items:center;gap:6px;margin-top:-6px;font-size:12px;color:#a9a69e"><span>{{ pr.whyLabel }}</span><button onClick="{{ tips.wait.toggle }}" onMouseEnter="{{ tips.wait.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ tips.wait.enter }}" onBlur="{{ hideTip }}" aria-expanded="{{ tips.wait.open }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid {{ tips.wait.bd }};background:{{ tips.wait.bg }};color:{{ tips.wait.ink }};font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button></p>
+          <sc-if value="{{ pr.late }}" hint-placeholder-val="{{ false }}"><p style="padding:10px 12px;border-radius:12px;background:rgba(235,233,228,0.05);font-size:13px;color:#d4d2cc;text-wrap:pretty">{{ copy.lateBody }}</p></sc-if>
+          <sc-if value="{{ pr.expandedBool }}" hint-placeholder-val="{{ true }}">
+            <p style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:#d4d2cc"><span>What is happening</span><button onClick="{{ tips.steps.toggle }}" onMouseEnter="{{ tips.steps.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ tips.steps.enter }}" onBlur="{{ hideTip }}" aria-expanded="{{ tips.steps.open }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid {{ tips.steps.bd }};background:{{ tips.steps.bg }};color:{{ tips.steps.ink }};font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button></p>
+            <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ pr.steps }}" as="st" hint-placeholder-count="4">
+                <li style="display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px;align-items:start">
+                  <span style="margin-top:3px;width:12px;height:12px;border-radius:50%;box-sizing:border-box;border:1.5px solid {{ st.ring }};background:{{ st.dot }}"></span>
+                  <span style="display:flex;flex-direction:column;gap:1px"><span style="font-size:13.5px;color:{{ st.ink }}">{{ st.label }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#8d8a83">{{ st.line }}</span></span>
+                </li>
+              </sc-for>
+            </ol>
+            <sc-if value="{{ pr.hasFact }}" hint-placeholder-val="{{ true }}">
+              <figure style="margin:0;display:flex;flex-direction:column;border-radius:16px;overflow:hidden;border:1px solid rgba(235,233,228,0.1);background:rgba(235,233,228,0.03)">
+                <div style="position:relative;aspect-ratio:16 / 8;background:#0e1930;overflow:hidden"><sc-if value="{{ fact.ready }}" hint-placeholder-val="{{ false }}"><img data-src="{{ fact.img }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;image-rendering:{{ fact.render }};opacity:{{ fact.op }};transition:{{ fact.trans }}"></sc-if><span style="position:absolute;left:10px;top:10px;padding:2px 8px;border-radius:999px;background:rgba(4,7,14,0.8);font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.06em;color:#c9b48b">{{ fact.count }}</span></div>
+                <figcaption style="display:flex;flex-direction:column;gap:6px;padding:12px 14px 14px">
+                  <span style="font-size:14.5px;font-weight:500">{{ fact.title }}</span>
+                  <span style="font-size:13px;color:#c4c1ba;text-wrap:pretty">{{ fact.text }}</span>
+                  <span style="display:flex;align-items:center;gap:10px;margin-top:2px"><a href="{{ fact.href }}" target="_blank" rel="noopener" style="flex:1;font-size:11.5px;color:#a9a69e">{{ fact.source }}</a><button onClick="{{ nextFact }}" style="height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(235,233,228,0.18);background:transparent;color:#ebe9e4;font-size:12.5px;cursor:pointer">{{ copy.nextFact }}</button></span>
+                </figcaption>
+              </figure>
+            </sc-if>
+            <button onClick="{{ cancel }}" style="align-self:flex-start;padding:0;border:0;background:transparent;color:#a9a69e;font-size:13px;text-decoration:underline;cursor:pointer">{{ pr.cancelLabel }}</button>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px;padding:18px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span title="{{ rs.modeTitle }}" style="padding:2px 8px;border-radius:999px;border:1px solid rgba(235,233,228,0.4);font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.06em;color:#ebe9e4">{{ rs.mode }}</span>
+            <span title="{{ rs.originTitle }}" style="padding:2px 8px;border-radius:999px;border:1px solid {{ rs.originBd }};background:{{ rs.originBg }};font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.06em;color:{{ rs.originInk }}">{{ rs.origin }}</span>
+            <button onClick="{{ tips.chips.toggle }}" onMouseEnter="{{ tips.chips.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ tips.chips.enter }}" onBlur="{{ hideTip }}" aria-expanded="{{ tips.chips.open }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid {{ tips.chips.bd }};background:{{ tips.chips.bg }};color:{{ tips.chips.ink }};font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button>
+          </div>
+          <p style="display:flex;align-items:center;gap:6px;font-size:12px;color:#a9a69e"><svg width="13" height="13" viewBox="0 0 24 24" style="fill:none;stroke:#c9b48b;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none"><path d="{{ rs.icon }}"></path></svg><span style="min-width:0">{{ rs.place }}</span></p>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <h2 style="font-size:21px;letter-spacing:-0.025em;line-height:1.15;text-wrap:pretty">{{ rs.title }}</h2>
+            <p style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.03em;color:#a9a69e">{{ rs.range }}</p>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:10px 12px;border-radius:12px;background:rgba(235,233,228,0.04)"><span style="flex-basis:100%;font-family:'JetBrains Mono',monospace;font-size:22px;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">{{ rs.stat }}</span><span style="flex:1;min-width:0;font-size:12.5px;color:#a9a69e">{{ rs.statLabel }}</span><button onClick="{{ tips.stat.toggle }}" onMouseEnter="{{ tips.stat.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ tips.stat.enter }}" onBlur="{{ hideTip }}" aria-expanded="{{ tips.stat.open }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid {{ tips.stat.bd }};background:{{ tips.stat.bg }};color:{{ tips.stat.ink }};font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button></div>
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;line-height:1.45">
+            <p style="color:#d4d2cc"><span style="color:#8d8a83">Could also be:</span> {{ rs.couldBe }}</p>
+            <p style="color:#d4d2cc"><span style="color:#8d8a83">Not shown:</span> {{ rs.notShown }}</p>
+          </div>
+          <button onClick="{{ toEmptyKeep }}" style="align-self:flex-start;padding:0;border:0;background:transparent;color:#c9b48b;font-size:13px;cursor:pointer">{{ copy.newSquare }} →</button>
+        </div>
+      </sc-if>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:16px;top:{{ lg.t }};display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:14px;background:rgba(8,16,31,0.88);border:1px solid rgba(235,233,228,0.1);z-index:12;width:{{ lg.w }};box-sizing:border-box">
+      <div role="radiogroup" aria-label="{{ copy.layerLabel }}" style="display:flex;gap:4px">
+        <sc-for list="{{ layers }}" as="y" hint-placeholder-count="2"><button role="radio" aria-checked="{{ y.on }}" onClick="{{ y.pick }}" style="flex:1;height:30px;padding:0 10px;border-radius:999px;border:0;background:{{ y.bg }};color:{{ y.ink }};font-size:12.5px;white-space:nowrap;cursor:pointer">{{ y.label }}</button></sc-for>
+      </div>
+      <span style="height:8px;border-radius:2px;background:{{ legend.ramp }}"></span>
+      <span style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;color:#a9a69e"><span>{{ legend.l }}</span><span>{{ legend.r }}</span></span>
+      <sc-if value="{{ legend.hasFirms }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#d4d2cc"><span style="width:9px;height:9px;border-radius:50%;background:#ff6b2c;border:1.5px solid #fff3e0;flex:none"></span>NASA FIRMS fire detection · illustrative</span></sc-if>
+      <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#d4d2cc"><span style="flex:1;min-width:0">{{ legend.what }}</span><button onClick="{{ tips.layer.toggle }}" onMouseEnter="{{ tips.layer.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ tips.layer.enter }}" onBlur="{{ hideTip }}" aria-expanded="{{ tips.layer.open }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid {{ tips.layer.bd }};background:{{ tips.layer.bg }};color:{{ tips.layer.ink }};font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button></span>
+      
+    </div>
+
+    <div style="position:absolute;left:{{ tl.l }};right:{{ tl.r }};bottom:{{ tl.b }};display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:20px;background:rgba(8,16,31,0.92);border:1px solid rgba(235,233,228,0.12);backdrop-filter:blur(16px);z-index:14">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+        <button onClick="{{ prev }}" aria-label="{{ copy.prev }}" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(235,233,228,0.16);background:transparent;display:grid;place-items:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" style="fill:none;stroke:#ebe9e4;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button onClick="{{ togglePlay }}" aria-label="{{ tlv.playLabel }}" style="width:44px;height:44px;border-radius:50%;border:0;background:#ebe9e4;display:grid;place-items:center;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" style="fill:#04070e"><path d="{{ tlv.playIcon }}"></path></svg></button>
+        <button onClick="{{ next }}" aria-label="{{ copy.next }}" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(235,233,228,0.16);background:transparent;display:grid;place-items:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" style="fill:none;stroke:#ebe9e4;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9 6l6 6-6 6"></path></svg></button>
+        <div style="flex:1 1 160px;display:flex;flex-direction:column;gap:0;min-width:0;padding-left:6px"><span style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tlv.title }}</span><span style="display:flex;align-items:center;gap:6px;min-width:0"><span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#a9a69e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">{{ tlv.sub }}</span><button onClick="{{ tips.timeline.toggle }}" onMouseEnter="{{ tips.timeline.enter }}" onMouseLeave="{{ hideTip }}" onFocus="{{ tips.timeline.enter }}" onBlur="{{ hideTip }}" aria-expanded="{{ tips.timeline.open }}" aria-label="What is this?" style="width:20px;height:20px;padding:0;border-radius:50%;border:1px solid {{ tips.timeline.bd }};background:{{ tips.timeline.bg }};color:{{ tips.timeline.ink }};font:600 11px 'Albert Sans',sans-serif;line-height:1;display:inline-grid;place-items:center;cursor:pointer;flex:none">i</button></span></div>
+        <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+          <div role="radiogroup" aria-label="{{ copy.speed }}" style="display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(235,233,228,0.06)">
+            <sc-for list="{{ speeds }}" as="v" hint-placeholder-count="3"><button role="radio" aria-checked="{{ v.on }}" onClick="{{ v.pick }}" style="height:28px;padding:0 10px;border-radius:999px;border:0;background:{{ v.bg }};color:{{ v.ink }};font-family:'JetBrains Mono',monospace;font-size:11.5px;cursor:pointer">{{ v.label }}</button></sc-for>
+          </div>
+          <button onClick="{{ toggleLoop }}" aria-pressed="{{ tlv.loopOn }}" style="height:34px;display:flex;align-items:center;gap:6px;padding:0 12px;border-radius:999px;border:1px solid {{ tlv.loopBd }};background:transparent;color:{{ tlv.loopInk }};font-size:12.5px;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="M17 2l3 3-3 3M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3M20 13v2a4 4 0 0 1-4 4H4"></path></svg>{{ copy.loop }}</button>
+        </sc-if>
+      </div>
+
+      
+      <sc-if value="{{ isPasses }}" hint-placeholder-val="{{ true }}">
+        <div style="position:relative;height:46px;margin:0 10px">
+          <span style="position:absolute;left:0;right:0;top:10px;height:3px;border-radius:2px;background:rgba(235,233,228,0.12)"></span>
+          <span style="position:absolute;left:0;width:{{ tlv.fill }};top:10px;height:3px;border-radius:2px;background:#c9b48b;transition:{{ tlv.trans }}"></span>
+          <sc-for list="{{ ticks }}" as="k" hint-placeholder-count="5">
+            <button onClick="{{ k.go }}" aria-label="{{ k.aria }}" aria-current="{{ k.cur }}" style="position:absolute;left:{{ k.x }};top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:{{ k.ink }};cursor:pointer">
+              <span style="width:{{ k.s }};height:{{ k.s }};margin-top:{{ k.mt }};box-sizing:border-box;border-radius:50%;background:{{ k.bg }};border:2px solid {{ k.bd }}"></span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;white-space:nowrap">{{ k.label }}</span>
+            </button>
+          </sc-for>
+          <sc-for list="{{ gaps }}" as="g" hint-placeholder-count="0"><span style="position:absolute;left:{{ g.x }};top:24px;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:9px;color:#6f6c66;white-space:nowrap">{{ g.label }}</span></sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isIntervals }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative;height:{{ iv.h }};margin:0 10px">
+          <sc-if value="{{ iv.hasEvent }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:{{ iv.eventX }};top:0;bottom:16px;width:2px;margin-left:-1px;background:#e8894a"></span>
+          <span style="position:absolute;left:{{ iv.eventX }};bottom:0;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#e8894a;white-space:nowrap">{{ iv.eventLabel }}</span></sc-if>
+          <sc-for list="{{ intervals }}" as="r" hint-placeholder-count="3">
+            <button onClick="{{ r.go }}" aria-label="{{ r.aria }}" aria-current="{{ r.cur }}" style="position:absolute;left:{{ r.l }};width:{{ r.w }};top:{{ r.t }};height:{{ r.rh }};padding:0 8px;box-sizing:border-box;border-radius:999px;border:1.5px solid {{ r.bd }};background:{{ r.bg }};color:{{ r.ink }};display:flex;align-items:center;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:9.5px;cursor:pointer;white-space:nowrap;overflow:hidden"><span>{{ r.a }}</span><span>{{ r.days }}</span><span>{{ r.b }}</span></button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ iv.hasEvent }}" hint-placeholder-val="{{ false }}"><p style="font-size:12px;color:#a9a69e">{{ copy.straddle }}</p></sc-if>
+      </sc-if>
+    </div>
+  </sc-if>
+  <sc-if value="{{ pop.show }}" hint-placeholder-val="{{ false }}">
+    <div role="tooltip" style="position:absolute;left:{{ pop.x }};top:{{ pop.y }};transform:{{ pop.tf }};width:280px;box-sizing:border-box;padding:12px 14px;border-radius:14px;background:#0e1930;border:1px solid rgba(201,180,139,0.45);box-shadow:0 18px 50px rgba(0,0,0,0.55);font-size:13px;line-height:1.5;color:#ebe9e4;text-wrap:pretty;z-index:60;pointer-events:none">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#c9b48b;margin-bottom:4px">{{ pop.title }}</p>{{ pop.text }}
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;empty&quot;,&quot;placed&quot;,&quot;confirm&quot;,&quot;confirm-case&quot;,&quot;confirm-nodata&quot;,&quot;confirm-four&quot;,&quot;confirm-few&quot;,&quot;processing&quot;,&quot;processing-late&quot;,&quot;processing-offline&quot;,&quot;result-playing&quot;,&quot;result-paused&quot;,&quot;result-quake&quot;],&quot;default&quot;:&quot;empty&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;mobile&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;reduced&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;frozen&quot;:{&quot;editor&quot;:null,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  openTip(key, el, pin) {
+    const root = this.rootRef.current; if (!root || !el) return;
+    clearTimeout(this.tipT);
+    const R0 = root.getBoundingClientRect(), r = el.getBoundingClientRect(), k = R0.width / (root.offsetWidth || 1);
+    const W = root.offsetWidth, H = root.offsetHeight;
+    const cx = (r.left + r.width / 2 - R0.left) / k, bottom = (r.bottom - R0.top) / k, top = (r.top - R0.top) / k;
+    const x = Math.max(8, Math.min(W - 288, cx - 140)), above = bottom + 180 > H;
+    this.setState({ tip: key, tipPin: !!pin, tipPos: { x, y: above ? top - 8 : bottom + 8, above } });
+  }
+  state = { datesOpen: false, advOpen: false, tip: null, tipPin: false, tipPos: null, s: null, phen: null, scen: null, start: null, end: null, dx: 0, dy: 0, setOpen: false, params: {}, datePick: null, idx: null, playing: null, speed: 1, loop: true, layer: null, fact: 0, factOn: true, collapsed: false, live: 0, caseId: null };
+  syncImgs() { const r = this.rootRef.current; if (!r) return; r.querySelectorAll("img[data-src]").forEach((im) => { const v = im.getAttribute("data-src"); if (v && !v.includes("{{") && im.getAttribute("src") !== v) im.setAttribute("src", v); }); }
+  componentDidUpdate() { this.syncImgs(); }
+  componentDidMount() {
+    this.syncImgs(); requestAnimationFrame(() => this.syncImgs());
+    this.rm = window.matchMedia("(prefers-reduced-motion: reduce)");
+    this.t = setInterval(() => this.tick(), 250);
+    this.ft = setInterval(() => this.rotateFact(), 9000);
+  }
+  componentWillUnmount() { clearInterval(this.t); clearInterval(this.ft); }
+  frozen() { return this.props.frozen === "1" || this.props.frozen === true; }
+  reduced() { return this.props.reduced === "1" || this.props.reduced === true || (this.rm && this.rm.matches); }
+  cur() { if (this.urlState === undefined) this.urlState = new URLSearchParams(window.location.search).get("state"); return this.state.s ?? this.props.state ?? this.urlState ?? "empty"; }
+  go(s, extra = {}) { this.setState({ s, live: 0, datePick: null, ...extra }); }
+  isResult(s) { return s.startsWith("result"); }
+  tick() {
+    if (this.frozen()) return;
+    const s = this.cur();
+    if (s === "processing" || s === "processing-late") {
+      const live = this.state.live + 0.25;
+      if (live >= 10) return this.go("result-playing", { playing: !this.reduced(), idx: 0 });
+      return this.setState({ live });
+    }
+    if (s === "processing-offline") {
+      const live = this.state.live + 0.25;
+      if (live >= 1) return this.go("result-playing", { playing: !this.reduced(), idx: 0 });
+      return this.setState({ live });
+    }
+    if (this.isResult(s) && this.playingNow(s)) {
+      this.acc = (this.acc || 0) + 0.25 * this.state.speed;
+      if (this.acc >= 1.6) {
+        this.acc = 0;
+        const n = this.seqLen || 5, i = this.state.idx ?? 0;
+        if (i + 1 >= n && !this.state.loop) this.setState({ playing: false });
+        else this.setState({ idx: (i + 1) % n });
+      }
+    }
+  }
+  rotateFact() { if (this.frozen()) return; const s = this.cur(); if (s === "processing" || s === "processing-late") this.nextFact(); }
+  nextFact() {
+    if (this.reduced()) return this.setState((st) => ({ fact: (st.fact + 1) % 10 }));
+    this.setState({ factOn: false });
+    setTimeout(() => this.setState((st) => ({ fact: (st.fact + 1) % 10, factOn: true })), 220);
+  }
+  playingNow(s) { return this.state.playing ?? (s === "result-playing" && !this.reduced()); }
+  renderVals() {
+    const RU = (p) => (window.__resources && window.__resources[p.replace(/[^a-z0-9]/gi, "_")]) || p;
+    const mobile = this.props.mobile === "1" || this.props.mobile === true, desktop = !mobile;
+    const s = this.cur(), st = this.state, frozen = this.frozen();
+    const IC = {
+      earthquake: "M2 12h4l2-5 3 10 3-12 2 7h6",
+      flood: "M12 3c2.5 3 4 5 4 7a4 4 0 0 1-8 0c0-2 1.5-4 4-7zM3 19c1.5 0 1.5-1 3-1s1.5 1 3 1 1.5-1 3-1 1.5 1 3 1 1.5-1 3-1 1.5 1 3 1",
+      wildfire: "M12 3c.5 3 4 4.8 4 9.2a4 4 0 0 1-8 .2c0-1.8.9-3 2-3.9.2 1.7 1 2.6 2 2.9-.6-2.8-.4-5.8 0-8.4z",
+      deforestation: "M12 3l5 7h-3l4 6H6l4-6H7zM12 16v5M8 21h8",
+      agriculture: "M3 20h18M7 20v-8M12 20V8M17 20v-8",
+    };
+    const PH = { earthquake: "Earthquake", wildfire: "Wildfire", deforestation: "Deforestation", flood: "Flood" };
+    const copy = {
+      casesKicker: "12 MEASURED CASES", casesTitle: "Start with a measured case", casesBody: "Prepared from real NISAR passes. Opens in about a second.",
+      moreCases: "MORE MEASURED CASES", dragHint: "Drag to move",
+      placedTitle: "Square placed", placedMeta: "10 × 10 km · about 105 km² · nothing runs yet", useSquare: "Use this square", cancel: "Cancel", edit: "Move",
+      phenLabel: "What do you want to look for?", lockedWhy: "This case was measured for one phenomenon. Place your own square to look for another.",
+      datesLabel: "Dates", start: "Start", end: "End", paramsLabel: "Settings",
+      lateBody: "Taking longer than the estimate. It keeps running; at 8 minutes we stop and show what is ready.", nextFact: "Next fact",
+      newSquare: "Place a new square", layerLabel: "Layer", prev: "Previous pass", next: "Next pass", speed: "Speed", loop: "Loop",
+      straddle: "Only a pair whose two passes fall on either side of the event can show it.",
+    };
+    const fmt = (d, y) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", ...(y ? { year: "numeric" } : {}), timeZone: "UTC" });
+    const days = (a, b) => Math.round((new Date(b) - new Date(a)) / 864e5);
+    const addDays = (d, n) => new Date(new Date(d + "T00:00:00Z").getTime() + n * 864e5).toISOString().slice(0, 10);
+
+    // cases
+    const CASES = [
+      { id: "qadirabad", phen: "flood", name: "Qadirabad, Pakistan", line: "1,911 of 16,384 cells darkened in both polarizations", feat: true, x: "57%", y: "40%" },
+      { id: "bugfire", phen: "wildfire", name: "Bug Fire, Nevada", line: "HV fell in 127 of 1,737 cells inside the perimeter, 18 of 1,813 outside", feat: true, x: "30%", y: "38%" },
+      { id: "rowecreek", phen: "deforestation", name: "Rowe Creek", line: "A disturbance with ambiguous radar signatures", feat: true, x: "27%", y: "34%" },
+      { id: "kumamoto", phen: "earthquake", name: "Kumamoto, Japan", line: "3 pass pairs around the event; 3 of 1,614 phase cells pass the checks", feat: true, x: "74%", y: "40%" },
+      { id: "chokwe", phen: "flood", name: "Chókwè, Mozambique" }, { id: "richmond", phen: "flood", name: "Richmond, Indiana" },
+      { id: "sanmarcos", phen: "flood", name: "San Marcos, Colombia" }, { id: "matam", phen: "flood", name: "Matam, Senegal" },
+      { id: "highplains", phen: "deforestation", name: "High Plains, Kansas · control" }, { id: "skollersta", phen: "agriculture", name: "Sköllersta, Sweden" },
+      { id: "palouse", phen: "agriculture", name: "Palouse, USA" }, { id: "choco", phen: "earthquake", name: "Chocó, Colombia · coherence only" },
+    ];
+    const quakeCase = s === "confirm-case" || (s === "result-quake" && !st.phen && !st.caseId);
+    const caseOf = CASES.find((c) => c.id === (quakeCase ? "kumamoto" : st.caseId));
+    const openCase = (c) => () => this.go("processing-offline", { caseId: c.id, idx: 0, playing: null, layer: null, phen: c.phen === "agriculture" ? "deforestation" : c.phen, scen: null, start: null, end: null, params: {}, dx: 0, dy: 0 });
+    const featured = CASES.filter((c) => c.feat).map((c) => ({ ...c, d: IC[c.phen], phen: PH[c.phen].toUpperCase(), open: openCase(c) }));
+    const others = CASES.filter((c) => !c.feat).map((c) => ({ name: c.name, phen: (PH[c.phen] || "Agriculture").toUpperCase(), open: openCase(c) }));
+    const globeMarks = featured.map((c) => ({ x: c.x, y: mobile ? `calc(${c.y} - 10%)` : c.y, d: c.d, aria: `Open ${c.name}`, open: (e) => { e.stopPropagation(); c.open(); } }));
+
+    // scenario + availability
+    const propKind = { "confirm-case": "case", "confirm-nodata": "none", "confirm-four": "four", "confirm-few": "few" }[this.props.state] || null;
+    const isCaseCtx = quakeCase || !!caseOf;
+    const scen = isCaseCtx ? "case" : st.scen ?? (s === this.props.state ? propKind : null) ?? "normal";
+    const cadence = (a, b, step) => { const out = []; for (let d = a; d <= b; d = addDays(d, step)) out.push(d); return out; };
+    const AV = { normal: cadence("2026-04-03", "2026-10-30", 12), four: ["2026-04-15", "2026-06-20", "2026-07-26", "2026-08-31", "2026-09-24", "2026-11-05"], few: ["2026-04-15", "2026-07-26", "2026-08-31", "2026-09-24", "2026-11-05"], none: [], case: cadence("2026-06-27", "2026-09-07", 12) };
+    const av = AV[scen];
+    const phen = isCaseCtx && caseOf ? (caseOf.phen === "agriculture" ? "deforestation" : caseOf.phen) : s === "confirm-case" ? "earthquake" : st.phen ?? "flood";
+    const PRESET = { flood: ["Event ± 60 days", "2026-06-20", "2026-09-24"], wildfire: ["45 days before, 90 after", "2026-06-12", "2026-10-25"], deforestation: ["Last 5 months", "2026-06-10", "2026-11-07"], earthquake: ["The pairs around the event", "2026-07-09", "2026-08-26"] };
+    let [presetName, ps, pe] = PRESET[phen];
+    const evPre = st.params.event ?? (phen === "flood" ? "2026-07-26" : "2026-07-28");
+    if (phen === "earthquake" && av.length >= 2 && !isCaseCtx) { presetName = "The 5 most recent passes"; ps = av[Math.max(0, av.length - 5)]; pe = av[av.length - 1]; }
+    if (scen === "few" && st.start == null) { ps = "2026-07-01"; pe = "2026-09-30"; }
+    const start = st.start ?? ps, end = st.end ?? pe;
+    const inside = av.filter((d) => d >= start && d <= end);
+    const n = inside.length;
+
+    // params
+    const P = st.params;
+    const EVENT_OPTS = [["2026-07-20", "20 Jul 2026 · example"], ["2026-07-28", "28 Jul 2026 · USGS"], ["2026-08-10", "10 Aug 2026 · example"]];
+    const event = P.event ?? (phen === "flood" ? "2026-07-26" : "2026-07-28");
+    // pairs (quake): consecutive and skip-one
+    const allPairs = [];
+    inside.forEach((a, k) => { [1, 2].forEach((g) => { const b = inside[k + g]; if (b) allPairs.push([a, b]); }); });
+    const straddle = isCaseCtx ? allPairs.filter(([a, b]) => a < event && b > event) : allPairs.slice().reverse();
+    const pairKey = P.pair && straddle.some(([a, b]) => a + "|" + b === P.pair) ? P.pair : straddle[0] ? straddle[0].join("|") : "";
+    const setP = (k, v) => this.setState({ params: { ...P, [k]: v } });
+    const PARAMS = {
+      flood: [], wildfire: [], deforestation: [],
+      earthquake: [
+        ["pair", "Pass pair", pairKey, straddle.length ? straddle.map(([a, b]) => [a + "|" + b, `${fmt(a)} → ${fmt(b)} · ${days(a, b)} d`]) : [["", "No pair in this range"]], "Two NISAR passes compared with each other, newest first."],
+        ["thr", "Coherence threshold", P.thr ?? "0.35", [["0.2", "0.20"], ["0.35", "0.35 · default"], ["0.5", "0.50"], ["0.7", "0.70"]], "Cells below it are left out of the phase."],
+      ],
+    };
+    const PTIP = {
+      event: phen === "earthquake" ? "The date and time of the earthquake, taken from the USGS catalogue. We only compare pass pairs where one pass is before this moment and one is after it, so the change can be the earthquake." : "The day the flood happened. Passes before it show what the place normally looks like; passes after it are compared with that.",
+      ref: "What 'normal' means for this place. The median of earlier passes is steadier, because one odd day does not decide it.",
+      fire: "When the fire started. By default we take the first NASA FIRMS satellite fire detection inside your square.",
+      ctx: "NASA FIRMS detects active fires from other satellites. We show those detections next to the radar so you can compare, but they never change the radar result.",
+      pair: "The two NISAR passes we compare. If the ground moved between them, the fringes show it. Pick a pair whose dates enclose the moment you care about. Shorter pairs (12 days) keep more of the ground recognisable; longer ones mix in more unrelated change.",
+      thr: "Coherence measures how alike the two echoes are, from 0 (nothing alike) to 1 (identical). Pixels below this number are too noisy to trust, so they are left out of the fringes.",
+    };
+    const tipBtn = (open) => ({ ibd: open ? "#c9b48b" : "rgba(235,233,228,0.35)", ibg: open ? "#c9b48b" : "transparent", iink: open ? "#16120a" : "#d4d2cc" });
+    const params = PARAMS[phen].map(([key, name, value, opts, help]) => { const open = st.tip === "p-" + key; return { name, value, help, options: opts.map(([v, l]) => ({ v, l })), change: (e) => setP(key, e.target.value), tip: PTIP[key], show: open, open: open ? "true" : "false", ...tipBtn(open), toggle: (e) => { e.preventDefault(); e.stopPropagation(); open && st.tipPin ? this.setState({ tip: null, tipPin: false }) : this.openTip("p-" + key, e.currentTarget, true); }, enter: (e) => this.openTip("p-" + key, e.currentTarget, false) }; });
+    const labelOf = (key) => { const p = PARAMS[phen].find((x) => x[0] === key); if (!p) return ""; const o = p[3].find((x) => x[0] === p[2]); return o ? o[1] : ""; };
+    const summary = phen === "earthquake" ? (straddle.length ? `Pair ${labelOf("pair").split(" · ")[0]} · threshold ${P.thr ?? "0.35"}` : `No pair yet · threshold ${P.thr ?? "0.35"}`) : "No settings needed for this phenomenon";
+
+    // chosen passes
+    let chosen = [];
+    if (phen !== "earthquake" && inside.length) {
+      const t0 = new Date(start), t1 = new Date(end);
+      for (let k = 0; k < 5; k++) { const tt = +t0 + ((t1 - t0) * k) / 4; const best = inside.reduce((b2, d) => (Math.abs(new Date(d) - tt) < Math.abs(new Date(b2) - tt) ? d : b2)); if (!chosen.includes(best)) chosen.push(best); }
+      chosen.sort();
+      if (chosen.length < 5) chosen = inside.slice(0, 5).length > chosen.length ? (inside.length >= 5 ? chosen : inside.slice()) : chosen;
+    }
+    const a0 = new Date(av.length ? addDays(av[0], -8) : "2026-04-01"), a1 = new Date(av.length ? addDays(av[av.length - 1], 8) : "2026-11-10"), span = a1 - a0;
+    const X = (d) => `${(((new Date(d) - a0) / span) * 100).toFixed(2)}%`;
+    const XW = (a, b) => `${(((new Date(b) - new Date(a)) / span) * 100).toFixed(2)}%`;
+
+    // notes and blockers
+    const offline = isCaseCtx;
+    let note = null;
+    const widest = (() => { if (!av.length) return null; return [av[0], av[av.length - 1]]; })();
+    if (scen === "none") note = { t: "NISAR hasn't measured this square yet", b: "No passes in the archive for this square. The Observation Plan schedules the next one on 27 Nov 2026 (track 112, descending).", tone: "info", act: "Open a measured case", do: () => this.go("empty", { scen: null, start: null, end: null }), block: true };
+    else if (phen === "earthquake" && !offline && !straddle.length) note = { t: "No pass pair in this range", b: `Only ${n} pass${n === 1 ? "" : "es"} in this range. A pair needs two passes from the same orbit.`, tone: "warn", act: "Reset to the preset", do: () => this.setState({ start: null, end: null }), block: true };
+    else if (phen !== "earthquake" && n <= 3) note = { t: "Not enough history here", b: `Only ${n} pass${n === 1 ? "" : "es"} fall in this range. An analysis needs at least 4 to compare against the place's own history.`, tone: "warn", act: widest ? `Widen to ${fmt(widest[0])} → ${fmt(widest[1])} (${av.length} passes)` : "", do: () => widest && this.setState({ start: widest[0], end: widest[1] }), block: true };
+    else if (phen !== "earthquake" && chosen.length === 4) { let g = [chosen[0], chosen[1]]; for (let k = 1; k < 4; k++) if (days(chosen[k - 1], chosen[k]) > days(g[0], g[1])) g = [chosen[k - 1], chosen[k]]; note = { t: "4 passes in this range", b: `The sequence will show 4 measured passes with their real gaps, not 5. NISAR has no pass here between ${fmt(g[0])} and ${fmt(g[1])}.`, tone: "info" }; }
+    const block = !!(note && note.block);
+
+    // date picker
+    const pickDates = st.datePick ? av.map((d) => { const isS = st.datePick === "start", sel = d === (isS ? start : end), dis = isS ? d >= end : d <= start; return { label: fmt(d), disabled: dis, op: dis ? 0.35 : 1, bd: sel ? "#c9b48b" : "rgba(235,233,228,0.16)", bg: sel ? "rgba(201,180,139,0.18)" : "transparent", ink: "#ebe9e4", pick: () => this.setState({ [isS ? "start" : "end"]: d, datePick: isS ? "end" : "start" }) }; }) : [];
+
+    // geometry
+    const isGlobe = s === "empty", isMap = !isGlobe;
+    const isQuake = phen === "earthquake" && (s.startsWith("confirm") || s.startsWith("processing") || this.isResult(s));
+    const kumamotoMap = st.caseId === "kumamoto" || quakeCase;
+    const isQuakeEarly = phen === "earthquake" && this.isResult(s);
+    const W = mobile ? 760 : 1500, H = Math.round((W * 1406) / 1600), side = Math.round((W * 10.24) / 32.9);
+    const cx = mobile ? "50%" : s === "placed" ? "50%" : "calc(50% - 208px)";
+    const cy = mobile ? (s === "placed" ? "44%" : this.isResult(s) ? "32%" : "22%") : this.isResult(s) ? (isQuakeEarly ? "38%" : "44%") : "50%";
+    const sqS = mobile && s !== "placed" ? Math.round(side * 0.8) : side;
+    const sc = sqS / side;
+    const dx = isCaseCtx ? 0 : st.dx * sc, dy = isCaseCtx ? 0 : st.dy * sc;
+    const map = { ready: true, src: kumamotoMap ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=130.55,32.64,130.94,32.98&bboxSR=4326&imageSR=4326&size=1600,1406&format=jpg&f=image" : "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=73.535,32.20,73.885,32.46&bboxSR=4326&imageSR=4326&size=1600,1406&format=jpg&f=image", w: `${W}px`, l: `calc(${cx} - ${W / 2}px)`, t: `calc(${cy} - ${H / 2}px)` };
+    const kmpp = 10.24 / side;
+    const lat0 = kumamotoMap ? 32.81 : 32.33, lon0 = kumamotoMap ? 130.75 : 73.71;
+    const lat = lat0 - (st.dy * kmpp) / 111.32, lon = lon0 + (st.dx * kmpp) / (111.32 * Math.cos((lat0 * Math.PI) / 180));
+    const coords = scen === "none" ? "78.22° N, 15.65° E" : `${lat.toFixed(2)}° N, ${lon.toFixed(2)}° E`;
+    const isResult = this.isResult(s), isPlaced = s === "placed";
+    const playing = this.playingNow(s);
+    const LAYERS = { flood: [["hh", "HH"], ["change", "Change since first"], ["sig", "Darkening signature"]], wildfire: [["hv", "HV"], ["hvdrop", "HV decline"]], deforestation: [["hv", "HV"], ["hvdrop", "HV decline"]], earthquake: [["coh", "Coherence"], ["phase", "Wrapped phase"]] };
+    const lensLayers = LAYERS[isQuake ? "earthquake" : phen] || LAYERS.flood;
+    const layer = lensLayers.some(([id]) => id === st.layer) ? st.layer : lensLayers[0][0];
+
+    // sequence
+    const caseIV = [["2026-07-09", "2026-08-02"], ["2026-07-21", "2026-08-14"], ["2026-07-21", "2026-08-26"]];
+    const seqQ = st.caseId === "kumamoto" || quakeCase ? caseIV : (() => { const ch = pairKey ? [pairKey.split("|")] : []; return ch.concat(straddle.filter(([a, b]) => a + "|" + b !== pairKey)).slice(0, 3); })();
+    const seqP = chosen.length >= 4 ? chosen : ["2026-06-20", "2026-07-14", "2026-08-07", "2026-08-31", "2026-09-24"];
+    const seq = isQuake ? (seqQ.length ? seqQ : caseIV) : seqP;
+    this.seqLen = seq.length;
+    const idx = Math.min(st.idx ?? (isQuake ? 0 : Math.min(2, seq.length - 1)), seq.length - 1);
+    let sqImg = null, sqAlt = "";
+    if (isResult) {
+      if (isQuake) { sqImg = layer === "phase" ? "docs/insar/kumamoto-wrapped-phase.png" : "docs/cases/kumamoto-coherence.png"; sqAlt = layer === "phase" ? "Wrapped phase for the selected pair" : "Coherence for the selected pair"; }
+      else { const IMG = { hh: "docs/cases/qadirabad-base-gray.png", change: idx > 0 ? "docs/cases/qadirabad-change.png" : "docs/cases/qadirabad-base-gray.png", sig: "docs/cases/qadirabad-signature.png", hv: phen === "wildfire" ? "docs/cases/richmond-base-gray.png" : "docs/cases/chokwe-base-gray.png", hvdrop: phen === "wildfire" ? "docs/cases/chokwe-change.png" : "docs/cases/richmond-change.png" }; sqImg = IMG[layer]; sqAlt = `${layer.toUpperCase()} layer, pass ${idx + 1} of ${seq.length}`; }
+    }
+    const sq = {
+      l: `calc(${cx} + ${dx}px)`, t: `calc(${cy} + ${dy}px)`, s: `${sqS}px`, bd: isPlaced ? "2px dashed #ebe9e4" : "2px solid #c9b48b", veil: isPlaced || s.startsWith("confirm") ? "rgba(4,7,14,0.35)" : "rgba(4,7,14,0)",
+      cursor: isPlaced ? (this.drag ? "grabbing" : "grab") : "default", hasProto: !!sqImg && !this.frozen(), protoText: isQuake ? "PROTOTYPE · SAME IMAGE FOR EVERY PAIR" : phen === "wildfire" || phen === "deforestation" ? "PROTOTYPE · STAND-IN IMAGE FROM ANOTHER CASE" : "PROTOTYPE · SAME IMAGE FOR EVERY PASS",
+      firms: isResult && phen === "wildfire" && idx > 0 ? [[22, 30], [27, 34], [31, 29], [64, 58], [68, 62], [71, 57], [45, 74]].slice(0, 2 + idx).map(([x, y]) => ({ x: x + "%", y: y + "%" })) : [], hasImg: !!sqImg, img: sqImg ? RU(sqImg) : "", alt: sqAlt,
+      handles: isPlaced ? [["0%", "0%"], ["100%", "0%"], ["0%", "100%"], ["100%", "100%"]].map(([x, y]) => ({ x, y })) : [], hasMove: isPlaced,
+      label: kumamotoMap && isCaseCtx ? "KUMAMOTO · 10 × 10 KM" : "10 × 10 KM · 105 KM²", hasStamp: isResult, stampSize: mobile ? "18px" : "26px",
+    };
+    const stamp = isQuake ? { date: `${fmt(seq[idx][0])} → ${fmt(seq[idx][1], true)}`.toUpperCase(), role: `PAIR ${idx + 1} OF ${seq.length} · ${days(seq[idx][0], seq[idx][1])} DAYS` } : { date: fmt(seq[idx], true).toUpperCase(), role: `PASS ${idx + 1} OF ${seq.length}${idx ? ` · ${days(seq[idx - 1], seq[idx])} DAYS AFTER PASS ${idx}` : " · REFERENCE"}` };
+
+    // confirm view model
+    const tickOff = phen === "earthquake" ? "32px" : "0px";
+    const pairsVis = phen === "earthquake" ? allPairs.slice(0, 12).map(([a, b], k) => { const str = isCaseCtx ? a < event && b > event : true, on = a + "|" + b === pairKey; return { l: X(a), w: XW(a, b), t: `${4 + (k % 3) * 13}px`, title: `${fmt(a)} → ${fmt(b)}${isCaseCtx && str ? " · straddles the event" : ""}`, bd: on ? "#ebe9e4" : str ? "#c9b48b" : "rgba(235,233,228,0.2)", bg: on ? "#c9b48b" : str ? "rgba(201,180,139,0.25)" : "transparent", disabled: !str || offline, cursor: str && !offline ? "pointer" : "default", pick: () => setP("pair", a + "|" + b) }; }) : [];
+    const XN = (d) => ((new Date(d) - a0) / span) * 1000;
+    const arcs = phen === "earthquake" ? allPairs.slice(0, 14).map(([pa2, pb2]) => { const x1 = XN(pa2), x2 = XN(pb2), h = Math.min(36, 10 + (x2 - x1) * 0.12), on = pa2 + "|" + pb2 === pairKey, ok = isCaseCtx ? pa2 < event && pb2 > event : true; return { d: `M${x1.toFixed(1)} 44 Q${((x1 + x2) / 2).toFixed(1)} ${(44 - h * 2).toFixed(1)} ${x2.toFixed(1)} 44`, stroke: on ? "#c9b48b" : ok ? "rgba(201,180,139,0.55)" : "rgba(235,233,228,0.18)", w: on ? 2.5 : 1.25, op: on ? 1 : 0.85, cursor: ok && !offline ? "pointer" : "default", title: `${fmt(pa2)} → ${fmt(pb2)} · ${days(pa2, pb2)} days`, pick: () => ok && !offline && setP("pair", pa2 + "|" + pb2) }; }) : [];
+    const LOOK = { flood: "Looks for spots that darken in both HH and HV, the way new open water does.", wildfire: "Looks for HV dropping and staying low across several passes.", deforestation: "Looks for HV declining across passes, the way it does when canopy is removed.", earthquake: "Compares the phase of two passes to see where the ground kept its echo." };
+    const thrV = P.thr ?? "0.35";
+    const cf = {
+      lookFor: offline ? copy.lockedWhy : LOOK[phen],
+      dateSummary: phen === "earthquake" ? `${n} passes · ${fmt(start)} → ${fmt(end, true)}` : `${n >= 5 ? 5 : n} passes · ${fmt(start)} → ${fmt(end, true)}`,
+      canEdit: !offline, datesOpenAttr: st.datesOpen ? "true" : "false", datesAction: st.datesOpen ? "Done" : "Change", toggleDates: () => this.setState({ datesOpen: !st.datesOpen, datePick: st.datesOpen ? null : "start" }),
+      arcs, linkL: phen !== "earthquake" && chosen.length ? X(chosen[0]) : "0%", linkW: phen !== "earthquake" && chosen.length > 1 ? XW(chosen[0], chosen[chosen.length - 1]) : "0%",
+      quakeUser: phen === "earthquake" && !offline, pairLine: pairKey ? `Pair ${pairKey.split("|").map((d) => fmt(d)).join(" → ")} · ${days(...pairKey.split("|"))} days · tap an arc to change` : "No pair in this range",
+      advOpen: st.advOpen, advOpenAttr: st.advOpen ? "true" : "false", advLabel: st.advOpen ? "Hide advanced" : `Advanced · threshold ${thrV}`, toggleAdv: () => this.setState({ advOpen: !st.advOpen }),
+      thr: thrV, thrChange: (e) => setP("thr", e.target.value), thrOptions: [["0.2", "0.20"], ["0.35", "0.35 · default"], ["0.5", "0.50"], ["0.7", "0.70"]].map(([v, l]) => ({ v, l })),
+      thrTip: { toggle: (e) => { e.preventDefault(); e.stopPropagation(); this.openTip("p-thr", e.currentTarget, true); }, enter: (e) => this.openTip("p-thr", e.currentTarget, false) },
+      kicker: offline ? `MEASURED CASE · ${(caseOf ? caseOf.name.split(",")[0] : "Kumamoto").toUpperCase()}` : "CONFIRM THE ANALYSIS", title: offline ? (caseOf ? caseOf.name : "Kumamoto earthquake, July 2026") : "What should the radar look for?",
+      area: "10 × 10 km square · 105 km²", coords, canMove: !offline, locked: offline, hasDates: scen !== "none",
+      preset: st.start || st.end ? "CUSTOM RANGE" : `PRESET · ${presetName.toUpperCase()}`, start: fmt(start, true), end: fmt(end, true), dateOp: offline ? 0.6 : 1,
+      startOpen: st.datePick === "start" ? "true" : "false", endOpen: st.datePick === "end" ? "true" : "false", startBd: st.datePick === "start" ? "#c9b48b" : "rgba(235,233,228,0.16)", endBd: st.datePick === "end" ? "#c9b48b" : "rgba(235,233,228,0.16)",
+      pickStart: () => !offline && this.setState({ datePick: "start" }), pickEnd: () => !offline && this.setState({ datePick: "end" }),
+      picking: !!st.datesOpen && !offline, pickHint: st.datePick === "end" ? "Pick the last pass to include:" : "Pick the first pass to include:", pickDates, resetLabel: `Reset to preset · ${presetName}`, resetPreset: () => this.setState({ start: null, end: null, datePick: null }),
+      stripH: phen === "earthquake" ? "66px" : "34px", lineT: phen === "earthquake" ? "44px" : "12px", bandT: phen === "earthquake" ? "40px" : "8px", eventLabel: `EVENT · ${fmt(event).toUpperCase()}`,
+      datesLabel: phen === "earthquake" ? "Which passes to compare" : "Which passes to read", stripTitle: "NISAR PASSES OVER THIS SQUARE",
+      legend: (phen === "earthquake" ? [["Pass", "8px", "8px", "50%", "rgba(235,233,228,0.55)", "transparent"], ["Chosen pair", "18px", "10px", "999px", "#c9b48b", "#ebe9e4"], ["Other pair you can pick", "18px", "10px", "999px", "rgba(201,180,139,0.25)", "#c9b48b"]] : [["Pass", "8px", "8px", "50%", "rgba(235,233,228,0.55)", "transparent"], ["Will be read", "12px", "12px", "50%", "#c9b48b", "#04070e"], ["Your range", "18px", "10px", "3px", "rgba(201,180,139,0.16)", "rgba(201,180,139,0.45)"]]).map(([t2, w, h, r, bg, bd]) => ({ t: t2, w, h, r, bg, bd })), tickOff, isQuake: phen === "earthquake", pairs: pairsVis, eventX: X(event),
+      rangeL: X(start), rangeW: XW(start, end), axisL: fmt(a0.toISOString().slice(0, 10)).toUpperCase(), axisR: fmt(a1.toISOString().slice(0, 10)).toUpperCase(),
+      ticks: av.map((d) => { const pick = phen === "earthquake" ? (pairKey.split("|").includes(d)) : chosen.includes(d), inn = d >= start && d <= end; return { x: X(d), top: pick ? "6px" : "9px", s: pick ? "14px" : "8px", bg: pick ? "#c9b48b" : inn ? "rgba(235,233,228,0.55)" : "rgba(235,233,228,0.15)", bd: pick ? "#04070e" : "transparent", title: fmt(d, true) }; }),
+      passLine: phen === "earthquake" ? `${av.length} NISAR passes here · ${n} in range · ${straddle.length} pair${straddle.length === 1 ? "" : "s"} · track 24 ascending` : n >= 5 ? `${av.length} NISAR passes here · ${n} in range · 5 will be read · track 24 ascending` : `${av.length} NISAR passes here · ${n} in range · track 24 ascending`,
+      hasNote: !!note, noteTitle: note ? note.t : "", noteBody: note ? note.b : "", noteBd: note && note.tone === "warn" ? "rgba(232,137,74,0.5)" : "rgba(235,233,228,0.2)", noteBg: note && note.tone === "warn" ? "rgba(232,137,74,0.08)" : "rgba(235,233,228,0.04)", hasNoteAction: !!(note && note.act), noteAction: note ? note.act || "" : "", noteDo: () => note && note.do && note.do(),
+      hasParams: scen !== "none", params, noParams: params.length === 0, summary, setOpen: st.setOpen && params.length > 0, setOpenAttr: st.setOpen ? "true" : "false", setAction: params.length ? (st.setOpen ? "Done" : "Change") : "", toggleSettings: () => this.setState({ setOpen: !st.setOpen }),
+      mode: offline ? "OFFLINE" : "ONLINE", modeBd: offline ? "rgba(235,233,228,0.4)" : "#c9b48b", modeInk: offline ? "#ebe9e4" : "#c9b48b",
+      modeLine: offline ? "Prepared ahead of time" : "Computed live from the NISAR archive", waitLine: offline ? "Prepared · opens in about a second" : block ? "Nothing to compute yet" : "Computed live · usually 1–3 min",
+      startDisabled: block, blockWhy: note && note.block ? note.t : "", startBg: block ? "rgba(235,233,228,0.1)" : "#c9b48b", startInk: block ? "#8d8a83" : "#16120a", startCursor: block ? "not-allowed" : "pointer", startLabel: offline ? "Show the result" : "Start analysis",
+    };
+    const TIPS = {
+      phen: "Each phenomenon reads the radar differently: floods look for darkening in both polarizations, fires and forest loss for a drop in HV, earthquakes compare the phase of two passes. Pick what you suspect happened here.",
+      dates: phen === "earthquake" ? "Ground movement is read from a pair of passes. The range limits which passes can form pairs; by default we use the 5 most recent." : "NISAR passes over each place about every 12 days. Pick a range and we read 5 passes spread evenly across it, then play them in order.",
+      strip: phen === "earthquake" ? "Each dot is a day NISAR imaged this square. Each arc joins two passes into a pair; the bright gold arc is the pair we will compare. Tap another arc to change it." : "Each dot is a day NISAR imaged this square. The shaded band is your date range. The gold dots joined by the gold line are the passes we will read, in order.",
+      mode: "ONLINE means we compute your square now, from the NISAR archive, which takes minutes. OFFLINE means the answer was prepared ahead of time and opens at once.",
+      cases: "Places the team already analysed with real NISAR passes. Each one opens in about a second, with its dates, sources and limits. From any case you can still place your own square.",
+      square: "NISAR data is analysed in a fixed square of about 10 × 10 km (105 km²). It is big enough to see a pattern and small enough to compute in minutes. Drag it to the spot you care about; nothing runs until you press Start.",
+      wait: "The time depends on how busy the service is and how many passes it must download, so we show a range based on recent analyses and count the time that has passed. If it takes longer, we say so; at 8 minutes we stop and show what is ready.",
+      steps: "Finding passes: we look up which NISAR images exist for your square. Reading: we download only your 10 km piece of each one. Measuring: we compare each pass with the place's own history. Drawing: we turn the result into map layers.",
+      chips: "ONLINE or OFFLINE says how the answer was obtained: computed now, or prepared earlier. MEASURED means it comes from real NISAR data; DEMO DATA marks anything that is an example. The last chip says what the radar was asked to look for.",
+      stat: "The square is split into small analysis cells. This counts how many cells showed the signal, out of how many could be measured. We never turn it into hectares, probabilities or a cause.",
+      layer: layer === "sig" ? "Darkening signature: cells where both HH and HV dropped below their usual range at the same time, the radar pattern of new open water. Blue cells met the rule; gray did not." : layer === "hv" ? "HV backscatter: the share of the pulse that comes back twisted, which happens mostly inside leaves and branches. Bright means a lot of vegetation structure; dark means little." : layer === "hvdrop" ? "HV decline: how much HV changed compared with the passes before. Blue cells lost HV and stayed low, the radar pattern of vegetation removed by fire or cutting. Orange dots are NASA FIRMS fire detections from other satellites, shown for comparison only." : isQuake ? (layer === "phase" ? "Wrapped phase: each colour cycle is about 12 cm of change in the radar's path length between the two passes. It mixes ground motion and atmosphere, so it is a pattern, not a distance." : "Coherence: how alike the two echoes are, from 0 (changed) to 1 (alike). Dark areas changed between the passes, or are water or dense forest.") : (layer === "change" ? "Change versus the first pass, in decibels: blue means the echo got weaker (for example new water), red that it got stronger. White means about the same." : "HH backscatter: how strongly each spot sends the radar pulse back, on a fixed gray scale from −30 dB (black, very weak, like calm water) to 0 dB (white, very strong, like buildings)."),
+      timeline: isQuake ? (caseOf ? "Each bar is a pair of NISAR passes that encloses the event. Press play to step through the pairs, or click one." : "Each bar is a pair of NISAR passes, newest first. Press play to step through them, or click one.") : "Each dot is a real NISAR pass, placed by its actual date, so uneven gaps are real gaps. Press play to watch them in order, change the speed, or click a date to jump there.",
+    };
+    const tips = Object.fromEntries(Object.entries(TIPS).map(([k2, text]) => { const open = st.tip === k2; return [k2, { text, show: open, open: open ? "true" : "false", bd: open ? "#c9b48b" : "rgba(235,233,228,0.35)", bg: open ? "#c9b48b" : "transparent", ink: open ? "#16120a" : "#d4d2cc", toggle: (e) => { e.preventDefault(); e.stopPropagation(); open && st.tipPin ? this.setState({ tip: null, tipPin: false }) : this.openTip(k2, e.currentTarget, true); }, enter: (e) => this.openTip(k2, e.currentTarget, false) }]; }));
+    const phens = Object.keys(PH).map((id) => { const on = id === phen, dis = offline || scen === "none"; return { label: PH[id], d: IC[id], on: on ? "true" : "false", disabled: dis, pick: () => this.setState({ phen: id, start: null, end: null, params: {}, datePick: null, layer: null }), bd: on ? "#c9b48b" : "rgba(235,233,228,0.14)", bg: on ? "rgba(201,180,139,0.14)" : "transparent", ink: on ? "#ebe9e4" : "#d4d2cc", cursor: dis ? "not-allowed" : "pointer", op: dis && !on ? 0.4 : 1 }; });
+
+    // processing
+    const late = s === "processing-late", off = s === "processing-offline";
+    const live = frozen ? 0 : st.live;
+    const el = late ? 214 + live : 72 * (frozen ? 1 : 0) + live * (frozen ? 0 : 18);
+    const isLateNow = late || el > 180;
+    const clock = (v) => `${Math.floor(v / 60)}:${String(Math.floor(v % 60)).padStart(2, "0")}`;
+    const collapsed = st.collapsed;
+    const nRead = Math.min(seq.length, Math.max(1, Math.round((el / 150) * seq.length)));
+    const stepsDef = [["Finding passes", phen === "earthquake" ? (caseOf ? "3 pairs straddle the event" : `Reading the pair ${pairKey ? pairKey.split("|").map((d) => fmt(d)).join(" → ") : ""}`) : `${seq.length} passes · ascending · ${fmt(seq[0])} → ${fmt(seq[seq.length - 1], true)}`], ["Reading passes", `${nRead} of ${seq.length} read`], ["Measuring change", ""], ["Drawing the layers", ""]];
+    const curStep = off ? 4 : isLateNow ? 2 : el > 120 ? 2 : 1;
+    const pr = {
+      mode: off ? "OFFLINE" : "ONLINE", modeBd: off ? "rgba(235,233,228,0.4)" : "#c9b48b", modeInk: off ? "#ebe9e4" : "#c9b48b",
+      title: off ? "Opening the prepared result" : "Analysing your square", expanded: collapsed ? "false" : "true", expandedBool: !collapsed, chev: collapsed ? "180deg" : "0deg", collapseLabel: collapsed ? "Expand" : "Collapse",
+      elapsed: off ? `${(0.4 + (frozen ? 0.4 : live)).toFixed(1)} s` : clock(el), elapsedLabel: "elapsed", est: off ? "Prepared ahead of time" : isLateNow ? "Estimate was 1–3 min" : "Usually 1–3 min", estInk: isLateNow ? "#e8894a" : "#a9a69e",
+      bandL: off ? "0%" : "20%", bandW: off ? "0%" : "40%", fill: off ? "100%" : `${Math.min(100, (el / 300) * 100).toFixed(1)}%`, fillBg: isLateNow ? "#e8894a" : "#ebe9e4",
+      axisMid: off ? "" : "2.5 min", axisEnd: off ? "" : "5 min", late: isLateNow, whyLabel: off ? "Why so fast?" : "Why a range and not a countdown?",
+      steps: stepsDef.map(([label, line], i) => ({ label, line: i < curStep ? line || "Done" : i === curStep ? (i === 1 ? line : "In progress") : "Waiting", ring: i < curStep ? "#c9b48b" : i === curStep ? "#ebe9e4" : "rgba(235,233,228,0.25)", dot: i < curStep ? "#c9b48b" : "transparent", ink: i <= curStep ? "#ebe9e4" : "#8d8a83" })),
+      hasFact: !off, cancelLabel: off ? "" : "Cancel analysis",
+    };
+    const FACTS = [
+      ["Radar sees through clouds", "NISAR sends its own microwave pulses and listens for the echo, so it measures day or night, through cloud and smoke.", "public/landing/radar-north-dakota.jpg", "NASA · 5 things to know about NISAR", "https://www.nasa.gov/missions/nisar/5-things-to-know-about-powerful-new-u-s-india-satellite-nisar/", false],
+      ["A 24 cm wave", "NISAR's L-band radar uses a wavelength of about 24 cm. It passes leaves and reaches branches, trunks and the ground.", "public/landing/nisar-concept.jpg", "NASA Science · get to know SAR", "https://science.nasa.gov/mission/nisar/get-to-know-sar/", false],
+      ["Calm water looks dark", "Smooth water reflects the pulse away from the satellite like a mirror, so new water shows up as a drop in the echo.", "docs/cases/qadirabad-base-gray.png", "NASA Science · get to know SAR", "https://science.nasa.gov/mission/nisar/get-to-know-sar/", true],
+      ["Every 12 days", "NISAR repeats the same orbit every 12 days, so each place builds its own history of echoes.", "docs/atlas/chenab.png", "NASA Science · NISAR interferometry", "https://science.nasa.gov/mission/nisar/interferometry/", true],
+      ["Coherence, 0 to 1", "Coherence says how alike two echoes from the same spot are. Near 1 the ground looked the same; near 0 something changed.", "docs/cases/kumamoto-coherence.png", "ASF HyP3 · InSAR product guide", "https://hyp3-docs.asf.alaska.edu/guides/insar_product_guide/", true],
+      ["A 12 m reflector", "The antenna reflector is about 12 m wide, the largest radar reflector NASA has sent to space.", "public/landing/reflector-deployment.jpg", "NASA Science · the reflector blooms", "https://science.nasa.gov/blogs/nisar/2025/08/15/giant-radar-antenna-reflector-on-nasa-isro-satellite-in-full-bloom/", false],
+      ["Fringes are 12 cm", "In an interferogram, one colour cycle is about 12 cm of change in the radar's path: half the 24 cm wave, there and back.", "docs/insar/kumamoto-wrapped-phase.png", "NASA Science · NISAR interferometry", "https://science.nasa.gov/mission/nisar/interferometry/", true],
+      ["Change, not a picture", "Red means the echo grew and blue that it shrank, compared with the same place before.", "docs/cases/chokwe-change.png", "NASA Earthdata · SAR", "https://www.earthdata.nasa.gov/learn/earth-observation-data-basics/sar", true],
+      ["Two agencies, one satellite", "NASA built the L-band radar and ISRO the S-band radar and the spacecraft. It launched on 30 July 2025 from Sriharikota.", "public/landing/nisar-concept.jpg", "NASA Science · NISAR lifts off", "https://science.nasa.gov/earth/earth-observatory/advanced-us-india-radar-mission-lifts-off-154617/", false],
+      ["Open to everyone", "NISAR data are archived at the Alaska Satellite Facility and free for anyone to download.", "public/landing/earth-day.jpg", "NASA Science · NISAR", "https://science.nasa.gov/mission/nisar/", false],
+    ];
+    const F = FACTS[st.fact % FACTS.length];
+    const fact = { ready: true, title: F[0], text: F[1], img: RU(F[2]), source: `Source: ${F[3]}`, href: F[4], render: F[5] ? "pixelated" : "auto", count: `FACT ${(st.fact % 10) + 1} OF 10`, op: st.factOn ? 1 : 0, trans: this.reduced() ? "none" : "opacity 220ms ease" };
+
+    // result card
+    const place = caseOf ? caseOf.name : `Your square · ${coords}`;
+    const measuredHere = !!caseOf || phen === "flood";
+    const RS = {
+      flood: { couldBe: "wet soil, or calm water that was already there.", notShown: "flood depth, hectares, probability.", phen: "FLOOD · BOTH POLARIZATIONS", title: "Parts of the square darkened", body: "Compared with the median of earlier passes, some cells dropped in both HH and HV, the way new open water does.", stat: "1,911 of 16,384", statLabel: "analysis cells met the darkening signature", limits: ["No flood depth, extent in hectares or probability.", "Darkening can also be wet soil or calm water that was already there."] },
+      wildfire: { couldBe: "rain, harvest or drying vegetation.", notShown: "burned hectares, cause.", phen: "WILDFIRE · HV DECLINE", title: "HV stayed low after the fire in part of the square", body: "Compared with the passes before the fire start, HV fell and stayed below its earlier range in some cells. FIRMS detections are shown next to it, not mixed in.", stat: "127 of 1,737", statLabel: "cells inside the reference perimeter with repeated HV decline", limits: ["No burned area in hectares and no cause.", "Rain and harvest can also lower HV."] },
+      deforestation: { couldBe: "ploughing, harvest or seasonal change.", notShown: "hectares of forest lost, cause.", phen: "DEFORESTATION · VEGETATION LENS", title: "Some cells lost part of their HV echo", body: "HV declined across several passes in some cells, the way it does when canopy is removed. Ploughing and harvest can do the same.", stat: "79 of 4,096", statLabel: "cells with repeated HV decline", limits: ["No hectares of forest lost.", "A decline is evidence of change, not a cause."] },
+      earthquake: { couldBe: "atmosphere between the passes, or unwrapping error.", notShown: "displacement in cm, magnitude, probability.", phen: "EARTHQUAKE · COHERENCE", title: "Coherent fringes survive in parts of the square", body: caseOf ? `${seq.length} pass pairs straddle the ${fmt("2026-07-28")} event. The phase is wrapped and uncorrected for the atmosphere, so it shows a pattern of change, not a distance.` : `The pair ${fmt(seq[0][0])} → ${fmt(seq[0][1])} kept its phase in parts of the square. The phase is wrapped and uncorrected for the atmosphere, so it shows a pattern of change, not a distance.`, stat: "3 of 1,614", statLabel: "common phase cells met the correction-input checks", limits: ["Each fringe is about 12 cm of change in the radar's path length.", "No displacement, magnitude or probability is shown."] },
+    }[phen];
+    const rs = { ...RS, icon: IC[phen], range: isQuake ? `${seq.length} pair${seq.length === 1 ? "" : "s"} · ${fmt(seq[0][0])} → ${fmt(seq[seq.length - 1][1], true)}`.toUpperCase() : `${fmt(seq[0])} → ${fmt(seq[seq.length - 1], true)} · ${seq.length} passes`.toUpperCase(), originBd: measuredHere ? "rgba(235,233,228,0.4)" : "transparent", originBg: measuredHere ? "transparent" : "rgba(245,158,11,0.18)", originInk: measuredHere ? "#d4d2cc" : "#fcd34d", place, mode: caseOf ? "OFFLINE" : "ONLINE", modeTitle: caseOf ? "Prepared ahead of time" : "Computed live for your square", origin: measuredHere ? "MEASURED" : "DEMO DATA", originTitle: measuredHere ? "NISAR, track 24" : "Prototype: numbers from a measured case stand in for this square" };
+    const layers = lensLayers.map(([id, label]) => ({ label, on: id === layer ? "true" : "false", bg: id === layer ? "#ebe9e4" : "transparent", ink: id === layer ? "#04070e" : "#d4d2cc", pick: () => this.setState({ layer: id }) }));
+    const LG = { hh: ["linear-gradient(90deg,#000,#fff)", "−30 dB", "0 dB", "How strongly the ground echoes (HH)"], hv: ["linear-gradient(90deg,#000,#fff)", "−30 dB", "0 dB", "How strongly vegetation echoes (HV)"], change: ["linear-gradient(90deg,#2166ac,#f7f7f7,#b2182b)", "−8 dB", "+8 dB", "Blue weaker, red stronger than the first pass"], hvdrop: ["linear-gradient(90deg,#2166ac,#f7f7f7,#b2182b)", "−8 dB", "+8 dB", "Blue: HV fell and stayed low"], sig: ["linear-gradient(90deg,#eeeeee 0 50%,#0072b2 50% 100%)", "No signal", "Signal met", "Cells where HH and HV both darkened"], coh: ["linear-gradient(90deg,#00204c,#31446b,#666970,#958f78,#cbba69,#ffe945)", "0 · changed", "1 · alike", "How alike the two passes are"], phase: ["linear-gradient(90deg,#e8e6f0,#6e5aa8,#2a1a3a,#a8433a,#e8c9a6,#e8e6f0)", "−π", "+π", "Fringes of change between the passes"] }[layer];
+    const legend = { ramp: LG[0], l: LG[1], r: LG[2], what: LG[3], hasFirms: phen === "wildfire" && isResult };
+    const sP = isQuake ? seqP : seq;
+    const t0 = new Date(sP[0]), t1 = new Date(sP[sP.length - 1]);
+    const tx = (d) => `${(((new Date(d) - t0) / (t1 - t0 || 1)) * 100).toFixed(2)}%`;
+    const ticks = isQuake ? [] : seq.map((d, i) => { const c = i === idx; return { x: tx(d), label: fmt(d).toUpperCase(), aria: `Pass ${i + 1}, ${fmt(d, true)}`, cur: c ? "true" : "false", s: c ? "16px" : "12px", mt: c ? "3px" : "5px", bg: i <= idx ? "#c9b48b" : "#04070e", bd: c ? "#ebe9e4" : i <= idx ? "#c9b48b" : "rgba(235,233,228,0.4)", ink: c ? "#ebe9e4" : "#a9a69e", go: () => this.setState({ idx: i, playing: false }) }; });
+    const gaps = isQuake ? [] : seq.slice(1).map((d, i) => ({ x: `calc((${tx(seq[i])} + ${tx(d)}) / 2)`, label: `${days(seq[i], d)} D` }));
+    const qa = isQuake ? addDays(seq.reduce((m, p) => (p[0] < m ? p[0] : m), seq[0][0]), -4) : "2026-07-05", qb = isQuake ? addDays(seq.reduce((m, p) => (p[1] > m ? p[1] : m), seq[0][1]), 4) : "2026-08-30";
+    const qx = (d) => ((new Date(d) - new Date(qa)) / (new Date(qb) - new Date(qa))) * 100;
+    const evQ = st.caseId === "kumamoto" || quakeCase ? "2026-07-28" : event;
+    const intervals = isQuake ? seq.map(([a, b], i) => { const c = i === idx, demo = (st.caseId === "kumamoto" || quakeCase) && i !== 1; return { l: `${qx(a)}%`, w: `${qx(b) - qx(a)}%`, t: `${i * (mobile ? 18 : 24)}px`, rh: mobile ? "14px" : "18px", a: fmt(a).toUpperCase(), b: fmt(b).toUpperCase(), days: `${days(a, b)} D${demo ? " · DEMO" : ""}`, aria: `Pair ${i + 1}: ${fmt(a, true)} to ${fmt(b, true)}`, cur: c ? "true" : "false", bd: c ? "#c9b48b" : "rgba(235,233,228,0.3)", bg: c ? "rgba(201,180,139,0.22)" : "transparent", ink: c ? "#ebe9e4" : "#a9a69e", go: () => this.setState({ idx: i, playing: false }) }; }) : [];
+    const tlv = {
+      playLabel: playing ? "Pause" : "Play", playIcon: playing ? "M7 5h4v14H7zM13 5h4v14h-4z" : "M8 5l11 7-11 7z",
+      title: isQuake ? `Pair ${idx + 1} of ${seq.length} · ${fmt(seq[idx][0])} → ${fmt(seq[idx][1], true)}` : `Pass ${idx + 1} of ${seq.length} · ${fmt(seq[idx], true)}`,
+      sub: isQuake ? (caseOf ? `${seq.length} MEASURED PAIRS · ALL STRADDLE THE EVENT` : `${seq.length} MEASURED PAIR${seq.length === 1 ? "" : "S"} · NEWEST FIRST`) : `${seq.length} MEASURED PASSES · ${fmt(seq[0]).toUpperCase()} → ${fmt(seq[seq.length - 1], true).toUpperCase()} · TRACK 24 ASC`,
+      fill: isQuake ? "0%" : tx(seq[idx]), trans: this.reduced() ? "none" : "width 400ms ease", loopOn: st.loop ? "true" : "false", loopBd: st.loop ? "#c9b48b" : "rgba(235,233,228,0.16)", loopInk: st.loop ? "#ebe9e4" : "#a9a69e",
+    };
+    const speeds = [0.5, 1, 2].map((v) => ({ label: `${v}×`, on: v === st.speed ? "true" : "false", bg: v === st.speed ? "#ebe9e4" : "transparent", ink: v === st.speed ? "#04070e" : "#d4d2cc", pick: () => this.setState({ speed: v }) }));
+    const nS = seq.length;
+
+    // layout
+    const hasPanel = s.startsWith("confirm") || s.startsWith("processing") || isResult;
+    const pn = desktop ? { l: "auto", r: "16px", t: "72px", b: "auto", w: s.startsWith("confirm") ? "400px" : "360px", mh: "calc(100% - 88px)", rad: "24px" }
+      : s.startsWith("confirm") ? { l: "0", r: "0", t: "auto", b: "0", w: "auto", mh: "62%", rad: "24px 24px 0 0" }
+      : s.startsWith("processing") ? { l: "0", r: "0", t: "auto", b: "0", w: "auto", mh: collapsed ? "120px" : "56%", rad: "24px 24px 0 0" }
+      : { l: "0", r: "0", t: "auto", b: "0", w: "auto", mh: "30%", rad: "24px 24px 0 0" };
+    const cp = desktop ? { l: "16px", r: "auto", t: "72px", b: "auto", w: "340px", mh: "calc(100% - 88px)", rad: "24px", cols: "1fr" } : { l: "0", r: "0", t: "auto", b: "0", w: "auto", mh: "48%", rad: "24px 24px 0 0", cols: "repeat(2,minmax(0,1fr))" };
+    const pb = desktop ? { l: "50%", r: "auto", b: "24px", tx: "translateX(-50%)", rad: "999px" } : { l: "0", r: "0", b: "0", tx: "none", rad: "24px 24px 0 0" };
+    const tl = desktop ? { l: "16px", r: "392px", b: "16px" } : { l: "8px", r: "8px", b: "calc(30% + 8px)" };
+    const lg = { t: "72px", w: desktop ? "280px" : "calc(100% - 32px)" };
+    const globe = { img: RU("public/landing/earth-day.jpg"), size: mobile ? "340px" : "620px", top: mobile ? "34%" : "52%" };
+    const showProto = !frozen && desktop && (isPlaced || s.startsWith("confirm")) && !isCaseCtx;
+    const scens = [["normal", "Many passes"], ["four", "4 passes"], ["few", "3 passes"], ["none", "No passes"]].map(([id, label]) => ({ label, bg: id === scen ? "#fcd34d" : "transparent", ink: id === scen ? "#16120a" : "#fcd34d", pick: () => this.setState({ scen: id, start: null, end: null, params: {}, datePick: null }) }));
+
+    return {
+      copy, desktop, mobile, isGlobe, isMap, map, hasSq: isMap, sq, stamp, globe, globeMarks,
+      showHint: s === "empty", hintText: mobile ? "Tap any land to place a square" : "Click any land to place a 10 × 10 km square", hintTop: mobile ? "68px" : "76px",
+      isEmpty: s === "empty", featured, others, cp, isPlaced, pb, showProto, scens,
+      hasPanel, pn, panelAria: s.startsWith("confirm") ? "Confirm the analysis" : s.startsWith("processing") ? "Analysis progress" : "Result",
+      isConfirm: s.startsWith("confirm"), cf, phens, tips, rootRef: this.rootRef,
+      hideTip: () => { if (st.tipPin) return; this.tipT = setTimeout(() => this.setState({ tip: null }), 80); },
+      pop: (() => { const key = st.tip, pos = st.tipPos; if (!key || !pos) return { show: false, x: "0px", y: "0px", tf: "none", title: "", text: "" }; const isP = key.startsWith("p-"); const text = isP ? (PTIP[key.slice(2)] || "") : (TIPS[key] || ""); const TT = { phen: "WHAT TO LOOK FOR", dates: "DATES", strip: "PASSES", mode: "ONLINE / OFFLINE", cases: "MEASURED CASES", square: "THE SQUARE", wait: "THE WAIT", steps: "THE STEPS", chips: "LABELS", stat: "THE NUMBER", layer: "THIS LAYER", timeline: "THE TIMELINE" }; const pn2 = isP ? (PARAMS[phen].find((x) => x[0] === key.slice(2)) || [])[1] || "" : TT[key] || ""; return { show: !!text, x: pos.x + "px", y: pos.y + "px", tf: pos.above ? "translateY(-100%)" : "none", title: String(pn2).toUpperCase(), text }; })(),
+      isProcessing: s.startsWith("processing"), pr, fact, nextFact: () => this.nextFact(),
+      isResult, rs, layers, legend, tl, lg, tlv, ticks, gaps, speeds, isPasses: !isQuake, isIntervals: isQuake, intervals,
+      iv: { hasEvent: !!caseOf, h: mobile ? "66px" : `${Math.max(2, seq.length) * 24 + 20}px`, eventX: `${qx(evQ)}%`, eventLabel: `EVENT · ${fmt(evQ, true).toUpperCase()}` },
+      sqDown: (e) => { if (!isPlaced) return; this.drag = { x: e.clientX, y: e.clientY, dx: st.dx, dy: st.dy }; e.currentTarget.setPointerCapture(e.pointerId); this.forceUpdate(); },
+      sqMove: (e) => { if (!this.drag) return; const lim = 600; this.setState({ dx: Math.max(-lim, Math.min(lim, this.drag.dx + (e.clientX - this.drag.x) / sc)), dy: Math.max(-lim, Math.min(lim, this.drag.dy + (e.clientY - this.drag.y) / sc)) }); },
+      sqUp: () => { this.drag = null; this.forceUpdate(); },
+      placeSquare: () => this.go("placed", { caseId: null, phen: null, dx: 0, dy: 0, scen: null, start: null, end: null, params: {} }), toPlaced: () => this.go("placed"), toConfirm: () => this.go("confirm"),
+      cancel: () => this.go("empty", { caseId: null, phen: null, idx: null, playing: null, layer: null, collapsed: false, dx: 0, dy: 0, scen: null, start: null, end: null, params: {}, setOpen: false }),
+      start: () => { if (block) return; offline ? this.go("processing-offline", { idx: 0 }) : this.go("processing", { idx: 0, playing: null }); },
+      toggleCollapse: () => this.setState({ collapsed: !collapsed }), toEmptyKeep: () => this.go("empty", { caseId: null, idx: null, playing: null, layer: null, dx: 0, dy: 0 }),
+      togglePlay: () => this.setState({ playing: !playing, idx }), prev: () => this.setState({ idx: (idx - 1 + nS) % nS, playing: false }), next: () => this.setState({ idx: (idx + 1) % nS, playing: false }),
+      toggleLoop: () => this.setState({ loop: !st.loop }),
+    };
+  }
+}
+</script>
+</body>
+</html>
