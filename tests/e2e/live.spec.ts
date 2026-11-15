@@ -796,18 +796,6 @@ test.describe("Explorer: live exploration", () => {
       await expect(page.getByTestId("pairs-empty")).toContainText("No NISAR pair covers this spot");
       await expect(globe.pairPicker).toHaveCount(0);
     });
-
-    test("the Kumamoto case offers to measure a live pair at its spot", async ({ page }) => {
-      await globe.mockExplorations({ first: insarView() });
-      await globe.mockInsarPairs();
-      await globe.goto("?case=kumamoto");
-      await expect(globe.verdict).toBeVisible();
-
-      await page.getByTestId("measure-live-pair").click();
-
-      await expect(globe.pairPicker).toBeVisible();
-      await expect(globe.panelMeta).toContainText("Live question");
-    });
   });
 
   test.describe("wildfire card", () => {

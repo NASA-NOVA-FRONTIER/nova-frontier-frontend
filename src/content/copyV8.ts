@@ -19,6 +19,8 @@ export const CHIP_COPY = {
   experimental: "EXPERIMENTAL",
   hypothesis: "HYPOTHESIS · NOT A RESULT",
   instant: "INSTANT",
+  // Issue #28 (new copy): a demo case computed ahead of time, never a live question.
+  offline: "OFFLINE",
   // SPECS-content-pages-v8 §0: typical values drawn for teaching, never a measurement.
   illustrative: "TYPICAL VALUES · ILLUSTRATIVE",
 } as const;
@@ -55,6 +57,15 @@ export const TOP_BAR = {
   help: "Help",
   download: "Download",
   fullScreen: "Full screen",
+} as const;
+
+// Issue #28 (new copy): a demo case keeps the analysis it was computed with.
+export const CASE_LOCK = {
+  chipTitle:
+    "Demo case computed ahead of time: its analysis is fixed and the live service isn't asked.",
+  note: (lens: string) =>
+    `Demo case, computed offline: its analysis is fixed to “${lens}”. Search a place or click the globe to ask the radar live.`,
+  buttonWhy: "Fixed for this demo case",
 } as const;
 
 // Phones (SPECS-v8 §1 Mobile). The pill labels are the short labels of `Explorer v8 v2.dc.html`;

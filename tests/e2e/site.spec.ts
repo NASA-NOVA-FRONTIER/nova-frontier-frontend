@@ -18,13 +18,16 @@ test.describe("Landing and about pages", () => {
     await page.goto("/");
     await expect(page.locator("[data-testid^=landing-case-]")).toHaveCount(5);
     await expect(page.getByTestId("landing-chip-choco")).toHaveText("COHERENCE ONLY · 0.247");
-    await expect(page.getByTestId("landing-chip-kumamoto")).toHaveText(
+    await expect(page.getByTestId("landing-chip-qadirabad")).toHaveText(
       "MEASURED CASE · ESRI WORLD IMAGERY",
+    );
+    await expect(page.getByTestId("landing-case-qadirabad").getByTestId("prov-offline")).toHaveText(
+      "OFFLINE",
     );
     await expect(page.getByTestId("landing-case-choco")).toContainText("Open on the globe →");
     await expect(page.getByTestId("landing-case-choco")).not.toContainText("See the event");
-    await page.getByTestId("landing-case-chokwe").click();
-    await expect(page).toHaveURL(/\/explore\?case=chokwe$/);
+    await page.getByTestId("landing-case-choco").click();
+    await expect(page).toHaveURL(/\/explore\?case=choco$/);
   });
 
   test("the landing sections follow the v8 order, with the atlas between honesty and sources", async ({

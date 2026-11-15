@@ -179,9 +179,9 @@ describe("report summary (template)", () => {
   });
 
   it("says no area when a case has no processed chip", () => {
-    const kumamoto = caseOf("kumamoto");
-    expect(reportSummary(kumamoto)).toContain(
-      "Across the area, 39,584 of 62,500 cells kept their phase at the 0.35 coherence threshold.",
+    const { chipKm: _chipKm, ...noChip } = qadirabad;
+    expect(reportSummary(noChip)).toContain(
+      "Across the area, 64.3% vs 1.0% of new-water cells flagged, against dry land.",
     );
   });
 

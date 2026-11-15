@@ -1,0 +1,542 @@
+{
+  "_source": "GET /api/v1/cases and /api/v1/cases/<id> on the production backend, recorded 2026-11-15",
+  "cases": [
+    {
+      "id": "qadirabad",
+      "title": "Qadirabad / Chenab, Pakistan",
+      "point": [73.713, 32.329],
+      "status": "complete",
+      "baselineDates": ["2026-06-20", "2026-07-02", "2026-07-14"],
+      "assessmentDates": ["2026-07-26", "2026-08-19", "2026-08-31", "2026-09-12", "2026-09-24"]
+    },
+    {
+      "id": "chokwe",
+      "title": "Chokwe, Mozambique",
+      "point": [32.986, -24.534],
+      "status": "partial",
+      "baselineDates": ["2025-11-30", "2025-12-12", "2025-12-24", "2026-01-05"],
+      "assessmentDates": ["2026-01-17"]
+    },
+    {
+      "id": "richmond",
+      "title": "Whitewater River / Richmond, Indiana, USA",
+      "point": [-84.894, 39.83],
+      "status": "partial",
+      "baselineDates": ["2026-06-17", "2026-06-29", "2026-07-11", "2026-07-23"],
+      "assessmentDates": ["2026-08-16", "2026-08-28", "2026-09-09", "2026-09-21"]
+    },
+    {
+      "id": "san-marcos",
+      "title": "La Mojana · San Marcos, Colombia",
+      "point": [-75.104, 8.657],
+      "status": "evaluated",
+      "baselineDates": ["2026-08-28", "2026-09-09", "2026-09-21"],
+      "assessmentDates": ["2026-10-15"]
+    },
+    {
+      "id": "skollersta",
+      "title": "Sköllersta rye trial, Sweden",
+      "point": [15.39726192, 59.13216973],
+      "status": "evaluated",
+      "baselineDates": ["2026-07-05", "2026-07-17", "2026-08-10"],
+      "assessmentDates": ["2026-08-22", "2026-09-03"]
+    },
+    {
+      "id": "bug-fire",
+      "title": "Bug Fire vicinity, Nevada, USA",
+      "point": [-119.88332214, 39.83778865],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-29", "2026-07-11", "2026-07-23"],
+      "assessmentDates": ["2026-08-28", "2026-09-09"]
+    },
+    {
+      "id": "high-plains",
+      "title": "High Plains off-event comparison, Kansas, USA",
+      "point": [-101.47, 38.49],
+      "status": "evaluated",
+      "baselineDates": ["2026-07-07", "2026-07-19", "2026-08-12"],
+      "assessmentDates": ["2026-10-11", "2026-10-23"]
+    },
+    {
+      "id": "kumamoto",
+      "title": "Kumamoto, Japan",
+      "point": [130.65, 32.65],
+      "status": "complete",
+      "baselineDates": ["2026-07-21"],
+      "assessmentDates": ["2026-08-14", "2026-08-26"]
+    },
+    {
+      "id": "choco",
+      "title": "Chocó, Colombia",
+      "point": [-76.256, 4.86],
+      "status": "not_displacement_ready",
+      "baselineDates": ["2026-07-18"],
+      "assessmentDates": ["2026-08-11", "2026-08-23"]
+    },
+    {
+      "id": "palouse",
+      "title": "Palouse upland comparison, Washington, USA",
+      "point": [-117.25, 46.82],
+      "status": "evaluated",
+      "baselineDates": ["2026-07-06", "2026-07-18", "2026-08-11"],
+      "assessmentDates": ["2026-10-10", "2026-10-22"]
+    },
+    {
+      "id": "matam",
+      "title": "Senegal River / Matam, Senegal",
+      "point": [-13.255, 15.656],
+      "status": "evaluated",
+      "baselineDates": ["2026-08-15", "2026-08-27", "2026-09-08"],
+      "assessmentDates": ["2026-10-14"]
+    },
+    {
+      "id": "rowe-creek",
+      "title": "Rowe Creek vicinity, Oregon, USA",
+      "point": [-120.26, 44.97],
+      "status": "evaluated",
+      "baselineDates": ["2026-07-01", "2026-07-13", "2026-07-25"],
+      "assessmentDates": ["2026-09-23"]
+    },
+    {
+      "id": "niscemi-aftermath",
+      "title": "Niscemi landslide aftermath, Italy",
+      "point": [14.38, 37.15],
+      "status": "measured",
+      "baselineDates": ["2026-06-24", "2026-07-06", "2026-07-18", "2026-08-11"],
+      "assessmentDates": ["2026-08-23", "2026-09-04", "2026-09-16", "2026-10-22"]
+    },
+    {
+      "id": "deliblato",
+      "title": "Deliblato Sands fire vicinity, Serbia",
+      "point": [21.1, 44.85],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-18", "2026-06-30", "2026-07-12", "2026-07-24"],
+      "assessmentDates": ["2026-08-17", "2026-09-10", "2026-10-04", "2026-10-16"]
+    },
+    {
+      "id": "forest-river",
+      "title": "Forest River, North Dakota",
+      "point": [-97.7, 48.2],
+      "status": "measured",
+      "baselineDates": ["2026-06-21", "2026-07-03", "2026-07-15", "2026-07-27", "2026-08-20"],
+      "assessmentDates": ["2026-09-01", "2026-09-13", "2026-09-25", "2026-10-07", "2026-10-19"]
+    },
+    {
+      "id": "pantanal",
+      "title": "Pantanal wetland, Brazil",
+      "point": [-56.8, -17.9],
+      "status": "measured",
+      "baselineDates": ["2026-07-17", "2026-08-10", "2026-08-22", "2026-09-03"],
+      "assessmentDates": ["2026-09-15", "2026-09-27", "2026-10-09", "2026-10-21"]
+    },
+    {
+      "id": "hokkaido",
+      "title": "Hokkaido geographic test, Japan",
+      "point": [142.5, 43.5],
+      "status": "measured",
+      "baselineDates": ["2026-06-19", "2026-07-01", "2026-07-13", "2026-07-25", "2026-08-18"],
+      "assessmentDates": ["2026-08-30", "2026-09-11", "2026-09-23", "2026-10-05", "2026-10-17"]
+    },
+    {
+      "id": "wheatbelt",
+      "title": "Wheatbelt control, Western Australia",
+      "point": [117.5, -31.5],
+      "status": "measured",
+      "baselineDates": ["2026-06-17", "2026-06-29", "2026-07-11", "2026-07-23", "2026-08-16"],
+      "assessmentDates": ["2026-08-28", "2026-09-09", "2026-09-21", "2026-10-03", "2026-10-15"]
+    },
+    {
+      "id": "rabelov",
+      "title": "Råbelöv wheat trial, Sweden",
+      "point": [14.02578735, 56.08499406],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-25", "2026-07-07", "2026-07-19"],
+      "assessmentDates": ["2026-08-12", "2026-08-24"]
+    },
+    {
+      "id": "gotland",
+      "title": "Gotland wheat trial, Sweden",
+      "point": [18.55338387, 57.6203566],
+      "status": "evaluated",
+      "baselineDates": ["2026-07-03", "2026-07-15", "2026-07-27"],
+      "assessmentDates": ["2026-08-20", "2026-09-01"]
+    },
+    {
+      "id": "platte-valley",
+      "title": "Platte Valley comparison, Nebraska",
+      "point": [-98.44, 40.776],
+      "status": "evaluated",
+      "baselineDates": ["2026-07-05", "2026-07-17", "2026-08-10"],
+      "assessmentDates": ["2026-10-09", "2026-10-21"]
+    },
+    {
+      "id": "timber-fire",
+      "title": "Timber Fire vicinity, California",
+      "point": [-121.72983, 36.224857],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-23", "2026-07-05", "2026-07-17"],
+      "assessmentDates": ["2026-10-09", "2026-10-21"]
+    },
+    {
+      "id": "weiser-knoll",
+      "title": "Weiser Knoll fire vicinity, Wyoming",
+      "point": [-108.56159047, 42.63582383],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-27", "2026-07-09", "2026-07-21"],
+      "assessmentDates": ["2026-08-26", "2026-09-07"]
+    },
+    {
+      "id": "crete-tzermiado",
+      "title": "Tzermiado flood / Sentinel-1 comparison, Crete",
+      "point": [25.4382619, 35.19345243],
+      "status": "evaluated",
+      "baselineDates": ["2026-08-29", "2026-09-10", "2026-09-22"],
+      "assessmentDates": ["2026-10-04"]
+    },
+    {
+      "id": "crete-tzermiado-optical",
+      "title": "Tzermiado flood / optical comparison, Crete",
+      "point": [25.43811726, 35.1935091],
+      "status": "evaluated",
+      "baselineDates": ["2026-09-03", "2026-09-15", "2026-09-27"],
+      "assessmentDates": ["2026-10-09"]
+    },
+    {
+      "id": "baja-optical-null",
+      "title": "Baja California Sur flood-context comparison",
+      "point": [-109.7025, 23.0598],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-21", "2026-07-03", "2026-07-15", "2026-07-27"],
+      "assessmentDates": ["2026-09-13"]
+    },
+    {
+      "id": "luang-namtha",
+      "title": "Nam Tha floodplain, Luang Namtha, Laos",
+      "point": [101.40334675261042, 20.92765869014561],
+      "status": "partial",
+      "baselineDates": ["2026-06-19", "2026-07-01", "2026-07-13", "2026-07-25", "2026-08-18"],
+      "assessmentDates": ["2026-08-30"]
+    },
+    {
+      "id": "matam-optical",
+      "title": "Senegal River at Matam, Senegal",
+      "point": [-13.254641146826382, 15.655695071581588],
+      "status": "evaluated",
+      "baselineDates": [
+        "2026-07-10",
+        "2026-07-22",
+        "2026-08-15",
+        "2026-08-27",
+        "2026-09-08",
+        "2026-09-20"
+      ],
+      "assessmentDates": ["2026-10-14"]
+    },
+    {
+      "id": "ndioum",
+      "title": "Senegal River near Ndioum, Senegal",
+      "point": [-14.636750735188905, 16.533639082691597],
+      "status": "evaluated",
+      "baselineDates": [
+        "2026-07-10",
+        "2026-07-22",
+        "2026-08-15",
+        "2026-08-27",
+        "2026-09-08",
+        "2026-09-20"
+      ],
+      "assessmentDates": ["2026-10-14"]
+    },
+    {
+      "id": "podor",
+      "title": "Senegal River at Podor, Senegal",
+      "point": [-14.967741458975198, 16.650748253084597],
+      "status": "partial",
+      "baselineDates": ["2026-06-22", "2026-07-16", "2026-09-02", "2026-09-26"],
+      "assessmentDates": ["2026-10-20"]
+    },
+    {
+      "id": "trishuli-betravati",
+      "title": "Trishuli River near Betravati, Nepal",
+      "point": [85.1853931590807, 27.965713250019707],
+      "status": "partial",
+      "baselineDates": [
+        "2026-06-08",
+        "2026-06-20",
+        "2026-07-02",
+        "2026-07-14",
+        "2026-07-26",
+        "2026-08-19"
+      ],
+      "assessmentDates": ["2026-08-31"]
+    },
+    {
+      "id": "ayutthaya",
+      "title": "Chao Phraya floodplain south of Ayutthaya, Thailand",
+      "point": [100.53529236893877, 14.296715853495453],
+      "status": "partial",
+      "baselineDates": ["2026-06-26", "2026-07-08", "2026-07-20", "2026-08-13"],
+      "assessmentDates": ["2026-09-18"]
+    },
+    {
+      "id": "bang-ban",
+      "title": "Chao Phraya floodplain at Bang Ban, Thailand",
+      "point": [100.33930750211064, 14.385674181959809],
+      "status": "partial",
+      "baselineDates": ["2026-06-26", "2026-07-08", "2026-07-20", "2026-08-13"],
+      "assessmentDates": ["2026-09-18"]
+    },
+    {
+      "id": "barh",
+      "title": "Ganga floodplain at Barh, India",
+      "point": [85.71034289153387, 25.494655038920747],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-20", "2026-07-02", "2026-07-14", "2026-07-26"],
+      "assessmentDates": ["2026-09-12"]
+    },
+    {
+      "id": "cabiao",
+      "title": "Pampanga River floodplain near Cabiao, Philippines",
+      "point": [120.85634790921522, 15.245656949457715],
+      "status": "partial",
+      "baselineDates": [
+        "2026-06-28",
+        "2026-07-10",
+        "2026-07-22",
+        "2026-08-15",
+        "2026-08-27",
+        "2026-09-08"
+      ],
+      "assessmentDates": ["2026-09-20"]
+    },
+    {
+      "id": "osogbo",
+      "title": "Osun River at Osogbo, Nigeria",
+      "point": [4.5492900321566205, 7.757670839838893],
+      "status": "partial",
+      "baselineDates": [
+        "2026-07-02",
+        "2026-07-14",
+        "2026-07-26",
+        "2026-08-19",
+        "2026-08-31",
+        "2026-09-12"
+      ],
+      "assessmentDates": ["2026-09-24"]
+    },
+    {
+      "id": "patna",
+      "title": "Ganga floodplain at Patna, India",
+      "point": [85.17638831206112, 25.63667714707197],
+      "status": "partial",
+      "baselineDates": ["2026-06-20", "2026-07-02", "2026-07-14", "2026-07-26"],
+      "assessmentDates": ["2026-09-12"]
+    },
+    {
+      "id": "gandia",
+      "title": "Gandia",
+      "point": [-0.1847019470754271, 38.965695625738206],
+      "status": "partial",
+      "baselineDates": ["2026-09-05", "2026-09-17", "2026-09-29", "2026-10-11"],
+      "assessmentDates": ["2026-10-23"]
+    },
+    {
+      "id": "pursat-lake",
+      "title": "Pursat Lake",
+      "point": [104.203213035051, 12.550691212954703],
+      "status": "partial",
+      "baselineDates": ["2026-06-24", "2026-07-18", "2026-08-11"],
+      "assessmentDates": ["2026-09-28"]
+    },
+    {
+      "id": "pursat-west",
+      "title": "Pursat West",
+      "point": [103.95133063163443, 12.744761684564926],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-24", "2026-07-18", "2026-08-11"],
+      "assessmentDates": ["2026-09-28"]
+    },
+    {
+      "id": "stung-sen",
+      "title": "Stung Sen",
+      "point": [104.86921740439358, 12.683688454642718],
+      "status": "partial",
+      "baselineDates": ["2026-06-24", "2026-07-18", "2026-08-11", "2026-09-04"],
+      "assessmentDates": ["2026-09-28"]
+    },
+    {
+      "id": "para-event-01",
+      "title": "Pará event 01, Brazil",
+      "point": [-55.504622738628385, -7.129393259253747],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-21", "2026-07-03", "2026-07-15"],
+      "assessmentDates": ["2026-10-07", "2026-10-19"]
+    },
+    {
+      "id": "para-event-02",
+      "title": "Pará event 02, Brazil",
+      "point": [-55.482254302487455, -7.180578271381999],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-21", "2026-07-03", "2026-07-15"],
+      "assessmentDates": ["2026-10-07", "2026-10-19"]
+    },
+    {
+      "id": "mato-grosso-event-01",
+      "title": "Mato Grosso event 01, Brazil",
+      "point": [-55.35914632716773, -11.39177315734766],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-21", "2026-07-03", "2026-07-15"],
+      "assessmentDates": ["2026-10-07", "2026-10-19"]
+    },
+    {
+      "id": "fire-emsr913",
+      "title": "Niebla · Huelva",
+      "point": [-6.68086666020784, 37.486310739331984],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-27", "2026-07-09", "2026-07-21"],
+      "assessmentDates": ["2026-08-14", "2026-08-26", "2026-09-07", "2026-09-19"]
+    },
+    {
+      "id": "fire-emsr931",
+      "title": "Podhume · isla de Brač",
+      "point": [16.501936767721077, 43.29698027544116],
+      "status": "evaluated",
+      "baselineDates": ["2026-08-16", "2026-08-28", "2026-09-09"],
+      "assessmentDates": ["2026-09-21", "2026-10-03", "2026-10-15"]
+    },
+    {
+      "id": "fire-emsr914",
+      "title": "Kraljevo · Maglič · Stolovi",
+      "point": [20.58635755951328, 43.59171267426971],
+      "status": "evaluated",
+      "baselineDates": ["2026-06-27", "2026-07-09", "2026-07-21"],
+      "assessmentDates": [
+        "2026-08-14",
+        "2026-08-26",
+        "2026-09-07",
+        "2026-09-19",
+        "2026-10-01",
+        "2026-10-13"
+      ]
+    },
+    {
+      "id": "fire-emsr918",
+      "title": "Siviri · Kassandra",
+      "point": [23.36609485927532, 40.03703557066892],
+      "status": "evaluated",
+      "baselineDates": ["2026-07-07", "2026-07-19", "2026-08-12"],
+      "assessmentDates": ["2026-08-24", "2026-09-05", "2026-09-17"]
+    },
+    {
+      "id": "fire-emsr920",
+      "title": "Hürtgen · Renania",
+      "point": [6.389749456736643, 50.74493096385228],
+      "status": "evaluated",
+      "baselineDates": ["2026-07-06", "2026-07-18", "2026-08-11"],
+      "assessmentDates": ["2026-08-23", "2026-09-04", "2026-09-16"]
+    },
+    {
+      "id": "kilauea-insar",
+      "title": "Kīlauea volcano vicinity, Hawaiʻi",
+      "point": [-155.29, 19.41],
+      "status": "single_measured_pair",
+      "baselineDates": ["2026-10-10"],
+      "assessmentDates": ["2026-10-22"]
+    },
+    {
+      "id": "mexico-city-insar",
+      "title": "Mexico City subsidence-context pair",
+      "point": [-99.1200337871805, 19.43965624430311],
+      "status": "single_measured_pair",
+      "baselineDates": ["2026-10-08"],
+      "assessmentDates": ["2026-10-20"]
+    },
+    {
+      "id": "venezuela-insar",
+      "title": "June 2026 Venezuela earthquake context",
+      "point": [-68.32, 10.4],
+      "status": "not_displacement_ready",
+      "baselineDates": ["2026-06-01"],
+      "assessmentDates": ["2026-06-13", "2026-06-25", "2026-07-07"]
+    }
+  ],
+  "details": {
+    "qadirabad": {
+      "status": "complete",
+      "state": "radar_darkening_with_optical_open_water_change",
+      "radarSupportCells": 16384,
+      "grid": {
+        "shape": [128, 128],
+        "postingM": [40.0, 40.0]
+      },
+      "medianCoherence": null,
+      "limitations": [
+        "This is a development characterization pilot, not a globally validated flood classifier or forecast.",
+        "Radar thresholds describe signal changes. Radar-signature area is not inundated area.",
+        "The optical product is independent of NISAR but has classification, cloud, temporal and mixed-pixel errors; agreement is not ground-truth flood accuracy.",
+        "Candidate controls are reference-stable predominantly nonwater cells matched on baseline radar levels; unmeasured confounders and intervening events remain.",
+        "Thermal-noise correction is not performed here. Missing SNR, terrain-visibility, land-cover and under-canopy water validation constrain physical interpretation; wind, wet soil and double bounce can change radar water response.",
+        "Persistence counts actual changed observations; gaps do not establish continuous flood duration. Signal return is not ecosystem or hydrologic recovery.",
+        "The first radar assessment is 2 day(s) after the reported event interval. A transient flood may have receded before observation.",
+        "Mixed cover, roughness and moisture can change the sign. Compare dated optical snapshots and field observations."
+      ]
+    },
+    "choco": {
+      "status": "not_displacement_ready",
+      "state": "not_displacement_ready",
+      "radarSupportCells": null,
+      "grid": {
+        "shape": [62, 62],
+        "postingM": [80.0, 80.0]
+      },
+      "medianCoherence": 0.2471621036529541,
+      "limitations": [
+        "Ionosphere input eligibility is not correction accuracy or stable-ground validation.",
+        "Filled flags, finite screens and positive reported uncertainty are different quality conditions; absence of a fill flag does not establish trustworthy correction.",
+        "All fractions name their denominator. No correction is applied and no phase is integrated or converted into a deformation estimate.",
+        "The maximum-minimum-coherence candidate is a proposed data-support location, not an independently stable reference.",
+        "No earthquake detection, earthquake attribution, vertical motion or forecasting is inferred from this audit.",
+        "Scattering changes and interval length affect coherence. Stable reference evidence and independently checked corrections would be needed for displacement."
+      ]
+    },
+    "bug-fire": {
+      "status": "evaluated",
+      "state": "radar_evaluated",
+      "radarSupportCells": 4096,
+      "grid": {
+        "shape": [64, 64],
+        "postingM": [10.0, 10.0]
+      },
+      "medianCoherence": null,
+      "limitations": [
+        "A perimeter can enclose unburned cells. Dated severity mapping and vegetation or field observations would help interpret the departures."
+      ]
+    },
+    "rowe-creek": {
+      "status": "evaluated",
+      "state": "radar_evaluated",
+      "radarSupportCells": 262142,
+      "grid": {
+        "shape": [512, 512],
+        "postingM": [10.0, 10.0]
+      },
+      "medianCoherence": null,
+      "limitations": [
+        "Moisture, roughness and vegetation structure all affect the channels. The native replay uses radar only. Independent dated event and vegetation evidence would help."
+      ]
+    },
+    "skollersta": {
+      "status": "evaluated",
+      "state": "radar_evaluated",
+      "radarSupportCells": 4096,
+      "grid": {
+        "shape": [64, 64],
+        "postingM": [20.0, 20.0]
+      },
+      "medianCoherence": null,
+      "limitations": [
+        "The independent record dates the trial. The harvested footprint, moisture and management across the full window remain unresolved."
+      ]
+    }
+  }
+}
