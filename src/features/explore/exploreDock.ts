@@ -147,35 +147,3 @@ export const defaultView = (layers: LiveLayer[], passes: TimelinePass[]): DockVi
     ? { pick: { kind: "layer", id }, date: fallbackDate }
     : { pick: { kind: "pass", pol: pass.pol }, date: pass.date };
 };
-
-export type TimeLapseStep = {
-  date: string;
-  // Undefined: this pass has no image for the channel, so the step shows no overlay.
-  layerId: string | undefined;
-  role: "BASELINE" | "TARGET" | undefined;
-  k: number;
-  n: number;
-};
-
-export const timeLapseSteps = (
-  passes: TimelinePass[],
-  layers: LiveLayer[],
-  pol: Pol,
-): TimeLapseStep[] => {
-  const measured = measuredPasses(passes);
-  return measured.map((item, index) => ({
-    date: item.date,
-    layerId: passLayer(layers, item.date, pol)?.id,
-    role: item.kind === "target" ? "TARGET" : item.kind === "base" ? "BASELINE" : undefined,
-    k: index + 1,
-    n: measured.length,
-  }));
-};
-
-// Play starts at pass 1, or at the current pass when it isn't the last one.
-export const playStart = (current: number, n: number): number =>
-  current < 0 || current >= n - 1 ? 0 : current;
-
-// The time-lapse stops on the last pass instead of looping.
-export const nextStep = (index: number, n: number): number | undefined =>
-  index + 1 < n ? index + 1 : undefined;

@@ -15,7 +15,13 @@ import { Icon } from "@/features/case-panel/icons";
 import { Prov } from "@/features/case-panel/Prov";
 import { SOURCE } from "@/features/case-panel/verdicts";
 import type { TimelineData } from "@/features/cases/cases";
-import { nearestStep, sequenceOf, sequenceReadout } from "@/features/timeline/sequence";
+import {
+  nearestStep,
+  sequenceOf,
+  sequenceReadout,
+  stepView,
+  type StepView,
+} from "@/features/timeline/sequence";
 import { SPEEDS } from "@/features/timeline/sequencePlayer";
 import {
   layoutTimeline,
@@ -34,18 +40,22 @@ const BAR_BASE_PX = 34;
 // Interval rows (ground motion): one bar per pair, stacked.
 const PAIR_ROW_PX = 22;
 
-// A live answer drives the dock, the globe and the stamp from the explorer, so the selected date lives
-// there: the timeline's player asks for each step with `onPick`. `playing`/`onPlay` belong to the v8
-// time-lapse, which the v9 player replaces.
+// A live answer drives the dock and the globe from the explorer, so the selected date lives there:
+// the player asks for each step with `onPick`, and the explorer can pull another date in.
 export type LiveTimelineControl = {
   date: string | undefined;
-  playing: boolean;
   onPick: (date: string) => void;
-  onPlay: () => void;
 };
 
 // `demo` is true for a measured case (its pass dates are illustrative) and false for a live result.
-type PassTimelineProps = { data: TimelineData; demo?: boolean; live?: LiveTimelineControl };
+// `onStep` labels the globe for the step in focus; a new `pauseSignal` value pauses (a globe drag).
+type PassTimelineProps = {
+  data: TimelineData;
+  demo?: boolean;
+  live?: LiveTimelineControl;
+  onStep?: (step: StepView | undefined) => void;
+  pauseSignal?: number;
+};
 
 const passClass = (item: LaidPass, comparing: boolean, selected: boolean): string => {
   const kind =
@@ -60,7 +70,13 @@ const passClass = (item: LaidPass, comparing: boolean, selected: boolean): strin
 };
 
 // SPECS-flow-v9 §3: the sequence player over the v8 lanes (measured, compared, planned, optical).
-export const PassTimeline = ({ data, demo = true, live }: PassTimelineProps) => {
+export const PassTimeline = ({
+  data,
+  demo = true,
+  live,
+  onStep,
+  pauseSignal = 0,
+}: PassTimelineProps) => {
   const layout = useMemo(() => layoutTimeline(data), [data]);
   const sequence = useMemo(() => sequenceOf(data, layout), [data, layout]);
   const { steps } = sequence;
@@ -109,6 +125,23 @@ export const PassTimeline = ({ data, demo = true, live }: PassTimelineProps) => 
     requested.current = step.date;
     onPick(step.date);
   }, [onPick, sequence.mode, step]);
+
+  const view = useMemo(
+    () => stepView(sequence, layout, player.index),
+    [sequence, layout, player.index],
+  );
+  useEffect(() => {
+    onStep?.(view);
+  }, [onStep, view]);
+  useEffect(() => () => onStep?.(undefined), [onStep]);
+
+  // Skip the first value: only a change means "the user touched the map".
+  const pausedAt = useRef(pauseSignal);
+  useEffect(() => {
+    if (pauseSignal === pausedAt.current) return;
+    pausedAt.current = pauseSignal;
+    dispatch({ type: "pause" });
+  }, [pauseSignal, dispatch]);
 
   const seek = (index: number) => {
     setComparing(false);

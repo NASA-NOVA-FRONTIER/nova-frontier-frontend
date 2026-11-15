@@ -1,4 +1,3 @@
-import { STEP_4 } from "@/content/copyV8";
 import type { PassKind, TimelineData } from "@/features/cases/cases";
 import { nextPlannedPass } from "@/features/frames/nextPlannedPass";
 
@@ -190,21 +189,3 @@ export const passSub = (item: LaidPass): string =>
     : item.kind === "base"
       ? "Baseline passes define the normal range"
       : "";
-
-const LIVE_ROLE = { target: "target", base: "baseline", meas: "measured" } as const;
-
-// A live answer (COPY-v8 §4): "12 Sep 2026 · baseline · pass 3 of 5", counting measured passes only.
-export const liveReadout = (layout: TimelineLayout, current: number): Readout => {
-  const item = layout.passes[current];
-  if (item === undefined || item.kind === "plan") return { line: "", sub: "" };
-  const k = layout.measured.indexOf(current) + 1;
-  return {
-    line: STEP_4.timelinePass(
-      formatDay(item.date),
-      LIVE_ROLE[item.kind],
-      k,
-      layout.measured.length,
-    ),
-    sub: passSub(item),
-  };
-};
