@@ -1,0 +1,685 @@
+<!doctype html>
+<!--
+  Architecture diagram for the READMEs. Every box and arrow is drawn from the code on main (see the
+  table in the PR that added it). Edit here, then run `pnpm diagram` to re-render architecture.png.
+  Layout: a fixed 1600 × 1250 canvas; boxes are absolutely positioned and the arrows in the <svg>
+  use the same pixel coordinates, so moving a box means moving its arrows too.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>NISAR Hazard Watch architecture</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+    />
+    <style>
+      :root {
+        --ink: #04070e;
+        --muted: #4e5766;
+        --line: #2b3340;
+        --gold: #a8884f;
+        --front: #c9b48b;
+        --front-bg: #fbf8f1;
+        --back: #7c5cd6;
+        --back-bg: #f7f4fd;
+        --modal: #3a9a55;
+        --modal-bg: #f1f9f3;
+        --ext: #98a1b0;
+        --ext-bg: #f5f6f8;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+
+      body {
+        background: #fff;
+        font-family: "Albert Sans", system-ui, sans-serif;
+        color: var(--ink);
+      }
+
+      code {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 0.92em;
+        font-weight: 500;
+      }
+
+      #diagram {
+        position: relative;
+        width: 1600px;
+        height: 1250px;
+        background: #fff;
+      }
+
+      .abs {
+        position: absolute;
+      }
+
+      header {
+        position: absolute;
+        left: 40px;
+        top: 34px;
+      }
+
+      header h1 {
+        font-size: 34px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      header p {
+        margin-top: 6px;
+        font-size: 19px;
+        color: var(--muted);
+      }
+
+      .group {
+        position: absolute;
+        border: 2px dashed var(--c);
+        border-radius: 18px;
+        background: var(--bg);
+      }
+
+      .group h2 {
+        position: absolute;
+        left: 20px;
+        top: 14px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--t);
+        white-space: nowrap;
+      }
+
+      .group h2 .tile {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+      }
+
+      .group h2 .tile img,
+      .group h2 .tile svg {
+        width: 15px;
+        height: 15px;
+      }
+
+      .front {
+        --c: var(--front);
+        --bg: var(--front-bg);
+        --t: #8a6a2e;
+      }
+
+      .back {
+        --c: var(--back);
+        --bg: var(--back-bg);
+        --t: #5b3fb5;
+      }
+
+      .modal {
+        --c: var(--modal);
+        --bg: var(--modal-bg);
+        --t: #2a7a41;
+      }
+
+      .ext {
+        --c: var(--ext);
+        --bg: var(--ext-bg);
+        --t: #4e5766;
+      }
+
+      .card {
+        position: absolute;
+        display: flex;
+        background: #fff;
+        border: 2px solid var(--c);
+        border-radius: 14px;
+        box-shadow: 0 1px 3px rgb(4 7 14 / 8%);
+      }
+
+      .card.tall {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 16px;
+        text-align: center;
+      }
+
+      .card.row {
+        align-items: center;
+        gap: 14px;
+        padding: 0 16px;
+      }
+
+      .ext .card {
+        border-color: #c3c9d3;
+      }
+
+      .card h3 {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.15;
+      }
+
+      .card.row h3 {
+        font-size: 20px;
+      }
+
+      .card p {
+        margin-top: 3px;
+        font-size: 16.5px;
+        line-height: 1.3;
+        color: var(--muted);
+      }
+
+      .tiles {
+        display: flex;
+        gap: 8px;
+      }
+
+      .tile {
+        display: grid;
+        flex: none;
+        place-items: center;
+        width: 46px;
+        height: 46px;
+        border-radius: 11px;
+        background: var(--brand);
+      }
+
+      .tile img,
+      .tile svg {
+        width: 27px;
+        height: 27px;
+      }
+
+      /* simple-icons are black glyphs; the tiles show them white on the brand colour. */
+      .tile img {
+        filter: invert(1);
+      }
+
+      .tile svg {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .card.row .tile {
+        width: 42px;
+        height: 42px;
+      }
+
+      .card.row .tile img,
+      .card.row .tile svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .chip {
+        position: absolute;
+        top: -12px;
+        right: 12px;
+        padding: 2px 9px;
+        border: 1.5px solid #3c6fd8;
+        border-radius: 999px;
+        background: #eef3fd;
+        font-size: 13.5px;
+        font-weight: 700;
+        color: #2d58b8;
+      }
+
+      .note {
+        font-size: 16px;
+        line-height: 1.35;
+        color: var(--muted);
+      }
+
+      svg.wires {
+        position: absolute;
+        inset: 0;
+        overflow: visible;
+      }
+
+      .wire {
+        fill: none;
+        stroke: var(--line);
+        stroke-width: 2.25;
+      }
+
+      .wire.async {
+        stroke-dasharray: 8 6;
+      }
+
+      .wire.gold {
+        stroke: var(--gold);
+        stroke-width: 3;
+      }
+
+      .wire.grey {
+        stroke: #8a93a3;
+      }
+
+      .label {
+        position: absolute;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.25;
+        text-align: center;
+        white-space: nowrap;
+        transform: translate(-50%, -50%);
+      }
+
+      .label.gold {
+        color: #7d6230;
+      }
+
+      .label.grey {
+        color: #4e5766;
+      }
+
+      .legend {
+        position: absolute;
+        left: 40px;
+        top: 1166px;
+        display: flex;
+        align-items: center;
+        gap: 34px;
+        font-size: 16.5px;
+        color: var(--muted);
+      }
+
+      .legend span {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .legend .chip {
+        position: static;
+      }
+
+      .legend .box {
+        width: 26px;
+        height: 20px;
+        border: 2px dashed var(--ext);
+        border-radius: 5px;
+        background: var(--ext-bg);
+      }
+
+      .credit {
+        position: absolute;
+        right: 40px;
+        top: 1212px;
+        font-size: 15px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main id="diagram">
+      <header>
+        <h1>NISAR Hazard Watch · how a question travels</h1>
+        <p>
+          Browser → backend → ML gateway → NASA data, and the radar layers back on the globe. Nova
+          Frontier · NASA Space Apps 2026.
+        </p>
+      </header>
+
+      <!-- Frontend · Vercel -->
+      <section class="group front" style="left: 40px; top: 205px; width: 340px; height: 575px">
+        <h2>
+          <span class="tile" style="--brand: #000"
+            ><img src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/vercel.svg" alt=""
+          /></span>
+          Frontend · Vercel
+        </h2>
+      </section>
+      <div class="front">
+        <div class="card tall" style="left: 65px; top: 260px; width: 290px; height: 170px">
+          <div class="tiles">
+            <span class="tile" style="--brand: #087ea4"
+              ><img src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/react.svg" alt=""
+            /></span>
+            <span class="tile" style="--brand: #4a8fc7"
+              ><img src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/cesium.svg" alt=""
+            /></span>
+          </div>
+          <div>
+            <h3>Web app</h3>
+            <p>React + CesiumJS globe, runs in the browser</p>
+          </div>
+        </div>
+        <div class="card row" style="left: 65px; top: 490px; width: 205px; height: 105px">
+          <span class="tile" style="--brand: #8a6a2e"
+            ><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v4h4" /></svg
+          ></span>
+          <div>
+            <h3>Static files</h3>
+            <p>frames.json, case PNGs</p>
+          </div>
+        </div>
+        <p class="note abs" style="left: 65px; top: 640px; width: 225px">
+          Vercel serves the built app. Production calls Railway directly
+          (<code>VITE_API_BASE_URL</code>); previews use the <code>/api/*</code> rewrite.
+        </p>
+      </div>
+
+      <!-- Backend · Railway -->
+      <section class="group back" style="left: 520px; top: 205px; width: 380px; height: 575px">
+        <h2>
+          <span class="tile" style="--brand: #0b0d0e"
+            ><img src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/railway.svg" alt=""
+          /></span>
+          Backend · Railway
+        </h2>
+      </section>
+      <div class="back">
+        <div class="card tall" style="left: 545px; top: 260px; width: 330px; height: 170px">
+          <span class="tile" style="--brand: #009688"
+            ><img src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/fastapi.svg" alt=""
+          /></span>
+          <div>
+            <h3>FastAPI · <code>/api/v1</code></h3>
+            <p>explorations · coverage · insar pairs · places · cases</p>
+          </div>
+        </div>
+        <div class="card row" style="left: 625px; top: 490px; width: 250px; height: 105px">
+          <span class="chip">cache</span>
+          <span class="tile" style="--brand: #4169e1"
+            ><img
+              src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/postgresql.svg"
+              alt=""
+          /></span>
+          <div>
+            <h3>PostgreSQL</h3>
+            <p>jobs + 24 h result cache</p>
+          </div>
+        </div>
+        <div class="card row" style="left: 625px; top: 645px; width: 250px; height: 105px">
+          <span class="chip">cache</span>
+          <span class="tile" style="--brand: #5b3fb5"
+            ><svg viewBox="0 0 24 24">
+              <path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4" /></svg
+          ></span>
+          <div>
+            <h3>Cases relay</h3>
+            <p>known cases, 10 min in memory</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ML gateway · Modal -->
+      <section class="group modal" style="left: 1040px; top: 205px; width: 520px; height: 575px">
+        <h2>
+          <span class="tile" style="--brand: #2a7a41"
+            ><img src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/modal.svg" alt=""
+          /></span>
+          ML gateway · Modal
+        </h2>
+      </section>
+      <div class="modal">
+        <div class="card tall" style="left: 1065px; top: 260px; width: 260px; height: 170px">
+          <span class="tile" style="--brand: #2a7a41"
+            ><img src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/modal.svg" alt=""
+          /></span>
+          <div>
+            <h3>Gateway</h3>
+            <p>jobs, coverage, cases; serves the layer PNGs</p>
+          </div>
+        </div>
+        <div class="card row" style="left: 1065px; top: 490px; width: 260px; height: 105px">
+          <span class="tile" style="--brand: #3776ab"
+            ><img src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/python.svg" alt=""
+          /></span>
+          <div>
+            <h3>Worker</h3>
+            <p>reads NISAR, runs the lens, writes layers</p>
+          </div>
+        </div>
+        <div class="card tall" style="left: 1400px; top: 270px; width: 135px; height: 150px">
+          <span class="tile" style="--brand: #2a7a41"
+            ><svg viewBox="0 0 24 24"><path d="M4 6h4M11 6h9M4 12h4M11 12h9M4 18h4M11 18h9" /></svg
+          ></span>
+          <div>
+            <h3>Job state</h3>
+            <p>Modal Dict</p>
+          </div>
+        </div>
+        <div class="card tall" style="left: 1400px; top: 465px; width: 135px; height: 155px">
+          <span class="chip">cache</span>
+          <span class="tile" style="--brand: #2a7a41"
+            ><svg viewBox="0 0 24 24">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="M3 13h18M7 16h.01" /></svg
+          ></span>
+          <div>
+            <h3>Volume</h3>
+            <p>chips + layer PNGs</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- NASA & public data -->
+      <section class="group ext" style="left: 40px; top: 835px; width: 1520px; height: 305px">
+        <h2>
+          <span class="tile" style="--brand: #e03c31"
+            ><svg viewBox="0 0 24 24">
+              <rect x="9.2" y="9.2" width="5.6" height="5.6" rx="1" transform="rotate(45 12 12)" />
+              <path
+                d="M3 9l6-6 2 2-6 6zM13 19l6-6 2 2-6 6zM9.5 9.5l-1.5-1.5M14.5 14.5l1.5 1.5M16 7a3 3 0 0 1 1.5 1.5M16.5 4.5a6 6 0 0 1 3 3"
+              /></svg
+          ></span>
+          NASA &amp; public data
+        </h2>
+      </section>
+      <div class="ext">
+        <div class="card row" style="left: 65px; top: 885px; width: 290px; height: 70px">
+          <span class="tile" style="--brand: #0079c1"
+            ><img src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/esri.svg" alt=""
+          /></span>
+          <div>
+            <h3>Esri World Imagery</h3>
+            <p>globe base map tiles</p>
+          </div>
+        </div>
+        <div class="card row" style="left: 65px; top: 965px; width: 290px; height: 70px">
+          <span class="tile" style="--brand: #2c7ac9"
+            ><img src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/arcgis.svg" alt=""
+          /></span>
+          <div>
+            <h3>Observation Plan</h3>
+            <p>NISAR passes, ArcGIS service</p>
+          </div>
+        </div>
+
+        <div class="card row" style="left: 545px; top: 885px; width: 330px; height: 70px">
+          <span class="tile" style="--brand: #e03c31"
+            ><svg viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="6" />
+              <path d="M20 20l-4.5-4.5" /></svg
+          ></span>
+          <div>
+            <h3>ASF Search API</h3>
+            <p>GCOV scenes for the plan</p>
+          </div>
+        </div>
+        <div class="card row" style="left: 545px; top: 965px; width: 330px; height: 70px">
+          <span class="tile" style="--brand: #e03c31"
+            ><svg viewBox="0 0 24 24">
+              <path
+                d="M12 3c.5 3 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.4-4.2 2.6-5.2.1 2 1 3.2 2.2 3.2-.4-3.2-.6-5.6.2-8z"
+              /></svg
+          ></span>
+          <div>
+            <h3>NASA FIRMS</h3>
+            <p>active fires, wildfire lens</p>
+          </div>
+        </div>
+        <div class="card row" style="left: 545px; top: 1045px; width: 330px; height: 70px">
+          <span class="tile" style="--brand: #6aa85f"
+            ><img
+              src="https://cdn.jsdelivr.net/npm/simple-icons@16.36.0/icons/openstreetmap.svg"
+              alt=""
+          /></span>
+          <div>
+            <h3>OSM Nominatim</h3>
+            <p>OpenStreetMap place search</p>
+          </div>
+        </div>
+
+        <div class="card row" style="left: 1065px; top: 885px; width: 470px; height: 70px">
+          <span class="tile" style="--brand: #e03c31"
+            ><svg viewBox="0 0 24 24">
+              <ellipse cx="12" cy="6" rx="7" ry="3" />
+              <path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3" /></svg
+          ></span>
+          <div>
+            <h3>NASA CMR</h3>
+            <p>granule search: GCOV, GUNW, OPERA</p>
+          </div>
+        </div>
+        <div class="card row" style="left: 1065px; top: 965px; width: 470px; height: 70px">
+          <span class="tile" style="--brand: #e03c31"
+            ><svg viewBox="0 0 24 24">
+              <rect x="9.2" y="9.2" width="5.6" height="5.6" rx="1" transform="rotate(45 12 12)" />
+              <path
+                d="M3 9l6-6 2 2-6 6zM13 19l6-6 2 2-6 6zM9.5 9.5l-1.5-1.5M14.5 14.5l1.5 1.5M16 7a3 3 0 0 1 1.5 1.5M16.5 4.5a6 6 0 0 1 3 3"
+              /></svg
+          ></span>
+          <div>
+            <h3>ASF DAAC · NISAR L2 GCOV / GUNW</h3>
+            <p>HDF5 reads with an Earthdata token</p>
+          </div>
+        </div>
+        <div class="card row" style="left: 1065px; top: 1045px; width: 470px; height: 70px">
+          <span class="tile" style="--brand: #e03c31"
+            ><svg viewBox="0 0 24 24">
+              <path d="M12 3s-5.5 6.2-5.5 10a5.5 5.5 0 0 0 11 0C17.5 9.2 12 3 12 3z" />
+              <path d="M9.5 14a2.5 2.5 0 0 0 2.5 2.5" /></svg
+          ></span>
+          <div>
+            <h3>OPERA DSWx-HLS · PO.DAAC</h3>
+            <p>optical water, flood lens only</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrows: same pixel coordinates as the boxes above. -->
+      <svg class="wires" width="1600" height="1250" viewBox="0 0 1600 1250" aria-hidden="true">
+        <defs>
+          <marker
+            id="head"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto-start-reverse"
+          >
+            <path d="M0 0L10 5L0 10z" fill="#2b3340" />
+          </marker>
+          <marker
+            id="head-gold"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="4.5"
+            markerHeight="4.5"
+            orient="auto-start-reverse"
+          >
+            <path d="M0 0L10 5L0 10z" fill="#a8884f" />
+          </marker>
+          <marker
+            id="head-grey"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto-start-reverse"
+          >
+            <path d="M0 0L10 5L0 10z" fill="#8a93a3" />
+          </marker>
+        </defs>
+
+        <!-- Web app ↔ FastAPI -->
+        <path class="wire" d="M355 300H543" marker-end="url(#head)" />
+        <path class="wire async" d="M355 350H543" marker-end="url(#head)" />
+        <path class="wire gold" d="M545 400H357" marker-end="url(#head-gold)" />
+        <!-- Layer PNG straight from the gateway after the 307 -->
+        <path class="wire gold" d="M330 260V168H1300V258" marker-end="url(#head-gold)" />
+        <!-- FastAPI → Gateway -->
+        <path class="wire" d="M875 300H1063" marker-end="url(#head)" />
+        <path class="wire async" d="M875 350H1063" marker-end="url(#head)" />
+        <!-- Cases relay → Gateway -->
+        <path class="wire" d="M875 697H995V405H1063" marker-end="url(#head)" />
+        <!-- FastAPI → PostgreSQL -->
+        <path class="wire" d="M760 430V488" marker-start="url(#head)" marker-end="url(#head)" />
+        <!-- Web app → static files -->
+        <path class="wire" d="M165 430V488" marker-end="url(#head)" />
+        <!-- Inside Modal -->
+        <path class="wire async" d="M1195 430V488" marker-end="url(#head)" />
+        <path class="wire" d="M1325 345H1398" marker-start="url(#head)" marker-end="url(#head)" />
+        <path class="wire" d="M1325 502L1410 422" marker-end="url(#head)" />
+        <path class="wire" d="M1325 542H1398" marker-start="url(#head)" marker-end="url(#head)" />
+        <!-- Down to external data -->
+        <path class="wire grey" d="M315 430V883" marker-end="url(#head-grey)" />
+        <path class="wire grey" d="M575 430V883" marker-end="url(#head-grey)" />
+        <path class="wire grey" d="M1195 595V883" marker-end="url(#head-grey)" />
+      </svg>
+
+      <span class="label" style="left: 450px; top: 300px">HTTPS <code>/api/v1</code></span>
+      <span class="label" style="left: 450px; top: 350px">poll every 1 s</span>
+      <span class="label gold" style="left: 450px; top: 400px">307 → layer URL</span>
+      <span class="label gold" style="left: 790px; top: 168px"
+        >layer PNG, fetched straight from Modal after the 307</span
+      >
+      <span class="label" style="left: 970px; top: 300px"><code>POST /v2/jobs</code></span>
+      <span class="label" style="left: 970px; top: 350px">poll the job</span>
+      <span class="label" style="left: 935px; top: 697px"><code>/v2/cases</code></span>
+      <span class="label" style="left: 760px; top: 459px">jobs + cache</span>
+      <span class="label" style="left: 165px; top: 459px">GET</span>
+      <span class="label" style="left: 1195px; top: 459px">spawn</span>
+      <span class="label grey" style="left: 315px; top: 808px">tiles · frame plan</span>
+      <span class="label grey" style="left: 575px; top: 808px">scenes · fires · geocode</span>
+      <span class="label grey" style="left: 1195px; top: 808px">CMR search + HDF5 / COG reads</span>
+
+      <div class="legend">
+        <span
+          ><svg width="44" height="12">
+            <path class="wire" d="M2 6H34" marker-end="url(#head)" /></svg
+          >HTTPS request</span
+        >
+        <span
+          ><svg width="44" height="12">
+            <path class="wire async" d="M2 6H34" marker-end="url(#head)" /></svg
+          >async job / polling</span
+        >
+        <span
+          ><svg width="44" height="12">
+            <path class="wire gold" d="M2 6H34" marker-end="url(#head-gold)" /></svg
+          >layer images back to the globe</span
+        >
+        <span
+          ><svg width="44" height="12">
+            <path class="wire grey" d="M2 6H34" marker-end="url(#head-grey)" /></svg
+          >call to an external service</span
+        >
+        <span><i class="chip">cache</i>keeps answers</span>
+        <span><i class="box"></i>not ours</span>
+      </div>
+      <p class="credit">
+        Drawn from the code on main of the frontend, backend and model repos · November 2026
+      </p>
+    </main>
+  </body>
+</html>
