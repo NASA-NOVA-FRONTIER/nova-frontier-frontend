@@ -25,6 +25,24 @@ test.describe("Landing surface atlas", () => {
     await expect(murray).toHaveAttribute("aria-expanded", "false");
   });
 
+  test("loads every tile as a 1024 px WebP under 250 KB, with its size reserved", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const strip = page.getByTestId("surface-atlas");
+    await strip.scrollIntoViewIfNeeded();
+    for (const id of ["forest-river", "chenab", "murray"]) {
+      const img = page.getByTestId(`atlas-img-${id}`);
+      await expect(img).toHaveAttribute("width", "1024");
+      await expect(img).toHaveAttribute("height", "1024");
+      await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(1024);
+      const src = await img.evaluate((el: HTMLImageElement) => el.currentSrc);
+      expect(src).toMatch(new RegExp(`/atlas/${id}\\.webp$`));
+      const body = await (await page.request.get(src)).body();
+      expect(body.byteLength).toBeLessThanOrEqual(250 * 1024);
+    }
+  });
+
   test("has no transition under reduced motion", async ({ page }) => {
     await page.goto("/");
     const duration = await page
