@@ -2254,7 +2254,7 @@
   color: var(--faint);
 }
 
-/* Time-lapse stamp under the footprint (SPECS-v8 §4); positioned from the globe every frame. */
+/* The timeline step's stamp under the footprint (COPY-flow-v9 §5); positioned from the globe every frame. */
 .x-stamp {
   position: absolute;
   left: 0;
@@ -3860,6 +3860,15 @@
   .x-tl__step {
     width: 30px;
     height: 30px;
+  }
+
+  /* The square sits just above the strip: the stamp keeps its date, the strip's title says the pass. */
+  .x-stamp__date {
+    font-size: 22px;
+  }
+
+  .x-stamp__pass {
+    display: none;
   }
 
   /* One radar lane and the months: 50 px, as the reference's mobile strip. */
