@@ -1,11 +1,12 @@
 // `title` and `image` come with the v8 facts (docs/design/v8/reference/v8-data.js FACTS); the older
-// facts are text only. `pixel` keeps a small measured layer crisp when it is scaled up.
+// facts are text only. `pixel` keeps a small measured layer crisp when it is scaled up. `credit`
+// names whoever made an image that isn't ours (#29); our own case and InSAR crops need none.
 export type Fact = {
   id: string;
   text: string;
   source: { label: string; href: string };
   title?: string;
-  image?: { src: string; pixel: boolean };
+  image?: { src: string; pixel: boolean; credit?: string };
 };
 
 const NASA_MISSION = {
@@ -61,14 +62,22 @@ const FACTS: Fact[] = [
     id: "clouds",
     title: "Radar sees through clouds",
     text: "NISAR sends its own microwave pulses and listens for the echo, so it measures day or night, through cloud and smoke.",
-    image: { src: "/landing/radar-north-dakota.jpg", pixel: false },
+    image: {
+      src: "/landing/radar-north-dakota.jpg",
+      pixel: false,
+      credit: "NISAR image · NASA/JPL-Caltech",
+    },
     source: FIVE_THINGS,
   },
   {
     id: "wave",
     title: "A 24 cm wave",
     text: "NISAR's L-band radar uses a wavelength of about 24 cm. It passes leaves and reaches branches, trunks and the ground below.",
-    image: { src: "/landing/nisar-concept.jpg", pixel: false },
+    image: {
+      src: "/landing/nisar-concept.jpg",
+      pixel: false,
+      credit: "Artist's concept · NASA/JPL-Caltech",
+    },
     source: GET_TO_KNOW_SAR,
   },
   {
