@@ -33,28 +33,77 @@ test.describe("Method page", () => {
     );
   });
 
-  test("reduced motion shows the satellite deployed and still; the steps follow the scroll", async ({
+  test("reduced motion: the teardown cuts from step to step with the scroll, without a loop", async ({
     page,
   }) => {
     const method = new MethodPage(page);
     await method.goto();
-    await method.scrollSatelliteTo(0.3);
+    await expect(method.satellite).toHaveAttribute("data-variant", "stage");
     const model = method.satellite.getByTestId("nisar-satellite");
+    const live = method.satellite.getByTestId("sat-live");
+    await expect(live).toHaveAttribute("aria-live", "polite");
+
+    // One step per sixth of the track: the reflector rests at 2/6.
+    await method.scrollSatelliteTo(2 / 6);
     await expect(model).toHaveAttribute("data-status", "ready");
-    await expect(model).toHaveAttribute("data-running", "false");
-    // Deployed: hotspots only show past 92 % of the deployment.
-    await expect(model.getByTestId("nisar-hotspot-reflector")).toHaveCSS("opacity", "1");
-
-    // 30 % of the track: step 2 is active, the others dimmed.
-    await expect(method.satStep(2)).toHaveAttribute("aria-current", "step");
-    await expect(method.satStep(2)).toHaveCSS("opacity", "1");
-    await expect(method.satStep(1)).toHaveCSS("opacity", "0.28");
-    await expect(method.satStep(3)).toHaveCSS("opacity", "0.28");
-    await expect(method.satStep(2)).toContainText("DEPLOYED IN ORBIT");
-
-    await method.scrollSatelliteTo(0.8);
     await expect(method.satStep(3)).toHaveAttribute("aria-current", "step");
+    await expect(method.satStep(3)).toContainText("12 m reflector");
+    await expect(method.satStep(3)).toContainText("Gold-plated wire mesh");
+    await expect(method.satStep(3).getByRole("link").first()).toHaveAttribute(
+      "href",
+      "https://science.nasa.gov/mission/nisar/about-the-satellite/",
+    );
+    await expect(live).toHaveText("03 / 07 · REFLECTOR. 12 m reflector");
+    // Only the active step opens its text.
+    await expect(method.satStep(2)).not.toContainText("A 12 m reflector on a 9 m boom.");
+    // Taken apart, the step names the piece and the hotspot rings stay hidden.
+    await expect(model.getByTestId("nisar-hotspot-reflector")).toHaveCSS("opacity", "0");
     await expect(model).toHaveAttribute("data-running", "false");
+
+    // The last step puts the model back together: deployed, rings back.
+    await method.scrollSatelliteTo(1);
+    await expect(method.satStep(7)).toHaveAttribute("aria-current", "step");
+    await expect(method.satStep(7)).toContainText("LOOKING SIDEWAYS");
+    await expect(model.getByTestId("nisar-hotspot-reflector")).toHaveCSS("opacity", "1");
+    await expect(model).toHaveAttribute("data-running", "false");
+  });
+
+  test("the keyboard walks the teardown: each step kicker is a button", async ({ page }) => {
+    const method = new MethodPage(page);
+    await method.goto();
+    await method.scrollSatelliteTo(0);
+    await expect(method.satStep(1)).toHaveAttribute("aria-current", "step");
+    await method.satGo(4).focus();
+    await page.keyboard.press("Tab");
+    await expect(method.satGo(5)).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(method.satStep(5)).toHaveAttribute("aria-current", "step");
+    await expect(method.satStep(5)).toContainText("L-band radar · 24 cm");
+    await expect(method.satStep(5)).toContainText("S-band radar · 9.4 cm");
+    await expect(method.satellite.getByTestId("sat-live")).toContainText("05 / 07 · RADARS");
+    await expect(method.satGo(5)).toBeFocused();
+  });
+
+  test("phones read the teardown as a list with photos, no 3D model", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const method = new MethodPage(page);
+    await method.goto();
+    await expect(method.satellite).toHaveAttribute("data-variant", "list");
+    await expect(method.satellite.locator("li")).toHaveCount(7);
+    await expect(method.satellite.locator("canvas")).toHaveCount(0);
+    await expect(method.satellite.locator("img")).toHaveCount(2);
+    await expect(method.satStep(6)).toContainText("Spacecraft bus");
+    await expect(method.satStep(6)).toContainText("Solar array");
+    for (let n = 1; n <= 7; n++) {
+      await expect(method.satStep(n).getByRole("link").first()).toHaveAttribute(
+        "href",
+        /^https:\/\/science\.nasa\.gov\//,
+      );
+    }
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBe(0);
   });
 
   test("the echo simulator switches surface with the arrow keys", async ({ page }) => {
