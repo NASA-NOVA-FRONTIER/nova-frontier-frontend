@@ -207,9 +207,7 @@ test.describe("Explorer: live questions", () => {
     await expect(globe.planPasses).toContainText("39 passes in the plan");
   });
 
-  test("a full queue asks to wait; Pick a measured case goes back to the list", async ({
-    page,
-  }) => {
+  test("a full queue asks to wait; Open a known case goes back to the list", async ({ page }) => {
     const globe = new GlobePage(page);
     await globe.mockObservationPlan();
     await globe.mockExplorations({
@@ -218,8 +216,8 @@ test.describe("Explorer: live questions", () => {
       ],
     });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(globe.jobError).toContainText("Lots of people are asking right now.");
-    await globe.jobError.getByRole("button", { name: "Pick a measured case" }).click();
+    await expect(globe.jobError).toContainText("Try again in a few minutes.");
+    await globe.jobError.getByRole("button", { name: "Open a known case" }).click();
     await expect(globe.startCard).toBeVisible();
   });
 

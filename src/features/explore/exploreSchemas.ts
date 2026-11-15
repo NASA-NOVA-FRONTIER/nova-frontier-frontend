@@ -329,6 +329,8 @@ export const explorationSchema = z.object({
   elapsedSeconds: z.number(),
   stages: z.array(stageSchema),
   progress: z.object({ scenesRead: z.number().nullable(), scenesTotal: z.number() }).nullable(),
+  // Backend #6: analyses ahead of this one while it is queued (0 when running). Absent until then.
+  queuePosition: z.number().int().nonnegative().nullish(),
   plan: z
     .object({
       status: z.string(),

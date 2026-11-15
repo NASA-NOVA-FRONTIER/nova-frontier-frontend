@@ -67,6 +67,12 @@ import type { ExplorationView } from "@/features/explore/exploreSchemas";
 import { exploreSubject } from "@/features/explore/exploreSubject";
 import { exploreTimeline } from "@/features/explore/exploreTimeline";
 import { useExploration } from "@/features/explore/useExploration";
+import {
+  explorationProblem,
+  partialProblem,
+  type ProblemAction,
+} from "@/features/explore/exploreProblems";
+import { fetchLimits, quotaOf } from "@/features/limits/limitsApi";
 import { JobModal } from "@/features/live/JobModal";
 import { formatLonLat, gridMetres, LIVE_CHIP_KM } from "@/features/live/liveQuestion";
 import { LiveProblem, LiveProgress } from "@/features/live/LiveStatus";
@@ -102,6 +108,7 @@ import { PassTimeline } from "@/features/timeline/PassTimeline";
 import { formatDay } from "@/features/timeline/timelineLayout";
 import { STEP_4, passOf } from "@/content/copyV8";
 import { useAsync } from "@/lib/useAsync";
+import { useNow } from "@/lib/useNow";
 import { AreaGuide, type AreaIssue } from "@/pages/explorer/AreaGuide";
 import { AreaTools } from "@/pages/explorer/AreaTools";
 import { DirectionSwitch } from "@/pages/explorer/DirectionSwitch";
@@ -274,6 +281,8 @@ export const ExplorerPage = () => {
   const [direction, setDirection] = useState<Direction>("ascending");
   // A picked spot (v8 step 2): a search hit or a clicked point, waiting for "Analyze this spot".
   const [place, setPlace] = useState<Place>();
+  // The spot "Analyze this spot" ran on, so Cancel analysis can go back to it (SPECS-v8 §3).
+  const [analysed, setAnalysed] = useState<Place>();
   const [collapsed, setCollapsed] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [mode, setMode] = useState<ChartMode>("plain");
@@ -398,6 +407,18 @@ export const ExplorerPage = () => {
       ? exploration.state.view
       : undefined;
   const receivedAt = exploration.state.phase === "running" ? exploration.state.receivedAt : 0;
+  // Backend #2's daily limits: read at load, on every spot and when a run ends. Until the endpoint
+  // exists the request fails and the quota line stays hidden (decision 8: no number of our own).
+  const limitsKey = `${place?.id ?? "-"}|${phase === "done" || phase === "error" ? runKey : ""}`;
+  const { state: limitsState } = useAsync(fetchLimits, limitsKey);
+  const limits = limitsState?.status === "success" ? limitsState.data : undefined;
+  // A minute clock is enough for "resets in 6 h 12 min".
+  const minuteNow = useNow(limits !== undefined, 60_000);
+  const quota = quotaOf(limits, new Date(minuteNow));
+  // "Show what arrived" puts the partial-result card away for that run.
+  const [partialSeenFor, setPartialSeenFor] = useState("");
+  const partial =
+    phase === "done" && exploredView !== undefined ? partialProblem(exploredView) : undefined;
   // The wait modal can be closed while the job runs; it stays closed for that run.
   const [modalClosedFor, setModalClosedFor] = useState("");
   const modalOpen =
@@ -498,6 +519,33 @@ export const ExplorerPage = () => {
     setPlace(undefined);
     setSheetOpen(false);
   }, []);
+
+  // SPECS-v8 §8: each category's buttons.
+  const retryExploration = exploration.retry;
+  const onProblemAction = useCallback(
+    (action: ProblemAction) => {
+      if (action === "retry" || action === "runAgain") retryExploration();
+      else if (action === "showPartial") setPartialSeenFor(runKey);
+      else if (action === "knownCase") close();
+    },
+    [retryExploration, runKey, close],
+  );
+
+  // SPECS-v8 §3 "Cancel analysis → back to step 2": the backend is asked to stop and the spot's
+  // card comes back. A drawn area has no step 2, so it goes back to the start.
+  const cancelExploration = exploration.cancel;
+  const cancelAnalysis = useCallback(() => {
+    void cancelExploration();
+    if (live === undefined || live.lensSwitch) return;
+    if (live.area.kind !== "point") {
+      close();
+      return;
+    }
+    const same = analysed !== undefined && analysed.point.join(",") === live.point.join(",");
+    setSelection(undefined);
+    setSheetOpen(false);
+    setPlace(same ? analysed : coordinatePlace(live.point));
+  }, [cancelExploration, live, analysed, close]);
 
   const pickPlace = useCallback((picked: Place) => {
     setSelection(undefined);
@@ -1077,7 +1125,14 @@ export const ExplorerPage = () => {
             place={place}
             coverage={coverage}
             nearest={nearest}
-            onAnalyse={() => askArea({ kind: "point", point: place.point })}
+            quota={quota}
+            limits={limits}
+            now={minuteNow}
+            cases={CASES}
+            onAnalyse={() => {
+              setAnalysed(place);
+              askArea({ kind: "point", point: place.point });
+            }}
             onRetry={retryCoverage}
             onOpenCase={openCase}
             onClose={close}
@@ -1120,6 +1175,14 @@ export const ExplorerPage = () => {
             onClose={close}
           >
             {item?.coherenceOnly === true && <PendingSummary item={item} />}
+            {/* SPECS-v8 §8 Partial result: said before the answer it qualifies. */}
+            {subject?.kind === "live" && partial !== undefined && partialSeenFor !== runKey && (
+              <LiveProblem
+                problem={partial}
+                reasonCode={exploredView?.error?.reasonCode ?? "PARTIAL"}
+                onAction={onProblemAction}
+              />
+            )}
             {showLensCard && subject !== undefined && exploredView !== undefined && (
               <LensResultCard
                 subject={subject}
@@ -1157,15 +1220,22 @@ export const ExplorerPage = () => {
                 view={exploredView}
                 receivedAt={receivedAt}
                 onDetails={() => setModalClosedFor("")}
-                onCancel={() => void exploration.cancel()}
+                onCancel={cancelAnalysis}
               />
             )}
             {liveRuns && exploration.state.phase === "error" && (
               <LiveProblem
+                problem={explorationProblem({
+                  reasonCode: exploration.state.error.reasonCode,
+                  detail: exploration.state.error.message,
+                  status: exploration.state.error.status,
+                  ...(limits && { limits }),
+                  now: new Date(minuteNow),
+                })}
                 reasonCode={exploration.state.error.reasonCode}
-                detail={exploration.state.error.message}
-                onRetry={exploration.retry}
-                onPickCase={close}
+                onAction={onProblemAction}
+                cases={CASES}
+                onOpenCase={openCase}
               />
             )}
             {liveRuns &&
@@ -1173,11 +1243,18 @@ export const ExplorerPage = () => {
               exploredView !== undefined &&
               exploredView.result === null && (
                 <LiveProblem
+                  problem={explorationProblem({
+                    reasonCode: exploredView.error?.reasonCode ?? "ANALYSIS_FAILED",
+                    detail: exploredView.error?.detail ?? "The analysis did not produce a result.",
+                    planStatus: exploredView.plan?.status ?? null,
+                    ...(limits && { limits }),
+                    now: new Date(minuteNow),
+                  })}
                   reasonCode={exploredView.error?.reasonCode ?? "ANALYSIS_FAILED"}
-                  detail={exploredView.error?.detail ?? "The analysis did not produce a result."}
                   notes={exploredView.plan?.notes ?? []}
-                  onRetry={exploration.retry}
-                  onPickCase={close}
+                  onAction={onProblemAction}
+                  cases={CASES}
+                  onOpenCase={openCase}
                 />
               )}
             {subject?.kind === "live" && exploredView?.status === "partial" && (
@@ -1236,13 +1313,16 @@ export const ExplorerPage = () => {
 
         {modalOpen && live !== undefined && (
           <JobModal
-            lensChip={lensChip}
-            placeName={liveName(live)}
+            placeName={
+              analysed !== undefined && analysed.point.join(",") === live.point.join(",")
+                ? analysed.name
+                : liveName(live)
+            }
             view={exploredView}
             receivedAt={receivedAt}
             reduceMotion={reduceMotion}
             onKeepExploring={() => setModalClosedFor(runKey)}
-            onCancel={() => void exploration.cancel()}
+            onCancel={cancelAnalysis}
           />
         )}
 

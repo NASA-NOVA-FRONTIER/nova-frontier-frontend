@@ -369,20 +369,28 @@ test.describe("Explorer: live exploration", () => {
     ]);
   });
 
-  test("while it runs, the modal shows the estimate, the stage and a sourced fact; the result replaces it", async ({
+  test("while it runs, the v8 panel shows elapsed time, the steps and a sourced fact; the result replaces it", async ({
     page,
   }) => {
     const api = await globe.mockExplorations();
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
     await expect(globe.jobModal).toBeVisible();
-    await expect(globe.jobRemaining).toContainText(/About \d+ s left/);
-    await expect(globe.jobModal).toContainText("Estimated 1 min 00 s");
-    await expect(page.getByTestId("job-stages")).toContainText("Choosing the passes");
-    await expect(page.getByTestId("job-stages")).toContainText("Reading the passes and measuring");
+    await expect(page.getByTestId("job-kicker")).toHaveText(/^LIVE ANALYSIS · /);
+    await expect(globe.jobModal).toContainText("Reading NISAR passes for this spot");
+    // Elapsed, never a countdown.
+    await expect(globe.jobElapsed).toHaveText(/^\d+:\d{2}$/);
+    await expect(globe.jobModal).not.toContainText(" left");
+    await expect(page.getByTestId("job-band")).toHaveAttribute("data-estimated", "true");
+    await expect(
+      page.getByRole("progressbar", { name: "Elapsed time, 0 to 5 minutes" }),
+    ).toBeVisible();
+    await expect(page.getByTestId("job-stages")).toContainText("Searching the catalog");
+    await expect(page.getByTestId("job-stages")).toContainText("Reading passes");
+    await expect(page.getByTestId("fact-count")).toHaveText(/^DID YOU KNOW\? · 1 OF \d+$/);
+    await expect(page.getByTestId("fact-title")).toHaveText("Radar sees through clouds");
     await expect(page.getByTestId("fact-text")).not.toBeEmpty();
     await expect(page.getByTestId("fact-source")).toHaveAttribute("href", /^https:\/\//);
-    await expect(page.getByRole("progressbar", { name: "Estimated progress" })).toBeVisible();
 
     const before = await page.getByTestId("fact-text").textContent();
     await page.getByRole("button", { name: "Next fact" }).click();
@@ -422,8 +430,8 @@ test.describe("Explorer: live exploration", () => {
     });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(globe.jobRemaining).toHaveText("Taking longer than expected");
     await expect(page.getByTestId("job-late")).toBeVisible();
+    await expect(page.getByTestId("job-bar")).toHaveAttribute("data-overdue", "true");
   });
 
   test("a full queue says so and Try again asks again", async ({ page }) => {
@@ -435,7 +443,7 @@ test.describe("Explorer: live exploration", () => {
     });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(globe.jobError).toContainText("The radar queue is full");
+    await expect(globe.jobError).toContainText("Analyses are already in line");
     await globe.jobError.getByRole("button", { name: "Try again" }).click();
     await expect(globe.verdict).toBeVisible();
     expect(api.posts).toHaveLength(2);
@@ -449,22 +457,25 @@ test.describe("Explorer: live exploration", () => {
     await expect(globe.jobError).toContainText("No NISAR passes cover this place");
     await expect(globe.jobError).toContainText("No scene covers the area.");
     await expect(globe.jobError.getByRole("button", { name: "Try again" })).toHaveCount(0);
-    await globe.jobError.getByRole("button", { name: "Pick a measured case" }).click();
+    await globe.jobError.getByRole("button", { name: "Open a known case" }).click();
     await expect(globe.startCard).toBeVisible();
   });
 
-  test("Cancel request asks the backend to stop and the panel says it was cancelled", async ({
+  test("Cancel analysis asks the backend to stop and goes back to the spot (step 2)", async ({
     page,
   }) => {
+    await globe.mockCoverage();
     const api = await globe.mockExplorations();
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
     await expect(globe.jobModal).toBeVisible();
 
     await page.getByTestId("job-cancel").click();
 
-    await expect(globe.jobError).toContainText("Request cancelled");
+    await expect(globe.placeCard).toBeVisible();
+    await expect(globe.placeAnalyse).toBeVisible();
     await expect(globe.jobModal).toBeHidden();
-    expect(api.cancelled).toBe(true);
+    await expect(globe.panel).toBeHidden();
+    await expect.poll(() => api.cancelled).toBe(true);
   });
 
   test("a failing Observation Plan never hides the exploration's answer", async ({ page }) => {
@@ -772,8 +783,8 @@ test.describe("Explorer: live exploration", () => {
       await globe.mockInsarPairs({ failures: 1 });
       await globe.goto(`?frame=${LIVE_FRAME.id}&lens=insar`);
 
-      await expect(globe.jobError).toBeVisible();
-      await page.getByRole("button", { name: "Try again" }).click();
+      await expect(globe.jobError).toContainText("We couldn't reach the radar archive");
+      await page.getByRole("button", { name: "Run it again" }).click();
       await expect(globe.pairPicker).toBeVisible();
     });
 

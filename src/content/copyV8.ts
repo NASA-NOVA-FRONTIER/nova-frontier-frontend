@@ -1,6 +1,6 @@
 // Visible strings of design v8 (docs/design/v8/COPY-v8.md), verbatim. Components read them from here.
 // `{x}` placeholders are small functions; callers pass values from the API, never invented ones.
-// §6.5 possible drivers are DRIVERS (#22). Not here: §8 errors (v8-data.js, the waiting issue).
+// §6.5 possible drivers are DRIVERS (#22). §8 errors are STEP_8 (v8-data.js ERRORS, #4).
 
 import type { LensId } from "@/features/cases/cases";
 
@@ -449,4 +449,47 @@ export const STEP_7 = {
   patchesTitle: "03 · SPATIAL STRUCTURE · PATCHES",
   historicalTitle: "04 · HISTORICAL BEHAVIOUR",
   gpUnavailable: (n: number) => `Model fit (GP) unavailable: needs 6 passes, this spot has ${n}.`,
+} as const;
+
+// 8 · Errors and limits (v8-data.js ERRORS). Decision 8 (docs/design/README.md): no daily number is
+// hardcoded, so the handoff's "12" sentences go and every count comes from GET /api/v1/limits.
+export const STEP_8 = {
+  quotaLowCat: "Quota · few left",
+  quotaLowTitle: (n: number) => `${n} live ${n === 1 ? "analysis" : "analyses"} left today`,
+  // Decision 8: "The app shares 12 live analyses a day across everyone." dropped with its number.
+  quotaLowBody: "Known cases and repeat spots don't use one.",
+  quotaOutCat: "Quota · used up",
+  quotaOutTitle: "Today's live analyses are used up",
+  // Decision 8: "All 12 for the app are taken." dropped; the reset comes from the backend or 00:00 UTC.
+  quotaOutBody: (at: string, wait: string) =>
+    `They reset at ${at} UTC, in ${wait}. Known cases open instantly and don't count.`,
+  resetIn: (h: number, m: number) => `${h} h ${m} min`,
+  queueFullCat: "Queue full",
+  // The handoff's "Two analyses" and "One runs at a time and one can wait." assume a capacity the
+  // backend doesn't report (it is configurable), so no count is printed.
+  queueFullTitle: "Analyses are already in line",
+  queueFullBody: "Try again in a few minutes.",
+  timeoutCat: "Time ran out",
+  timeoutTitle: "The analysis ran out of time",
+  // "(about 4 minutes)" only when the backend states its own limit.
+  timeoutBody: (minutes: number | undefined) =>
+    `Reading the passes took longer than the server allows${minutes === undefined ? "" : ` (about ${minutes} minutes)`}. Try again, or open a known case.`,
+  restartedCat: "Server down or restarted",
+  restartedTitle: "The server restarted and lost this job",
+  restartedBody: "It's back up. Running the same spot again starts a new job.",
+  noDataCat: "No data",
+  noDataTitle: "NISAR has no usable pass here yet",
+  noDataBody: (otherDirection: boolean) =>
+    `The catalog lists passes, but none had valid pixels at this point. ${otherDirection ? "Try the other pass direction or a known case." : "Try a known case."}`,
+  partialCat: "Partial result",
+  partialTitle: (k: number, n: number) => `${k} of ${n} passes arrived`,
+  partialBody: (missing: number) =>
+    `${missing === 1 ? "One pass" : `${missing} passes`} couldn't be read. Lenses that need a 3-pass baseline may say Not enough data.`,
+  analyze: "Analyze this spot",
+  knownCase: "Open a known case",
+  tryAgain: "Try again",
+  runAgain: "Run it again",
+  tryDirection: (direction: string) => `Try ${direction}`,
+  showPartial: "Show what arrived",
+  instant: "INSTANT",
 } as const;
