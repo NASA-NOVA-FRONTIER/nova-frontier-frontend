@@ -2301,16 +2301,10 @@
   cursor: pointer;
 }
 
-/* v8 Play: white 38 px, desktop only (the reference switches to mobile under 700 px). */
+/* v8 Play: white 38 px, desktop only; phones get the compact strip without it. */
 .x-tl__play--v8 {
   width: 38px;
   height: 38px;
-}
-
-@media (max-width: 699px) {
-  .x-tl__play--v8 {
-    display: none;
-  }
 }
 
 .x-tl__readout {
@@ -3399,10 +3393,6 @@
     bottom: 120px;
   }
 
-  .x-timeline-wrap {
-    display: none;
-  }
-
   .x-sheet {
     left: 0;
     right: 0;
@@ -3514,4 +3504,201 @@
 .x-pairs__threshold output {
   font-family: var(--mono);
   color: var(--gold);
+}
+
+/*
+ * Phones, design v8 (SPECS-v8 §1 Mobile, `Explorer v8 v2.dc.html` at 390 × 844): steps 2–6 and 8
+ * sit in a bottom sheet whose height the page sets per step (`--x-sheet-f`, mobileSheet.ts); the
+ * search and the mobile bar stay on top, the compact timeline rides on the sheet and Nova above it.
+ */
+@media (max-width: 760px) {
+  .explorer {
+    --x-sheet-h: calc(var(--x-sheet-f, 0) * 100dvh);
+    --x-sheet-edge: 8px;
+  }
+
+  /* Top row: the mark, the search and the two menus; the rest is in Help or the mobile bar. */
+  .x-top {
+    top: 12px;
+    left: var(--x-sheet-edge);
+    right: var(--x-sheet-edge);
+  }
+
+  .x-top .x-switches,
+  .x-top__globe {
+    display: none;
+  }
+
+  .x-pill--mark {
+    flex: none;
+    width: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .x-pill__word {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .x-top__search {
+    flex: 1 1 auto;
+  }
+
+  .x-menu--search {
+    width: calc(100vw - 2 * var(--x-sheet-edge));
+  }
+
+  /* Asc / Desc and the layer pills under the search. */
+  .x-mobilebar {
+    position: absolute;
+    top: 60px;
+    left: var(--x-sheet-edge);
+    right: var(--x-sheet-edge);
+    z-index: 19;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .x-mobilebar > * {
+    pointer-events: auto;
+  }
+
+  .x-mobilebar .x-source {
+    height: 36px;
+    padding: 3px;
+    gap: 3px;
+  }
+
+  .x-mobilebar .x-source button {
+    min-width: 44px;
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+
+  /* The tools hang under the top bar, and under the mobile bar when it shows. */
+  .explorer:has(.x-mobilebar) .x-tools {
+    top: 92px;
+  }
+
+  /* The sheet: one geometry for the spot card, the waiting panel and the result panel. */
+  .explorer:not([data-sheet="none"]) :is(.x-place, .x-panel, .x-jobmodal) {
+    left: var(--x-sheet-edge);
+    right: var(--x-sheet-edge);
+    top: auto;
+    bottom: var(--x-sheet-edge);
+    width: auto;
+    max-width: none;
+    height: var(--x-sheet-h);
+    max-height: none;
+    transform: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 28px 16px 20px;
+    border-radius: 24px;
+    transition: height 0.25s var(--ease-out);
+  }
+
+  .explorer[data-reduce-motion="true"] :is(.x-place, .x-panel, .x-jobmodal) {
+    transition: none;
+  }
+
+  .x-sheet-handle {
+    position: absolute;
+    z-index: 16;
+    left: 50%;
+    bottom: calc(var(--x-sheet-edge) + var(--x-sheet-h) - 28px);
+    transform: translateX(-50%);
+    width: 72px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+
+  .x-sheet-handle:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: -2px;
+    border-radius: 999px;
+  }
+
+  .x-sheet-handle__bar {
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(235, 233, 228, 0.3);
+  }
+
+  /* The compact timeline: on the sheet, no Play, no lane names (the reference's mobile strip). */
+  .x-timeline-wrap,
+  .x-timeline-wrap[data-collapsed="true"] {
+    left: var(--x-sheet-edge);
+    right: var(--x-sheet-edge);
+    bottom: calc(var(--x-sheet-h) + 2 * var(--x-sheet-edge));
+  }
+
+  /* Expanded, the sheet takes the room of the tools, the timeline and Nova; shrinking gives it back. */
+  .explorer[data-sheet-expanded="true"] :is(.x-tools, .x-timeline-wrap, .x-nova-bubble) {
+    display: none;
+  }
+
+  .x-timeline {
+    max-width: none;
+    padding: 6px 12px 4px;
+    gap: 2px;
+    border-radius: 16px;
+  }
+
+  .x-tl__play,
+  .x-tl__sub,
+  .x-tl__compare,
+  .x-tl__legend,
+  .x-tl__lane,
+  .x-tl__bar,
+  .x-tl__bracket,
+  .x-tl__bracket-label,
+  .x-tl__today-label,
+  .x-tl__onset,
+  .x-tl__onset-label,
+  .x-tl__planned-label,
+  .x-tl__target-label,
+  .x-tl__optical,
+  .x-tl__optical-axis {
+    display: none;
+  }
+
+  .x-tl__line {
+    font-size: 13px;
+  }
+
+  /* One radar lane and the months: 50 px, as the reference's mobile strip. */
+  .x-tl__track {
+    height: 50px;
+    margin: 0 8px;
+  }
+
+  .x-tl__axis,
+  .x-tl__pass {
+    top: 18px;
+  }
+
+  .x-tl__today {
+    top: 4px;
+    bottom: 16px;
+  }
+
+  .x-tl__month {
+    top: 36px;
+  }
 }

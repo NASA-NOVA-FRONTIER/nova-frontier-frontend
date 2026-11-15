@@ -1,12 +1,14 @@
 import { useEffect, useState, type RefObject } from "react";
 
-// The bottom cards on a phone: the start card, a searched place and the result panel (the sheet).
-const BOTTOM_CARDS = ".x-start, .x-place, .x-panel";
-const NARROW = "(max-width: 760px)";
+import { PHONE_QUERY } from "@/lib/useMediaQuery";
+
+// What sits at the bottom on a phone: the start card, the sheet (spot, waiting, panel) and the
+// compact timeline over it.
+const BOTTOM_CARDS = ".x-start, .x-place, .x-panel, .x-jobmodal, .x-timeline-wrap .x-timeline";
 const GAP_PX = 12;
 
 /*
- * SPECS-v8 §10: on a phone the bubble sits above the sheet. The sheet's height follows its content,
+ * SPECS-v8 §10: on a phone the bubble sits above the sheet and the timeline. The sheet's height follows its content,
  * so this measures it: pixels from the explorer's bottom edge to just above the highest bottom card,
  * or undefined on wide screens or when no card is shown (the CSS default applies).
  */
@@ -16,7 +18,7 @@ export const useBubbleLift = (anchor: RefObject<HTMLElement | null>): number | u
   useEffect(() => {
     const root = anchor.current?.closest<HTMLElement>(".explorer");
     if (root === null || root === undefined) return;
-    const narrow = window.matchMedia(NARROW);
+    const narrow = window.matchMedia(PHONE_QUERY);
     let frame = 0;
 
     const measure = () => {
