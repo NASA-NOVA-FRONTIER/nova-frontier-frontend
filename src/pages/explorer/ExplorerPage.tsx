@@ -5,7 +5,7 @@ import "@/pages/explorer/story.css";
 import "@/features/lenses/lenses.css";
 
 import type { Viewer } from "cesium";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { CasePanel } from "@/features/case-panel/CasePanel";
 import { PendingSummary, ResultSummary } from "@/features/case-panel/CaseSummary";
@@ -55,6 +55,7 @@ import { insarFromParams } from "@/features/insar/insarLink";
 import { explorationCsv, explorationJson } from "@/features/explore/exploreExport";
 import {
   defaultView,
+  dockRows,
   measuredPasses,
   nextStep,
   playStart,
@@ -108,6 +109,7 @@ import { PassTimeline } from "@/features/timeline/PassTimeline";
 import { formatDay } from "@/features/timeline/timelineLayout";
 import { STEP_4, passOf } from "@/content/copyV8";
 import { useAsync } from "@/lib/useAsync";
+import { PHONE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import { useNow } from "@/lib/useNow";
 import { AreaGuide, type AreaIssue } from "@/pages/explorer/AreaGuide";
 import { AreaTools } from "@/pages/explorer/AreaTools";
@@ -116,6 +118,9 @@ import { SpotCard } from "@/pages/explorer/SpotCard";
 import { LEGEND, type DrapeKind } from "@/pages/explorer/drapeLegend";
 import { LayerDock } from "@/pages/explorer/LayerDock";
 import { LiveLayerDock } from "@/pages/explorer/LiveLayerDock";
+import { MobileBar } from "@/pages/explorer/MobileBar";
+import { hasLayerPills, layerPills, sheetFraction, sheetStep } from "@/pages/explorer/mobileSheet";
+import { SheetHandle } from "@/pages/explorer/SheetHandle";
 import { SourceSwitch } from "@/pages/explorer/SourceSwitch";
 import { HintPill, StartCard } from "@/pages/explorer/StartCard";
 import { TopBar, type DownloadItem } from "@/pages/explorer/TopBar";
@@ -293,6 +298,9 @@ export const ExplorerPage = () => {
   const [opacity, setOpacity] = useState(DEFAULT_OPACITY);
   const [homeRequest, setHomeRequest] = useState(0);
   const [unavailable, setUnavailable] = useState(false);
+  const phone = useMediaQuery(PHONE_QUERY);
+  // The sheet a tap on the handle expanded; any other step or run starts at its own height.
+  const [expandedFor, setExpandedFor] = useState("");
 
   const ask = useCallback(
     (
@@ -841,6 +849,33 @@ export const ExplorerPage = () => {
   const showDock = item?.crops !== undefined && !sheetOpen;
   const showLiveDock = layers.length > 0 && !sheetOpen;
 
+  // Phones: the bottom sheet of steps 2–6 and 8, the layer pills and the timeline above them.
+  const failed =
+    liveRuns && (phase === "error" || (phase === "done" && exploredView?.result === null));
+  const step = phone
+    ? sheetStep({
+        story,
+        moreInfo: sheetOpen,
+        collapsed,
+        spot: place !== undefined,
+        selection: selection?.kind,
+        running: liveRuns && running,
+        lensSwitch: live?.lensSwitch === true,
+        needsPair,
+        failed,
+        done: phase === "done",
+      })
+    : undefined;
+  const sheetKey = step === undefined ? "" : `${step}|${runKey}|${place?.id ?? ""}`;
+  const expanded = sheetKey !== "" && expandedFor === sheetKey;
+  const pills =
+    hasLayerPills(step) && layers.length > 0
+      ? layerPills(dockRows(layers, dockView.date, dockView.pick))
+      : [];
+  const sheetStyle = {
+    "--x-sheet-f": step === undefined ? "0" : String(sheetFraction(step, expanded)),
+  } as CSSProperties;
+
   const lensId = item?.lens ?? live?.lens;
   const lensChip = lensId === undefined ? "" : (findLens(lensId)?.chip ?? "");
   // Nova reads the v8 lens card through the same pure functions the card draws with.
@@ -1011,6 +1046,9 @@ export const ExplorerPage = () => {
         className="site explorer"
         data-frames={framesState?.status ?? "loading"}
         data-reduce-motion={reduceMotion}
+        data-sheet={step ?? "none"}
+        data-sheet-expanded={expanded}
+        style={sheetStyle}
       >
         {unavailable ? (
           <div className="x-nogl" data-testid="no-webgl">
@@ -1054,6 +1092,7 @@ export const ExplorerPage = () => {
           story={story}
           showReal={showReal}
           reduceMotion={reduceMotion}
+          phone={phone}
           searchOpen={searchOpen}
           onHelp={(open) => {
             setHelpOpen(open);
@@ -1090,6 +1129,25 @@ export const ExplorerPage = () => {
           onReduceMotion={setReduceMotion}
           onWholeGlobe={wholeGlobe}
         />
+
+        {phone && !story && (
+          <MobileBar
+            direction={
+              DIRECTION_CHOICE_READY ? (
+                <DirectionSwitch direction={direction} onChange={setDirection} />
+              ) : undefined
+            }
+            pills={pills}
+            onPick={pickDock}
+          />
+        )}
+
+        {step !== undefined && (
+          <SheetHandle
+            expanded={expanded}
+            onToggle={() => setExpandedFor(expanded ? "" : sheetKey)}
+          />
+        )}
 
         {!story && (
           <AreaGuide
