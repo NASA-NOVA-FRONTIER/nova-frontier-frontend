@@ -1,137 +1,198 @@
-import { expect, test } from "./fixtures";
+import { expect, test, type Page } from "./fixtures";
 import { succeededView } from "./pom/explorationMock";
-import { GlobePage, LIVE_FRAME } from "./pom/GlobePage";
+import { GlobePage } from "./pom/GlobePage";
 
-// Inside frame 47-3 (Colombia), so the question finds its frame without a measured case.
+// Inside frame 47-3 (Colombia); its centre is -74.755, 2.89.
 const BBOX = "-74.78,2.87,-74.73,2.91";
 
-test.describe("Explorer: choosing an area", () => {
+// Every request that would run or check something; placing and moving the square must make none.
+const watchRuns = (page: Page): string[] => {
+  const runs: string[] = [];
+  page.on("request", (request) => {
+    const url = request.url();
+    if (url.includes("/api/v1/explorations") || url.includes("/api/v1/coverage")) runs.push(url);
+  });
+  return runs;
+};
+
+test.describe("Explorer: the 10 × 10 km square", () => {
   let globe: GlobePage;
 
   test.beforeEach(async ({ page }) => {
     globe = new GlobePage(page);
     await globe.skipOnboarding();
     await globe.mockObservationPlan();
-    // A live question reaches the exploration API; mock it so a real backend on :8000 cannot interfere.
+    await globe.mockCoverage();
+    // "Analyze this spot" reaches the exploration API; mock it so a real backend on :8000 cannot interfere.
     await globe.mockExplorations({ first: succeededView() });
   });
 
-  test(
-    "a rectangle of the right size asks the radar about that area",
-    { tag: "@globe" },
-    async ({ page }) => {
-      // Close-up imagery tiles render slowly in software WebGL.
-      test.slow();
-      await globe.goto(`?frame=${LIVE_FRAME.id}`);
-      await expect(globe.panelMeta).toContainText(LIVE_FRAME.title);
-
-      await globe.tool("rectangle").click();
-      await expect(globe.tool("rectangle")).toHaveAttribute("aria-pressed", "true");
-      await expect(globe.areaSize).toContainText("10 × 10 km ideal · max 20 × 20 km");
-
-      await globe.dragFromCentre({ dx: -70, dy: -50 }, { dx: 70, dy: 50 });
-      await expect(globe.panelTitle).toContainText("Rectangle ·");
-      await expect(globe.panelMeta).toContainText("Live question");
-      await expect(page).toHaveURL(/bbox=-?\d+\.?\d*,-?\d+\.?\d*,-?\d+\.?\d*,-?\d+\.?\d*/);
-      // One drawing, one question: the tool puts itself away.
-      await expect(globe.tool("rectangle")).toHaveAttribute("aria-pressed", "false");
-      await expect(globe.areaGuide).toBeHidden();
-    },
-  );
-
-  test("a polygon closes with a double-click", { tag: "@globe" }, async ({ page }) => {
-    test.slow();
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await globe.tool("polygon").click();
-
-    await globe.clickFromCentre({ dx: -80, dy: -50 });
-    await globe.clickFromCentre({ dx: 80, dy: -40 });
-    await expect(globe.areaGuide.getByTestId("area-finish")).toBeDisabled();
-    await globe.clickFromCentre({ dx: 90, dy: 60 });
-    await expect(globe.areaGuide.getByTestId("area-finish")).toBeEnabled();
-    await globe.doubleClickFromCentre({ dx: -70, dy: 50 });
-
-    await expect(globe.panelTitle).toContainText("Polygon ·");
-    await expect(page).toHaveURL(/geo=-?\d/);
-  });
-
-  test("Esc cancels the shape, then puts the tool away", async () => {
-    test.slow();
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await globe.tool("polygon").click();
-    await globe.clickFromCentre({ dx: -80, dy: -50 });
-    await expect(globe.areaGuide.getByTestId("area-cancel")).toBeVisible();
-
-    await globe.press("Escape");
-    await expect(globe.areaGuide.getByTestId("area-cancel")).toBeHidden();
-    await expect(globe.tool("polygon")).toHaveAttribute("aria-pressed", "true");
-    await expect(globe.panel).toBeVisible();
-
-    await globe.press("Escape");
-    await expect(globe.tool("polygon")).toHaveAttribute("aria-pressed", "false");
-    await expect(globe.panel).toBeVisible();
-  });
-
-  test(
-    "an area over the limit is explained and the centred square is offered",
-    { tag: "@globe" },
-    async ({ page }) => {
-      await globe.goto();
-      await globe.tool("rectangle").click();
-      // At the whole-globe view a few pixels are hundreds of kilometres.
-      await globe.dragFromCentre({ dx: 60, dy: -40 }, { dx: 160, dy: 60 });
-
-      await expect(globe.areaGuide).toContainText("is over the 400 km² limit");
-      await expect(globe.areaGuide).toContainText("10 × 10 km is ideal");
-      await expect(globe.panel).toBeHidden();
-
-      await globe.useSquare.click();
-      await expect(globe.panelMeta).toContainText("Live question");
-      await expect(globe.panelTitle).not.toContainText("Rectangle");
-      await expect(page).toHaveURL(/frame=\d+-\d+/);
-      await expect(globe.areaGuide).toBeHidden();
-    },
-  );
-
-  test("discarding an over-the-limit area leaves the globe as it was", async () => {
+  test("a click places the square and nothing runs yet", async ({ page }) => {
+    const runs = watchRuns(page);
     await globe.goto();
-    await globe.tool("rectangle").click();
-    await globe.dragFromCentre({ dx: 60, dy: -40 }, { dx: 160, dy: 60 });
-    await globe.areaGuide.getByTestId("area-dismiss").click();
-    await expect(globe.areaGuide).toBeHidden();
-    await expect(globe.startCard).toBeVisible();
+    await expect(page.getByTestId("hint-pill")).toHaveText(
+      "Click any land to place a 10 × 10 km square",
+    );
+
+    await globe.placeSquare();
+    await expect(globe.squareBar).toContainText("Square placed");
+    await expect(globe.squareBar).toContainText("10 × 10 km · about 105 km² · nothing runs yet");
+    await expect(globe.useSquare).toHaveText("Use this square");
+    await expect(globe.startCard).toBeHidden();
     await globe.expectScene((scene) => {
-      expect(scene.target).toBeUndefined();
-      expect(scene.outline).toBeUndefined();
+      expect(scene.square).toEqual({ centre: [-74.75, 2.89], sideKm: 10.24, movable: true });
+      expect(scene.target?.key).toMatch(/^square\|/);
     });
+    expect(runs).toEqual([]);
   });
 
-  test("a shared ?bbox= link opens the question on that area", async ({ page }) => {
-    test.slow();
-    await globe.goto(`?bbox=${BBOX}&lens=wildfire`);
-    await expect(globe.panelTitle).toContainText("Rectangle ·");
-    await expect(globe.panelMeta).toContainText("Live question");
-    await expect(globe.lens("wildfire")).toHaveAttribute("aria-pressed", "true");
-    await expect(page).toHaveURL(new RegExp(`bbox=${BBOX}`));
+  test("a drag moves the square under a still camera, and still nothing runs", async ({ page }) => {
+    const runs = watchRuns(page);
+    await globe.goto();
+    await globe.placeSquare();
+    const key = (await globe.scene()).target?.key;
+
+    await globe.dragSquare({ dx: 80, dy: -40 });
+    await globe.expectScene((scene) => {
+      const [lon, lat] = scene.square?.centre ?? [0, 0];
+      expect(lon).toBeCloseTo(-74.71, 6);
+      expect(lat).toBeCloseTo(2.91, 6);
+      expect(scene.square?.movable).toBe(true);
+      expect(scene.target?.key).toBe(key);
+    });
+    await expect(globe.squareBar).toBeVisible();
+    expect(runs).toEqual([]);
   });
 
-  test("a link outside the frame snapshot still asks the archive", async ({ page }) => {
-    const request = page.waitForRequest((entry) => entry.url().endsWith("/api/v1/explorations"));
-    await globe.goto("?bbox=0,0,0.05,0.04");
-    expect((await request).postDataJSON()).toMatchObject({ geometry: { type: "Polygon" } });
-    await expect(globe.panelMeta).toContainText("Live question · NISAR catalog");
+  test("clicking other land moves the square there", async () => {
+    await globe.goto();
+    await globe.placeSquare();
+    await globe.clickOcean();
+    await globe.expectScene((scene) => expect(scene.square?.centre).toEqual([-20, 18]));
+    await expect(globe.squareBar).toBeVisible();
   });
 
-  test("the tools are off in the guided tour and the globe does not answer clicks", async ({
+  test("Cancel and Esc take the square away", async () => {
+    await globe.goto();
+    await globe.placeSquare();
+    await globe.squareCancel.click();
+    await expect(globe.squareBar).toBeHidden();
+    await expect(globe.startCard).toBeVisible();
+    await globe.expectScene((scene) => expect(scene.square).toBeUndefined());
+
+    await globe.placeSquare();
+    await globe.press("Escape");
+    await expect(globe.squareBar).toBeHidden();
+    await globe.expectScene((scene) => expect(scene.square).toBeUndefined());
+  });
+
+  test("Use this square checks the catalog, then Analyze asks about the moved centre", async ({
     page,
   }) => {
-    await globe.goto("?story=1");
-    await expect(globe.tool("point")).toBeDisabled();
-    await expect(globe.tool("rectangle")).toBeDisabled();
-    await expect(globe.tool("polygon")).toBeDisabled();
-    await globe.clickLand();
-    await expect(globe.panel).toBeHidden();
-    await expect(page).toHaveURL(/story=1/);
-    await expect(globe.areaGuide).toBeHidden();
+    await globe.goto();
+    await globe.placeSquare();
+    await globe.dragSquare({ dx: 80, dy: -40 });
+    expect(globe.coverageRequests).toHaveLength(0);
+
+    await globe.useSquare.click();
+    await expect(globe.squareBar).toBeHidden();
+    await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
+    expect(globe.coverageRequests).toHaveLength(1);
+    // Used, the square stays where it is.
+    await globe.expectScene((scene) => expect(scene.square?.movable).toBe(false));
+
+    const request = page.waitForRequest((entry) => entry.url().endsWith("/api/v1/explorations"));
+    await globe.placeAnalyse.click();
+    const body = (await request).postDataJSON() as {
+      geometry: { type: string; coordinates: number[] };
+    };
+    expect(body.geometry.type).toBe("Point");
+    expect(body.geometry.coordinates[0]).toBeCloseTo(-74.71, 4);
+    expect(body.geometry.coordinates[1]).toBeCloseTo(2.91, 4);
+    await expect(globe.panelMeta).toContainText("Live question");
   });
+
+  test("an old ?bbox= link places the square at its centre and runs nothing", async ({ page }) => {
+    const runs = watchRuns(page);
+    await globe.goto(`?bbox=${BBOX}&lens=wildfire`);
+    await expect(globe.squareBar).toBeVisible();
+    await globe.expectScene((scene) => {
+      const [lon, lat] = scene.square?.centre ?? [0, 0];
+      expect(lon).toBeCloseTo(-74.755, 6);
+      expect(lat).toBeCloseTo(2.89, 6);
+    });
+    expect(runs).toEqual([]);
+
+    // The link's lens is kept for the square's first run.
+    await globe.useSquare.click();
+    const request = page.waitForRequest((entry) => entry.url().endsWith("/api/v1/explorations"));
+    await globe.placeAnalyse.click();
+    expect((await request).postDataJSON()).toMatchObject({ lens: "wildfire" });
+  });
+
+  test("an old ?geo= link falls back to the centre of its corners", async ({ page }) => {
+    const runs = watchRuns(page);
+    await globe.goto("?geo=-74.78,2.87_-74.73,2.87_-74.73,2.91_-74.78,2.91");
+    await expect(globe.squareBar).toBeVisible();
+    await globe.expectScene((scene) => {
+      const [lon, lat] = scene.square?.centre ?? [0, 0];
+      expect(lon).toBeCloseTo(-74.755, 6);
+      expect(lat).toBeCloseTo(2.89, 6);
+    });
+    expect(runs).toEqual([]);
+  });
+
+  test("the guided tour ignores clicks on the globe", async ({ page }) => {
+    await globe.goto("?story=1");
+    await globe.clickLand();
+    await expect(globe.squareBar).toBeHidden();
+    await expect(page).toHaveURL(/story=1/);
+    await globe.expectScene((scene) => expect(scene.square).toBeUndefined());
+  });
+
+  test.describe("on a phone", () => {
+    test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
+
+    test("the bar and Use this square fit the screen", async ({ page }) => {
+      await globe.goto();
+      await expect(page.getByTestId("hint-pill")).toHaveText("Tap any land to place a square");
+      await globe.placeSquare();
+      await expect(globe.useSquare).toBeInViewport({ ratio: 1 });
+      await expect(globe.squareCancel).toBeInViewport({ ratio: 1 });
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow).toBe(0);
+    });
+  });
+});
+
+test.describe("Explorer: dragging the square on the real globe", () => {
+  test(
+    "a click places the square and a mouse drag moves it east",
+    { tag: "@globe" },
+    async ({ page }) => {
+      const globe = new GlobePage(page);
+      await globe.skipOnboarding();
+      await globe.mockObservationPlan();
+      const runs = watchRuns(page);
+      await globe.goto();
+
+      await globe.placeSquare();
+      await expect(globe.square).toHaveAttribute("data-movable", "true");
+      await expect(page.getByTestId("square-label")).toHaveText("10 × 10 KM · 105 KM²");
+      const before = await globe.squareCentre();
+      expect(before).toBeDefined();
+
+      await globe.dragSquare({ dx: 80, dy: 0 });
+      await expect(async () => {
+        const after = await globe.squareCentre();
+        expect(after?.[0]).toBeGreaterThan(before?.[0] ?? 0);
+        // A drag sideways barely changes the latitude (the camera looks straight down).
+        expect(Math.abs((after?.[1] ?? 0) - (before?.[1] ?? 0))).toBeLessThan(0.02);
+      }).toPass({ timeout: 10_000 });
+      await expect(globe.squareBar).toBeVisible();
+      expect(runs).toEqual([]);
+    },
+  );
 });

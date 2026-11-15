@@ -21,8 +21,6 @@ export type DownloadItem = {
 type TopBarProps = {
   // L | S and Ascending / Descending, right after the search pill (SPECS-v8 top bar).
   switches: ReactNode;
-  // The area tools sit between the mode switch and the page links.
-  tools: ReactNode;
   cases: readonly Case[];
   searchInputRef: Ref<HTMLInputElement>;
   helpOpen: boolean;
@@ -53,7 +51,6 @@ const toggleFullScreen = () => {
 
 export const TopBar = ({
   switches,
-  tools,
   cases,
   searchInputRef,
   helpOpen,
@@ -132,7 +129,6 @@ export const TopBar = ({
         </button>
       </div>
       <span className="x-top__fill" />
-      {tools}
       <Link to="/cases" className="x-pill x-top__nav" testId="nav-cases">
         {TOP_BAR.linkCases}
       </Link>
