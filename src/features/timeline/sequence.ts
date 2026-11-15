@@ -1,4 +1,4 @@
-import { TIMELINE } from "@/content/copyV9";
+import { RESULT, TIMELINE } from "@/content/copyV9";
 import type { TimelineData } from "@/features/cases/cases";
 import { PASS_LABEL } from "@/features/frames/passLabel";
 import {
@@ -173,3 +173,55 @@ export const nearestStep = (lefts: number[], pct: number): number =>
       Math.abs(left - pct) < Math.abs((lefts[best] ?? Infinity) - pct) ? index : best,
     0,
   );
+
+// What the explorer needs to label the globe for the step in focus.
+export type StepView = {
+  mode: Sequence["mode"];
+  // The pass, or the pair's later pass.
+  date: string;
+  from: string;
+  // 1-based, as the copy counts.
+  i: number;
+  n: number;
+  // Days since the previous pass (passes) or across the pair (intervals); undefined on the first pass.
+  days: number | undefined;
+  target: boolean;
+};
+
+export const stepView = (
+  sequence: Sequence,
+  layout: TimelineLayout,
+  index: number,
+): StepView | undefined => {
+  const step = sequence.steps[index];
+  if (step === undefined) return undefined;
+  const before = sequence.steps[index - 1];
+  const pass = step.passIndex === undefined ? undefined : layout.passes[step.passIndex];
+  return {
+    mode: sequence.mode,
+    date: step.date,
+    from: step.from,
+    i: index + 1,
+    n: sequence.steps.length,
+    days:
+      sequence.mode === "intervals"
+        ? daysBetween(step.from, step.date)
+        : before === undefined
+          ? undefined
+          : daysBetween(before.date, step.date),
+    target: pass?.kind === "target",
+  };
+};
+
+// The globe stamp (COPY-flow-v9 §5): the date part and the rest, split as the stamp draws them.
+export const stampOf = (view: StepView): { date: string; pass: string; target: boolean } => {
+  const day = (iso: string) => formatDay(iso).toUpperCase();
+  const date = view.mode === "intervals" ? `${day(view.from)} → ${day(view.date)}` : day(view.date);
+  const full =
+    view.mode === "intervals"
+      ? RESULT.stampQuake(day(view.from), day(view.date), view.i, view.n, view.days ?? 0)
+      : view.days === undefined
+        ? RESULT.stampFirst(date, view.n)
+        : RESULT.stamp(date, view.i, view.n, view.days);
+  return { date, pass: full.slice(date.length + " · ".length), target: view.target };
+};

@@ -6,6 +6,8 @@ import {
   nearestStep,
   sequenceOf,
   sequenceReadout,
+  stampOf,
+  stepView,
 } from "@/features/timeline/sequence";
 import { layoutTimeline } from "@/features/timeline/timelineLayout";
 
@@ -176,5 +178,41 @@ describe("helpers", () => {
     expect(nearestStep([0, 30, 60, 100], 44)).toBe(1);
     expect(nearestStep([0, 30, 60, 100], 46)).toBe(2);
     expect(nearestStep([0, 30, 60, 100], 120)).toBe(3);
+  });
+});
+
+describe("globe stamp", () => {
+  it("names the reference pass, then each pass with the days since the one before", () => {
+    const { layout, sequence } = build(live);
+    const first = stepView(sequence, layout, 0);
+    const third = stepView(sequence, layout, 2);
+    if (first === undefined || third === undefined) throw new Error("steps exist");
+    expect(stampOf(first)).toEqual({
+      date: "14 JUL 2026",
+      pass: "PASS 1 OF 5 · REFERENCE",
+      target: false,
+    });
+    expect(stampOf(third)).toEqual({
+      date: "12 SEP 2026",
+      pass: "PASS 3 OF 5 · 24 DAYS AFTER PASS 2",
+      target: false,
+    });
+    expect(stepView(sequence, layout, 4)?.target).toBe(true);
+  });
+
+  it("names a pair as an interval with its length", () => {
+    const pair: TimelineData = {
+      ...live,
+      passes: [],
+      intervals: { items: [{ a: "2026-07-21", b: "2026-08-14" }], chain: false },
+    };
+    const { layout, sequence } = build(pair);
+    const view = stepView(sequence, layout, 0);
+    if (view === undefined) throw new Error("one pair");
+    expect(stampOf(view)).toEqual({
+      date: "21 JUL 2026 → 14 AUG 2026",
+      pass: "INTERVAL 1 OF 1 · 24 DAYS",
+      target: false,
+    });
   });
 });
