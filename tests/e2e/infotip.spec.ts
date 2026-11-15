@@ -7,6 +7,14 @@ const VIEWPORTS = [
 ] as const;
 const EDGE = 8;
 
+// Pushes to main run the suite on the production dist/, where the harness route doesn't exist.
+test.beforeEach(() => {
+  test.skip(
+    test.info().project.metadata["globe"] !== "stub",
+    "the harness only exists in the stub build",
+  );
+});
+
 const box = async (locator: Locator) => {
   const found = await locator.boundingBox();
   if (found === null) throw new Error("not laid out");
