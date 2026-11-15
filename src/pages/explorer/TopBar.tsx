@@ -32,6 +32,8 @@ type TopBarProps = {
   story: boolean;
   showReal: boolean;
   reduceMotion: boolean;
+  // Phones: the short search placeholder; the mark stands without the name (CSS).
+  phone: boolean;
   onHelp: (open: boolean) => void;
   onDownload: (open: boolean) => void;
   onSearch: (open: boolean) => void;
@@ -61,6 +63,7 @@ export const TopBar = ({
   story,
   showReal,
   reduceMotion,
+  phone,
   onHelp,
   onDownload,
   onSearch,
@@ -93,7 +96,7 @@ export const TopBar = ({
     <header className="x-top">
       <Link to="/" className="x-pill x-pill--mark">
         <BrandMark />
-        {TOP_BAR.wordmark}
+        <span className="x-pill__word">{TOP_BAR.wordmark}</span>
       </Link>
       {!story && (
         <div className="x-help x-top__search" ref={searchRef}>
@@ -104,6 +107,7 @@ export const TopBar = ({
             onPick={onPickPlace}
             onOpenCase={onOpenCase}
             inputRef={searchInputRef}
+            compact={phone}
           />
         </div>
       )}
@@ -137,7 +141,7 @@ export const TopBar = ({
       </Link>
       <button
         type="button"
-        className="x-icon-button"
+        className="x-icon-button x-top__globe"
         onClick={onWholeGlobe}
         aria-label={TOP_BAR.wholeGlobe}
         title={TOP_BAR.wholeGlobe}
