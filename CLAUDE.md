@@ -18,8 +18,9 @@ Pages (`src/App.tsx` switches on the pathname; no router dependency):
 - `/report?case=<id>` a printable one-page report for a measured case; `/report?exploration=<id>`
   the same for a live answer, fetched from the backend (`src/pages/report/`).
 
-Design source of truth: `docs/design/` (reading order in `docs/design/README.md`: `v8/` specs, copy
-and provenance on top of `v7/`; its team decisions win over the handoff). Visual system as built:
+Design source of truth: `docs/design/` (reading order in `docs/design/README.md`: the `v9/` explorer
+flow on top of `v8/` specs, copy and provenance, on top of `v7/`; its team decisions and v9 corrections
+win over the handoffs). Visual system as built:
 `DESIGN.md`.
 
 ## v8 foundations
