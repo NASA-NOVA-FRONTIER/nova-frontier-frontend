@@ -2,4 +2,5 @@ public/data
 pnpm-lock.yaml
 test-results
 dist
+dist-e2e-stub
 docs/design

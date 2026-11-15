@@ -7,6 +7,13 @@ import { viteStaticCopy } from "vite-plugin-static-copy";
 
 const CESIUM_BUILD = "node_modules/cesium/Build/Cesium";
 
+// E2E only (`pnpm build:e2e-stub`): a stub replaces the Cesium globe so UI tests skip its boot.
+// Production builds never set the flag; Vercel refuses it outright.
+const GLOBE_STUB = process.env.VITE_E2E_GLOBE === "stub";
+if (GLOBE_STUB && process.env.VERCEL !== undefined)
+  throw new Error("VITE_E2E_GLOBE=stub is for E2E builds only, never a Vercel deploy");
+const SRC = fileURLToPath(new URL("./src", import.meta.url));
+
 export default defineConfig({
   plugins: [
     react(),
@@ -21,7 +28,18 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
+    // Order matters: the stub's exact match must come before the "@" prefix.
+    alias: [
+      ...(GLOBE_STUB
+        ? [
+            {
+              find: /^@\/features\/globe\/GlobeView$/,
+              replacement: `${SRC}/features/globe/GlobeView.stub.tsx`,
+            },
+          ]
+        : []),
+      { find: "@", replacement: SRC },
+    ],
   },
   // /api reaches a local backend while developing; production proxies it through Vercel.
   server: {
