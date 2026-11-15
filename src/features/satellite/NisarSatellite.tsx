@@ -197,7 +197,11 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
           offsetX: p.offsetX ?? 0,
           time: reduced ? undefined : (now - t0) / 1000,
         });
-        placeHotspots(scene, (p.hotspots ?? false) && pose.deploy > HOTSPOT_MIN_DEPLOY);
+        // Taken apart, the step text names each piece, so the rings wait for the assembled model.
+        placeHotspots(
+          scene,
+          (p.hotspots ?? false) && pose.deploy > HOTSPOT_MIN_DEPLOY && pose.explode === 0,
+        );
         element.dataset.frames = String(loop.frames());
         if (!reduced && p.onFps !== undefined) {
           const avg = fps.tick(now);

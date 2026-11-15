@@ -667,7 +667,7 @@ export const createSatelliteScene = (
     if (part === null) return out.set(0, 0, 0);
     const o = anchors.get(lookAnchor[part]);
     if (o === undefined) return out.set(0, 0, 0);
-    return o.getWorldPosition(out).sub(target).multiplyScalar(0.6);
+    return o.getWorldPosition(out).sub(target).multiplyScalar(0.4);
   };
 
   const render = ({ pose, camera: pose3, offsetX, time }: FrameInput) => {
@@ -706,7 +706,7 @@ export const createSatelliteScene = (
       const lean = (from === null ? 0 : 1 - t) + (to === null ? 0 : t);
       camera.position
         .sub(target)
-        .multiplyScalar(1 - 0.45 * lean)
+        .multiplyScalar(1 - 0.2 * lean)
         .add(target)
         .add(shift);
       target.add(shift);

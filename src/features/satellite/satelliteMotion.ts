@@ -26,7 +26,7 @@ export type TeardownPart = (typeof TEARDOWN_PARTS)[number];
 /** How far each piece travels (model units, about metres) when the model is fully exploded. The
  * reflector rides on the boom tip, so its vector adds to the boom's. */
 export const EXPLODE_VECTORS: Record<TeardownPart, Vec3> = {
-  reflector: [2.2, 2.6, 0],
+  reflector: [1.6, 1.8, 0],
   boom: [1.4, 1.8, 0],
   radars: [0, 0.6, 0],
   bus: [0, -1.8, 0],
