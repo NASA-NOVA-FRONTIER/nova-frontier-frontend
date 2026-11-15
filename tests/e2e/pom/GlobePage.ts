@@ -41,7 +41,7 @@ export type SceneJson = {
   drape?: { url: string; bounds: BBox };
   drapeAlpha: number;
   stamp?: { date: string; pass: string; target: boolean; box: BBox };
-  square?: { centre: LonLat; sideKm: number; movable: boolean };
+  square?: { centre: LonLat; sideKm: number; movable: boolean; innerKm?: number };
 };
 
 // Stub twins of the pixel clicks: same outcome as the pixel they replace on the real globe.

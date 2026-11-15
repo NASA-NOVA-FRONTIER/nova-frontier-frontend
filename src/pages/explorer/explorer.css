@@ -1040,6 +1040,29 @@
   pointer-events: none;
 }
 
+/* The 5 × 5 km window live Earthquake measures at the centre (v9 correction C5). */
+.x-square__inner {
+  fill: rgba(201, 180, 139, 0.1);
+  stroke: var(--gold);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  pointer-events: none;
+}
+
+.x-square__inner-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--gold);
+  text-shadow: 0 1px 4px #04070e;
+}
+
 .x-square__label,
 .x-square__hint {
   position: absolute;
