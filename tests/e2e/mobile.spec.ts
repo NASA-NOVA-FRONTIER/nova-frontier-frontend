@@ -152,11 +152,12 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await expect(hv).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("layer-pill-hh")).toHaveAttribute("aria-pressed", "false");
 
-    // The compact strip sits on the sheet, without the time-lapse button.
+    // The compact strip sits on the sheet: previous, play and next, no speed or loop (v9 frames).
     await expect(globe.timeline).toBeVisible();
     const strip = await box(globe.timeline);
     expect(strip.y + strip.height).toBeLessThanOrEqual((await box(globe.panel)).y);
-    await expect(page.getByTestId("timeline-play")).toBeHidden();
+    await expect(page.getByTestId("timeline-play")).toBeVisible();
+    await expect(page.getByTestId("timeline-speed")).toBeHidden();
     await expectNovaAbove(page, globe.timeline);
     await expectNoSideScroll(page);
   });

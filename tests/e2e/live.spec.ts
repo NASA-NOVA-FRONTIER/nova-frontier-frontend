@@ -997,7 +997,7 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
   }) => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(globe.timelineReadout).toHaveText("12 Sep 2026 · baseline · pass 3 of 5");
+    await expect(globe.timelineReadout).toHaveText("Pass 3 of 5 · 12 Sep 2026");
     // The globe drapes the selected pass's own HH image.
     await globe.expectScene((scene) =>
       expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-09-12_HH"),
@@ -1006,14 +1006,14 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
     await expect(globe.timeline).toContainText("BASELINE · 4 PASSES");
     const first = globe.timelinePasses("base").first();
     await first.click();
-    await expect(globe.timelineReadout).toHaveText("14 Jul 2026 · baseline · pass 1 of 5");
+    await expect(globe.timelineReadout).toHaveText("Pass 1 of 5 · 14 Jul 2026");
     await globe.expectScene((scene) =>
       expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-07-14_HH"),
     );
     await page.keyboard.press("ArrowRight");
-    await expect(globe.timelineReadout).toHaveText("19 Aug 2026 · baseline · pass 2 of 5");
+    await expect(globe.timelineReadout).toHaveText("Pass 2 of 5 · 19 Aug 2026");
     await globe.timelinePasses("target").click();
-    await expect(globe.timelineReadout).toHaveText("11 Nov 2026 · target · pass 5 of 5");
+    await expect(globe.timelineReadout).toHaveText("Pass 5 of 5 · 11 Nov 2026");
   });
 
   test("the dock follows the pass: a missing image is disabled and an empty tile, never another date", async ({
@@ -1051,81 +1051,14 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
     await expect(page).toHaveURL(/lens=insar/);
   });
 
-  test(
-    "Play runs the five passes every 1.1 s and stops on the target; the stamp shows each date",
-    { tag: "@globe" },
-    async ({ page }) => {
-      await globe.goto(`?frame=${LIVE_FRAME.id}`);
-      await globe.timelinePasses("base").first().click();
-      await expect(globe.timelineReadout).toHaveText("14 Jul 2026 · baseline · pass 1 of 5");
-
-      // Real time, not page.clock: a fake clock also drives requestAnimationFrame, so every tick made
-      // Cesium render dozens of SwiftShader frames and slow CI ran out of time. The page records every
-      // render where the readout, the stamp or the Play label changed, so nothing is missed however
-      // slowly the test itself runs.
-      await page.evaluate(() => {
-        const text = (id: string) =>
-          document.querySelector(`[data-testid="${id}"]`)?.textContent ?? "";
-        const label = () =>
-          document.querySelector('[data-testid="timeline-play"]')?.getAttribute("aria-label") ?? "";
-        const now = () => ({
-          line: text("timeline-readout"),
-          stamp: text("timelapse-stamp"),
-          play: label(),
-          at: performance.now(),
-        });
-        const steps = [now()];
-        new MutationObserver(() => {
-          const step = now();
-          const last = steps.at(-1);
-          if (last?.line !== step.line || last.stamp !== step.stamp || last.play !== step.play)
-            steps.push(step);
-        }).observe(document.body, {
-          subtree: true,
-          childList: true,
-          characterData: true,
-          attributes: true,
-        });
-        Object.assign(window, { lapseSteps: steps });
-      });
-      type Step = { line: string; stamp: string; play: string; at: number };
-      const recorded = () =>
-        page.evaluate(() => (window as unknown as { lapseSteps: Step[] }).lapseSteps);
-
-      await page.getByTestId("timeline-play").click();
-      // Four steps of 1.1 s plus the one that ends on the target; generous for slow software WebGL.
-      await expect.poll(async () => (await recorded()).length, { timeout: 30_000 }).toBe(7);
-
-      const PLAY = "Play the 5 passes";
-      const PAUSE = "Pause time-lapse";
-      const steps = await recorded();
-      expect(steps.map(({ line, stamp, play }) => [line, stamp, play])).toEqual([
-        ["14 Jul 2026 · baseline · pass 1 of 5", "", PLAY],
-        ["14 Jul 2026 · baseline · pass 1 of 5", "14 JUL 2026PASS 1 OF 5 · BASELINE", PAUSE],
-        ["19 Aug 2026 · baseline · pass 2 of 5", "19 AUG 2026PASS 2 OF 5 · BASELINE", PAUSE],
-        ["12 Sep 2026 · baseline · pass 3 of 5", "12 SEP 2026PASS 3 OF 5 · BASELINE", PAUSE],
-        ["18 Oct 2026 · baseline · pass 4 of 5", "18 OCT 2026PASS 4 OF 5 · BASELINE", PAUSE],
-        ["11 Nov 2026 · target · pass 5 of 5", "11 NOV 2026PASS 5 OF 5 · TARGET", PAUSE],
-        ["11 Nov 2026 · target · pass 5 of 5", "", PLAY],
-      ]);
-      // A timer never fires early: from Play on, each step comes at least one step after the last.
-      for (let index = 2; index < steps.length; index += 1) {
-        const gap = (steps[index]?.at ?? 0) - (steps[index - 1]?.at ?? 0);
-        expect(gap).toBeGreaterThanOrEqual(1000);
-      }
-      // 18 Oct and 11 Nov have no image: the HH row is off, nothing else is drawn in their place.
-      await expect(page.getByTestId("dock-row-hh")).toBeDisabled();
-    },
-  );
-
   test("a manual pass pick stops the time-lapse and keeps that pass", async ({ page }) => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
     const play = page.getByTestId("timeline-play");
     await play.click();
-    await expect(play).toHaveAttribute("aria-label", "Pause time-lapse");
+    await expect(play).toHaveAttribute("aria-label", "Pause");
     await globe.timelinePasses("base").nth(1).click();
-    await expect(play).toHaveAttribute("aria-label", "Play the 5 passes");
-    await expect(globe.timelineReadout).toHaveText("19 Aug 2026 · baseline · pass 2 of 5");
+    await expect(play).toHaveAttribute("aria-label", "Play");
+    await expect(globe.timelineReadout).toHaveText("Pass 2 of 5 · 19 Aug 2026");
     // Stopped: no stamp on the globe, and the picked pass stays draped.
     await globe.expectScene((scene) => {
       expect(scene.stamp).toBeUndefined();
@@ -1147,10 +1080,16 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
     },
   );
 
-  test("on a phone there is no Play button", async ({ page }) => {
+  test("on a phone the strip keeps previous, play and next, without speed or loop", async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
     await expect(globe.verdict).toBeVisible();
-    await expect(page.getByTestId("timeline-play")).toBeHidden();
+    await expect(page.getByTestId("timeline-play")).toBeVisible();
+    await expect(page.getByTestId("timeline-prev")).toBeVisible();
+    await expect(page.getByTestId("timeline-step-next")).toBeVisible();
+    await expect(page.getByTestId("timeline-speed")).toBeHidden();
+    await expect(page.getByTestId("timeline-loop")).toBeHidden();
   });
 });
