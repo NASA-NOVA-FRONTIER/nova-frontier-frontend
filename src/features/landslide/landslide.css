@@ -1,0 +1,154 @@
+/* The landslide More information panel (#24), inside the explorer sheet. */
+
+.x-ls {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.x-ls__aftermath {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  background: var(--fill);
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.x-ls__aftermath p {
+  margin: 0;
+}
+
+.x-ls__title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.x-ls__imagery {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.x-ls__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.x-ls__chips button {
+  border: 1px solid var(--line);
+  background: #121e31;
+  color: var(--ink-2);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.x-ls__chips button[aria-pressed="true"] {
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
+.x-ls__chips button:focus-visible,
+.x-ls__bar:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.x-ls__channel {
+  align-self: flex-start;
+}
+
+.x-ls__image {
+  aspect-ratio: 1;
+  max-width: 520px;
+}
+
+.x-ls__imagery .x-split {
+  max-width: 520px;
+}
+
+.x-ls__imagery .x-split img {
+  image-rendering: pixelated;
+}
+
+.x-ls__plot {
+  height: 240px;
+  min-width: 0;
+}
+
+.x-ls__bars {
+  display: grid;
+  gap: 8px;
+}
+
+.x-ls__bar {
+  display: grid;
+  grid-template-columns: 96px minmax(60px, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.x-ls__bar[aria-pressed="true"] {
+  border-color: var(--gold);
+}
+
+.x-ls__bar-date {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.x-ls__bar-track {
+  height: 10px;
+  border-radius: 6px;
+  background: #1a273b;
+  overflow: hidden;
+}
+
+.x-ls__bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+}
+
+.x-ls__bar-value strong {
+  color: var(--ink);
+}
+
+.x-ls__table summary {
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.x-ls__how {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+@media (max-width: 560px) {
+  .x-ls__bar {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

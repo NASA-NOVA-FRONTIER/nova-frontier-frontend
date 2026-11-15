@@ -1,13 +1,19 @@
+import { NISCEMI } from "@/features/cases/niscemi";
 import type { LonLat } from "@/features/frames/frame.types";
+import type { LandslideEvidence } from "@/features/landslide/landslideEvidence";
 
 /*
  * Measured cases from the science backend (github.com/NASA-NOVA-FRONTIER/nova-frontier-model). Every number here
  * is copied from its reports; DATA_PROVENANCE in design_handoff_v7 says where each one comes from.
- * Pass dates on the timeline are DEMO (12-day spacing) until the backend serves the real ones.
+ * Pass dates on the timeline are DEMO (12-day spacing) until the backend serves the real ones,
+ * except where a case marks them `realDates` (Niscemi, copied from its series).
  */
 
 export type LensId =
   "flood_wetland" | "vegetation_disturbance" | "wildfire" | "agriculture" | "insar";
+// A measured case can also be read without a lens of its own: the model's descriptive
+// observed_dynamics (Niscemi). It is never a live lens, so it stays out of LENSES and LensId.
+export type CaseLensId = LensId | "observed_dynamics";
 export type HazardId = "earthquake" | "wildfire" | "deforestation" | "flood" | "landslide";
 export type IconId = HazardId | "agriculture";
 
@@ -40,13 +46,16 @@ export type TimelineData = {
   onset?: { date: string; label: string };
   optical: Array<{ date: string; label: string }>;
   opticalNote: string;
+  // The dates and "% outside range" come from the case's own series, not the 12-day demo.
+  realDates?: boolean;
 };
 
-export type Crops = { base: string; change: string; optical: string; signature: string };
+// Optical and signature exist only where the case had an optical stage (the flood cases).
+export type Crops = { base: string; change: string; optical?: string; signature?: string };
 
 export type Case = {
   id: string;
-  lens: LensId;
+  lens: CaseLensId;
   hazard: HazardId;
   name: string;
   place: string;
@@ -79,6 +88,8 @@ export type Case = {
   // Coherence only (Chocó): a measured median but no case layer, timeline or report.
   coherenceOnly?: boolean;
   tour?: boolean;
+  // A landslide case: its per-pass series and layers for the More information panel (#24).
+  landslide?: LandslideEvidence;
 };
 
 export type Lens = { id: LensId; chip: string; icon: IconId; compares: string };
@@ -116,7 +127,16 @@ export const LENSES: Lens[] = [
   },
 ];
 
-export const findLens = (id: LensId): Lens | undefined => LENSES.find((lens) => lens.id === id);
+// Docs/design/v8 PLAN-content-pages-v8 §0: "the radar checks whether passes bracket the event and
+// whether the slope kept its echo".
+export const OBSERVED_DYNAMICS = {
+  chip: "Did the slope keep its echo?",
+  icon: "landslide",
+  compares: "Every pass against the median of the first four, all after the event",
+} as const satisfies Omit<Lens, "id">;
+
+export const findLens = (id: CaseLensId): Omit<Lens, "id"> | undefined =>
+  id === "observed_dynamics" ? OBSERVED_DYNAMICS : LENSES.find((lens) => lens.id === id);
 
 // OPERA's optical classes (Okabe–Ito), so the colours match the backend legend.
 export const OPTICAL = {
@@ -451,6 +471,7 @@ export const CASES: Case[] = [
       opticalNote: "InSAR pair · no optical stage",
     },
   },
+  NISCEMI,
   {
     id: "choco",
     lens: "insar",

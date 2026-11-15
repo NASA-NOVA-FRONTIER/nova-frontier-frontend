@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 
 import { Icon } from "@/features/case-panel/icons";
-import { LENSES, type LensId } from "@/features/cases/cases";
+import { findLens, type CaseLensId } from "@/features/cases/cases";
 
 type CasePanelProps = {
   meta: string;
   title: string;
-  lens: LensId;
+  lens: CaseLensId;
   collapsed: boolean;
   // The lens buttons (LensPicker): the grid, or tabs above a lens result.
   picker: ReactNode;
@@ -30,7 +30,7 @@ export const CasePanel = ({
   children,
 }: CasePanelProps) => {
   if (collapsed) {
-    const chip = LENSES.find((item) => item.id === lens)?.chip ?? "";
+    const chip = findLens(lens)?.chip ?? "";
     return (
       <button
         type="button"

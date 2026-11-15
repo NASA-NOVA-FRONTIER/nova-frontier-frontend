@@ -286,7 +286,9 @@ const Witness = ({ item }: { item: Case }) => {
       {item.crops !== undefined && (
         <div className="x-story__tiles">
           <Tile src={item.crops.change} label={`NISAR change · ${targetDay(item)}`} />
-          <Tile src={item.crops.optical} label={opticalLabel} />
+          {item.crops.optical !== undefined && (
+            <Tile src={item.crops.optical} label={opticalLabel} />
+          )}
         </div>
       )}
       {group !== undefined && (
