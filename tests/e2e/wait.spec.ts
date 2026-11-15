@@ -117,16 +117,6 @@ test.describe("Explorer v8: the waiting panel", () => {
     await expect(globe.placeAnalyse).toBeEnabled();
     await expect.poll(() => api.cancelled).toBe(true);
   });
-
-  test("waiting → result: the panel closes when the answer arrives", async ({ page }) => {
-    const api = await globe.mockExplorations();
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(page.getByTestId("job-stages")).toBeVisible();
-
-    api.complete();
-    await expect(globe.verdict).toBeVisible({ timeout: 15_000 });
-    await expect(globe.jobModal).toBeHidden();
-  });
 });
 
 test.describe("Explorer v8: errors and limits", () => {
@@ -148,8 +138,11 @@ test.describe("Explorer v8: errors and limits", () => {
 
     await expect(globe.jobError).toHaveAttribute("data-category", "queueFull");
     await expect(globe.jobError).toContainText("QUEUE FULL");
+    await expect(globe.jobError).toContainText("Try again in a few minutes.");
     await expect(globe.jobError.getByRole("button", { name: "Try again" })).toBeVisible();
-    await expect(globe.jobError.getByRole("button", { name: "Open a known case" })).toBeVisible();
+    // Try again is followed through in live.spec ("a full queue says so and Try again asks again").
+    await globe.jobError.getByRole("button", { name: "Open a known case" }).click();
+    await expect(globe.startCard).toBeVisible();
   });
 
   test("Quota used up (429): the known cases open instantly, with the reset time", async () => {

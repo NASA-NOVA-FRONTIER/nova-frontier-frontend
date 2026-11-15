@@ -351,6 +351,10 @@ test.describe("Explorer: live exploration", () => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
     await expect(globe.verdict).toHaveAttribute("data-verdict", "within");
+    await expect(globe.verdict.getByTestId("prov-real")).toBeVisible();
+    // The passes are NASA's Observation Plan, the answer is the backend's.
+    await expect(globe.planPasses).toContainText("39 passes in the plan");
+    await expect(globe.planPasses.getByTestId("prov-real")).toBeVisible();
     await expect(globe.normalRange).toContainText("−1.2 dB");
     await expect(globe.normalRange).toContainText("−0.8 dB");
     await expect(globe.panel.getByTestId("prov-demo")).toHaveCount(0);

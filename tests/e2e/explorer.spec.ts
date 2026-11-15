@@ -172,23 +172,6 @@ test.describe("Explorer: measured cases", () => {
 });
 
 test.describe("Explorer: live questions", () => {
-  test("a frame link asks the radar: the passes are NASA's plan, the answer is the backend's", async ({
-    page,
-  }) => {
-    const globe = new GlobePage(page);
-    await globe.mockObservationPlan();
-    await globe.mockExplorations({ first: succeededView() });
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(globe.panelMeta).toContainText(`Live question · ${LIVE_FRAME.title}`);
-    await expect(globe.planPasses).toContainText("39 passes in the plan");
-    await expect(globe.planPasses.getByTestId("prov-real")).toBeVisible();
-    await expect(globe.verdict).toBeVisible();
-    await expect(globe.verdict.getByTestId("prov-real")).toBeVisible();
-    await expect(globe.verdict.getByTestId("prov-demo")).toHaveCount(0);
-    await expect(globe.verdict.getByTestId("prov-demo-dates")).toHaveCount(0);
-    await expect(page).toHaveURL(new RegExp(`frame=${LIVE_FRAME.id}`));
-  });
-
   test("the frame's next planned pass is the earliest one after today", async ({ page }) => {
     await page.clock.setFixedTime(new Date("2026-11-10T12:00:00Z"));
     const globe = new GlobePage(page);
@@ -214,20 +197,6 @@ test.describe("Explorer: live questions", () => {
     await expect(globe.verdict).toBeVisible();
     await page.getByTestId("plan-error").getByRole("button", { name: "Try again" }).click();
     await expect(globe.planPasses).toContainText("39 passes in the plan");
-  });
-
-  test("a full queue asks to wait; Open a known case goes back to the list", async ({ page }) => {
-    const globe = new GlobePage(page);
-    await globe.mockObservationPlan();
-    await globe.mockExplorations({
-      startProblems: [
-        { status: 503, reasonCode: "QUEUE_FULL", detail: "5 explorations are running" },
-      ],
-    });
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(globe.jobError).toContainText("Try again in a few minutes.");
-    await globe.jobError.getByRole("button", { name: "Open a known case" }).click();
-    await expect(globe.startCard).toBeVisible();
   });
 
   test("another lens on a case re-runs it as a live question", async ({ page }) => {
@@ -282,7 +251,7 @@ test.describe("Explorer: v8 top bar", () => {
     await globe.mockObservationPlan();
   });
 
-  test("search pill and L | S follow the wordmark; an open case adds no context pill", async ({
+  test("search pill and L | S follow the wordmark, an open case adds no context pill; links fold as it narrows", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -296,11 +265,9 @@ test.describe("Explorer: v8 top bar", () => {
 
     const pill = await globe.searchPill.boundingBox();
     expect(pill?.width).toBeCloseTo(340, 0);
-  });
 
-  test("the mode switch hides below 1280 px and the page links below 1120 px", async ({ page }) => {
+    // The mode switch hides below 1280 px and the page links below 1120 px.
     await page.setViewportSize({ width: 1300, height: 900 });
-    await globe.goto();
     await expect(page.getByTestId("mode-explore")).toBeVisible();
     await expect(page.getByTestId("nav-cases")).toBeVisible();
 
