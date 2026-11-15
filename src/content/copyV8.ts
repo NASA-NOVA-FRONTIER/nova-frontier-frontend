@@ -516,3 +516,17 @@ export const STEP_8 = {
   showPartial: "Show what arrived",
   instant: "INSTANT",
 } as const;
+
+// Not in COPY-v8: Nova answered by Claude (#31). Rule-based stays the label whenever Claude isn't
+// answering, so the chat never claims more than it is.
+export const NOVA_AI = {
+  ruleLine: "Rule-based assistant · not an AI model yet",
+  aiLine: "Answers by Claude from the result on screen · check numbers against the panel",
+  aiChip: (model: string) =>
+    `Written by Claude (${model}) from the result on screen. It can be wrong: every number is on the panel with its source.`,
+  ruleChip:
+    "Rule-based answers from the data on screen. Real version: a language model that cites the case sources",
+  writing: "Nova is writing…",
+  by: "Written by Claude from the result on screen",
+  fallback: "Claude couldn't answer this, so here is the rule-based answer.",
+} as const;
