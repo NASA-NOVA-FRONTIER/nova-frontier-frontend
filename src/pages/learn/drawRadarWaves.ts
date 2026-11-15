@@ -223,14 +223,22 @@ const label = (g: CanvasRenderingContext2D, text: string, x: number, y: number):
   g.fillText(text, x, y);
 };
 
-const leader = (g: CanvasRenderingContext2D, scene: Scene, y: number, text: string): void => {
+// `before` puts the label on the far side of the leader, clear of the 24 cm bar in the corner.
+const leader = (
+  g: CanvasRenderingContext2D,
+  scene: Scene,
+  y: number,
+  text: string,
+  before = false,
+): void => {
   g.strokeStyle = "rgba(235,233,228,0.4)";
   g.lineWidth = 1;
   g.beginPath();
   g.moveTo(scene.W - 70, y);
   g.lineTo(scene.W - 90, y);
   g.stroke();
-  label(g, text, scene.W - 85, y + 3);
+  const x = before ? scene.W - 94 - g.measureText(text).width : scene.W - 85;
+  label(g, text, x, y + 3);
 };
 
 export const drawFrame = (
@@ -328,7 +336,7 @@ export const drawFrame = (
 
   leader(g, scene, canopyTop + canopyH * 0.2, RADAR_WAVES_COPY.leaves);
   leader(g, scene, canopyTop + canopyH * 0.62, RADAR_WAVES_COPY.branches);
-  leader(g, scene, groundY + (H - groundY) * 0.5, RADAR_WAVES_COPY.soil);
+  leader(g, scene, groundY + (H - groundY) * 0.5, RADAR_WAVES_COPY.soil, true);
 
   // Reach line and its label.
   g.setLineDash([3, 5]);
