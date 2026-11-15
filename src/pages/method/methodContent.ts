@@ -295,6 +295,12 @@ export const SAT_STAGE = {
   footnote: "MODEL BUILT TO NASA/JPL PUBLISHED DIMENSIONS · TOUCH THE GOLD RINGS",
   // Under the static photo (no WebGL) the credit replaces any claim about the model.
   photoCaption: "Artist's concept, NASA/JPL-Caltech.",
+  // The phone list's second photo: image, alt and credit as on Learn (learnResources.ts, "Apply").
+  deployPhoto: {
+    src: "/landing/reflector-deployment.jpg",
+    alt: "Mission control room during NISAR's reflector deployment",
+    caption: "MISSION OPERATIONS, REFLECTOR DEPLOYMENT · NASA/JPL-CALTECH",
+  },
 } as const;
 
 export type Palette = { title: string; bar: string; left: string; right: string; note: string };

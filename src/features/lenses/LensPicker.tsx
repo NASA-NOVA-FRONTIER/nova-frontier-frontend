@@ -1,4 +1,4 @@
-import { LENS_CARD, LENS_COPY, STEP_3, STEP_4 } from "@/content/copyV8";
+import { CASE_LOCK, LENS_CARD, LENS_COPY, STEP_3, STEP_4 } from "@/content/copyV8";
 import { Icon } from "@/features/case-panel/icons";
 import { HazardIcon } from "@/features/cases/HazardIcon";
 import { findLens, type CaseLensId, type LensId } from "@/features/cases/cases";
@@ -54,18 +54,25 @@ type Props = {
   // Tabs above a lens result; the full grid otherwise.
   tabs: boolean;
   running: LensRun | undefined;
+  // A demo case (issue #28): why its analysis is fixed. Only its own lens stays on.
+  locked?: string | undefined;
   onLens: (lens: LensId) => void;
   onCancel: () => void;
 };
 
 // The four lenses, their questions and ground motion (decision 2): every control picks a lens the
 // same way, so a question link and its button ask the same run and write the same shared link.
-export const LensPicker = ({ lens, tabs, running, onLens, onCancel }: Props) => {
+export const LensPicker = ({ lens, tabs, running, locked, onLens, onCancel }: Props) => {
+  // A locked picker never offers another lens: a demo case can't turn into a live question.
+  const off = (id: LensId) => locked !== undefined && id !== lens;
+  const why = (id: LensId) => (off(id) ? CASE_LOCK.buttonWhy : undefined);
   const ground = (
     <button
       type="button"
       className={tabs ? "x-ltab x-ltab--ground" : "x-lground"}
       aria-pressed={lens === "insar"}
+      disabled={off("insar")}
+      title={why("insar")}
       onClick={() => onLens("insar")}
       data-testid="lens-insar"
     >
@@ -83,6 +90,8 @@ export const LensPicker = ({ lens, tabs, running, onLens, onCancel }: Props) => 
             type="button"
             className="x-ltab"
             aria-pressed={id === lens}
+            disabled={off(id)}
+            title={why(id)}
             onClick={() => onLens(id)}
             data-testid={`lens-${id}`}
           >
@@ -94,8 +103,13 @@ export const LensPicker = ({ lens, tabs, running, onLens, onCancel }: Props) => 
       </div>
     );
   return (
-    <div className="x-lpick" data-testid="lens-picker">
+    <div className="x-lpick" data-testid="lens-picker" data-locked={locked !== undefined}>
       <p className="x-kicker x-lpick__title">{STEP_4.lensTitle}</p>
+      {locked !== undefined && (
+        <p className="x-lpick__lock" role="note" data-testid="lens-locked">
+          {locked}
+        </p>
+      )}
       <div role="group" aria-label="Lens" className="x-lgrid">
         {CARD_LENSES.map((id) => (
           <button
@@ -104,6 +118,8 @@ export const LensPicker = ({ lens, tabs, running, onLens, onCancel }: Props) => 
             className="x-lbtn"
             aria-pressed={id === lens}
             data-running={running?.lens === id || undefined}
+            disabled={off(id)}
+            title={why(id)}
             onClick={() => onLens(id)}
             data-testid={`lens-${id}`}
           >

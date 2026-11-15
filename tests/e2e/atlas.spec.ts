@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test.describe("Landing surface atlas", () => {
   test("opens on Chenab and expands a tile on keyboard focus and click", async ({ page }) => {

@@ -107,7 +107,8 @@ import { nearestCase, squareSideKm } from "@/features/spot/spot";
 import { StoryMode } from "@/features/story/StoryMode";
 import { PassTimeline } from "@/features/timeline/PassTimeline";
 import { formatDay } from "@/features/timeline/timelineLayout";
-import { STEP_4, passOf } from "@/content/copyV8";
+import { CASE_LOCK, STEP_4, passOf } from "@/content/copyV8";
+import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { useAsync } from "@/lib/useAsync";
 import { PHONE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import { useNow } from "@/lib/useNow";
@@ -134,8 +135,6 @@ type Selection =
       point: LonLat;
       area: Area;
       lens: LensId;
-      // A live question started from a case's lens chips can go back to that case.
-      fromCase: Case | undefined;
       // Ground motion measures one pair, chosen first from the picker.
       insar: InsarChoice | undefined;
       run: number;
@@ -248,7 +247,6 @@ export const ExplorerPage = () => {
       area: initial.area,
       lens: initial.lens,
       frame: undefined,
-      fromCase: undefined,
       insar: initial.insar,
       run: 0,
       lensSwitch: false,
@@ -307,7 +305,6 @@ export const ExplorerPage = () => {
       frame: Frame | undefined,
       point: LonLat,
       lens: LensId = DEFAULT_LENS,
-      fromCase?: Case,
       area?: Area,
       insar?: InsarChoice,
       lensSwitch = false,
@@ -318,7 +315,6 @@ export const ExplorerPage = () => {
         point,
         area: area ?? { kind: "point", point },
         lens,
-        fromCase,
         insar,
         run: previous?.kind === "live" ? previous.run + 1 : 0,
         lensSwitch,
@@ -341,7 +337,7 @@ export const ExplorerPage = () => {
         linkRef.current = null;
         const frame = loaded.find((entry) => entry.id === linked);
         if (frame !== undefined)
-          ask(frame, bboxCentre(frame), initial.lens, undefined, undefined, initial.insar);
+          ask(frame, bboxCentre(frame), initial.lens, undefined, initial.insar);
         setLinkPending(false);
       }
       return loaded;
@@ -380,7 +376,7 @@ export const ExplorerPage = () => {
   const askArea = useCallback(
     (area: Area) => {
       const centre = centreOf(area);
-      ask(frameUnder(framesRef.current, centre), centre, DEFAULT_LENS, undefined, area);
+      ask(frameUnder(framesRef.current, centre), centre, DEFAULT_LENS, area);
     },
     [ask],
   );
@@ -701,37 +697,16 @@ export const ExplorerPage = () => {
 
   const chooseLens = (lens: LensId) => {
     setLapseFor("");
-    if (selection === undefined) return;
-    if (selection.kind === "case") {
-      if (lens === selection.item.lens) return;
-      const frame = frameUnder(frames, selection.item.focus);
-      ask(frame, selection.item.focus, lens, selection.item);
-      return;
-    }
+    // Issue #28: a demo case keeps the analysis it was computed with; it never becomes a live question.
+    if (selection === undefined || selection.kind === "case") return;
     if (lens === selection.lens) return;
-    if (selection.fromCase !== undefined && lens === selection.fromCase.lens) {
-      openCase(selection.fromCase);
-      return;
-    }
-    ask(
-      selection.frame,
-      selection.point,
-      lens,
-      selection.fromCase,
-      selection.area,
-      undefined,
-      true,
-    );
+    ask(selection.frame, selection.point, lens, selection.area, undefined, true);
   };
 
   // The pair is chosen after the lens: the choice starts the run and goes into the shared link.
   const measurePair = (current: typeof live, choice: InsarChoice) => {
     if (current === undefined) return;
-    ask(current.frame, current.point, current.lens, current.fromCase, current.area, choice);
-  };
-  const measureLivePair = (fromCase: Case) => {
-    const frame = frameUnder(frames, fromCase.focus);
-    ask(frame, fromCase.focus, "insar", fromCase);
+    ask(current.frame, current.point, current.lens, current.area, choice);
   };
 
   const item = selection?.kind === "case" ? selection.item : undefined;
@@ -1217,6 +1192,7 @@ export const ExplorerPage = () => {
                   : ""
             }
             lens={item?.lens ?? live?.lens ?? DEFAULT_LENS}
+            chip={item !== undefined && <ProvenanceChip kind="offline" />}
             collapsed={collapsed || sheetOpen}
             result={showLensCard}
             picker={
@@ -1224,6 +1200,7 @@ export const ExplorerPage = () => {
                 lens={item?.lens ?? live?.lens ?? DEFAULT_LENS}
                 tabs={showLensCard}
                 running={lensRun}
+                locked={item && CASE_LOCK.note(findLens(item.lens)?.chip ?? item.lens)}
                 onLens={chooseLens}
                 onCancel={() => void exploration.cancel()}
               />
@@ -1257,16 +1234,6 @@ export const ExplorerPage = () => {
             )}
             {subject !== undefined && !showLensCard && (
               <ResultSummary subject={subject} mode={mode} onMore={openSheet} />
-            )}
-            {item !== undefined && item.coherenceOnly !== true && item.lens === "insar" && (
-              <button
-                type="button"
-                className="x-ghost"
-                onClick={() => measureLivePair(item)}
-                data-testid="measure-live-pair"
-              >
-                Measure a live NISAR pair here
-              </button>
             )}
             {live !== undefined && needsPair && (
               <InsarPairPicker

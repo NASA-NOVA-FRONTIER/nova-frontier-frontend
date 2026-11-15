@@ -12,9 +12,9 @@ import {
 } from "cesium";
 import { useEffect, useRef, useState } from "react";
 
-import { coherenceOnlyLabel, findLens, type Case } from "@/features/cases/cases";
+import type { Case } from "@/features/cases/cases";
 import type { BBox, Frame, LonLat } from "@/features/frames/frame.types";
-import { findFrameAt } from "@/features/frames/frames";
+import { frameUnder } from "@/features/frames/frames";
 import type { DrawEvent, Pointer } from "@/features/geo/drawMachine";
 import type { DrawTool } from "@/features/geo/geo.types";
 import { wrapBox } from "@/features/geo/longitude";
@@ -40,8 +40,13 @@ import {
   type Drape,
 } from "@/features/globe/frameEntities";
 import { framedBox, viewInsets, type GlobeView as View } from "@/features/globe/framing";
-import { GlobeTooltip, type TooltipContent } from "@/features/globe/GlobeTooltip";
-import { formatLonLat } from "@/features/live/liveQuestion";
+import {
+  GlobeTooltip,
+  StampLabel,
+  type GlobeStamp,
+  type TooltipContent,
+} from "@/features/globe/GlobeTooltip";
+import { caseTooltip, frameTooltip } from "@/features/globe/tooltipText";
 
 const HOME = Cartesian3.fromDegrees(-20, 18, 21_000_000); // the Atlantic: four of the five cases
 const ARRIVAL = Cartesian3.fromDegrees(-20, 18, 32_000_000);
@@ -54,8 +59,7 @@ const SPIN_RADIANS_PER_TICK = -0.0005;
 // `seconds` overrides the flight time (the story's region view flies a little slower).
 export type CameraTarget = { key: string; box: BBox; zoom: number; seconds?: number };
 
-// The time-lapse stamp under the footprint (SPECS-v8 §4), shown while it plays.
-export type GlobeStamp = { date: string; pass: string; target: boolean; box: BBox };
+export type { GlobeStamp };
 
 export type GlobeScene = {
   target: CameraTarget | undefined;
@@ -68,7 +72,7 @@ export type GlobeScene = {
   stamp: GlobeStamp | undefined;
 };
 
-type GlobeViewProps = {
+export type GlobeViewProps = {
   frames: Frame[];
   cases: Case[];
   scene: GlobeScene;
@@ -89,10 +93,6 @@ type GlobeViewProps = {
 };
 
 type Hover = { content: TooltipContent; x: number; y: number; frame?: Frame };
-
-// Ascending frames first, as the mission plans most science passes; descending fills the gaps.
-const frameUnder = (frames: Frame[], point: LonLat): Frame | undefined =>
-  findFrameAt(frames, point, "A") ?? findFrameAt(frames, point, "D");
 
 export const GlobeView = ({
   frames,
@@ -193,11 +193,7 @@ export const GlobeView = ({
       const { x, y } = endPosition;
       const item = caseAt(endPosition);
       if (item !== undefined) {
-        const what =
-          item.coherenceOnly === true
-            ? coherenceOnlyLabel(item)
-            : `Measured case · ${findLens(item.lens)?.chip ?? ""}`;
-        setHover({ content: { title: item.name, sub: what }, x, y });
+        setHover({ content: caseTooltip(item), x, y });
         return;
       }
       const point = pickLonLat(viewer, endPosition);
@@ -206,15 +202,7 @@ export const GlobeView = ({
         setHover(undefined);
         return;
       }
-      setHover({
-        content: {
-          title: `Track ${frame.track} · Frame ${frame.frame} · ${frame.hasCrossPol ? "HH+HV" : "HH only"}`,
-          sub: `${formatLonLat(point)} · NISAR frame ~240 km · click to ask the radar`,
-        },
-        x,
-        y,
-        frame,
-      });
+      setHover({ content: frameTooltip(frame, point), x, y, frame });
     }, ScreenSpaceEventType.MOUSE_MOVE);
     handler.setInputAction(({ position }: ScreenSpaceEventHandler.PositionedEvent) => {
       if (latest.current.drawTool !== undefined) {
@@ -420,14 +408,7 @@ export const GlobeView = ({
       onMouseLeave={() => setHover(undefined)}
     >
       <div ref={containerRef} className="x-globe" />
-      {scene.stamp !== undefined && (
-        <p className="x-stamp" ref={stampRef} data-testid="timelapse-stamp">
-          <span className="x-stamp__date">{scene.stamp.date}</span>
-          <span className="x-stamp__pass" data-target={scene.stamp.target}>
-            {scene.stamp.pass}
-          </span>
-        </p>
-      )}
+      {scene.stamp !== undefined && <StampLabel stamp={scene.stamp} ref={stampRef} />}
       {hover !== undefined && <GlobeTooltip content={hover.content} x={hover.x} y={hover.y} />}
     </div>
   );

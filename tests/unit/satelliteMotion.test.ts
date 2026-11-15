@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   cameraPose,
+  EXPLODE_VECTORS,
   hotspotVisible,
   INITIAL_ORBIT,
   orbitByDrag,
@@ -9,6 +10,8 @@ import {
   pixelRatioFor,
   satellitePose,
   smoothstep,
+  type StagePose,
+  TEARDOWN_PARTS,
   tipPosition,
   trackProgress,
 } from "@/features/satellite/satelliteMotion";
@@ -111,5 +114,41 @@ describe("hotspots", () => {
   it("flips the tooltip left near the right edge", () => {
     expect(tipPosition(100, 200, 800, 600).left).toBe(118);
     expect(tipPosition(700, 200, 800, 600).left).toBe(432);
+  });
+});
+
+describe("teardown stage", () => {
+  const stage: StagePose = {
+    deploy: 0.4,
+    beam: 0.2,
+    zoom: 0.8,
+    explode: 1,
+    parts: { reflector: 1, boom: 0.15, radars: 0.15, bus: 0.15, solar: 0.15 },
+    look: { from: null, to: "reflector", t: 1 },
+  };
+
+  it("without a stage the pose is the one the Landing always had: assembled, nothing faded", () => {
+    for (const over of [{}, { scrollDriven: true, progress: 0.5 }, { reduced: true }]) {
+      const p = pose(over);
+      expect(p.explode).toBe(0);
+      expect(Object.values(p.parts)).toEqual([1, 1, 1, 1, 1]);
+      expect(p.look).toEqual({ from: null, to: null, t: 0 });
+    }
+  });
+
+  it("a stage replaces the scroll mapping, also under reduced motion", () => {
+    for (const reduced of [false, true]) {
+      const p = pose({ scrollDriven: true, progress: 0.9, reduced, stage });
+      expect(p.deploy).toBe(0.4);
+      expect(p.beam).toBe(0.2);
+      expect(p.zoom).toBe(0.8);
+      expect(p.explode).toBe(1);
+      expect(p.parts.boom).toBe(0.15);
+      expect(p.look.to).toBe("reflector");
+    }
+  });
+
+  it("every piece has an explode vector", () => {
+    expect(Object.keys(EXPLODE_VECTORS).sort()).toEqual([...TEARDOWN_PARTS].sort());
   });
 });

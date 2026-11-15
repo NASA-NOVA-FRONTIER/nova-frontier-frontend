@@ -7,6 +7,21 @@ import { bandOf, demoBandPasses, isOutside, verdictOf } from "@/features/cases/d
 const SHIPPED = new Set(Object.keys(import.meta.glob("/public/cases/**/*.png")));
 
 describe("measured cases", () => {
+  // Issue #28: one demo case per phenomenon; no phenomenon gets a second, swappable example.
+  it("keep exactly one demo case per phenomenon", () => {
+    const hazards = CASES.map((item) => item.hazard);
+    expect(new Set(hazards).size).toBe(hazards.length);
+    expect(CASES.map((item) => `${item.hazard} ${item.id}`)).toEqual([
+      "flood qadirabad",
+      "earthquake choco",
+      "wildfire bug-fire",
+      "deforestation rowe-creek",
+      "agriculture skollersta",
+      // #24: the landslide case, the model's only one.
+      "landslide niscemi-aftermath",
+    ]);
+  });
+
   it("only publish shares that match the backend's counts", () => {
     // The panel headline must agree with the bars it summarises: 332/516 is the 64.3% in the stat.
     const qadirabad = CASES.find((item) => item.id === "qadirabad");

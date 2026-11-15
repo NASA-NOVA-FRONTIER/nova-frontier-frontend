@@ -14,8 +14,9 @@ export type LensId =
 // A measured case can also be read without a lens of its own: the model's descriptive
 // observed_dynamics (Niscemi). It is never a live lens, so it stays out of LENSES and LensId.
 export type CaseLensId = LensId | "observed_dynamics";
-export type HazardId = "earthquake" | "wildfire" | "deforestation" | "flood" | "landslide";
-export type IconId = HazardId | "agriculture";
+export type HazardId =
+  "earthquake" | "wildfire" | "deforestation" | "flood" | "landslide" | "agriculture";
+export type IconId = HazardId;
 
 // The backend's three outcomes: observed_departure, within_observed_baseline, insufficient_data.
 export type Verdict = "departure" | "within" | "insufficient";
@@ -150,6 +151,7 @@ export const OPTICAL = {
 
 const EMPTY_FLOOD = ["Flood depth", "Probability", "Cause", "Validated extent"];
 const MODELING = "https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model/blob/main/docs";
+const BACKEND = "https://github.com/NASA-NOVA-FRONTIER/nova-frontier-backend";
 
 const pass = (date: string, kind: PassKind, outsidePct?: number): TimelinePass =>
   outsidePct === undefined ? { date, kind } : { date, kind, outsidePct };
@@ -161,6 +163,8 @@ const crops = (id: string): Crops => ({
   signature: `/cases/${id}-signature.png`,
 });
 
+// Issue #28: exactly one demo case per phenomenon (Case.hazard), each precomputed and shown
+// OFFLINE, with its lens fixed. Phenomena without real precomputed numbers have no case.
 export const CASES: Case[] = [
   {
     id: "qadirabad",
@@ -255,224 +259,6 @@ export const CASES: Case[] = [
     },
   },
   {
-    id: "chokwe",
-    lens: "flood_wetland",
-    hazard: "flood",
-    name: "Chókwè",
-    place: "Limpopo River, Mozambique",
-    region: "Gaza · Limpopo",
-    focus: [32.99, -24.52],
-    chipKm: 5.12,
-    when: "Jan 2026",
-    target: "2026-01-17",
-    verdict: "departure",
-    verdictLine:
-      "New-water cells darkened against matched dry cells, but only one assessment pass exists.",
-    band: "departure",
-    stat: "37.3% vs 0.7%",
-    statLine: "of new-water cells flagged, against dry land.",
-    groups: [
-      {
-        title: "Flagged by the radar rule",
-        sub: "first assessment minus the baseline median",
-        rows: [
-          { label: "New water (optical)", k: 164, n: 440, color: OPTICAL.newWater },
-          { label: "Stayed dry (optical)", k: 20, n: 2881, color: OPTICAL.dry },
-        ],
-      },
-    ],
-    matched: {
-      title: "Matched pairs · HH, new water minus dry land",
-      n: "382 pairs with similar radar before the flood",
-      v: -4.34,
-      ci: [-5.08, -3.47],
-      line: "Spatial resampling puts it between −5.08 and −3.47 dB.",
-    },
-    witness: {
-      label: "OPERA DSWx-HLS · 7 Jan → 22 Jan",
-      note: "Only 22.8% of cells had usable optical views",
-    },
-    quality: [
-      { k: "Status", v: "Partial", why: "Cloud gaps: 22.8% joint optical support." },
-      { k: "Passes", v: "4 + 1", why: "One assessment pass, so persistence can't be measured." },
-      { k: "Product", v: "Beta", why: "Beta GCOV calibration and a wet-season baseline." },
-    ],
-    plainLimit:
-      "Clouds hid most of the area from the optical satellite, and the radar looked only once after the flood.",
-    techLimit:
-      "The strict new-water group's median HH change is −2.35 dB, below the 3 dB diagnostic threshold. Temporal persistence or signal return can't be measured from one assessment.",
-    alternatives: ["Wet-season soil moisture", "Crops", "Cloud-hidden water"],
-    empties: EMPTY_FLOOD,
-    sources: [
-      {
-        label: "nova-frontier-model · flood characterization",
-        href: `${MODELING}/FLOOD_CHARACTERIZATION.md`,
-      },
-      { label: "nova-frontier-model · flood validation", href: `${MODELING}/FLOOD_VALIDATION.md` },
-    ],
-    figure: "/cases/figures/chokwe_flood_evidence.png",
-    crops: crops("chokwe"),
-    timeline: {
-      passes: [
-        pass("2025-11-30", "base"),
-        pass("2025-12-12", "base"),
-        pass("2025-12-24", "base"),
-        pass("2026-01-05", "base"),
-        pass("2026-01-17", "target", 17.6),
-      ],
-      start: "2025-11-20",
-      end: "2026-02-10",
-      today: "2026-02-10",
-      optical: [
-        { date: "2026-01-07", label: "OPERA · pre · 7 Jan" },
-        { date: "2026-01-22", label: "OPERA · post · 22 Jan" },
-      ],
-      opticalNote: "Optical check: OPERA 7 Jan → 22 Jan · 22.8% joint coverage",
-    },
-  },
-  {
-    id: "richmond",
-    lens: "flood_wetland",
-    hazard: "flood",
-    name: "Richmond",
-    place: "Indiana, USA",
-    region: "Indiana · flash flood",
-    focus: [-84.89, 39.83],
-    chipKm: 5.12,
-    when: "Aug 2026",
-    target: "2026-08-16",
-    verdict: "insufficient",
-    verdictLine:
-      "The radar looked three days after the 12–13 Aug flash flood, and optical views found no new water to compare.",
-    band: "within",
-    reason:
-      "No new-water group was resolved on the 13.2% of cells with usable optical views. That doesn't mean no flood happened.",
-    stat: "0 cells",
-    statLine: "of new water resolved by the optical snapshots, so there's nothing to score.",
-    witness: { label: "OPERA DSWx-HLS · 22 Jul → 21 Aug", note: "13.2% joint optical support" },
-    quality: [
-      { k: "Status", v: "Partial", why: "Partial native radar support; small optical subset." },
-      {
-        k: "Timing",
-        v: "+3 days",
-        why: "First radar pass came after the reported flood interval.",
-      },
-      { k: "Dry land", v: "0.15% flagged", why: "8 of 5,249 stable dry cells." },
-    ],
-    plainLimit:
-      "A short flash flood can be gone before the satellite returns. Missing evidence isn't proof nothing happened.",
-    techLimit:
-      "Recall is null because there are no positives. Optical support is reported against the 40,390 radar-supported cells, not the full 65,536-cell grid.",
-    alternatives: ["Flood receded before the pass", "Cloud-hidden water", "Urban surfaces"],
-    empties: EMPTY_FLOOD,
-    sources: [
-      {
-        label: "NWS Wilmington · 13 Aug 2026 flash flooding",
-        href: "https://www.weather.gov/iln/20260813",
-      },
-      {
-        label: "nova-frontier-model · flood characterization",
-        href: `${MODELING}/FLOOD_CHARACTERIZATION.md`,
-      },
-    ],
-    figure: "/cases/figures/richmond_flood_evidence.png",
-    crops: crops("richmond"),
-    timeline: {
-      passes: [
-        pass("2026-06-29", "base"),
-        pass("2026-07-11", "base"),
-        pass("2026-07-23", "base"),
-        pass("2026-08-04", "base"),
-        pass("2026-08-16", "target", 0.4),
-        pass("2026-08-28", "meas", 0.3),
-        pass("2026-09-09", "meas", 0.2),
-        pass("2026-09-21", "meas", 0.2),
-        pass("2026-11-14", "plan"),
-      ],
-      start: "2026-06-20",
-      end: "2026-11-25",
-      today: "2026-11-08",
-      onset: { date: "2026-08-12", label: "Flash flood 12–13 Aug" },
-      optical: [
-        { date: "2026-07-22", label: "OPERA · pre · 22 Jul" },
-        { date: "2026-08-21", label: "OPERA · post · 21 Aug" },
-      ],
-      opticalNote: "Optical check: OPERA 22 Jul → 21 Aug · 13.2% joint coverage",
-    },
-  },
-  {
-    id: "kumamoto",
-    lens: "insar",
-    hazard: "earthquake",
-    name: "Kumamoto",
-    place: "Kyushu, Japan",
-    region: "Earthquake · 28 Jul 2026",
-    focus: [130.65, 32.65],
-    when: "Jul 2026",
-    target: "2026-08-14",
-    verdict: "measured",
-    verdictLine:
-      "Cells in a 5 km window that kept their phase at the 0.35 coherence threshold, 21 Jul → 14 Aug 2026. Published as coherence and wrapped phase.",
-    reason:
-      "The phase is wrapped and not corrected for troposphere or ionosphere, so no displacement is reported.",
-    // Backend run (README "Measured on 2026-11-12"): windowCells 62,500, phaseCells 39,584.
-    stat: "39,584 of 62,500",
-    statLine: "cells kept their phase at the 0.35 coherence threshold.",
-    statSource:
-      "nova-frontier-backend README: Kumamoto, track 24, 21 Jul → 14 Aug 2026, 5 km window, measured 12 Nov 2026",
-    witness: { label: "GSI multi-mission analysis (external)", note: "Credited, not our result" },
-    quality: [
-      {
-        k: "Measured",
-        v: "Coherence + phase",
-        why: "Coherence and wrapped phase from the backend run of 12 Nov 2026.",
-      },
-      { k: "Pair", v: "21 Jul → 14 Aug", why: "The interval brackets the 28 Jul earthquake." },
-      {
-        k: "Fringe",
-        v: "≈ 12 cm path",
-        why: "Half of the 24 cm wave, because the pulse travels there and back.",
-      },
-    ],
-    plainLimit: "We show where the radar echo stayed steady between two passes.",
-    techLimit:
-      "Each fringe is about 12 cm of change in the radar's path length, not a ground displacement. The interval mixes coseismic, postseismic and atmospheric signal.",
-    alternatives: ["Atmospheric phase", "Ionosphere", "Unwrapping error"],
-    empties: ["Displacement", "Magnitude", "Probability"],
-    sources: [
-      {
-        label: "GSI · 2026 Kumamoto earthquake analysis",
-        href: "https://www.gsi.go.jp/uchusokuchi/20260728kumamoto-e.html",
-      },
-      {
-        label: "NISAR L2 GUNW · ASF product guide",
-        href: "https://nisar-docs.asf.alaska.edu/gunw/",
-      },
-      {
-        label: "nova-frontier-backend · Kumamoto run, 12 Nov 2026",
-        href: "https://github.com/NASA-NOVA-FRONTIER/nova-frontier-backend",
-      },
-    ],
-    figure: "/cases/figures/interferometry.png",
-    timeline: {
-      passes: [
-        pass("2026-07-09", "meas"),
-        pass("2026-07-21", "base"),
-        pass("2026-08-14", "target"),
-        pass("2026-08-26", "meas"),
-        pass("2026-09-07", "meas"),
-        pass("2026-11-20", "plan"),
-      ],
-      start: "2026-07-01",
-      end: "2026-11-28",
-      today: "2026-11-08",
-      onset: { date: "2026-07-28", label: "Earthquake 28 Jul" },
-      optical: [],
-      opticalNote: "InSAR pair · no optical stage",
-    },
-  },
-  NISCEMI,
-  {
     id: "choco",
     lens: "insar",
     hazard: "earthquake",
@@ -503,6 +289,152 @@ export const CASES: Case[] = [
     sources: [{ label: "Servicio Geológico Colombiano", href: "https://www.sgc.gov.co" }],
     coherenceOnly: true,
   },
+  // The three below come from the gateway's precomputed cases (/v2/cases, relayed by the backend at
+  // /api/v1/cases/<id>). Each is radar_evaluated: dated layers, no comparator and no verdict, so
+  // only the numbers the gateway returns are shown.
+  {
+    id: "bug-fire",
+    lens: "wildfire",
+    hazard: "wildfire",
+    name: "Bug Fire",
+    place: "Nevada, USA",
+    region: "Wildfire · Nevada",
+    focus: [-119.88332214, 39.83778865],
+    when: "Aug 2026",
+    target: "2026-08-28",
+    verdict: "measured",
+    verdictLine:
+      "The radar read 4,096 cells on a 10 m grid in the Bug Fire vicinity: three passes before the 8 Aug 2026 ignition and two after it (28 Aug, 9 Sep).",
+    reason:
+      "The gateway reports radar_evaluated: dated layers and no comparison against the fire perimeter, so no verdict is given.",
+    stat: "4,096 cells",
+    statLine: "read by the radar on a 10 m grid · no comparison score yet",
+    statSource: "Gateway case bug-fire · evidence.radarSupportCells, 64 × 64 grid at 10 m",
+    quality: [
+      {
+        k: "Status",
+        v: "Radar evaluated",
+        why: "radar_evaluated from the gateway; scientific status diagnostic.",
+      },
+      {
+        k: "Passes",
+        v: "3 + 2",
+        why: "Baseline 29 Jun, 11 Jul and 23 Jul; after the fire 28 Aug and 9 Sep 2026.",
+      },
+      { k: "Reference", v: "WFIGS perimeter", why: "Ignition 8 Aug, contained 27 Aug 2026." },
+    ],
+    plainLimit:
+      "A perimeter can enclose unburned cells. Dated severity mapping and vegetation or field observations would help interpret the departures.",
+    techLimit:
+      "No radar comparator or signature policy is attached to this case yet, so no share of cells is reported.",
+    alternatives: [],
+    empties: ["Burned area", "Severity", "Cause"],
+    sources: [
+      {
+        label: "WFIGS Interagency Fire Perimeters · Bug Fire",
+        href: "https://services3.arcgis.com/T4QMspbfLg3qTGWY/ArcGIS/rest/services/WFIGS_Interagency_Perimeters/FeatureServer/0/61953",
+      },
+      { label: "nova-frontier-backend · cases relay", href: BACKEND },
+    ],
+  },
+  {
+    id: "rowe-creek",
+    lens: "vegetation_disturbance",
+    hazard: "deforestation",
+    name: "Rowe Creek",
+    place: "Oregon, USA",
+    region: "Vegetation · Oregon",
+    focus: [-120.26, 44.97],
+    when: "Sep 2026",
+    target: "2026-09-23",
+    verdict: "measured",
+    verdictLine:
+      "The radar read 262,142 cells on a 10 m grid near Rowe Creek: three passes from 1 to 25 Jul 2026 and one on 23 Sep.",
+    reason:
+      "The gateway reports radar_evaluated: dated layers and no independent vegetation reference, so no verdict is given.",
+    stat: "262,142 cells",
+    statLine: "read by the radar on a 10 m grid · no comparison score yet",
+    statSource: "Gateway case rowe-creek · evidence.radarSupportCells, 512 × 512 grid at 10 m",
+    quality: [
+      {
+        k: "Status",
+        v: "Radar evaluated",
+        why: "radar_evaluated from the gateway; scientific status diagnostic.",
+      },
+      {
+        k: "Passes",
+        v: "3 + 1",
+        why: "Baseline 1, 13 and 25 Jul; one assessment pass on 23 Sep 2026.",
+      },
+      {
+        k: "Reference",
+        v: "None",
+        why: "No independent dated event or vegetation record is attached.",
+      },
+    ],
+    plainLimit:
+      "Moisture, roughness and vegetation structure all affect the channels. The native replay uses radar only. Independent dated event and vegetation evidence would help.",
+    techLimit:
+      "No radar comparator or signature policy is attached to this case yet, so no share of cells is reported.",
+    alternatives: [],
+    empties: ["Area lost", "Cause", "Probability"],
+    sources: [{ label: "nova-frontier-backend · cases relay", href: BACKEND }],
+  },
+  {
+    id: "skollersta",
+    lens: "agriculture",
+    hazard: "agriculture",
+    name: "Sköllersta",
+    place: "Rye trial, Sweden",
+    region: "Agriculture · rye trial",
+    focus: [15.39726192, 59.13216973],
+    when: "Aug 2026",
+    target: "2026-08-22",
+    verdict: "measured",
+    verdictLine:
+      "A winter rye trial field brightened in HH against its surroundings between the 10 and 22 Aug 2026 passes, around its recorded harvest on 18 Aug.",
+    reason:
+      "The gateway reports radar_evaluated: the record dates the trial, not the harvested footprint, so no verdict is given.",
+    stat: "+1.78 dB",
+    statLine: "HH step, patch minus surroundings, 10 → 22 Aug 2026.",
+    statSource: "nova-frontier-model · docs/EXPLORATION_HOLDOUT.md · Swedish crop trial records",
+    quality: [
+      {
+        k: "Status",
+        v: "Radar evaluated",
+        why: "radar_evaluated from the gateway; scientific status diagnostic.",
+      },
+      {
+        k: "Passes",
+        v: "3 + 2",
+        why: "Baseline 5 Jul, 17 Jul and 10 Aug; assessments 22 Aug and 3 Sep 2026.",
+      },
+      {
+        k: "Reference",
+        v: "Trial record",
+        why: "Winter rye, documented at-harvest date 18 Aug 2026; footprint unresolved.",
+      },
+    ],
+    plainLimit:
+      "The independent record dates the trial. The harvested footprint, moisture and management across the full window remain unresolved.",
+    techLimit:
+      "Grid 64 × 64 at 20 m (4,096 cells). The step comes from the holdout report; the gateway attaches no comparator to this case.",
+    alternatives: [],
+    empties: ["Yield", "Crop map", "Cause"],
+    sources: [
+      {
+        label: "Swedish crop trial record · winter rye",
+        href: "https://nfts.dlbr.dk/Forms/Dokumentation.aspx?GUID=6c558a36-cd71-4531-8119-ca05278419a2&KardexID=75095&applLangID=en",
+      },
+      {
+        label: "nova-frontier-model · geographic holdout",
+        href: `${MODELING}/EXPLORATION_HOLDOUT.md`,
+      },
+      { label: "nova-frontier-backend · cases relay", href: BACKEND },
+    ],
+  },
+  // Landslide (#24): the model's only landslide case, aftermath only.
+  NISCEMI,
 ];
 
 // PLAN-content-pages-v8 §0: name the actual state, never "Pending". The median is the case stat.

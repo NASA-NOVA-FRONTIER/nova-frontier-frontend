@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { coherenceOnlyLabel, findLens, type Case } from "@/features/cases/cases";
 import { Link } from "@/lib/Link";
+import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { esriImageryUrl } from "@/pages/landing/eventImagery";
 import { caseCountry, caseHref, caseSummary } from "@/pages/cases/casesView";
 
@@ -41,7 +42,9 @@ export const LandingCaseCard = ({ item }: LandingCaseCardProps) => {
           : "MEASURED CASE · ESRI WORLD IMAGERY"}
       </span>
       <span className="l-card__text">
-        <span className="l-card__meta">{meta}</span>
+        <span className="l-card__meta">
+          {meta} <ProvenanceChip kind="offline" />
+        </span>
         <span className="l-card__name">
           {item.name}, {caseCountry(item)}
         </span>

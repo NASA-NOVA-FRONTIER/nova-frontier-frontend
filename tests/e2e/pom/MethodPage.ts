@@ -23,8 +23,13 @@ export class MethodPage {
     await this.page.goto("/method");
   }
 
-  satStep(n: 1 | 2 | 3): Locator {
+  satStep(n: number): Locator {
     return this.page.getByTestId(`sat-step-${n}`);
+  }
+
+  /** The step's kicker button, which scrolls the teardown to that step. */
+  satGo(n: number): Locator {
+    return this.page.getByTestId(`sat-go-${n}`);
   }
 
   // Scrolls so the satellite track has run `share` of its length (what the stage reads as progress).

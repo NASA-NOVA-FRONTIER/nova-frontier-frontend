@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-
+import { expect, test } from "./fixtures";
 import {
   agricultureView,
   INSAR_PAIRS,
@@ -11,7 +10,7 @@ import {
   wildfireView,
   withFireContext,
 } from "./pom/explorationMock";
-import { GlobePage, LIVE_FRAME } from "./pom/GlobePage";
+import { GlobePage, layerIdOf, LIVE_FRAME } from "./pom/GlobePage";
 
 const FIRE_AVAILABLE = {
   status: "available",
@@ -352,6 +351,10 @@ test.describe("Explorer: live exploration", () => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
     await expect(globe.verdict).toHaveAttribute("data-verdict", "within");
+    await expect(globe.verdict.getByTestId("prov-real")).toBeVisible();
+    // The passes are NASA's Observation Plan, the answer is the backend's.
+    await expect(globe.planPasses).toContainText("39 passes in the plan");
+    await expect(globe.planPasses.getByTestId("prov-real")).toBeVisible();
     await expect(globe.normalRange).toContainText("−1.2 dB");
     await expect(globe.normalRange).toContainText("−0.8 dB");
     await expect(globe.panel.getByTestId("prov-demo")).toHaveCount(0);
@@ -376,6 +379,8 @@ test.describe("Explorer: live exploration", () => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
     await expect(globe.jobModal).toBeVisible();
+    // While the job runs the footprint is a gold dash (processing); it turns solid with the answer.
+    await globe.expectScene((scene) => expect(scene.outline?.processing).toBe(true));
     await expect(page.getByTestId("job-kicker")).toHaveText(/^LIVE ANALYSIS · /);
     await expect(globe.jobModal).toContainText("Reading NISAR passes for this spot");
     // Elapsed, never a countdown.
@@ -399,6 +404,7 @@ test.describe("Explorer: live exploration", () => {
     api.complete();
     await expect(globe.verdict).toBeVisible({ timeout: 15_000 });
     await expect(globe.jobModal).toBeHidden();
+    await globe.expectScene((scene) => expect(scene.outline?.processing).toBe(false));
   });
 
   test("closing the modal keeps the job running; the answer still arrives; Esc closes it too", async ({
@@ -490,27 +496,29 @@ test.describe("Explorer: live exploration", () => {
     );
   });
 
-  test("the layers come from the answer: the pass's HH opens first, the other layers stay a click away", async ({
-    page,
-  }) => {
-    await globe.mockExplorations({ first: succeededView() });
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
+  test(
+    "the layers come from the answer: the pass's HH opens first, the other layers stay a click away",
+    { tag: "@globe" },
+    async ({ page }) => {
+      await globe.mockExplorations({ first: succeededView() });
+      await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(globe.liveLayerDock).toBeVisible();
-    const hh = page.getByTestId("dock-row-hh");
-    // #21 follow-up: the brightening flags no longer open first; the newest HH image does.
-    await expect(hh).toHaveAttribute("aria-pressed", "true");
-    const signature = page.getByTestId(
-      "layer-option-display_flood_signature_flags_co_pol_brightening",
-    );
-    await expect(signature).toHaveAttribute("aria-pressed", "false");
-    await expect(globe.liveLayerDock).toContainText("HH on 12 Sep 2026, fixed −30 to 0 dB gray.");
-    await signature.click();
-    await expect(signature).toHaveAttribute("aria-pressed", "true");
-    await expect(hh).toHaveAttribute("aria-pressed", "false");
-    await signature.click();
-    await expect(signature).toHaveAttribute("aria-pressed", "false");
-  });
+      await expect(globe.liveLayerDock).toBeVisible();
+      const hh = page.getByTestId("dock-row-hh");
+      // #21 follow-up: the brightening flags no longer open first; the newest HH image does.
+      await expect(hh).toHaveAttribute("aria-pressed", "true");
+      const signature = page.getByTestId(
+        "layer-option-display_flood_signature_flags_co_pol_brightening",
+      );
+      await expect(signature).toHaveAttribute("aria-pressed", "false");
+      await expect(globe.liveLayerDock).toContainText("HH on 12 Sep 2026, fixed −30 to 0 dB gray.");
+      await signature.click();
+      await expect(signature).toHaveAttribute("aria-pressed", "true");
+      await expect(hh).toHaveAttribute("aria-pressed", "false");
+      await signature.click();
+      await expect(signature).toHaveAttribute("aria-pressed", "false");
+    },
+  );
 
   test("the timeline shows the scenes the service read as real dates and the plan's future passes as planned", async () => {
     await globe.mockExplorations({ first: succeededView() });
@@ -747,21 +755,23 @@ test.describe("Explorer: live exploration", () => {
       ]);
     });
 
-    test("the globe offers the coherence and the wrapped phase, and the phase says its colours repeat", async ({
-      page,
-    }) => {
-      await globe.mockExplorations({ first: insarView() });
-      await globe.mockInsarPairs();
-      await globe.goto(`?frame=${LIVE_FRAME.id}&lens=insar&pair=${NEWEST_PAIR}`);
-      await expect(globe.verdict).toBeVisible();
+    test(
+      "the globe offers the coherence and the wrapped phase, and the phase says its colours repeat",
+      { tag: "@globe" },
+      async ({ page }) => {
+        await globe.mockExplorations({ first: insarView() });
+        await globe.mockInsarPairs();
+        await globe.goto(`?frame=${LIVE_FRAME.id}&lens=insar&pair=${NEWEST_PAIR}`);
+        await expect(globe.verdict).toBeVisible();
 
-      await expect(globe.liveLayerDock).toContainText("Interferometric coherence");
-      await expect(globe.liveLayerDock).toContainText("Wrapped phase");
-      await page.getByTestId("layer-option-display_wrapped_phase_rad_wrapped_phase_rad").click();
+        await expect(globe.liveLayerDock).toContainText("Interferometric coherence");
+        await expect(globe.liveLayerDock).toContainText("Wrapped phase");
+        await page.getByTestId("layer-option-display_wrapped_phase_rad_wrapped_phase_rad").click();
 
-      await expect(page.getByTestId("phase-note")).toContainText("repeat every 2π");
-      await expect(page.getByTestId("layer-scale")).toHaveText("−π to +π rad");
-    });
+        await expect(page.getByTestId("phase-note")).toContainText("repeat every 2π");
+        await expect(page.getByTestId("layer-scale")).toHaveText("−π to +π rad");
+      },
+    );
 
     test("a shared link with the pair measures straight away, without the picker", async () => {
       const api = await globe.mockExplorations({ first: insarView() });
@@ -795,18 +805,6 @@ test.describe("Explorer: live exploration", () => {
 
       await expect(page.getByTestId("pairs-empty")).toContainText("No NISAR pair covers this spot");
       await expect(globe.pairPicker).toHaveCount(0);
-    });
-
-    test("the Kumamoto case offers to measure a live pair at its spot", async ({ page }) => {
-      await globe.mockExplorations({ first: insarView() });
-      await globe.mockInsarPairs();
-      await globe.goto("?case=kumamoto");
-      await expect(globe.verdict).toBeVisible();
-
-      await page.getByTestId("measure-live-pair").click();
-
-      await expect(globe.pairPicker).toBeVisible();
-      await expect(globe.panelMeta).toContainText("Live question");
     });
   });
 
@@ -1000,11 +998,18 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
     await expect(globe.timelineReadout).toHaveText("12 Sep 2026 · baseline · pass 3 of 5");
+    // The globe drapes the selected pass's own HH image.
+    await globe.expectScene((scene) =>
+      expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-09-12_HH"),
+    );
     await expect(globe.timelineCompare).toHaveCount(0);
     await expect(globe.timeline).toContainText("BASELINE · 4 PASSES");
     const first = globe.timelinePasses("base").first();
     await first.click();
     await expect(globe.timelineReadout).toHaveText("14 Jul 2026 · baseline · pass 1 of 5");
+    await globe.expectScene((scene) =>
+      expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-07-14_HH"),
+    );
     await page.keyboard.press("ArrowRight");
     await expect(globe.timelineReadout).toHaveText("19 Aug 2026 · baseline · pass 2 of 5");
     await globe.timelinePasses("target").click();
@@ -1046,70 +1051,72 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
     await expect(page).toHaveURL(/lens=insar/);
   });
 
-  test("Play runs the five passes every 1.1 s and stops on the target; the stamp shows each date", async ({
-    page,
-  }) => {
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await globe.timelinePasses("base").first().click();
-    await expect(globe.timelineReadout).toHaveText("14 Jul 2026 · baseline · pass 1 of 5");
+  test(
+    "Play runs the five passes every 1.1 s and stops on the target; the stamp shows each date",
+    { tag: "@globe" },
+    async ({ page }) => {
+      await globe.goto(`?frame=${LIVE_FRAME.id}`);
+      await globe.timelinePasses("base").first().click();
+      await expect(globe.timelineReadout).toHaveText("14 Jul 2026 · baseline · pass 1 of 5");
 
-    // Real time, not page.clock: a fake clock also drives requestAnimationFrame, so every tick made
-    // Cesium render dozens of SwiftShader frames and slow CI ran out of time. The page records every
-    // render where the readout, the stamp or the Play label changed, so nothing is missed however
-    // slowly the test itself runs.
-    await page.evaluate(() => {
-      const text = (id: string) =>
-        document.querySelector(`[data-testid="${id}"]`)?.textContent ?? "";
-      const label = () =>
-        document.querySelector('[data-testid="timeline-play"]')?.getAttribute("aria-label") ?? "";
-      const now = () => ({
-        line: text("timeline-readout"),
-        stamp: text("timelapse-stamp"),
-        play: label(),
-        at: performance.now(),
+      // Real time, not page.clock: a fake clock also drives requestAnimationFrame, so every tick made
+      // Cesium render dozens of SwiftShader frames and slow CI ran out of time. The page records every
+      // render where the readout, the stamp or the Play label changed, so nothing is missed however
+      // slowly the test itself runs.
+      await page.evaluate(() => {
+        const text = (id: string) =>
+          document.querySelector(`[data-testid="${id}"]`)?.textContent ?? "";
+        const label = () =>
+          document.querySelector('[data-testid="timeline-play"]')?.getAttribute("aria-label") ?? "";
+        const now = () => ({
+          line: text("timeline-readout"),
+          stamp: text("timelapse-stamp"),
+          play: label(),
+          at: performance.now(),
+        });
+        const steps = [now()];
+        new MutationObserver(() => {
+          const step = now();
+          const last = steps.at(-1);
+          if (last?.line !== step.line || last.stamp !== step.stamp || last.play !== step.play)
+            steps.push(step);
+        }).observe(document.body, {
+          subtree: true,
+          childList: true,
+          characterData: true,
+          attributes: true,
+        });
+        Object.assign(window, { lapseSteps: steps });
       });
-      const steps = [now()];
-      new MutationObserver(() => {
-        const step = now();
-        const last = steps.at(-1);
-        if (last?.line !== step.line || last.stamp !== step.stamp || last.play !== step.play)
-          steps.push(step);
-      }).observe(document.body, {
-        subtree: true,
-        childList: true,
-        characterData: true,
-        attributes: true,
-      });
-      Object.assign(window, { lapseSteps: steps });
-    });
-    type Step = { line: string; stamp: string; play: string; at: number };
-    const recorded = () =>
-      page.evaluate(() => (window as unknown as { lapseSteps: Step[] }).lapseSteps);
+      type Step = { line: string; stamp: string; play: string; at: number };
+      const recorded = () =>
+        page.evaluate(() => (window as unknown as { lapseSteps: Step[] }).lapseSteps);
 
-    await page.getByTestId("timeline-play").click();
-    // Four steps of 1.1 s plus the one that ends on the target; generous for slow software WebGL.
-    await expect.poll(async () => (await recorded()).length, { timeout: 30_000 }).toBe(7);
+      await page.getByTestId("timeline-play").click();
+      // Four steps of 1.1 s plus the one that ends on the target; generous for slow software WebGL.
+      await expect.poll(async () => (await recorded()).length, { timeout: 30_000 }).toBe(7);
 
-    const PLAY = "Play the 5 passes";
-    const PAUSE = "Pause time-lapse";
-    const steps = await recorded();
-    expect(steps.map(({ line, stamp, play }) => [line, stamp, play])).toEqual([
-      ["14 Jul 2026 · baseline · pass 1 of 5", "", PLAY],
-      ["14 Jul 2026 · baseline · pass 1 of 5", "14 JUL 2026PASS 1 OF 5 · BASELINE", PAUSE],
-      ["19 Aug 2026 · baseline · pass 2 of 5", "19 AUG 2026PASS 2 OF 5 · BASELINE", PAUSE],
-      ["12 Sep 2026 · baseline · pass 3 of 5", "12 SEP 2026PASS 3 OF 5 · BASELINE", PAUSE],
-      ["18 Oct 2026 · baseline · pass 4 of 5", "18 OCT 2026PASS 4 OF 5 · BASELINE", PAUSE],
-      ["11 Nov 2026 · target · pass 5 of 5", "11 NOV 2026PASS 5 OF 5 · TARGET", PAUSE],
-      ["11 Nov 2026 · target · pass 5 of 5", "", PLAY],
-    ]);
-    // A timer never fires early: from Play on, each step comes at least one step after the last.
-    for (let index = 2; index < steps.length; index += 1) {
-      const gap = (steps[index]?.at ?? 0) - (steps[index - 1]?.at ?? 0);
-      expect(gap).toBeGreaterThanOrEqual(1000);
-    }
-    // 18 Oct and 11 Nov have no image: the HH row is off, nothing else is drawn in their place.
-    await expect(page.getByTestId("dock-row-hh")).toBeDisabled();
-  });
+      const PLAY = "Play the 5 passes";
+      const PAUSE = "Pause time-lapse";
+      const steps = await recorded();
+      expect(steps.map(({ line, stamp, play }) => [line, stamp, play])).toEqual([
+        ["14 Jul 2026 · baseline · pass 1 of 5", "", PLAY],
+        ["14 Jul 2026 · baseline · pass 1 of 5", "14 JUL 2026PASS 1 OF 5 · BASELINE", PAUSE],
+        ["19 Aug 2026 · baseline · pass 2 of 5", "19 AUG 2026PASS 2 OF 5 · BASELINE", PAUSE],
+        ["12 Sep 2026 · baseline · pass 3 of 5", "12 SEP 2026PASS 3 OF 5 · BASELINE", PAUSE],
+        ["18 Oct 2026 · baseline · pass 4 of 5", "18 OCT 2026PASS 4 OF 5 · BASELINE", PAUSE],
+        ["11 Nov 2026 · target · pass 5 of 5", "11 NOV 2026PASS 5 OF 5 · TARGET", PAUSE],
+        ["11 Nov 2026 · target · pass 5 of 5", "", PLAY],
+      ]);
+      // A timer never fires early: from Play on, each step comes at least one step after the last.
+      for (let index = 2; index < steps.length; index += 1) {
+        const gap = (steps[index]?.at ?? 0) - (steps[index - 1]?.at ?? 0);
+        expect(gap).toBeGreaterThanOrEqual(1000);
+      }
+      // 18 Oct and 11 Nov have no image: the HH row is off, nothing else is drawn in their place.
+      await expect(page.getByTestId("dock-row-hh")).toBeDisabled();
+    },
+  );
 
   test("a manual pass pick stops the time-lapse and keeps that pass", async ({ page }) => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
@@ -1119,17 +1126,26 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
     await globe.timelinePasses("base").nth(1).click();
     await expect(play).toHaveAttribute("aria-label", "Play the 5 passes");
     await expect(globe.timelineReadout).toHaveText("19 Aug 2026 · baseline · pass 2 of 5");
+    // Stopped: no stamp on the globe, and the picked pass stays draped.
+    await globe.expectScene((scene) => {
+      expect(scene.stamp).toBeUndefined();
+      expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-08-19_HH");
+    });
   });
 
-  test("under reduced motion the globe swaps layers with no crossfade", async ({ page }) => {
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(page.getByTestId("dock-row-hh")).toHaveAttribute("aria-pressed", "true");
+  test(
+    "under reduced motion the globe swaps layers with no crossfade",
+    { tag: "@globe" },
+    async ({ page }) => {
+      await globe.goto(`?frame=${LIVE_FRAME.id}`);
+      await expect(page.getByTestId("dock-row-hh")).toHaveAttribute("aria-pressed", "true");
 
-    await globe.timelinePasses("base").first().click();
-    await page.getByTestId("dock-row-hv").click();
-    await expect(page.getByTestId("dock-row-hv")).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByTestId("globe")).not.toHaveAttribute("data-crossfade", "on");
-  });
+      await globe.timelinePasses("base").first().click();
+      await page.getByTestId("dock-row-hv").click();
+      await expect(page.getByTestId("dock-row-hv")).toHaveAttribute("aria-pressed", "true");
+      await expect(page.getByTestId("globe")).not.toHaveAttribute("data-crossfade", "on");
+    },
+  );
 
   test("on a phone there is no Play button", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
