@@ -77,6 +77,9 @@ type SceneOptions = {
   earth?: string | undefined;
   /** Called when a late asset (the Earth texture) arrives, so a paused stage can redraw. */
   onAssetLoad: () => void;
+  /** The page will take the model apart: make the fading copies and compile them up front, so the
+   * first faded step doesn't stall a frame mid-scroll. */
+  teardown?: boolean | undefined;
 };
 
 type MaterialOptions = {
@@ -105,7 +108,7 @@ const seededRandom = () => {
 /** Throws when WebGL is unavailable; the component shows the static fallback then. */
 export const createSatelliteScene = (
   canvas: HTMLCanvasElement,
-  { earth: earthSrc, onAssetLoad }: SceneOptions,
+  { earth: earthSrc, onAssetLoad, teardown = false }: SceneOptions,
 ): SatelliteScene => {
   const renderer = new WebGLRenderer({
     canvas,
@@ -569,6 +572,12 @@ export const createSatelliteScene = (
       earthMat.emissiveMap = tx;
       earthMat.color.set(0xffffff);
       earthMat.needsUpdate = true;
+      // The teardown first shows the Earth mid-scroll: upload the texture and build the textured
+      // shader now, not on that frame.
+      if (teardown) {
+        renderer.initTexture(tx);
+        renderer.compile(scene, camera);
+      }
       onAssetLoad();
     });
   }
@@ -755,6 +764,11 @@ export const createSatelliteScene = (
     renderer.dispose();
     renderer.forceContextLoss();
   };
+
+  if (teardown) {
+    fades = buildFades();
+    renderer.compile(scene, camera);
+  }
 
   return { render, project, resize, dispose };
 };

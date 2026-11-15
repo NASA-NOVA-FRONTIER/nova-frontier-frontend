@@ -152,6 +152,7 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
         scene = createScene(canvas, {
           earth: latest.current.earth,
           onAssetLoad: () => invalidate.current(),
+          teardown: latest.current.stage !== undefined,
         });
       } catch {
         setStatus("fallback");
