@@ -258,7 +258,11 @@ export const CASES: Case[] = [
     quality: [
       { k: "Status", v: "Coherence only", why: "not_displacement_ready from the API." },
       { k: "Coherence", v: "0.247", why: "Median, fixed 0–1 scale. Confirmed by Daniel, 11 Nov." },
-      { k: "SGC", v: "[Report]", why: "Servicio Geológico Colombiano report." },
+      {
+        k: "SGC",
+        v: "Update · 10 Aug 2026",
+        why: "Servicio Geológico Colombiano update on the San José del Palmar earthquake.",
+      },
     ],
     plainLimit:
       "Coherence 0.247 is low: the echo changed between the two passes, so its phase can't be read as ground motion.",
@@ -266,7 +270,12 @@ export const CASES: Case[] = [
       "The phase is wrapped and not corrected for troposphere or ionosphere, so no displacement is reported.",
     alternatives: [],
     empties: ["Displacement", "Magnitude", "Casualties"],
-    sources: [{ label: "Servicio Geológico Colombiano", href: "https://www.sgc.gov.co" }],
+    sources: [
+      {
+        label: "Servicio Geológico Colombiano · San José del Palmar earthquake update",
+        href: "https://www2.sgc.gov.co/Noticias/Paginas/SGC-actualiza-la-informacion-sobre-el-sismo-ocurrido-en-San-Jose-del-Palmar-Choco.aspx",
+      },
+    ],
     coherenceOnly: true,
   },
   // The three below come from the gateway's precomputed cases (/v2/cases, relayed by the backend at

@@ -95,6 +95,11 @@ export const FactsCarousel = ({ reduceMotion }: FactsCarouselProps) => {
             data-testid="fact-image"
           />
         )}
+        {fact.image?.credit !== undefined && (
+          <p className="x-facts-carousel__credit" data-testid="fact-credit">
+            {fact.image.credit}
+          </p>
+        )}
         {fact.title !== undefined && (
           <p className="x-facts-carousel__title" data-testid="fact-title">
             {fact.title}
