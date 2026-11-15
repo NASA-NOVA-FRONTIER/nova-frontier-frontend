@@ -101,7 +101,11 @@ export const InfoTip = ({ label, title, text, testId = "info-tip" }: InfoTipProp
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
+      if (event.key !== "Escape") return;
+      // Esc closes the innermost thing only: the explorer's window listener must not also act.
+      // Our listener is on document, so it runs before the window one.
+      event.stopPropagation();
+      close();
     };
     // A pinned tip closes on a tap anywhere else (iOS doesn't blur a tapped button).
     const onDown = (event: globalThis.PointerEvent) => {

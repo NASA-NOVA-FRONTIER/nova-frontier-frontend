@@ -93,6 +93,19 @@ for (const viewport of VIEWPORTS) {
       await expect(button).toBeFocused();
     });
 
+    test("Esc on an open tip doesn't reach the page's own Esc handler", async ({ page }) => {
+      const { button, pop } = tip(page, "plain");
+      const pageEsc = page.getByTestId("page-esc");
+      await button.focus();
+      await expect(pop).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(pop).toBeHidden();
+      await expect(pageEsc).toHaveText("0");
+      // With no tip open, Esc does reach the page: the spy works.
+      await page.keyboard.press("Escape");
+      await expect(pageEsc).toHaveText("1");
+    });
+
     test("escapes the scrolling panel and follows its scroll", async ({ page }) => {
       const { button, pop } = tip(page, "panel");
       await button.click();
