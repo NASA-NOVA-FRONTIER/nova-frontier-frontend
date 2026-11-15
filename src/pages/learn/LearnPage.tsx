@@ -14,6 +14,7 @@ import {
   type OtherRadar,
 } from "@/pages/learn/learnResources";
 import { RadarCompare } from "@/pages/learn/RadarCompare";
+import { RadarWaves } from "@/pages/learn/RadarWaves";
 import { useLearnMotion } from "@/pages/learn/useLearnMotion";
 import { SiteFooter } from "@/pages/site/SiteFooter";
 import { SiteNav } from "@/pages/site/SiteNav";
@@ -195,6 +196,8 @@ export const LearnPage = () => {
             </div>
           </section>
         ))}
+
+        <RadarWaves />
 
         <section className="lr-others" data-section aria-labelledby="learn-others-heading">
           <div className="lr-others__intro" data-reveal>

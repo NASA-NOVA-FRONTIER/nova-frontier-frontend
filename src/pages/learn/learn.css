@@ -1,4 +1,4 @@
-/* Learn page (lr-): see like a radar, four steps of resources, other radars. Tokens from site.css. */
+/* Learn page (lr-): see like a radar, four steps of resources, play with the wave, other radars. Tokens from site.css. */
 
 .lr-main {
   max-width: 1200px;
@@ -366,6 +366,253 @@
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+/* Play with the wave (v9 Radar Waves, #33) */
+.lr-waves {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.lr-waves__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 760px;
+}
+
+.lr-waves__title {
+  font-size: clamp(30px, 3.4vw, 48px);
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+}
+
+.lr-waves__lede {
+  font-size: 16px;
+  color: #c4c1ba;
+  text-wrap: pretty;
+}
+
+.lr-waves__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
+  gap: 20px;
+  padding: 20px;
+  border-radius: 28px;
+  background: rgba(235, 233, 228, 0.035);
+  border: 1px solid rgba(235, 233, 228, 0.08);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+/* The chip and legend float over the canvas; on phones they move below it (see the media query). */
+.lr-waves__figure {
+  position: relative;
+  min-width: 0;
+}
+
+.lr-waves__stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--deep);
+}
+
+.lr-waves__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.lr-waves__chip {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.18);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  color: var(--demo);
+  white-space: nowrap;
+}
+
+.lr-waves__legend {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: flex;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-2);
+}
+
+.lr-waves__key {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.lr-waves__swatch {
+  width: 14px;
+  height: 2px;
+  background: var(--gold);
+}
+
+.lr-waves__swatch--hh {
+  background: #e8894a;
+}
+
+.lr-waves__swatch--hv {
+  background: #6fb3e8;
+}
+
+.lr-waves__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.lr-waves__group,
+.lr-waves__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lr-waves__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.lr-waves__label--split {
+  display: flex;
+  justify-content: space-between;
+}
+
+.lr-waves__mono {
+  font-family: var(--mono);
+  font-weight: 400;
+}
+
+.lr-waves__radios {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(235, 233, 228, 0.06);
+}
+
+.lr-waves__radio {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.lr-waves__radio[aria-checked="true"] {
+  background: var(--ink);
+  color: var(--space);
+}
+
+.lr-waves__radio:focus-visible,
+.lr-waves__range:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.lr-waves__meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.lr-waves__range {
+  width: 100%;
+  accent-color: var(--gold);
+}
+
+.lr-waves__ends {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #8d8a83;
+}
+
+.lr-waves__readout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(235, 233, 228, 0.04);
+}
+
+.lr-waves__readout-title {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.lr-waves__readout-body {
+  font-size: 13.5px;
+  color: #c4c1ba;
+  text-wrap: pretty;
+}
+
+/* Phones: the canvas sits above the controls. */
+@media (max-width: 760px) {
+  .lr-waves__body {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px;
+    border-radius: 22px;
+  }
+
+  .lr-waves__figure {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .lr-waves__stage {
+    flex: 1 1 100%;
+  }
+
+  .lr-waves__chip,
+  .lr-waves__legend {
+    position: static;
+  }
+
+  /* Three band labels don't fit one line at 390 px: they wrap inside their pill. */
+  .lr-waves__radio {
+    height: auto;
+    min-height: 36px;
+    padding: 4px 6px;
+    border-radius: 18px;
+    font-size: 12.5px;
+    line-height: 1.2;
+    white-space: normal;
+    text-wrap: balance;
+  }
 }
 
 /* Other radars */
