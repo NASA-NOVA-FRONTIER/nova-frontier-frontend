@@ -50,7 +50,8 @@ test.describe("Explorer: place search", () => {
     await globe.searchInput.click();
     await globe.searchInput.fill("Qadirabad");
     await globe.searchInput.press("Enter");
-    await expect(globe.placeOption(0)).toBeVisible();
+    // The instant case row shows before the geocoder answers; wait for the place to lead the list.
+    await expect(globe.placeOption(0)).toContainText("Phalia Tehsil");
 
     await globe.searchInput.press("ArrowDown");
     await expect(globe.placeOption(0)).toHaveAttribute("aria-selected", "true");
@@ -130,7 +131,8 @@ test.describe("Explorer: place search", () => {
 
     await expect(globe.searchError).toContainText("We couldn't reach the place search");
     await globe.searchError.getByRole("button", { name: "Try again" }).click();
-    await expect(globe.placeOption(0)).toBeVisible();
+    // The instant case row is there before the retry answers; the geocoder's row proves it did.
+    await expect(globe.placeOption(0)).toContainText("Phalia Tehsil");
     expect(globe.placeRequests).toHaveLength(2);
   });
 
