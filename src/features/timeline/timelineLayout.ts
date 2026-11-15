@@ -181,10 +181,10 @@ export const readoutOf = (
   }
   const item = layout.passes[current];
   if (item === undefined) return { line: "", sub: "" };
-  return { line: `${formatDay(item.date)} · ${ROLE[item.kind]}`, sub: subOf(item) };
+  return { line: `${formatDay(item.date)} · ${ROLE[item.kind]}`, sub: passSub(item) };
 };
 
-const subOf = (item: LaidPass): string =>
+export const passSub = (item: LaidPass): string =>
   item.outsidePct !== undefined
     ? `${item.outsidePct.toFixed(1)}% of supported cells outside the normal range`
     : item.kind === "base"
@@ -205,6 +205,6 @@ export const liveReadout = (layout: TimelineLayout, current: number): Readout =>
       k,
       layout.measured.length,
     ),
-    sub: subOf(item),
+    sub: passSub(item),
   };
 };
