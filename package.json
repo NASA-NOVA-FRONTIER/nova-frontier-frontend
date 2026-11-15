@@ -16,7 +16,8 @@
     "typecheck": "tsc -b",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "diagram": "tsx --tsconfig tsconfig.node.json scripts/render-architecture.ts"
   },
   "dependencies": {
     "cesium": "^1.146.0",
