@@ -4,6 +4,7 @@
 import {
   bandById,
   BEAM_HALF,
+  beamDistance,
   echoDotStep,
   echoStrength,
   ECHO_OFFSET,
@@ -248,7 +249,7 @@ export const drawFrame = (
     if (p.depth) continue;
     g.beginPath();
     if (inBeam(scene, geo, band, p)) {
-      const d = Math.abs((p.x - geo.ex) * geo.nx + (p.y - geo.ey) * geo.ny);
+      const d = beamDistance(geo, p.x, p.y);
       const k = 1 - d / BEAM_HALF;
       g.fillStyle = `rgba(233,207,149,${Math.min(1, 0.4 + k * 0.8)})`;
       g.arc(p.x, p.y, p.r + 0.6 * k, 0, TAU);
