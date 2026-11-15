@@ -860,6 +860,12 @@
   image-rendering: pixelated;
 }
 
+.x-facts-carousel__credit {
+  margin: -2px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+
 .x-facts-carousel__title {
   margin: 0;
   font-size: 15px;

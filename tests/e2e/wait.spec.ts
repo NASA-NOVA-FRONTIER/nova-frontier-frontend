@@ -90,6 +90,7 @@ test.describe("Explorer v8: the waiting panel", () => {
       "src",
       "/landing/radar-north-dakota.jpg",
     );
+    await expect(page.getByTestId("fact-credit")).toHaveText("NISAR image · NASA/JPL-Caltech");
     await expect(page.getByTestId("fact-body")).toHaveAttribute("aria-live", "polite");
     await expect(facts).toHaveAttribute("data-paused", "false");
     await facts.hover();
