@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>NISAR Hazard Watch · Explorer flow v9 · frames</title>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#1a1d24}
+a{color:#c9b48b;text-decoration:none}
+a:hover{color:#dccaa3}
+h1,h2,p{margin:0}
+</style>
+</helmet>
+<div style="padding:64px;display:flex;flex-direction:column;gap:72px;font-family:'Albert Sans',system-ui,sans-serif;color:#ebe9e4;background:#1a1d24;width:max-content">
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:1100px">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:0.08em;color:#c9b48b">EXPLORER FLOW v9 · 15 NOV 2026</p>
+    <h1 style="font-size:48px;font-weight:500;letter-spacing:-0.04em;line-height:1">Place the square → confirm → process → watch the passes</h1>
+    <p style="font-size:18px;color:#c4c1ba;max-width:80ch">Every frame is the live prototype frozen in one state. Open <a href="Explorer Flow v9.dc.html">Explorer Flow v9</a> to click through it. Copy, reduced motion and the open decisions are in <a href="design_handoff_v9/COPY-flow-v9.md">COPY-flow-v9.md</a>.</p>
+    <p style="font-size:14px;color:#8d8a83;max-width:90ch">Mock content: pass dates follow the Qadirabad pilot's 12-day cadence, and each pass shows the baseline layer as a stand-in for that pass's own PNG. The Kumamoto pairs other than 21 Jul → 14 Aug carry DEMO dates.</p>
+  </div>
+  <sc-for list="{{ rows }}" as="r" hint-placeholder-count="3">
+    <section id="{{ r.id }}" data-screen-label="{{ r.label }}" style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <span style="padding:4px 12px;border-radius:999px;background:#c9b48b;color:#16120a;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500">{{ r.id }}</span>
+        <h2 style="font-size:28px;font-weight:500;letter-spacing:-0.02em">{{ r.label }}</h2>
+        <p style="font-size:16px;color:#a9a69e">{{ r.note }}</p>
+      </div>
+      <div style="display:flex;gap:40px;align-items:flex-start">
+        <div style="width:1440px;height:900px;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);flex:none">
+          <dc-import name="Explorer Flow v9" state="{{ r.state }}" reduced="{{ r.reduced }}" frozen="1" style="width:1440px;height:900px" hint-size="1440px,900px"></dc-import>
+        </div>
+        <div style="width:390px;height:844px;border-radius:44px;overflow:hidden;box-shadow:0 0 0 10px #0b0d11,0 20px 60px rgba(0,0,0,0.5);flex:none">
+          <dc-import name="Explorer Flow v9" state="{{ r.state }}" reduced="{{ r.reduced }}" mobile="1" frozen="1" style="width:390px;height:844px" hint-size="390px,844px"></dc-import>
+        </div>
+      </div>
+    </section>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const R = [
+      ["01", "Empty globe", "empty", "Measured cases first; any land takes a square."],
+      ["02", "Square placed", "placed", "Drag to move. Nothing runs yet."],
+      ["03", "Confirm · normal", "confirm", "Phenomenon, dates with preset, settings, mode and wait."],
+      ["04", "Confirm · measured case", "confirm-case", "Phenomenon locked, OFFLINE."],
+      ["05", "Confirm · no NISAR dates", "confirm-nodata", "Start disabled; next planned pass from the Observation Plan."],
+      ["06", "Confirm · 4 passes", "confirm-four", "Allowed; the gap is named."],
+      ["07", "Confirm · 3 or fewer passes", "confirm-few", "Start disabled; one-tap way out."],
+      ["08", "Processing · ONLINE, within estimate", "processing", "Elapsed time, never a countdown. Facts rotate."],
+      ["09", "Processing · estimate exceeded", "processing-late", "Says so and keeps running until 8 min."],
+      ["10", "Processing · OFFLINE", "processing-offline", "About a second; no facts."],
+      ["11", "Result · timeline playing", "result-playing", "Five measured passes on the square."],
+      ["12", "Result · paused", "result-paused", "Scrub, previous / next, speed, loop."],
+      ["13", "Result · earthquake pairs", "result-quake", "Intervals, with the event marked."],
+      ["14", "Reduced motion", "result-playing", "The timeline opens paused."],
+    ];
+    return { rows: R.map(([id, label, state, note], i) => ({ id, label, state, note, reduced: i === 13 ? "1" : "" })) };
+  }
+}
+</script>
+</body>
+</html>
