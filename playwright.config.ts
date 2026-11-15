@@ -5,6 +5,8 @@ const isCI = Boolean(process.env.CI) && process.env.CI !== "false";
 // E2E_PORT lets parallel worktrees run their own server.
 const PORT = Number(process.env.E2E_PORT ?? 5174);
 const BASE_URL = `http://localhost:${PORT}`;
+// CI shards download the dist/ built once by the build job, so they only serve it.
+const prebuilt = process.env.E2E_PREBUILT === "1";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -14,7 +16,10 @@ export default defineConfig({
   retries: isCI ? 2 : 0,
   // Each test renders the globe in software WebGL; more workers starve the CPU.
   workers: 2,
-  reporter: [["list"], ["html", { outputFolder: "test-results/html-report", open: "never" }]],
+  // On CI each shard writes a blob report; the final job merges them into one HTML report.
+  reporter: isCI
+    ? [["list"], ["blob"]]
+    : [["list"], ["html", { outputFolder: "test-results/html-report", open: "never" }]],
   outputDir: "test-results/test-output",
   // Software WebGL is slow; same budget as the work monorepo.
   timeout: 60_000,
@@ -36,7 +41,7 @@ export default defineConfig({
   ],
   webServer: {
     // The production build, as deployed: no dev-server reloads mid-test.
-    command: `pnpm build && pnpm preview --port ${PORT} --strictPort`,
+    command: `${prebuilt ? "" : "pnpm build && "}pnpm preview --port ${PORT} --strictPort`,
     url: BASE_URL,
     reuseExistingServer: !isCI,
     timeout: 120_000,
