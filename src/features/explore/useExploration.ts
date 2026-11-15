@@ -131,10 +131,14 @@ export const useExploration = (
       setState({ phase: "error", error: new ApiError(0, CANCELLED, "Request cancelled") });
       return;
     }
+    // Cancel goes back to step 2 at once; once the run is left, its late answer must not land.
+    const run = controllerRef.current;
+    const current = () => run === controllerRef.current && run?.signal.aborted !== true;
     try {
-      setState(stateOf(await cancelExploration(id, new AbortController().signal)));
+      const view = await cancelExploration(id, new AbortController().signal);
+      if (current()) setState(stateOf(view));
     } catch (error) {
-      setState({ phase: "error", error: toApiError(error) });
+      if (current()) setState({ phase: "error", error: toApiError(error) });
     }
   }, []);
 

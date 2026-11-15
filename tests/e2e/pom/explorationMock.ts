@@ -107,6 +107,8 @@ type Options = {
   first?: View;
   // One answer per POST, in order (a lens switch is a second POST); later POSTs reuse `first`.
   answers?: View[];
+  // What every poll answers instead of a view (a job the server lost answers 404).
+  pollProblem?: Problem;
 };
 
 // Plays the backend's exploration API: POST starts, GET polls, DELETE cancels.
@@ -166,6 +168,13 @@ export class ExplorationMock {
       });
     }
     this.polls.push(request.url());
+    const lost = this.options.pollProblem;
+    if (lost !== undefined)
+      return route.fulfill({
+        status: lost.status,
+        contentType: "application/problem+json",
+        body: JSON.stringify({ title: "Problem", ...lost }),
+      });
     return route.fulfill({
       json: this.finished || this.cancelled ? (this.options.final ?? succeededView()) : running,
     });

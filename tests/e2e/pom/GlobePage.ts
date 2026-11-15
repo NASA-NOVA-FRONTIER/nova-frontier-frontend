@@ -11,6 +11,7 @@ export const LIVE_FRAME = { id: "47-3", title: "Track 47 · Frame 3" };
 
 const PLACES_URL = "**/api/v1/places**";
 const COVERAGE_URL = "**/api/v1/coverage**";
+const LIMITS_URL = "**/api/v1/limits";
 
 const readMock = (name: string): string =>
   readFileSync(new URL(`../mocks/${name}.json`, import.meta.url), "utf8");
@@ -67,7 +68,7 @@ export class GlobePage {
   readonly placeRequests: string[] = [];
   readonly coverageRequests: string[] = [];
   readonly jobModal: Locator;
-  readonly jobRemaining: Locator;
+  readonly jobElapsed: Locator;
   readonly jobProgress: Locator;
   readonly normalRange: Locator;
   readonly liveLayerDock: Locator;
@@ -76,6 +77,7 @@ export class GlobePage {
   readonly insarCard: Locator;
   // Every pair list the page asked for, in order.
   readonly pairRequests: string[] = [];
+  private limitsRouted = false;
 
   constructor(page: Page) {
     this.page = page;
@@ -113,7 +115,7 @@ export class GlobePage {
     this.spotNearest = page.getByTestId("spot-nearest");
     this.placeAnalyse = page.getByTestId("place-analyse");
     this.jobModal = page.getByTestId("job-modal");
-    this.jobRemaining = page.getByTestId("job-remaining");
+    this.jobElapsed = page.getByTestId("job-elapsed");
     this.jobProgress = page.getByTestId("job-progress");
     this.normalRange = page.getByTestId("normal-range");
     this.liveLayerDock = page.getByTestId("live-layer-dock");
@@ -226,6 +228,29 @@ export class GlobePage {
     });
   }
 
+  // Backend #2's daily limits. Every page gets an answer, so E2E never reaches a backend; without
+  // this mock it is a 404 (the endpoint isn't deployed yet) and the quota line stays hidden.
+  async mockLimits(limits: {
+    remainingApp: number | null;
+    remainingClient: number | null;
+    resetsAt?: string;
+  }): Promise<void> {
+    this.limitsRouted = true;
+    await this.page.route(LIMITS_URL, (route) => route.fulfill({ json: limits }));
+  }
+
+  private async limitsNotDeployed(): Promise<void> {
+    if (this.limitsRouted) return;
+    this.limitsRouted = true;
+    await this.page.route(LIMITS_URL, (route) =>
+      route.fulfill({
+        status: 404,
+        contentType: "application/problem+json",
+        body: JSON.stringify({ title: "Not found", reasonCode: "NOT_FOUND", detail: "no route" }),
+      }),
+    );
+  }
+
   // Marks the quick tour as seen before the page loads, as on any visit after the first.
   async skipOnboarding(): Promise<void> {
     await this.page.addInitScript((key) => window.localStorage.setItem(key, "1"), ONBOARDING_KEY);
@@ -233,6 +258,7 @@ export class GlobePage {
 
   // Hover and live questions need the frames snapshot, so every test waits for it.
   async goto(query = ""): Promise<void> {
+    await this.limitsNotDeployed();
     await this.page.goto(`/explore${query}`);
     await this.page.locator('main[data-frames="success"]').waitFor({ timeout: 30_000 });
   }

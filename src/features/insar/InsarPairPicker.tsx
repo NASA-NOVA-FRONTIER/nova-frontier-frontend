@@ -10,6 +10,7 @@ import {
   type InsarChoice,
   type InsarPair,
 } from "@/features/insar/insarApi";
+import { explorationProblem } from "@/features/explore/exploreProblems";
 import { LiveProblem } from "@/features/live/LiveStatus";
 import type { LonLat } from "@/features/frames/frame.types";
 import { ApiError } from "@/lib/api/apiClient";
@@ -47,10 +48,17 @@ export const InsarPairPicker = ({ point, initial, onMeasure, onPickCase }: Picke
   if (state.status === "error")
     return (
       <LiveProblem
+        problem={explorationProblem(
+          state.error instanceof ApiError
+            ? {
+                reasonCode: state.error.reasonCode,
+                detail: state.error.message,
+                status: state.error.status,
+              }
+            : { reasonCode: "NETWORK_ERROR", detail: state.error.message },
+        )}
         reasonCode={state.error instanceof ApiError ? state.error.reasonCode : "NETWORK_ERROR"}
-        detail={state.error.message}
-        onRetry={retry}
-        onPickCase={onPickCase}
+        onAction={(action) => (action === "knownCase" ? onPickCase() : retry())}
       />
     );
   const { pairs, windowStart, windowEnd } = state.data;

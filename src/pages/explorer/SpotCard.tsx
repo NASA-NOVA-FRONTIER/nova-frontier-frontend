@@ -2,7 +2,13 @@ import { STEP_2, STEP_3 } from "@/content/copyV8";
 import { Prov } from "@/features/case-panel/Prov";
 import { Icon } from "@/features/case-panel/icons";
 import type { Case } from "@/features/cases/cases";
-import { explorationProblem } from "@/features/explore/exploreProblems";
+import {
+  explorationProblem,
+  quotaLowProblem,
+  quotaOutProblem,
+} from "@/features/explore/exploreProblems";
+import { LiveProblem } from "@/features/live/LiveStatus";
+import type { Limits, Quota } from "@/features/limits/limitsApi";
 import { formatLonLat } from "@/features/live/liveQuestion";
 import type { Place } from "@/features/search/placesApi";
 import { caseName } from "@/features/search/searchRows";
@@ -19,6 +25,12 @@ type SpotCardProps = {
   place: Place;
   coverage: AsyncState<Coverage> | undefined;
   nearest: Nearest | undefined;
+  // SPECS-v8 §8: the quota line shows only at 3 or fewer left, or when used up.
+  quota: Quota;
+  limits: Limits | undefined;
+  // A minute clock, for the reset time of a used-up quota.
+  now: number;
+  cases: readonly Case[];
   onAnalyse: () => void;
   onRetry: () => void;
   onOpenCase: (item: Case) => void;
@@ -42,6 +54,10 @@ export const SpotCard = ({
   place,
   coverage,
   nearest,
+  quota,
+  limits,
+  now,
+  cases,
   onAnalyse,
   onRetry,
   onOpenCase,
@@ -146,16 +162,38 @@ export const SpotCard = ({
               <p>{explorationProblem({ reasonCode: "INSUFFICIENT_HISTORY", detail: "" }).body}</p>
             </div>
           )}
-          <button
-            type="button"
-            className="x-primary"
-            disabled={view.state !== "ready"}
-            onClick={onAnalyse}
-            data-testid="place-analyse"
-          >
-            {STEP_2.primary}
-            <Icon name="arrow" size={14} />
-          </button>
+          {quota.kind === "low" && (
+            <LiveProblem
+              problem={quotaLowProblem(quota.remaining)}
+              reasonCode=""
+              onAction={() => undefined}
+              actions={false}
+              testId="spot-quota"
+            />
+          )}
+          {quota.kind === "out" && (
+            <LiveProblem
+              problem={quotaOutProblem(limits, new Date(now))}
+              reasonCode=""
+              onAction={onClose}
+              actions={false}
+              cases={cases}
+              onOpenCase={onOpenCase}
+              testId="spot-quota"
+            />
+          )}
+          {quota.kind !== "out" && (
+            <button
+              type="button"
+              className="x-primary"
+              disabled={view.state !== "ready"}
+              onClick={onAnalyse}
+              data-testid="place-analyse"
+            >
+              {STEP_2.primary}
+              <Icon name="arrow" size={14} />
+            </button>
+          )}
           <button type="button" className="x-ghost" onClick={onClose} data-testid="spot-cases">
             {STEP_2.secondary}
           </button>
