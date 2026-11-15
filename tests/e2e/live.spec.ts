@@ -1051,17 +1051,16 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
     await expect(page).toHaveURL(/lens=insar/);
   });
 
-  test("a manual pass pick stops the time-lapse and keeps that pass", async ({ page }) => {
+  test("a manual pass pick stops the player and keeps that pass", async () => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    const play = page.getByTestId("timeline-play");
-    await play.click();
-    await expect(play).toHaveAttribute("aria-label", "Pause");
+    await globe.timelinePlay.click();
+    await expect(globe.timelinePlay).toHaveAttribute("aria-label", "Pause");
     await globe.timelinePasses("base").nth(1).click();
-    await expect(play).toHaveAttribute("aria-label", "Play");
+    await expect(globe.timelinePlay).toHaveAttribute("aria-label", "Play");
     await expect(globe.timelineReadout).toHaveText("Pass 2 of 5 · 19 Aug 2026");
-    // Stopped: no stamp on the globe, and the picked pass stays draped.
+    // Stopped on the picked pass: it stays draped and the stamp names it.
     await globe.expectScene((scene) => {
-      expect(scene.stamp).toBeUndefined();
+      expect(scene.stamp?.date).toBe("19 AUG 2026");
       expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-08-19_HH");
     });
   });

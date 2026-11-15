@@ -72,6 +72,16 @@ export class GlobePage {
   readonly timeline: Locator;
   readonly timelineCompare: Locator;
   readonly timelineReadout: Locator;
+  readonly timelineSub: Locator;
+  readonly timelinePlay: Locator;
+  readonly timelinePrev: Locator;
+  readonly timelineStepNext: Locator;
+  readonly timelineLoop: Locator;
+  readonly timelineSpeed: Locator;
+  readonly timelineTrack: Locator;
+  readonly timelineGaps: Locator;
+  readonly timelineEvent: Locator;
+  readonly stamp: Locator;
   readonly dock: Locator;
   readonly jobError: Locator;
   readonly planPasses: Locator;
@@ -121,6 +131,16 @@ export class GlobePage {
     this.timeline = page.getByTestId("timeline");
     this.timelineCompare = page.getByTestId("timeline-compare");
     this.timelineReadout = page.getByTestId("timeline-readout");
+    this.timelineSub = page.getByTestId("timeline-sub");
+    this.timelinePlay = page.getByTestId("timeline-play");
+    this.timelinePrev = page.getByTestId("timeline-prev");
+    this.timelineStepNext = page.getByTestId("timeline-step-next");
+    this.timelineLoop = page.getByTestId("timeline-loop");
+    this.timelineSpeed = page.getByTestId("timeline-speed");
+    this.timelineTrack = page.getByTestId("timeline-track");
+    this.timelineGaps = page.getByTestId("timeline-gap");
+    this.timelineEvent = page.getByTestId("timeline-event");
+    this.stamp = page.getByTestId("timelapse-stamp");
     this.dock = page.getByTestId("layer-dock");
     this.jobError = page.getByTestId("job-error");
     this.planPasses = page.getByTestId("plan-passes");
@@ -231,6 +251,29 @@ export class GlobePage {
 
   timelinePasses(kind: "base" | "target" | "meas" | "plan"): Locator {
     return this.timeline.locator(`[data-testid^="timeline-pass-"][data-kind="${kind}"]`);
+  }
+
+  timelinePair(index: number): Locator {
+    return this.page.getByTestId(`timeline-pair-${index}`);
+  }
+
+  timelineSpeedOption(speed: 0.5 | 1 | 2): Locator {
+    return this.page.getByTestId(`timeline-speed-${speed}`);
+  }
+
+  // "true" while the sequence player runs.
+  async expectTimelinePlaying(playing: boolean): Promise<void> {
+    await expect(this.timeline).toHaveAttribute("data-playing", String(playing));
+  }
+
+  // A zoom of the globe itself (not the square), which pauses the timeline.
+  async grabGlobe(): Promise<void> {
+    if (this.stub) {
+      await this.page.evaluate(() => window.__globe?.interact());
+      return;
+    }
+    await this.page.mouse.move(FREE_CENTRE.x, FREE_CENTRE.y);
+    await this.page.mouse.wheel(0, 120);
   }
 
   // Answers every plan query with frame 47-3's dates; `failures` HTTP errors come first.
