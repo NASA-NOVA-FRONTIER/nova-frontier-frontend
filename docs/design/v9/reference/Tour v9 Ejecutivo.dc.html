@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>NISAR Hazard Watch · Tour ejecutivo v9</title>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://cesium.com/downloads/cesiumjs/releases/1.120/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+<script>window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.120/Build/Cesium/";</script>
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.120/Build/Cesium/Cesium.js"></script>
+<style>
+html,body{margin:0;height:100%;background:#04070e;color-scheme:dark;overflow:hidden}
+a{color:#c9b48b;text-decoration:none}
+a:hover{color:#dccaa3}
+h1,h2,p{margin:0}
+button{font:inherit}
+.cesium-widget-credits{display:none !important}
+@keyframes tourbar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+</style>
+</helmet>
+<div onKeyDown="{{ onKey }}" tabIndex="0" ref="{{ rootRef }}" style="position:fixed;inset:0;background:#04070e;color:#ebe9e4;font-family:'Albert Sans',system-ui,sans-serif;outline:none;overflow:hidden">
+  <div ref="{{ globeRef }}" style="position:absolute;inset:0"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,7,14,0.88) 0%,rgba(4,7,14,0.55) 34%,rgba(4,7,14,0) 60%);pointer-events:none"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:180px;background:linear-gradient(0deg,rgba(4,7,14,0.85),rgba(4,7,14,0));pointer-events:none"></div>
+
+  <div style="position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%) scale({{ k }});pointer-events:none;z-index:4">
+  <header style="position:absolute;top:40px;left:72px;right:72px;pointer-events:auto;display:flex;align-items:center;gap:16px;z-index:5">
+    <span style="font-weight:600;font-size:24px;white-space:nowrap">NISAR Hazard Watch</span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:0.08em;color:#c9b48b;white-space:nowrap">TOUR EJECUTIVO · v9 · 15 NOV 2026</span>
+    <div style="flex:1;display:flex;gap:4px;min-width:120px">
+      <sc-for list="{{ segs }}" as="g" hint-placeholder-count="15">
+        <button onClick="{{ g.go }}" aria-label="{{ g.aria }}" aria-current="{{ g.cur }}" style="flex:1;height:14px;padding:5px 0;border:0;background:transparent;cursor:pointer"><span style="display:block;height:4px;border-radius:2px;background:{{ g.bg }}"></span></button>
+      </sc-for>
+    </div>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:20px;font-variant-numeric:tabular-nums;color:#d4d2cc;white-space:nowrap">{{ counter }}</span>
+  </header>
+
+  <section data-screen-label="{{ stop.label }}" style="position:absolute;left:72px;top:150px;bottom:140px;width:760px;display:flex;flex-direction:column;justify-content:center;gap:28px;pointer-events:auto">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:20px;letter-spacing:0.08em;color:#c9b48b">{{ stop.kicker }}</p>
+    <h1 style="font-size:{{ stop.size }};font-weight:500;letter-spacing:-0.04em;line-height:1.02;text-wrap:balance">{{ stop.title }}</h1>
+    <p style="font-size:28px;line-height:1.42;color:#d4d2cc;text-wrap:pretty">{{ stop.lede }}</p>
+    <sc-if value="{{ stop.hasPoints }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;border-top:1px solid rgba(235,233,228,0.14)">
+        <sc-for list="{{ stop.points }}" as="p" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;padding:14px 0;border-bottom:1px solid rgba(235,233,228,0.1)">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#ebe9e4">{{ p.k }}</span>
+            <span style="font-size:24px;color:#c4c1ba;text-wrap:pretty">{{ p.v }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ stop.hasChips }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ stop.chips }}" as="c" hint-placeholder-count="4"><span style="padding:8px 18px;border-radius:999px;border:1.5px solid {{ c.bd }};background:{{ c.bg }};font-family:'JetBrains Mono',monospace;font-size:20px;letter-spacing:0.06em;color:{{ c.ink }}">{{ c.t }}</span></sc-for>
+      </div>
+    </sc-if>
+  </section>
+
+  <sc-if value="{{ hasPreview }}" hint-placeholder-val="{{ false }}">
+    <figure style="position:absolute;right:56px;bottom:136px;margin:0;width:{{ pv.w }};display:flex;flex-direction:column;gap:12px;pointer-events:auto">
+      <a href="#" onClick="{{ openZoom }}" title="Ampliar" style="display:block;cursor:zoom-in;position:relative;width:{{ pv.w }};height:{{ pv.h }};border-radius:18px;overflow:hidden;border:1px solid rgba(235,233,228,0.16);box-shadow:0 30px 80px rgba(0,0,0,0.6);background:#04070e">
+        <div style="position:absolute;left:0;top:0;width:{{ pv.iw }};height:{{ pv.ih }};transform:scale({{ pv.k }});transform-origin:0 0;pointer-events:none">
+          <sc-if value="{{ pv.isFlow }}" hint-placeholder-val="{{ false }}"><dc-import name="Explorer Flow v9" state="{{ pv.state }}" frozen="1" style="width:1440px;height:900px" hint-size="1440px,900px"></dc-import></sc-if>
+          <sc-if value="{{ pv.isWaves }}" hint-placeholder-val="{{ false }}"><div style="width:1100px;padding:0;background:#04070e"><dc-import name="Radar Waves" hint-size="1100px,560px"></dc-import></div></sc-if>
+        </div>
+      </a>
+      <figcaption style="display:flex;justify-content:space-between;gap:12px;font-family:'JetBrains Mono',monospace;font-size:18px;letter-spacing:0.05em;color:#a9a69e"><span>{{ pv.caption }}</span><button onClick="{{ openZoom }}" style="padding:0;border:0;background:transparent;color:#c9b48b;font:inherit;letter-spacing:inherit;cursor:pointer">AMPLIAR ⤢</button></figcaption>
+    </figure>
+  </sc-if>
+
+  <sc-if value="{{ zoom }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeZoom }}" style="position:absolute;inset:0;background:rgba(4,7,14,0.86);backdrop-filter:blur(6px);pointer-events:auto;z-index:20">
+      <div onClick="{{ stopProp }}" style="position:absolute;left:50%;top:50%;width:{{ zm.w }};height:{{ zm.h }};transform:translate(-50%,-50%);border-radius:20px;overflow:hidden;border:1px solid rgba(235,233,228,0.2);box-shadow:0 40px 120px rgba(0,0,0,0.7);background:#04070e">
+        <div style="position:absolute;left:0;top:0;width:{{ pv.iw }};height:{{ pv.ih }};transform:scale({{ zm.k }});transform-origin:0 0">
+          <sc-if value="{{ pv.isFlow }}" hint-placeholder-val="{{ false }}"><dc-import name="Explorer Flow v9" state="{{ pv.state }}" style="width:1440px;height:900px" hint-size="1440px,900px"></dc-import></sc-if>
+          <sc-if value="{{ pv.isWaves }}" hint-placeholder-val="{{ false }}"><div style="width:1100px;background:#04070e"><dc-import name="Radar Waves" hint-size="1100px,560px"></dc-import></div></sc-if>
+        </div>
+      </div>
+      <p style="position:absolute;left:50%;bottom:28px;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:18px;letter-spacing:0.06em;color:#a9a69e;white-space:nowrap">INTERACTIVO · HAZ CLIC DENTRO PARA PROBAR EL FLUJO · ESC O CLIC FUERA PARA CERRAR</p>
+      <button onClick="{{ closeZoom }}" aria-label="Cerrar" style="position:absolute;right:48px;top:40px;width:60px;height:60px;border-radius:50%;border:1px solid rgba(235,233,228,0.3);background:rgba(8,16,31,0.8);display:grid;place-items:center;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" style="fill:none;stroke:#ebe9e4;stroke-width:2;stroke-linecap:round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+  </sc-if>
+  <footer style="position:absolute;left:72px;right:72px;bottom:44px;display:flex;align-items:center;gap:12px;pointer-events:auto">
+    <button onClick="{{ prev }}" aria-label="Anterior" style="width:60px;height:60px;border-radius:50%;border:1px solid rgba(235,233,228,0.22);background:rgba(8,16,31,0.7);display:grid;place-items:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" style="fill:none;stroke:#ebe9e4;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+    <button onClick="{{ next }}" aria-label="Siguiente" style="height:48px;display:flex;align-items:center;gap:10px;padding:0 24px;border-radius:999px;border:0;background:#c9b48b;color:#16120a;font-weight:500;font-size:20px;white-space:nowrap;height:60px;cursor:pointer">{{ nextLabel }}<svg width="16" height="16" viewBox="0 0 24 24" style="fill:none;stroke:#16120a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9 6l6 6-6 6"></path></svg></button>
+    <button onClick="{{ togglePlay }}" aria-pressed="{{ playOn }}" style="height:48px;display:flex;align-items:center;gap:8px;padding:0 18px;border-radius:999px;border:1px solid rgba(235,233,228,0.22);background:rgba(8,16,31,0.7);color:#ebe9e4;font-size:20px;white-space:nowrap;height:60px;cursor:pointer;position:relative;overflow:hidden"><svg width="14" height="14" viewBox="0 0 24 24" style="fill:#ebe9e4"><path d="{{ playIcon }}"></path></svg>{{ playLabel }}<sc-if value="{{ playing }}" hint-placeholder-val="{{ false }}"><span key="{{ barKey }}" style="position:absolute;left:0;bottom:0;height:2px;width:100%;background:#c9b48b;transform-origin:0 0;animation:tourbar {{ autoSec }} linear forwards"></span></sc-if></button>
+    <span style="flex:1"></span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:0.05em;color:#8d8a83;text-align:right;white-space:nowrap">{{ footNote }}</span>
+  </footer>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  rootRef = React.createRef(); globeRef = React.createRef();
+  state = { scale: Math.min(window.innerWidth / 1920, window.innerHeight / 1080), i: Math.min(14, Math.max(0, parseInt(localStorage.getItem("tourv9-stop") || "0", 10) || 0)), playing: false };
+  SQ = { qadirabad: [73.71, 32.33], kumamoto: [130.75, 32.81] };
+  CASES = [["Qadirabad", 73.71, 32.33, 1], ["Bug Fire", -117.4, 38.4, 1], ["Rowe Creek", -120.1, 44.8, 1], ["Kumamoto", 130.75, 32.81, 1], ["Chókwè", 33.0, -24.53, 0], ["Richmond", -84.89, 39.83, 0], ["San Marcos", -75.13, 8.66, 0], ["Matam", -13.26, 15.66, 0], ["High Plains", -99.5, 38.5, 0], ["Sköllersta", 15.33, 59.13, 0], ["Palouse", -117.2, 46.9, 0], ["Chocó", -76.65, 5.69, 0]];
+  async componentDidMount() {
+    this.rootRef.current?.focus();
+    this.onResize = () => this.setState({ scale: Math.min(window.innerWidth / 1920, window.innerHeight / 1080) }); window.addEventListener("resize", this.onResize);
+    await new Promise((r) => { let n = 0; const t = () => (window.Cesium ? r() : n++ > 200 ? r() : setTimeout(t, 50)); t(); });
+    const C = window.Cesium; if (!C || !this.globeRef.current) return;
+    this.reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const credit = document.createElement("div");
+    const v = (this.v = new C.Viewer(this.globeRef.current, { baseLayer: false, animation: false, timeline: false, baseLayerPicker: false, geocoder: false, homeButton: false, sceneModePicker: false, navigationHelpButton: false, fullscreenButton: false, infoBox: false, selectionIndicator: false, creditContainer: credit }));
+    v.scene.backgroundColor = C.Color.fromCssColorString("#04070e");
+    v.scene.globe.baseColor = C.Color.fromCssColorString("#0e1930");
+    v.scene.skyBox.show = false; v.scene.sun.show = false; v.scene.moon.show = false;
+    v.scene.globe.enableLighting = false; v.scene.fog.enabled = true;
+    try { v.imageryLayers.addImageryProvider(await C.ArcGisMapServerImageryProvider.fromUrl("https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer")); }
+    catch (e) { v.imageryLayers.addImageryProvider(await C.TileMapServiceImageryProvider.fromUrl(C.buildModuleUrl("Assets/Textures/NaturalEarthII"))); }
+    const gold = C.Color.fromCssColorString("#c9b48b");
+    const square = ([lon, lat]) => { const dLat = 5.12 / 111.32, dLon = 5.12 / (111.32 * Math.cos((lat * Math.PI) / 180)); return C.Rectangle.fromDegrees(lon - dLon, lat - dLat, lon + dLon, lat + dLat); };
+    this.squares = Object.values(this.SQ).map((p) => v.entities.add({ rectangle: { coordinates: square(p), material: gold.withAlpha(0.12), outline: true, outlineColor: gold, outlineWidth: 2, height: 0 }, show: false }));
+    this.sqOutline = Object.values(this.SQ).map(([lon, lat]) => { const dLat = 5.12 / 111.32, dLon = 5.12 / (111.32 * Math.cos((lat * Math.PI) / 180)); return v.entities.add({ polyline: { positions: C.Cartesian3.fromDegreesArray([lon - dLon, lat - dLat, lon + dLon, lat - dLat, lon + dLon, lat + dLat, lon - dLon, lat + dLat, lon - dLon, lat - dLat]), width: 3, material: gold, clampToGround: true }, show: false }); });
+    this.marks = this.CASES.map(([name, lon, lat, feat]) => v.entities.add({ position: C.Cartesian3.fromDegrees(lon, lat), point: { pixelSize: feat ? 12 : 8, color: feat ? gold : C.Color.fromCssColorString("#ebe9e4"), outlineColor: C.Color.fromCssColorString("#04070e"), outlineWidth: 2, disableDepthTestDistance: Number.POSITIVE_INFINITY }, label: { text: name, font: "500 14px 'Albert Sans', sans-serif", fillColor: C.Color.fromCssColorString("#ebe9e4"), outlineColor: C.Color.fromCssColorString("#04070e"), outlineWidth: 4, style: C.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new C.Cartesian2(12, -10), horizontalOrigin: C.HorizontalOrigin.LEFT, disableDepthTestDistance: Number.POSITIVE_INFINITY, show: !!feat }, show: false }));
+    v.clock.onTick.addEventListener(() => { if (this.spin && !this.reduced) v.scene.camera.rotate(C.Cartesian3.UNIT_Z, -0.0006); });
+    this.fly(true);
+  }
+  componentDidUpdate(_, prev) { if (prev.i !== this.state.i) { localStorage.setItem("tourv9-stop", String(this.state.i)); this.fly(false); } if (prev.playing !== this.state.playing || prev.i !== this.state.i) this.schedule(); }
+  componentWillUnmount() { window.removeEventListener("resize", this.onResize); clearTimeout(this.auto); this.v?.destroy(); }
+  schedule() { clearTimeout(this.auto); if (this.state.playing) this.auto = setTimeout(() => (this.state.i < 14 ? this.setState({ i: this.state.i + 1 }) : this.setState({ playing: false })), 11000); }
+  fly(first) {
+    const C = window.Cesium, v = this.v; if (!C || !v) return;
+    const s = this.stops()[this.state.i], cam = s.cam;
+    this.spin = !!cam.spin;
+    const sh = s.show || {};
+    this.squares.forEach((e, k) => (e.show = !!sh.sq && sh.sq.includes(k)));
+    this.sqOutline.forEach((e, k) => (e.show = !!sh.sq && sh.sq.includes(k)));
+    this.marks.forEach((e) => (e.show = !!sh.cases));
+    v.camera.flyTo({ destination: C.Cartesian3.fromDegrees(cam.lon, cam.lat, cam.h), orientation: { heading: C.Math.toRadians(cam.hd || 0), pitch: C.Math.toRadians(cam.p ?? -90), roll: 0 }, duration: first || this.reduced ? 0 : cam.d || 3.2, easingFunction: C.EasingFunction.QUADRATIC_IN_OUT });
+  }
+  stops() {
+    const Q = this.SQ.qadirabad, K = this.SQ.kumamoto;
+    return [
+      { label: "Portada", kicker: "RESUMEN EJECUTIVO DE CAMBIOS", title: "Un cuadro, una pregunta, cinco pasadas medidas.", lede: "Lo que cambió en el Explorer después de la reunión del 14 de noviembre, contado sobre el mismo globo que usa el producto.", size: "92px", cam: { lon: -40, lat: 15, h: 21000000, spin: true }, note: "" },
+      { label: "El cambio", kicker: "QUÉ CAMBIA", title: "Menos herramientas, menos dudas.", lede: "Punto, rectángulo y polígono se reemplazan por una sola acción. El usuario confirma antes de gastar tiempo de cómputo y ve el resultado como una secuencia en el tiempo.", size: "76px", points: [["Antes", "3 herramientas de dibujo; el análisis arrancaba sin confirmar"], ["Ahora", "1 cuadro → confirmar → procesar → ver la secuencia"], ["Alcance", "Solo el Explorer. More Information, búsqueda y Nova van después"]], cam: { lon: -74, lat: 4.6, h: 9000000 }, note: "" },
+      { label: "1 · El cuadro", kicker: "PASO 1 · COLOCAR EL CUADRO", title: "Un clic, un cuadro de 10 × 10 km.", lede: "Es el cuadro de 10,24 km que ya usa el backend, unos 105 km². Se puede arrastrar antes de confirmar y no procesa nada todavía.", size: "76px", points: [["Tamaño", "10,24 km por lado, en la zona UTM local"], ["Gesto", "Clic o toque; se arrastra para ajustar"], ["Costo", "Cero hasta que el usuario pulsa Start"]], cam: { lon: Q[0], lat: Q[1] - 0.32, h: 42000, p: -48, d: 4.5 }, show: { sq: [0] }, preview: "placed", note: "QADIRABAD, PAKISTÁN" },
+      { label: "2 · Confirmar", kicker: "PASO 2 · CONFIRMAR QUÉ SE ANALIZA", title: "El usuario elige qué buscar y cuándo.", lede: "Cuatro bloques y nada más: qué buscar, qué pasadas leer, un aviso si hace falta y Start. Las pasadas elegidas son círculos dorados unidos por una línea; en sismo, cada pareja es un arco que se toca para elegirla.", size: "68px", points: [["Fenómenos", "Sismo · Incendio · Deforestación · Inundación, con una línea de qué busca el radar"], ["Fechas", "“5 passes · 20 Jun → 24 Sep · Change”; solo fechas con pasada real"], ["Ajustes", "Solo los que acepta el backend: pareja y umbral en sismo; ninguno en los demás"]], cam: { lon: Q[0] + 0.04, lat: Q[1] - 0.22, h: 30000, p: -55, hd: 8 }, show: { sq: [0] }, preview: "confirm", note: "QADIRABAD, PAKISTÁN" },
+      { label: "Reglas de pasadas", kicker: "REGLAS CLARAS", title: "Cinco pasadas, o decimos por qué no.", lede: "Cada caso límite tiene su propio mensaje y una salida de un toque. Nunca se inventa una imagen para llenar un hueco.", size: "68px", points: [["5 pasadas", "Lo normal: las más cercanas a cinco fechas parejas"], ["4 pasadas", "Se permite y se nombra el hueco"], ["≤ 3", "Start bloqueado: no hay suficiente historia"], ["Sin pasadas", "Próxima pasada según el Observation Plan"]], cam: { lon: Q[0] - 0.05, lat: Q[1] - 0.25, h: 34000, p: -50, hd: -10 }, show: { sq: [0] }, preview: "confirm-few", note: "QADIRABAD, PAKISTÁN" },
+      { label: "Explicado", kicker: "CUALQUIERA LO ENTIENDE", title: "Cada término tiene su ⓘ.", lede: "Al pasar el mouse, con el teclado o tocando en el teléfono, una ventanita flotante explica en lenguaje simple qué es cada cosa: pasadas, parejas, coherencia, capas, ONLINE/OFFLINE, el número de celdas.", size: "68px", points: [["Dónde", "En las cinco pantallas del flujo, sin empujar el layout"], ["Tono", "Una o dos frases, sin jerga; la ciencia completa vive en Method"]], cam: { lon: Q[0] + 0.02, lat: Q[1] - 0.2, h: 28000, p: -52, hd: 12 }, show: { sq: [0] }, preview: "confirm", note: "QADIRABAD, PAKISTÁN" },
+      { label: "3 · Procesar", kicker: "PASO 3 · UNA ESPERA HONESTA", title: "Tiempo transcurrido, nunca una cuenta regresiva.", lede: "El panel va arriba a la derecha y nunca tapa el cuadro. Muestra el rango que da el backend, el paso actual y, si se pasa del estimado, lo dice.", size: "68px", points: [["Estimado", "p80 de las últimas 50 ejecuciones del backend"], ["Límite", "A los 8 min: resultado parcial, nunca congelado"], ["Mientras tanto", "10 datos curiosos de un banco de 40, con fuente"]], cam: { lon: Q[0], lat: Q[1] - 0.18, h: 26000, p: -60, hd: 20 }, show: { sq: [0] }, preview: "processing", note: "QADIRABAD, PAKISTÁN" },
+      { label: "4 · Secuencia", kicker: "PASO 4 · EL RESULTADO EN EL TIEMPO", title: "Cinco pasadas medidas, con sus huecos reales.", lede: "La línea de tiempo se reproduce sola sobre el globo: play, pausa, velocidad, bucle y avance por pasada. La capa, la leyenda y la fecha se mueven juntas.", size: "68px", points: [["Capas", "HH en gris fijo −30…0 dB · cambio −8…+8 dB"], ["Dato", "1.911 de 16.384 celdas con la firma de oscurecimiento"]], cam: { lon: Q[0] + 0.06, lat: Q[1] - 0.12, h: 18000, p: -42, hd: -25, d: 4 }, show: { sq: [0] }, preview: "result-playing", note: "QADIRABAD, PAKISTÁN" },
+      { label: "Capas por lente", kicker: "CADA FENÓMENO SE VE DISTINTO", title: "Cada lente pinta lo que mide.", lede: "Inundación mira HH y HV juntos; incendio y deforestación miran HV, el eco que rebota dentro de hojas y ramas. La tarjeta de resultado quedó en lo esencial: el número, qué más podría ser y qué no mostramos.", size: "68px", points: [["Inundación", "HH · cambio desde la primera pasada · firma de oscurecimiento"], ["Incendio", "HV · caída de HV · detecciones de NASA FIRMS al lado"], ["Deforestación", "HV · caída de HV"], ["Resultado", "“1,911 of 16,384” · Could also be · Not shown"]], cam: { lon: Q[0] - 0.04, lat: Q[1] - 0.1, h: 20000, p: -45, hd: 30 }, show: { sq: [0] }, preview: "result-paused", note: "IMÁGENES DE INCENDIO Y DEFORESTACIÓN: RELLENO" },
+      { label: "Sismos", kicker: "SISMOS · PAREJAS DE PASADAS", title: "Solo cuentan los pares que cruzan el evento.", lede: "Para un sismo lo que se mide es una pareja: coherencia y fase entre dos pasadas. La línea de tiempo muestra intervalos y marca el evento para que se vea que lo encierran.", size: "68px", points: [["Casos", "Kumamoto: 3 parejas que encierran el evento del manifiesto"], ["Tu cuadro", "Las parejas de /insar/pairs, más reciente primero; sin catálogo de eventos por ahora"], ["Capas", "Coherencia (dónde creerle) y fase (el patrón)"], ["Nunca", "Desplazamiento en cm"]], cam: { lon: K[0], lat: K[1] - 0.3, h: 40000, p: -45, hd: 5, d: 5 }, show: { sq: [1] }, preview: "result-quake", note: "KUMAMOTO, JAPÓN" },
+      { label: "Casos medidos", kicker: "12 CASOS MEDIDOS", title: "Uno destacado por fenómeno, el resto en lista.", lede: "Los jueces entran por aquí: abren en un segundo, con su fenómeno fijo y sus límites a la vista. Desde cualquiera pueden colocar su propio cuadro.", size: "68px", chips: [["INUNDACIÓN · QADIRABAD", 1], ["INCENDIO · BUG FIRE", 1], ["DEFORESTACIÓN · ROWE CREEK", 1], ["SISMO · KUMAMOTO", 1], ["+ 8 MÁS", 0]], cam: { lon: -20, lat: 25, h: 24000000, spin: true, d: 4.5 }, show: { cases: true }, preview: "empty", note: "UBICACIONES APROXIMADAS" },
+      { label: "Etiquetas", kicker: "ETIQUETAS", title: "Dos chips: cómo se calculó y de dónde salió.", lede: "OFFLINE y ONLINE dicen cómo se obtuvo la respuesta. El origen dice si es medido o demo. Separados, un caso precalculado nunca se confunde con un dato inventado.", size: "68px", chips: [["OFFLINE", 2], ["ONLINE", 3], ["MEASURED", 2], ["DEMO DATA", 4]], cam: { lon: 100, lat: 20, h: 16000000, spin: true }, note: "" },
+      { label: "Ciencia", kicker: "LO QUE NUNCA MOSTRAMOS", title: "Evidencia medida, no conclusiones.", lede: "Toda proporción lleva su denominador y toda cifra sus fechas y su fuente. Estas reglas no cambian con el nuevo flujo.", size: "68px", points: [["Nunca", "Hectáreas · probabilidades · profundidad del agua · cm de desplazamiento · causas como hecho"], ["Siempre", "“N de M celdas”, fechas reales y fuente"], ["Fase", "Cada franja ≈ 12 cm de cambio en el trayecto del radar"]], cam: { lon: 20, lat: -5, h: 18000000, spin: true }, note: "" },
+      { label: "Learn · ondas", kicker: "LEARN · ISSUE #33", title: "Ondas que se mueven en tiempo real.", lede: "Un corte técnico en vivo: el dosel en partículas se ilumina donde rebota el pulso, y cada banda llega a una profundidad distinta. El público cambia longitud de onda, polarización y ángulo.", size: "68px", points: [["Bandas", "L 24 cm · S 9,4 cm · C 5,6 cm, a escala"], ["Control", "Teclado completo; 60 fps en canvas"]], cam: { lon: -62, lat: -3.5, h: 900000, p: -60, d: 4 }, preview: "waves", note: "AMAZONÍA" },
+      { label: "Próximos pasos", kicker: "PARA DECIDIR", title: "Lo que falta para pasar a código.", lede: "El diseño está listo en frames 1440 y 390, con textos y comportamiento documentados. Quedan cuatro pendientes con el equipo.", size: "68px", points: [["Backend #18", "startDate / endDate y la lista completa de pasadas en /coverage"], ["Imágenes", "Un PNG por pasada; capas HV reales de Bug Fire y Rowe Creek"], ["Kumamoto", "Fechas reales de las 3 parejas y del evento"], ["Después", "Catálogo de sismos USGS y datos curiosos 11–40 verificados"]], cam: { lon: -74, lat: 4.6, h: 20000000, spin: true }, note: "" },
+    ];
+  }
+  renderVals() {
+    const S = this.stops(), i = this.state.i, s = S[i];
+    const go = (n) => this.setState({ i: Math.max(0, Math.min(S.length - 1, n)) });
+    const CH = { 0: ["rgba(235,233,228,0.3)", "transparent", "#d4d2cc"], 1: ["#c9b48b", "rgba(201,180,139,0.14)", "#ebe9e4"], 2: ["rgba(235,233,228,0.5)", "transparent", "#ebe9e4"], 3: ["#c9b48b", "transparent", "#c9b48b"], 4: ["transparent", "rgba(245,158,11,0.18)", "#fcd34d"] };
+    const pvState = s.preview;
+    const isWaves = pvState === "waves";
+    const k = isWaves ? 0.8 : 0.62;
+    return {
+      rootRef: this.rootRef, globeRef: this.globeRef,
+      counter: `${String(i + 1).padStart(2, "0")} / ${S.length}`,
+      segs: S.map((x, n) => ({ aria: `${n + 1}. ${x.label}`, cur: n === i ? "step" : "false", bg: n < i ? "#c9b48b" : n === i ? "#ebe9e4" : "rgba(235,233,228,0.2)", go: () => go(n) })),
+      stop: { ...s, hasPoints: !!s.points, points: (s.points || []).map(([k2, v]) => ({ k: k2, v })), hasChips: !!s.chips, chips: (s.chips || []).map(([t, c]) => ({ t, bd: CH[c][0], bg: CH[c][1], ink: CH[c][2] })) },
+      hasPreview: !!pvState,
+      zoom: !!this.state.zoom, openZoom: (e) => { e.preventDefault(); this.setState({ zoom: true, playing: false }); }, closeZoom: () => this.setState({ zoom: false }), stopProp: (e) => e.stopPropagation(),
+      zm: isWaves ? { k: 1.45, w: "1595px", h: "812px" } : { k: 1.15, w: "1656px", h: "1035px" },
+      k: this.state.scale, footNote: `← → PARA NAVEGAR · ARRASTRA EL GLOBO · IMAGERY: ESRI WORLD IMAGERY${s.note ? " · " + s.note : ""}`,
+      pv: { state: isWaves ? "empty" : pvState, isFlow: !!pvState && !isWaves, isWaves, k: k, iw: isWaves ? "1100px" : "1440px", ih: isWaves ? "560px" : "900px", w: isWaves ? "880px" : "893px", h: isWaves ? "448px" : "558px", caption: isWaves ? "RADAR WAVES · LEARN" : `EXPLORER FLOW v9 · ${String(pvState).toUpperCase()}`, href: (() => { const u = new URL(isWaves ? "Radar Waves.dc.html" : "Explorer Flow v9.dc.html", window.location.href); new URLSearchParams(window.location.search).forEach((v, k2) => u.searchParams.set(k2, v)); if (!isWaves) u.searchParams.set("state", pvState); u.hash = window.location.hash; return u.toString(); })() },
+      prev: () => go(i - 1), next: () => go(i === S.length - 1 ? 0 : i + 1), nextLabel: i === S.length - 1 ? "Volver al inicio" : "Siguiente",
+      onKey: (e) => { if (this.state.zoom) { if (e.key === "Escape") this.setState({ zoom: false }); return; } if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(i === S.length - 1 ? 0 : i + 1); } else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(i - 1); } else if (e.key === "Home") go(0); else if (e.key === "End") go(S.length - 1); },
+      playing: this.state.playing, playOn: this.state.playing ? "true" : "false", playIcon: this.state.playing ? "M7 5h4v14H7zM13 5h4v14h-4z" : "M8 5l11 7-11 7z", playLabel: this.state.playing ? "Pausar tour" : "Reproducir tour", togglePlay: () => this.setState({ playing: !this.state.playing }), barKey: `b${i}`, autoSec: "11s",
+    };
+  }
+}
+</script>
+</body>
+</html>
