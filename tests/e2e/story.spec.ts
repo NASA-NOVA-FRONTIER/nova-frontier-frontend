@@ -37,11 +37,19 @@ test.describe("Explorer: guided story", () => {
     await expect(page).toHaveURL(/\/explore$/);
   });
 
-  test("chapter 5 keeps photos and news as slots; chapter 6 opens Qadirabad", async ({ page }) => {
+  test("chapter 5 keeps photos as slots and links real news; chapter 6 opens Qadirabad", async ({
+    page,
+  }) => {
     await globe.goto("?story=1");
     await page.getByTestId("story-segment-5").click();
     await expect(page.getByTestId("story-photo-slot")).toContainText("Credited photo goes here");
-    await expect(page.getByTestId("story-news-slot")).toHaveCount(3);
+    const news = page.getByTestId("story-news");
+    await expect(news).toHaveCount(3);
+    for (const item of await news.all()) {
+      await expect(item.getByRole("link")).toHaveAttribute("href", /^https:\/\//);
+      await expect(item.getByRole("link")).toHaveAttribute("target", "_blank");
+    }
+    await expect(news.first()).toContainText("The Express Tribune · 23 Jul 2026");
 
     await page.getByTestId("story-segment-6").click();
     await expect(page.getByTestId("story-next")).toHaveText("Explore");

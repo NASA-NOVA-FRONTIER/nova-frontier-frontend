@@ -137,7 +137,13 @@ test.describe("Explorer: measured cases", () => {
     );
     await expect(globe.panel.getByTestId("band-chart")).toHaveCount(0);
     await expect(globe.timeline).toHaveCount(0);
-    await expect(globe.panel.getByTestId("prov-todo").first()).toBeVisible();
+    // #29: the SGC update is linked, so no quality fact is left as a slot.
+    await expect(globe.panel).toContainText("Update · 10 Aug 2026");
+    await expect(globe.panel.getByTestId("prov-todo")).toHaveCount(0);
+    await expect(globe.panel.getByRole("link", { name: /San José del Palmar/ })).toHaveAttribute(
+      "href",
+      /^https:\/\/www2\.sgc\.gov\.co\//,
+    );
   });
 
   test("hiding REAL labels keeps every DEMO chip", async ({ page }) => {
