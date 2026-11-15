@@ -11,10 +11,10 @@ Pages (`src/App.tsx` switches on the pathname; no router dependency):
   (`src/pages/method/`), `/learn` (`src/pages/learn/`, every link in `learnResources.ts` from the
   challenge resource list), `/about` (`src/pages/about/`, team data in `src/content/team.ts`).
 - `/explore` the CesiumJS explorer (`src/pages/explorer/`). Deep links: `?case=<id>` opens a
-  measured case; `?frame=<track-frame>[&lens=<id>]` asks a live question on a point;
-  `?bbox=<west,south,east,north>` (east below west crosses ±180°) or `?geo=<lon,lat_lon,lat_…>`
-  asks it on a drawn rectangle or polygon; `?story=1` starts the guided story. Legacy `/?frame=`
-  links also open the explorer.
+  measured case; `?point=<lon,lat>` or `?frame=<track-frame>` (plus `&lens=<id>`) asks a live
+  question on the square there; old `?bbox=<west,south,east,north>` (east below west crosses ±180°)
+  and `?geo=<lon,lat_lon,lat_…>` links place the square at their centre without running anything;
+  `?story=1` starts the guided story. Legacy `/?frame=` links also open the explorer.
 - `/report?case=<id>` a printable one-page report for a measured case; `/report?exploration=<id>`
   the same for a live answer, fetched from the backend (`src/pages/report/`).
 
@@ -69,22 +69,32 @@ plus the E2E spec(s) you touched.
 `src/features/search/`: `PlaceSearch` is a combobox (TopBar popover and a button on the start card)
 that calls `GET /api/v1/places?q=` **only when the text is submitted** (Enter or the button):
 OpenStreetMap's Nominatim, which the backend proxies, forbids type-ahead autocomplete. Picking a
-place shows a `PlaceCard` with its NISAR frame (or "No NISAR frame covers this place"), flies the
-camera to its box or to the 10.24 km square (`placeFraming`) and draws that square; "Analyse this
-area" asks the radar at the point. The OpenStreetMap credit comes from the API and is always shown.
+place places the square there and flies the camera to its box or to the 10.24 km square
+(`placeFraming`); after "Use this square" the spot card shows the catalog's passes, and "Analyze
+this spot" asks the radar at the centre. The OpenStreetMap credit comes from the API and is always shown.
 
 ## Choosing an area
 
-`src/features/geo/` is pure (no Cesium types): longitudes and the antimeridian (`longitude.ts`,
-`antimeridian.ts`), the backend's size limits (`limits.ts`, the same numbers as its
-`constants/sar.py`), spherical measures (`measure.ts`), the point's contract square (`square.ts`),
-GeoJSON/WKT (`serialize.ts`), shared links (`areaLink.ts`) and the drawing tools as a state machine
-(`drawMachine.ts`: point, rectangle, polygon; with no tool nothing fires, which is how the guided
-tour keeps the globe still). Rings stay continuous (longitudes may pass ±180°) in the app and are
-split into a `MultiPolygon` only in `toGeoJson`. `src/features/globe/drawTools.ts` and `GlobeView`
-turn pointer events into machine events; `ExplorerPage` owns the state. Sizes: 10 × 10 km ideal
-(110 km²), up to 400 km² accepted, above that the UI explains the limit and offers the centred
-square. Cesium's own double-click is removed in `createViewer` so it never fights the polygon tool.
+Since v9 there is one area: the backend's 10.24 km contract square (`AOI_SIDE_KM` in
+`src/features/geo/limits.ts`, the same number as its `constants/sar.py`), shown as "10 × 10 km".
+A click or tap on the globe, or a search hit, places it (step 2, `SquareBar`: "Square placed ·
+nothing runs yet", Cancel, Use this square). The camera flies to it once per placement, and
+nothing is fetched or POSTed. Dragging moves it, and so do the arrow keys when it has focus (1 km,
+Shift 5 km). "Use this square" locks it and opens the spot card, which checks coverage. A question
+always sends the centre as a GeoJSON `Point`, and the backend builds the exact UTM square.
+
+- **`src/features/geo/`** is pure (no Cesium types): longitudes and the antimeridian
+  (`longitude.ts`, `antimeridian.ts`), spherical measures (`measure.ts`), the square around a point
+  (`square.ts`), moving it (`squareMove.ts`: drag with the grab offset, nudge in km, clamp off the
+  poles, continuous across ±180°), GeoJSON/WKT (`serialize.ts`) and shared links (`areaLink.ts`).
+- **`src/features/globe/SquareOverlay.tsx`** draws the square as an SVG over the canvas, as the
+  design prototype does. Its corners are projected on every `postRender` and written straight to
+  the DOM. Pointer events land on the square, not the canvas, so a drag never spins the globe
+  (pointer capture, `touch-action: none`), and the wheel is passed on to the canvas.
+- **`GlobeView`** reports `onPlace(point)` and `onMoveSquare(centre)`, and `ExplorerPage` owns the
+  state.
+- **Tests:** the stub globe (`GlobeView.stub.tsx`) exposes `window.__globe.click` and
+  `window.__globe.dragSquare`, and `data-scene` carries `square: { centre, sideKm, movable }`.
 
 ## The live exploration flow
 
