@@ -2,14 +2,24 @@ import real from "../fixtures/exploration-qadirabad.json";
 import { describe, expect, it } from "vitest";
 
 import { explorationSchema, type ExplorationView } from "@/features/explore/exploreSchemas";
-import { queueAhead, waitBar, waitSteps } from "@/features/explore/exploreWait";
+import {
+  drawFacts,
+  estimateLine,
+  formatEstimate,
+  queueAhead,
+  waitBar,
+  waitMode,
+  waitSteps,
+} from "@/features/explore/exploreWait";
 
 const REAL = explorationSchema.parse(real);
 
-// The backend's view while a job runs today: planning done, one `processing` stage.
+// The backend's view while a job runs today: planning done, one `processing` stage. A running job is
+// never a cache hit (a hit answers final at once).
 const running = (extra: Partial<ExplorationView> = {}): ExplorationView => ({
   ...REAL,
   status: "running",
+  cache: "miss",
   stage: "processing",
   etaSeconds: 120,
   elapsedSeconds: 30,
@@ -53,30 +63,30 @@ describe("waitBar: elapsed on a 0–5 min axis, never a countdown", () => {
 describe("waitSteps: as far as the backend reports, no further", () => {
   it("before the first answer only the catalog search is under way", () => {
     expect(waitSteps(undefined).map((step) => [step.state, step.line])).toEqual([
-      ["current", "in progress"],
-      ["waiting", "waiting"],
-      ["waiting", "waiting"],
-      ["waiting", "waiting"],
+      ["current", "In progress"],
+      ["waiting", "Waiting"],
+      ["waiting", "Waiting"],
+      ["waiting", "Waiting"],
     ]);
   });
 
   it("with only `processing`, the search is done, reading is current and the rest wait", () => {
     const steps = waitSteps(running());
     expect(steps.map((step) => step.label)).toEqual([
-      "Searching the catalog",
+      "Finding passes",
       "Reading passes",
       "Measuring change",
-      "Drawing layers",
+      "Drawing the layers",
     ]);
     expect(steps.map((step) => step.state)).toEqual(["done", "current", "waiting", "waiting"]);
     // The real plan: five dates of series 084_A_018 between 14 Jul and 11 Nov.
-    expect(steps[0]?.line).toBe("5 passes found · Ascending · 14 Jul → 11 Nov");
-    expect(steps[1]?.line).toBe("in progress");
+    expect(steps[0]?.line).toBe("5 passes · Ascending · 14 Jul → 11 Nov");
+    expect(steps[1]?.line).toBe("In progress");
   });
 
   it("shows k of n while passes are read (backend #6)", () => {
     const steps = waitSteps(running({ progress: { scenesRead: 2, scenesTotal: 5 } }));
-    expect(steps[1]?.line).toBe("2 of 5 read · each appears on the timeline");
+    expect(steps[1]?.line).toBe("2 of 5 read");
   });
 
   it("moves on only when the backend names the later stages", () => {
@@ -91,10 +101,10 @@ describe("waitSteps: as far as the backend reports, no further", () => {
       }),
     );
     expect(steps.map((step) => [step.state, step.line])).toEqual([
-      ["done", "5 passes found · Ascending · 14 Jul → 11 Nov"],
+      ["done", "5 passes · Ascending · 14 Jul → 11 Nov"],
       ["done", "5 of 5 read"],
-      ["current", "in progress"],
-      ["waiting", "waiting"],
+      ["current", "In progress"],
+      ["waiting", "Waiting"],
     ]);
   });
 
@@ -107,9 +117,14 @@ describe("waitSteps: as far as the backend reports, no further", () => {
     ]);
   });
 
-  it("leaves the search line empty when the series key names no direction (#25)", () => {
+  it("says only Done for the search when the series key names no direction (#25)", () => {
     const plan = REAL.plan === null ? null : { ...REAL.plan, seriesKey: "odd-key" };
-    expect(waitSteps(running({ plan }))[0]?.line).toBe("");
+    expect(waitSteps(running({ plan }))[0]?.line).toBe("Done");
+  });
+
+  it("OFFLINE: a prepared answer shows every step done (v9 §1.4)", () => {
+    const steps = waitSteps(running({ cache: "hit" }));
+    expect(steps.map((step) => step.state)).toEqual(["done", "done", "done", "done"]);
   });
 });
 
@@ -119,5 +134,46 @@ describe("queueAhead", () => {
     expect(queueAhead(running({ status: "queued", queuePosition: 2 }))).toBeUndefined();
     expect(queueAhead(running({ status: "queued" }))).toBeUndefined();
     expect(queueAhead(running({ queuePosition: 0 }))).toBeUndefined();
+  });
+});
+
+describe("the mode and the estimate (#25, v9 C7)", () => {
+  it("is OFFLINE only for a prepared answer", () => {
+    expect(waitMode(running())).toBe("online");
+    expect(waitMode(running({ cache: "hit" }))).toBe("offline");
+    expect(waitMode(undefined)).toBe("online");
+  });
+
+  it("names the backend's p80, then says when it is past it, and no number without one", () => {
+    const at = (elapsedSeconds: number, etaSeconds: number | null) => {
+      const view = running({ elapsedSeconds, etaSeconds });
+      return estimateLine(view, waitBar(view, 0, 0));
+    };
+    expect(at(30, 150)).toBe("Usually under 3 min");
+    expect(at(200, 150)).toBe("Estimate was under 3 min");
+    expect(at(30, null)).toBe("Computed live · we stop at 8 min");
+    const offline = running({ cache: "hit" });
+    expect(estimateLine(offline, waitBar(offline, 0, 0))).toBe("Prepared ahead of time");
+    expect(formatEstimate(45)).toBe("45 s");
+  });
+});
+
+describe("drawFacts: ten per wait, stable within a run, no repeats", () => {
+  const pool = Array.from({ length: 40 }, (_, index) => index);
+
+  it("draws ten different facts, the same ten for the same run", () => {
+    const drawn = drawFacts(pool, "run-a");
+    expect(drawn).toHaveLength(10);
+    expect(new Set(drawn).size).toBe(10);
+    expect(drawFacts(pool, "run-a")).toEqual(drawn);
+  });
+
+  it("draws another set for another run", () => {
+    expect(drawFacts(pool, "run-b")).not.toEqual(drawFacts(pool, "run-a"));
+  });
+
+  it("shows the whole pool, shuffled, when it holds fewer than ten", () => {
+    const small = [1, 2, 3];
+    expect([...drawFacts(small, "run-a")].sort()).toEqual(small);
   });
 });
