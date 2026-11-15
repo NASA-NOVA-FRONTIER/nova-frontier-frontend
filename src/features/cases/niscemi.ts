@@ -121,7 +121,7 @@ export const NISCEMI_EVIDENCE: LandslideEvidence = {
   views: [
     {
       id: "change",
-      title: "Change on 22 Oct",
+      title: "Change vs baseline median",
       src: `${FOLDER}/change-{channel}.png`,
       dates: ["2026-10-22"],
       ramp: "linear-gradient(90deg,#053061,#f7f7f7,#67001f)",
