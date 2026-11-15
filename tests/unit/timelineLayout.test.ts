@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CASES, type TimelineData } from "@/features/cases/cases";
+import type { TimelineData } from "@/features/cases/cases";
 import {
   axisPct,
   barHeight,
@@ -91,12 +91,22 @@ describe("pass timeline layout", () => {
     });
   });
 
-  // Regression: Kumamoto has one baseline pass and read "1 passes, 21 Jul – 21 Jul".
+  // Regression: a one-baseline pair (the former Kumamoto case) read "1 passes, 21 Jul – 21 Jul".
   it("names a single baseline pass once", () => {
-    const kumamoto = CASES.find((item) => item.id === "kumamoto")?.timeline;
-    if (kumamoto === undefined) throw new Error("Kumamoto has a timeline");
-    const layout = layoutTimeline(kumamoto);
-    expect(readoutOf(kumamoto, layout, true, layout.targetIndex).line).toBe(
+    const pair: TimelineData = {
+      passes: [
+        { date: "2026-07-09", kind: "meas" },
+        { date: "2026-07-21", kind: "base" },
+        { date: "2026-08-14", kind: "target" },
+      ],
+      start: "2026-07-01",
+      end: "2026-09-01",
+      today: "2026-11-08",
+      optical: [],
+      opticalNote: "InSAR pair · no optical stage",
+    };
+    const layout = layoutTimeline(pair);
+    expect(readoutOf(pair, layout, true, layout.targetIndex).line).toBe(
       "Baseline (1 pass, 21 Jul) ↔ Target 14 Aug 2026",
     );
   });

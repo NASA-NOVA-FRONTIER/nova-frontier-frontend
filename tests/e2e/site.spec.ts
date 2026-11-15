@@ -1,4 +1,4 @@
-import { expect, test } from "./fixtures";
+import { expect, type Page, test } from "./fixtures";
 
 test.describe("Landing and about pages", () => {
   test("the landing compare slider moves with the arrow keys", async ({ page }) => {
@@ -18,13 +18,16 @@ test.describe("Landing and about pages", () => {
     await page.goto("/");
     await expect(page.locator("[data-testid^=landing-case-]")).toHaveCount(5);
     await expect(page.getByTestId("landing-chip-choco")).toHaveText("COHERENCE ONLY · 0.247");
-    await expect(page.getByTestId("landing-chip-kumamoto")).toHaveText(
+    await expect(page.getByTestId("landing-chip-qadirabad")).toHaveText(
       "MEASURED CASE · ESRI WORLD IMAGERY",
+    );
+    await expect(page.getByTestId("landing-case-qadirabad").getByTestId("prov-offline")).toHaveText(
+      "OFFLINE",
     );
     await expect(page.getByTestId("landing-case-choco")).toContainText("Open on the globe →");
     await expect(page.getByTestId("landing-case-choco")).not.toContainText("See the event");
-    await page.getByTestId("landing-case-chokwe").click();
-    await expect(page).toHaveURL(/\/explore\?case=chokwe$/);
+    await page.getByTestId("landing-case-choco").click();
+    await expect(page).toHaveURL(/\/explore\?case=choco$/);
   });
 
   test("the landing sections follow the v8 order, with the atlas between honesty and sources", async ({
@@ -165,5 +168,89 @@ test.describe("Landing and about pages", () => {
         photo.evaluate((img) => (img instanceof HTMLImageElement ? img.naturalWidth : 0));
       await expect.poll(width).toBe(400);
     }
+  });
+});
+
+// The mission model under reduced motion: deployed and still, so a hotspot stays where it was drawn.
+const openMissionModel = async (page: Page) => {
+  await page.goto("/");
+  const figure = page.getByTestId("mission-figure");
+  await figure.scrollIntoViewIfNeeded();
+  const model = figure.getByTestId("nisar-satellite");
+  await expect(model).toHaveAttribute("data-status", "ready");
+  await expect(model).toHaveAttribute("data-running", "false");
+  const boom = model.getByTestId("nisar-hotspot-boom");
+  await expect(boom).toHaveCSS("opacity", "1");
+  return { boom, tip: model.getByTestId("nisar-satellite-tip") };
+};
+
+const SHOWN = /s-sat__tip--shown/;
+
+test.describe("Landing satellite hotspots", () => {
+  test("hovering the boom keeps its card open while the pointer moves toward it", async ({
+    page,
+  }) => {
+    const { boom, tip } = await openMissionModel(page);
+    const box = await boom.boundingBox();
+    if (box === null) throw new Error("boom hotspot has no box");
+    // A 44 px target around the same 26 px ring.
+    expect(box.width).toBeCloseTo(44, 0);
+    await expect(boom).toHaveCSS("width", "44px");
+    expect(
+      await boom.evaluate((el) => getComputedStyle(el, "::before").getPropertyValue("width")),
+    ).toBe("26px");
+
+    const cx = box.x + box.width / 2;
+    const cy = box.y + box.height / 2;
+    await page.mouse.move(cx, cy);
+    await expect(tip).toHaveClass(SHOWN);
+    await expect(tip).toContainText("9 m boom");
+
+    // Count every time the card closes from here on: it must not blink while the pointer stays near.
+    await tip.evaluate((el) => {
+      const w = window as unknown as { tipClosed: number };
+      w.tipClosed = 0;
+      new MutationObserver(() => {
+        if (!el.classList.contains("s-sat__tip--shown")) w.tipClosed += 1;
+      }).observe(el, { attributes: true, attributeFilter: ["class"] });
+    });
+    const tipBox = await tip.boundingBox();
+    const toward = tipBox !== null && tipBox.x > cx ? 1 : -1;
+    await page.mouse.move(cx + toward * 10, cy, { steps: 10 });
+    await page.mouse.move(cx + toward * 20, cy, { steps: 10 });
+    await page.waitForTimeout(300);
+    await expect(tip).toHaveClass(SHOWN);
+    expect(await page.evaluate(() => (window as unknown as { tipClosed: number }).tipClosed)).toBe(
+      0,
+    );
+    // Hovering doesn't move the target.
+    expect(await boom.boundingBox()).toEqual(box);
+
+    // Clearly away from every dot: the card closes.
+    await page.mouse.move(cx - 150, cy - 150, { steps: 5 });
+    await expect(tip).not.toHaveClass(SHOWN);
+  });
+
+  test("keyboard focus on a hotspot shows its card and blur hides it", async ({ page }) => {
+    const { boom, tip } = await openMissionModel(page);
+    await boom.focus();
+    await expect(tip).toHaveClass(SHOWN);
+    await expect(tip).toContainText("9 m boom");
+    await boom.blur();
+    await expect(tip).not.toHaveClass(SHOWN);
+  });
+
+  test.describe("on a touch screen", () => {
+    test.use({ hasTouch: true });
+
+    test("a tap toggles the card", async ({ page }) => {
+      const { boom, tip } = await openMissionModel(page);
+      await boom.tap();
+      await expect(tip).toHaveClass(SHOWN);
+      await expect(boom).toHaveAttribute("aria-pressed", "true");
+      await boom.tap();
+      await expect(tip).not.toHaveClass(SHOWN);
+      await expect(boom).toHaveAttribute("aria-pressed", "false");
+    });
   });
 });

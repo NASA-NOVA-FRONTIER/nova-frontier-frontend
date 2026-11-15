@@ -141,15 +141,17 @@ Shareable explorer links: `/explore?case=qadirabad` opens a measured case;
 ## Measured cases
 
 All numbers live in `src/features/cases/cases.ts`, copied from the
-[nova-frontier-model](https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model) reports.
+[nova-frontier-model](https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model) reports. There is
+exactly one demo case per phenomenon, computed offline and marked **OFFLINE**; its analysis is fixed,
+so the lens buttons can't turn it into a live question.
 
-| Case                        | Question                      | Verdict                         | Headline                                                                |
-| --------------------------- | ----------------------------- | ------------------------------- | ----------------------------------------------------------------------- |
-| Qadirabad, Chenab, Pakistan | Did it flood?                 | Changed beyond its normal range | 64.3% vs 1.0% of new-water vs dry cells flagged                         |
-| Chókwè, Limpopo, Mozambique | Did it flood?                 | Changed beyond its normal range | 37.3% vs 0.7%, one assessment pass only                                 |
-| Richmond, Indiana, USA      | Did it flood?                 | Not enough radar yet            | 0 new-water cells resolved by the optical snapshots                     |
-| Kumamoto, Kyushu, Japan     | Did the ground keep its echo? | Not enough radar yet            | 39,584 of 62,500 cells kept their phase at the 0.35 coherence threshold |
-| Chocó, Colombia             | Did the ground keep its echo? | Coherence only · 0.247          | Coherence 0.247 between two passes                                      |
+| Case                        | Question                      | Verdict                         | Headline                                         |
+| --------------------------- | ----------------------------- | ------------------------------- | ------------------------------------------------ |
+| Qadirabad, Chenab, Pakistan | Did it flood?                 | Changed beyond its normal range | 64.3% vs 1.0% of new-water vs dry cells flagged  |
+| Chocó, Colombia             | Did the ground keep its echo? | Coherence only · 0.247          | Coherence 0.247 between two passes               |
+| Bug Fire, Nevada, USA       | Did fire scar it?             | Measured, not a verdict         | 4,096 cells read on a 10 m grid, no comparator   |
+| Rowe Creek, Oregon, USA     | Did vegetation disappear?     | Measured, not a verdict         | 262,142 cells read on a 10 m grid, no comparator |
+| Sköllersta, Sweden          | Did a field change?           | Measured, not a verdict         | +1.78 dB HH step, rye trial vs its surroundings  |
 
 ## Data sources and where they are fetched
 

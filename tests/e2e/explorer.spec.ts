@@ -25,6 +25,7 @@ test.describe("Explorer: measured cases", () => {
     await globe.goto("?case=qadirabad");
     await expect(globe.panelTitle).toHaveText("Qadirabad, Pakistan");
     await expect(globe.panelMeta).toContainText("Measured case");
+    await expect(globe.panel.getByTestId("prov-offline")).toHaveText("OFFLINE");
     await expect(globe.verdict).toHaveAttribute("data-verdict", "departure");
     await expect(globe.verdict).toContainText("Changed beyond its normal range");
     await expect(globe.panelStat).toContainText("64.3%");
@@ -64,14 +65,16 @@ test.describe("Explorer: measured cases", () => {
 
   test("a case row opens the case and puts it in the link", async ({ page }) => {
     await globe.goto();
-    await globe.caseRow("chokwe").click();
-    await expect(globe.panelTitle).toHaveText("Chókwè, Mozambique");
-    await expect(page).toHaveURL(/\?case=chokwe$/);
-    // The globe flies to the case and draws its measured footprint in solid gold.
+    await expect(globe.caseRow("choco").getByTestId("prov-offline")).toHaveText("OFFLINE");
+    await globe.caseRow("choco").click();
+    await expect(globe.panelTitle).toHaveText("Chocó, Colombia");
+    await expect(page).toHaveURL(/\?case=choco$/);
+    // The globe flies to the case; coherence only, so no measured footprint or drape.
     await globe.expectScene((scene) => {
-      expect(scene.selectedCaseId).toBe("chokwe");
-      expect(scene.target?.key).toBe("chokwe");
-      expect(scene.outline?.processing).toBe(false);
+      expect(scene.selectedCaseId).toBe("choco");
+      expect(scene.target?.key).toBe("choco");
+      expect(scene.outline).toBeUndefined();
+      expect(scene.drape).toBeUndefined();
     });
   });
 
@@ -149,7 +152,7 @@ test.describe("Explorer: measured cases", () => {
   });
 
   test("the whole-globe button closes the case and clears the link", async ({ page }) => {
-    await globe.goto("?case=richmond");
+    await globe.goto("?case=choco");
     await expect(globe.panel).toBeVisible();
     await globe.wholeGlobe.click();
     await expect(globe.panel).toBeHidden();
@@ -199,18 +202,61 @@ test.describe("Explorer: live questions", () => {
     await expect(globe.planPasses).toContainText("39 passes in the plan");
   });
 
-  test("another lens on a case re-runs it as a live question", async ({ page }) => {
+  // Issue #28: a demo case keeps its analysis; no other lens turns it into a live question.
+  test("a demo case keeps its lens fixed and says why", async ({ page }) => {
     const globe = new GlobePage(page);
     await globe.mockObservationPlan();
-    await globe.mockExplorations({ first: succeededView() });
+    const api = await globe.mockExplorations({ first: succeededView() });
     await globe.goto("?case=qadirabad");
-    await globe.lens("vegetation_disturbance").click();
-    await expect(globe.panelMeta).toContainText("Live question");
-    await expect(globe.lens("vegetation_disturbance")).toHaveAttribute("aria-pressed", "true");
-    await expect(page).toHaveURL(/lens=vegetation_disturbance/);
 
-    await globe.lens("flood_wetland").click();
-    await expect(globe.panelTitle).toHaveText("Qadirabad, Pakistan");
+    await expect(page.getByTestId("lens-locked")).toHaveText(
+      "Demo case, computed offline: its analysis is fixed to “Did it flood?”. Search a place or click the globe to ask the radar live.",
+    );
+    await expect(globe.lens("flood_wetland")).toHaveAttribute("aria-pressed", "true");
+    await expect(globe.lens("flood_wetland")).toBeEnabled();
+    for (const id of ["vegetation_disturbance", "wildfire", "agriculture", "insar"]) {
+      await expect(globe.lens(id)).toBeDisabled();
+      await expect(globe.lens(id)).toHaveAttribute("title", "Fixed for this demo case");
+    }
+    // The questions would each pick another lens, so they leave.
+    await expect(page.getByTestId("lens-ask-wildfire")).toBeHidden();
+
+    await globe.lens("wildfire").click({ force: true });
+    await expect(globe.panelMeta).toContainText("Measured case");
+    await expect(page).toHaveURL(/\?case=qadirabad$/);
+    expect(api.posts).toHaveLength(0);
+  });
+
+  test("the ground-motion demo case keeps ground motion", async ({ page }) => {
+    const globe = new GlobePage(page);
+    await globe.mockObservationPlan();
+    await globe.goto("?case=choco");
+    await expect(globe.lens("insar")).toHaveAttribute("aria-pressed", "true");
+    await expect(globe.lens("insar")).toBeEnabled();
+    await expect(globe.lens("flood_wetland")).toBeDisabled();
+    await expect(page.getByTestId("lens-locked")).toContainText("“Did the ground keep its echo?”");
+  });
+
+  test("the gateway's demo cases open measured, OFFLINE and locked to their lens", async ({
+    page,
+  }) => {
+    const globe = new GlobePage(page);
+    await globe.mockObservationPlan();
+    const api = await globe.mockExplorations({ first: succeededView() });
+    const LOCKED = [
+      ["bug-fire", "wildfire", "Bug Fire, USA"],
+      ["rowe-creek", "vegetation_disturbance", "Rowe Creek, USA"],
+      ["skollersta", "agriculture", "Sköllersta, Sweden"],
+    ] as const;
+    for (const [id, lens, title] of LOCKED) {
+      await globe.goto(`?case=${id}`);
+      await expect(globe.panelTitle).toHaveText(title);
+      await expect(globe.panel.getByTestId("prov-offline")).toHaveText("OFFLINE");
+      await expect(globe.lens(lens)).toHaveAttribute("aria-pressed", "true");
+      await expect(globe.lens("flood_wetland")).toBeDisabled();
+      await expect(page.getByTestId("lens-locked")).toBeVisible();
+    }
+    expect(api.posts).toHaveLength(0);
   });
 
   test(

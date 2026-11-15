@@ -15,7 +15,6 @@ import {
   SEQ_FRAMES,
 } from "@/pages/method/methodContent";
 import { missionFallback } from "@/features/satellite/mobileFallback";
-import { satStepIndex } from "@/pages/method/satSteps";
 
 const shares = (id: string): string[] =>
   EVIDENCE.find((item) => item.id === id)?.group?.rows.map((row) =>
@@ -108,17 +107,7 @@ describe("colour key", () => {
 });
 
 describe("satellite stage", () => {
-  it("switches step at 0.12 and 0.55 of the track", () => {
-    expect(satStepIndex(0)).toBe(0);
-    expect(satStepIndex(0.119)).toBe(0);
-    expect(satStepIndex(0.12)).toBe(1);
-    expect(satStepIndex(0.3)).toBe(1);
-    expect(satStepIndex(0.549)).toBe(1);
-    expect(satStepIndex(0.55)).toBe(2);
-    expect(satStepIndex(1)).toBe(2);
-  });
-
-  it("has a step for each switch", () => {
+  it("keeps the three SPECS §3 steps that open and close the teardown", () => {
     expect(SAT_STAGE.steps.map(({ kicker }) => kicker)).toEqual([
       "STOWED FOR LAUNCH",
       "DEPLOYED IN ORBIT",

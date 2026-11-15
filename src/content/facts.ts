@@ -16,18 +16,32 @@ const FIVE_THINGS = {
   label: "NASA · 5 things to know about NISAR",
   href: "https://www.nasa.gov/missions/nisar/5-things-to-know-about-powerful-new-u-s-india-satellite-nisar/",
 };
-const ANTENNA = {
+// Read 2026-11-15: 12 m reflector of gold-plated wire mesh on a 9 m boom, stowed like an umbrella,
+// used by both radars.
+export const ANTENNA = {
   label: "NASA Science · the antenna reflector blooms",
   href: "https://science.nasa.gov/blogs/nisar/2025/08/15/giant-radar-antenna-reflector-on-nasa-isro-satellite-in-full-bloom/",
 };
-const LAUNCH = {
+export const LAUNCH = {
   label: "NASA Science · NISAR lifts off",
   href: "https://science.nasa.gov/earth/earth-observatory/advanced-us-india-radar-mission-lifts-off-154617/",
 };
 // Read 2026-11-14: the 24 cm L-band, and calm water appearing black as the pulse reflects away.
-const GET_TO_KNOW_SAR = {
+export const GET_TO_KNOW_SAR = {
   label: "NASA Science · NISAR, get to know SAR",
   href: "https://science.nasa.gov/mission/nisar/get-to-know-sar/",
+};
+// Read 2026-11-15: 12 m gold-plated wire-mesh reflector on a 9 m boom, 242 km (more than 240 km)
+// swaths, side-looking 24 cm L-SAR by JPL, 9.4 cm S-SAR by ISRO, ISRO bus, 3.5 Gbps Ka-band
+// telecom, solar arrays folded for launch, the stowed configuration.
+export const ABOUT_SATELLITE = {
+  label: "NASA Science · About the NISAR satellite",
+  href: "https://science.nasa.gov/mission/nisar/about-the-satellite/",
+};
+// Read 2026-11-15: launched on ISRO's GSLV Mark II, 12-day exact repeat cycle, 24 / 9.4 cm.
+export const MISSION_OVERVIEW = {
+  label: "NASA Science · NISAR mission overview",
+  href: "https://science.nasa.gov/mission/nisar/mission-overview/",
 };
 // Read 2026-11-14: observations repeat every 12 days.
 const INTERFEROMETRY = {
