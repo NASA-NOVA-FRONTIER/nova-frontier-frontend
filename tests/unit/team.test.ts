@@ -21,10 +21,12 @@ describe("team", () => {
     }
   });
 
-  it("points every photo at a file that ships with the app", () => {
+  // #29: no card falls back to initials or to "Role to fill".
+  it("gives every member a photo that ships with the app and a role", () => {
     for (const member of TEAM) {
-      if (member.photo === undefined) continue;
+      expect(member.photo, member.name).toBeDefined();
       expect(SHIPPED.has(`/public${member.photo}`), member.name).toBe(true);
+      expect(member.role, member.name).toBeTruthy();
     }
   });
 });
