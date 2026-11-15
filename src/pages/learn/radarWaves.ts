@@ -287,8 +287,16 @@ export const inBeam = (
 
 // --- Waves -----------------------------------------------------------------------------------
 
-/** Screen pixels per wavelength: every band uses the same cm → px factor, so they stay to scale. */
-export const wavePx = (cm: number, W: number): number => Math.max(10, cm * 2.4 * (W / 900));
+/** The shortest band (C, 5.6 cm) never draws under this many pixels per wavelength. */
+export const MIN_WAVE_PX = 10;
+
+// One cm → px factor for every band and the 24 cm bar. The floor goes on this shared factor, not
+// on each band, so L : S : C stay 24 : 9.4 : 5.6 at every width (a per-band floor made S and C
+// identical on phones).
+export const pxPerCm = (W: number): number => Math.max(2.4 * (W / 900), MIN_WAVE_PX / 5.6);
+
+/** Screen pixels per wavelength. */
+export const wavePx = (cm: number, W: number): number => cm * pxPerCm(W);
 
 export const waveAmp = (px: number): number => Math.min(11, 4 + px * 0.12);
 

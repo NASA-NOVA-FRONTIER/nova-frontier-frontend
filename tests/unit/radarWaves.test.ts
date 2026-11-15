@@ -13,8 +13,10 @@ import {
   inBeam,
   INCIDENCE,
   MAX_STEP_S,
+  MIN_WAVE_PX,
   POLS,
   pulseGeometry,
+  pxPerCm,
   RADAR_WAVES_COPY,
   readout,
   rovingNext,
@@ -148,10 +150,19 @@ describe("radar waves: scene and geometry", () => {
 });
 
 describe("radar waves: waves", () => {
-  it("draws every band with the same cm → px factor, so they stay to scale", () => {
-    expect(wavePx(24, 900) / wavePx(9.4, 900)).toBeCloseTo(24 / 9.4);
+  it("keeps L : S : C and the 24 cm bar to scale at phone and desktop widths", () => {
+    for (const W of [318, 641, 900, 1100]) {
+      const [L, S, C] = [wavePx(24, W), wavePx(9.4, W), wavePx(5.6, W)];
+      expect(L / S, `L/S at ${W}`).toBeCloseTo(24 / 9.4);
+      expect(S / C, `S/C at ${W}`).toBeCloseTo(9.4 / 5.6);
+      expect(L / C, `L/C at ${W}`).toBeCloseTo(24 / 5.6);
+      // The scale bar is one L wavelength on the same factor.
+      expect(wavePx(24, W), `bar at ${W}`).toBeCloseTo(24 * pxPerCm(W));
+      expect(C, `C visible at ${W}`).toBeGreaterThanOrEqual(MIN_WAVE_PX);
+    }
+    // Regression: a per-band floor drew S and C both at 10 px on a phone.
+    expect(wavePx(9.4, 318)).toBeGreaterThan(wavePx(5.6, 318));
     expect(wavePx(24, 900)).toBeCloseTo(57.6);
-    expect(wavePx(5.6, 300)).toBe(10);
   });
 
   it("caps the amplitude and spaces HV dots at least half a wavelength apart", () => {
