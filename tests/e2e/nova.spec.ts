@@ -112,5 +112,9 @@ test.describe("Nova with Claude", () => {
     await expect(nova.getByTestId("nova-answer").last()).toContainText(
       "Changed beyond its normal range",
     );
+    // The sheet no longer shares this switch, so Nova's own Plain / Technical must still work.
+    await nova.getByTestId("nova-technical").click();
+    await expect(nova.getByTestId("nova-technical")).toHaveAttribute("aria-pressed", "true");
+    await expect(nova.getByTestId("nova-plain")).toHaveAttribute("aria-pressed", "false");
   });
 });

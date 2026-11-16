@@ -94,10 +94,16 @@ test.describe("Explorer: measured cases", () => {
       "data-on",
       "true",
     );
+    // A measured case reads Plain only; Technical's extras sit in a closed disclosure at the end.
+    await expect(globe.sheet.getByTestId("read-regional")).toHaveCount(0);
+    const detail = globe.sheet.getByTestId("sheet-technical-detail");
+    await expect(detail).not.toHaveAttribute("open", "");
     await expect(globe.techLimit).toBeHidden();
-
-    await page.getByTestId("read-technical").click();
+    await detail.getByText("Technical detail").click();
     await expect(globe.techLimit).toContainText("precision 29.7%, recall 64.3%, IoU 25.5%");
+    await expect(detail.getByTestId("band-chart")).toContainText(
+      "median ± max(3, 3·max(1.4826·MAD, 1)) dB",
+    );
 
     await page.keyboard.press("Escape");
     await expect(globe.sheet).toBeHidden();
