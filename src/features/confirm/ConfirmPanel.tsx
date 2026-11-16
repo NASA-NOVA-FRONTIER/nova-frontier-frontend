@@ -4,11 +4,13 @@ import {
   CONFIRM,
   CONFIRM_NOTES,
   EARTHQUAKE_SETTINGS,
+  INFO_TIP,
   MEASURED_CASE,
   PRESET_NAME,
   PROCESSING,
   RESULT,
   SQUARE,
+  TIPS,
   type V9LensId,
 } from "@/content/copyV9";
 import type { Case } from "@/features/cases/cases";
@@ -50,6 +52,7 @@ import type { Coverage } from "@/features/spot/coverageApi";
 import type { Nearest } from "@/features/spot/spot";
 import { formatDay } from "@/features/timeline/timelineLayout";
 import { ApiError } from "@/lib/api/apiClient";
+import { InfoTip } from "@/lib/InfoTip";
 import { useAsync, type AsyncState } from "@/lib/useAsync";
 
 type ConfirmPanelProps = {
@@ -258,9 +261,16 @@ export const ConfirmPanel = ({
             {chosen !== undefined && group !== undefined && (
               <div className="x-confirm__block">
                 <p className="x-kicker x-kicker--split">
-                  <span>{CONFIRM.stripLabel("insar")}</span>
+                  <span className="x-confirm__label">
+                    {CONFIRM.stripLabel("insar")}
+                    <InfoTip
+                      label={INFO_TIP.label}
+                      title={CONFIRM.stripLabel("insar")}
+                      text={TIPS.strip.insar}
+                      testId="tip-strip"
+                    />
+                  </span>
                   <span>{CONFIRM.preset(PRESET_NAME.insar)}</span>
-                  {/* TODO(#59): InfoTip with TIPS.strip.insar once PR #59 merges. */}
                 </p>
                 <QuakeStrip
                   strip={arcStrip(group, chosen)}
@@ -325,8 +335,14 @@ export const ConfirmPanel = ({
             >
               {offline ? RESULT.offline : RESULT.online}
             </span>
+            <InfoTip
+              label={INFO_TIP.label}
+              title={offline ? RESULT.offline : RESULT.online}
+              text={TIPS.mode}
+              testId="tip-mode"
+            />
             <span data-testid="confirm-wait">{waitLine}</span>
-            {/* TODO(#59): InfoTips with TIPS.mode and TIPS.wait once PR #59 merges. */}
+            <InfoTip label={INFO_TIP.label} title={waitLine} text={TIPS.wait} testId="tip-wait" />
           </p>
         )}
         {reason !== undefined && (
@@ -402,9 +418,16 @@ const GcovPasses = ({ lens, coverage, passes, next, nearest, onOpenCase }: GcovP
     <>
       <div className="x-confirm__block">
         <p className="x-kicker x-kicker--split">
-          <span>{CONFIRM.stripLabel(lens)}</span>
+          <span className="x-confirm__label">
+            {CONFIRM.stripLabel(lens)}
+            <InfoTip
+              label={INFO_TIP.label}
+              title={CONFIRM.stripLabel(lens)}
+              text={TIPS.strip.gcov}
+              testId="tip-strip"
+            />
+          </span>
           <span>{CONFIRM.preset(PRESET_NAME[lens])}</span>
-          {/* TODO(#59): InfoTip with TIPS.strip.gcov once PR #59 merges. */}
         </p>
         <GcovStrip dates={dates} />
         {series !== undefined && (

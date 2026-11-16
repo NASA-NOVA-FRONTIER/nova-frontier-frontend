@@ -348,3 +348,9 @@
     font-size: 12.5px;
   }
 }
+
+.x-confirm__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

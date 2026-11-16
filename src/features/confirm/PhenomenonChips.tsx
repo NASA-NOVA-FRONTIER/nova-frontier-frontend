@@ -1,6 +1,15 @@
 import { useRef, type KeyboardEvent } from "react";
 
-import { CONFIRM, LOOK, PHENOMENA, PHENOMENON_LABEL, type V9LensId } from "@/content/copyV9";
+import {
+  CONFIRM,
+  INFO_TIP,
+  LOOK,
+  PHENOMENA,
+  PHENOMENON_LABEL,
+  TIPS,
+  type V9LensId,
+} from "@/content/copyV9";
+import { InfoTip } from "@/lib/InfoTip";
 
 type PhenomenonChipsProps = {
   lens: V9LensId;
@@ -28,7 +37,12 @@ export const PhenomenonChips = ({ lens, onLens }: PhenomenonChipsProps) => {
     <div className="x-confirm__block">
       <p className="x-kicker" id="x-confirm-phen">
         {CONFIRM.phenLabel}
-        {/* TODO(#59): InfoTip with TIPS.phen once PR #59 merges. */}
+        <InfoTip
+          label={INFO_TIP.label}
+          title={CONFIRM.phenLabel}
+          text={TIPS.phen}
+          testId="tip-phen"
+        />
       </p>
       <div
         className="x-confirm__chips"

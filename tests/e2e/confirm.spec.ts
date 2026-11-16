@@ -264,6 +264,38 @@ test.describe("Explorer v9: the confirm panel", () => {
     await expect(globe.startCard).toBeVisible();
   });
 
+  test("the panel's ⓘ open on hover, on focus and on tap, with the v9 tip texts", async ({
+    page,
+  }) => {
+    await globe.mockCoverage();
+    await globe.mockInsarPairs();
+    await useSquareAt(globe);
+    await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
+
+    await page.getByTestId("tip-phen").hover();
+    await expect(page.getByTestId("tip-phen-pop")).toContainText(
+      "Each phenomenon reads the radar differently",
+    );
+    await page.getByTestId("tip-strip").focus();
+    await expect(page.getByTestId("tip-strip-pop")).toContainText(
+      "The gold dots joined by the gold line are the passes we will read",
+    );
+    await page.getByTestId("tip-mode").click();
+    await expect(page.getByTestId("tip-mode-pop")).toContainText("ONLINE means we compute");
+    await page.getByTestId("tip-wait").click();
+    await expect(page.getByTestId("tip-wait-pop")).toContainText("at 8 minutes we stop");
+    await expect(page.getByTestId("tip-mode-pop")).toHaveCount(0);
+
+    await globe.phenomenon("insar").click();
+    await page.getByTestId("confirm-advanced").click();
+    await page.getByTestId("tip-threshold").click();
+    await expect(page.getByTestId("tip-threshold-pop")).toContainText("Coherence measures");
+    // The popover lives outside the scrolling panel, so the panel can't clip it.
+    await expect(globe.placeCard.getByTestId("tip-threshold-pop")).toHaveCount(0);
+    await page.getByTestId("tip-pair").click();
+    await expect(page.getByTestId("tip-pair-pop")).toContainText("The two NISAR passes we compare");
+  });
+
   test("at 1440 × 900 Start stays in view with the longest panel", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await globe.mockCoverage();

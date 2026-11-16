@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { EARTHQUAKE_SETTINGS, MEASURED_CASE } from "@/content/copyV9";
+import { EARTHQUAKE_SETTINGS, INFO_TIP, MEASURED_CASE, PARAM_TIPS } from "@/content/copyV9";
 import type { PairGroup } from "@/features/confirm/confirmView";
 import {
   clampCoherence,
@@ -10,6 +10,7 @@ import {
   MIN_COHERENCE,
 } from "@/features/insar/insarApi";
 import { formatDay } from "@/features/timeline/timelineLayout";
+import { InfoTip } from "@/lib/InfoTip";
 
 type QuakeSettingsProps = {
   groups: readonly PairGroup[];
@@ -55,7 +56,12 @@ export const QuakeSettings = ({
                   ? EARTHQUAKE_SETTINGS.thresholdDefault(shown)
                   : shown}
               </output>
-              {/* TODO(#59): InfoTip with PARAM_TIPS.thr once PR #59 merges. */}
+              <InfoTip
+                label={INFO_TIP.label}
+                title={EARTHQUAKE_SETTINGS.thresholdName}
+                text={PARAM_TIPS.thr}
+                testId="tip-threshold"
+              />
             </span>
             <input
               type="range"
@@ -71,7 +77,12 @@ export const QuakeSettings = ({
           <fieldset className="x-confirm__pairs">
             <legend className="x-confirm__setting-name">
               {EARTHQUAKE_SETTINGS.pairName}
-              {/* TODO(#59): InfoTip with PARAM_TIPS.pair once PR #59 merges. */}
+              <InfoTip
+                label={INFO_TIP.label}
+                title={EARTHQUAKE_SETTINGS.pairName}
+                text={PARAM_TIPS.pair}
+                testId="tip-pair"
+              />
             </legend>
             <small>{EARTHQUAKE_SETTINGS.pairHelp}</small>
             {groups.map((group) => (
