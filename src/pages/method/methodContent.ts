@@ -147,6 +147,11 @@ export const LENS_NOTES: Record<LensId, { tag: string; limit: string }> = {
     limit:
       "The phase is wrapped and not corrected for troposphere or ionosphere, so no displacement is reported.",
   },
+  observed_dynamics: {
+    tag: "observed_dynamics · offline demo case only",
+    limit:
+      "Intensity is not displacement. DEM/visibility, geodetic or offset evidence is needed; the Niscemi example is aftermath-only.",
+  },
 };
 
 // One matched-cells contrast with its spatial resampling interval, in dB.

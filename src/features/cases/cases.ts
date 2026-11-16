@@ -6,8 +6,15 @@ import type { LonLat } from "@/features/frames/frame.types";
  * Pass dates on the timeline are DEMO (12-day spacing) until the backend serves the real ones.
  */
 
+// observed_dynamics is the gateway's descriptive radar view (Niscemi); the live service has no such
+// lens, so it only ever belongs to a demo case.
 export type LensId =
-  "flood_wetland" | "vegetation_disturbance" | "wildfire" | "agriculture" | "insar";
+  | "flood_wetland"
+  | "vegetation_disturbance"
+  | "wildfire"
+  | "agriculture"
+  | "insar"
+  | "observed_dynamics";
 export type HazardId =
   "earthquake" | "wildfire" | "deforestation" | "flood" | "landslide" | "agriculture";
 export type IconId = HazardId;
@@ -69,6 +76,8 @@ export type Case = {
   quality: QualityItem[];
   plainLimit: string;
   techLimit: string;
+  // The gateway's own limitations, verbatim, when it sends more than the one in plainLimit.
+  limitations?: string[];
   alternatives: string[];
   empties: string[];
   sources: Source[];
@@ -114,6 +123,12 @@ export const LENSES: Lens[] = [
     chip: "Did the ground keep its echo?",
     icon: "earthquake",
     compares: "Where the echo kept or lost coherence between two passes",
+  },
+  {
+    id: "observed_dynamics",
+    chip: "Do the passes bracket the event?",
+    icon: "landslide",
+    compares: "HH and HV change against the earlier passes, as a descriptive view",
   },
 ];
 
@@ -245,7 +260,8 @@ export const CASES: Case[] = [
     name: "Chocó",
     place: "Colombia",
     region: "Earthquake · 10 Aug 2026",
-    focus: [-76.65, 5.69],
+    // The gateway's measured window (events.index.json point), not the older regional marker.
+    focus: [-76.256, 4.86],
     when: "Aug 2026",
     verdict: "measured",
     verdictLine:
@@ -258,20 +274,46 @@ export const CASES: Case[] = [
     quality: [
       { k: "Status", v: "Coherence only", why: "not_displacement_ready from the API." },
       { k: "Coherence", v: "0.247", why: "Median, fixed 0–1 scale. Confirmed by Daniel, 11 Nov." },
+      {
+        k: "Passes",
+        v: "1 + 2",
+        why: "Baseline 18 Jul; assessments 11 Aug and 23 Aug 2026, as two compatible GUNW pairs.",
+      },
+      {
+        k: "Grid",
+        v: "80 m grid",
+        why: "62 × 62 = 3,844 cells, all with coherence on both pairs.",
+      },
+      {
+        k: "Common phase",
+        v: "0 cells",
+        why: "Common phase and correction-input support are zero, so no phase is shown.",
+      },
       { k: "SGC", v: "[Report]", why: "Servicio Geológico Colombiano report." },
     ],
     plainLimit:
       "Coherence 0.247 is low: the echo changed between the two passes, so its phase can't be read as ground motion.",
     techLimit:
-      "The phase is wrapped and not corrected for troposphere or ionosphere, so no displacement is reported.",
+      "No cell has phase common to both pairs, so there is no phase to correct for troposphere or ionosphere, and no displacement is reported.",
+    limitations: [
+      "Ionosphere input eligibility is not correction accuracy or stable-ground validation.",
+      "Filled flags, finite screens and positive reported uncertainty are different quality conditions; absence of a fill flag does not establish trustworthy correction.",
+      "All fractions name their denominator. No correction is applied and no phase is integrated or converted into a deformation estimate.",
+      "The maximum-minimum-coherence candidate is a proposed data-support location, not an independently stable reference.",
+      "No earthquake detection, earthquake attribution, vertical motion or forecasting is inferred from this audit.",
+      "Scattering changes and interval length affect coherence. Stable reference evidence and independently checked corrections would be needed for displacement.",
+    ],
     alternatives: [],
     empties: ["Displacement", "Magnitude", "Casualties"],
-    sources: [{ label: "Servicio Geológico Colombiano", href: "https://www.sgc.gov.co" }],
+    sources: [
+      { label: "Servicio Geológico Colombiano", href: "https://www.sgc.gov.co" },
+      { label: "nova-frontier-model · event bundles", href: `${MODELING}/EVENT_BUNDLES.md` },
+    ],
     coherenceOnly: true,
   },
   // The three below come from the gateway's precomputed cases (/v2/cases, relayed by the backend at
-  // /api/v1/cases/<id>). Each is radar_evaluated: dated layers, no comparator and no verdict, so
-  // only the numbers the gateway returns are shown.
+  // /api/v1/cases/<id>), the featured stops of the model's PHENOMENA_EXAMPLES.md. None has a
+  // comparator, so there is no verdict and only the numbers the gateway returns are shown.
   {
     id: "bug-fire",
     lens: "wildfire",
@@ -318,97 +360,104 @@ export const CASES: Case[] = [
     ],
   },
   {
-    id: "rowe-creek",
+    id: "para-event-02",
     lens: "vegetation_disturbance",
     hazard: "deforestation",
-    name: "Rowe Creek",
-    place: "Oregon, USA",
-    region: "Vegetation · Oregon",
-    focus: [-120.26, 44.97],
-    when: "Sep 2026",
-    target: "2026-09-23",
+    name: "Pará event 02",
+    place: "Pará, Brazil",
+    region: "Deforestation · Pará",
+    focus: [-55.482254302487455, -7.180578271381999],
+    when: "Oct 2026",
+    target: "2026-10-07",
     verdict: "measured",
     verdictLine:
-      "The radar read 262,142 cells on a 10 m grid near Rowe Creek: three passes from 1 to 25 Jul 2026 and one on 23 Sep.",
+      "The radar read 6,889 cells on a 20 m grid in Pará: three passes from 21 Jun to 15 Jul 2026 and two in October (7 and 19 Oct).",
     reason:
-      "The gateway reports radar_evaluated: dated layers and no independent vegetation reference, so no verdict is given.",
-    stat: "262,142 cells",
-    statLine: "read by the radar on a 10 m grid · no comparison score yet",
-    statSource: "Gateway case rowe-creek · evidence.radarSupportCells, 512 × 512 grid at 10 m",
+      "The gateway reports a radar-only diagnostic: dated layers and no independent vegetation reference, so no verdict is given.",
+    stat: "6,889 cells",
+    statLine: "read by the radar on a 20 m grid · no comparison score yet",
+    statSource: "Gateway case para-event-02 · evidence.radarSupportCells, 83 × 83 grid at 20 m",
     quality: [
       {
         k: "Status",
-        v: "Radar evaluated",
-        why: "radar_evaluated from the gateway; scientific status diagnostic.",
-      },
-      {
-        k: "Passes",
-        v: "3 + 1",
-        why: "Baseline 1, 13 and 25 Jul; one assessment pass on 23 Sep 2026.",
-      },
-      {
-        k: "Reference",
-        v: "None",
-        why: "No independent dated event or vegetation record is attached.",
-      },
-    ],
-    plainLimit:
-      "Moisture, roughness and vegetation structure all affect the channels. The native replay uses radar only. Independent dated event and vegetation evidence would help.",
-    techLimit:
-      "No radar comparator or signature policy is attached to this case yet, so no share of cells is reported.",
-    alternatives: [],
-    empties: ["Area lost", "Cause", "Probability"],
-    sources: [{ label: "nova-frontier-backend · cases relay", href: BACKEND }],
-  },
-  {
-    id: "skollersta",
-    lens: "agriculture",
-    hazard: "agriculture",
-    name: "Sköllersta",
-    place: "Rye trial, Sweden",
-    region: "Agriculture · rye trial",
-    focus: [15.39726192, 59.13216973],
-    when: "Aug 2026",
-    target: "2026-08-22",
-    verdict: "measured",
-    verdictLine:
-      "A winter rye trial field brightened in HH against its surroundings between the 10 and 22 Aug 2026 passes, around its recorded harvest on 18 Aug.",
-    reason:
-      "The gateway reports radar_evaluated: the record dates the trial, not the harvested footprint, so no verdict is given.",
-    stat: "+1.78 dB",
-    statLine: "HH step, patch minus surroundings, 10 → 22 Aug 2026.",
-    statSource: "nova-frontier-model · docs/EXPLORATION_HOLDOUT.md · Swedish crop trial records",
-    quality: [
-      {
-        k: "Status",
-        v: "Radar evaluated",
-        why: "radar_evaluated from the gateway; scientific status diagnostic.",
+        v: "Evaluated",
+        why: "evaluated from the gateway; scientific status diagnostic.",
       },
       {
         k: "Passes",
         v: "3 + 2",
-        why: "Baseline 5 Jul, 17 Jul and 10 Aug; assessments 22 Aug and 3 Sep 2026.",
+        why: "Baseline 21 Jun, 3 Jul and 15 Jul; assessments 7 Oct and 19 Oct 2026.",
       },
       {
         k: "Reference",
-        v: "Trial record",
-        why: "Winter rye, documented at-harvest date 18 Aug 2026; footprint unresolved.",
+        v: "Weak legacy record",
+        why: "Reported onsets 28 Aug to 7 Oct 2026; the curated result uses radar-only diagnostics.",
       },
     ],
     plainLimit:
-      "The independent record dates the trial. The harvested footprint, moisture and management across the full window remain unresolved.",
+      "The map shows gamma-zero change on measured support. Moisture, geometry and surface structure can affect the return. Permanent forest conversion and its cause remain unverified.",
     techLimit:
-      "Grid 64 × 64 at 20 m (4,096 cells). The step comes from the holdout report; the gateway attaches no comparator to this case.",
+      "No radar comparator or signature policy is attached to this case yet, so no share of cells is reported.",
     alternatives: [],
-    empties: ["Yield", "Crop map", "Cause"],
+    empties: ["Area lost", "Cause", "Probability"],
     sources: [
       {
-        label: "Swedish crop trial record · winter rye",
-        href: "https://nfts.dlbr.dk/Forms/Dokumentation.aspx?GUID=6c558a36-cd71-4531-8119-ca05278419a2&KardexID=75095&applLangID=en",
+        label: "nova-frontier-model · phenomena examples",
+        href: `${MODELING}/PHENOMENA_EXAMPLES.md`,
+      },
+      { label: "nova-frontier-backend · cases relay", href: BACKEND },
+    ],
+  },
+  {
+    id: "niscemi-aftermath",
+    lens: "observed_dynamics",
+    hazard: "landslide",
+    name: "Niscemi",
+    place: "Sicily, Italy",
+    region: "Landslide · aftermath",
+    focus: [14.38, 37.15],
+    when: "Aug 2026",
+    target: "2026-08-23",
+    verdict: "measured",
+    verdictLine:
+      "The radar read Niscemi on an 80 m grid (128 × 128 cells) on eight passes from 24 Jun to 22 Oct 2026, all months after the 25 Jan 2026 landslide.",
+    reason:
+      "The gateway reports a measured descriptive view: aftermath passes only and no comparator, so no verdict is given.",
+    stat: "8 passes",
+    statLine: "after the landslide, on an 80 m grid · no comparison score",
+    statSource:
+      "Gateway case niscemi-aftermath · baselineDates and assessmentDates, 128 × 128 grid at 80 m",
+    quality: [
+      {
+        k: "Status",
+        v: "Measured",
+        why: "measured from the gateway; scientific status diagnostic.",
       },
       {
-        label: "nova-frontier-model · geographic holdout",
-        href: `${MODELING}/EXPLORATION_HOLDOUT.md`,
+        k: "Passes",
+        v: "4 + 4",
+        why: "Baseline 24 Jun, 6 Jul, 18 Jul and 11 Aug; assessments 23 Aug, 4 Sep, 16 Sep and 22 Oct 2026.",
+      },
+      {
+        k: "Reference",
+        v: "Civil Protection",
+        why: "Landslide on 25 Jan 2026, before the first pass: aftermath only.",
+      },
+    ],
+    plainLimit:
+      "Available radar passes begin months after the January 25 landslide. The baseline and target are both aftermath observations.",
+    techLimit:
+      "Intensity is not displacement. DEM/visibility, geodetic or offset evidence is needed; the Niscemi example is aftermath-only.",
+    alternatives: [],
+    empties: ["Displacement", "Area moved", "Cause"],
+    sources: [
+      {
+        label: "Protezione Civile · Niscemi landslide",
+        href: "https://www.protezionecivile.gov.it/en/notizia/niscemi-landslide-national-service-efforts-continue/index.html",
+      },
+      {
+        label: "nova-frontier-model · phenomena examples",
+        href: `${MODELING}/PHENOMENA_EXAMPLES.md`,
       },
       { label: "nova-frontier-backend · cases relay", href: BACKEND },
     ],

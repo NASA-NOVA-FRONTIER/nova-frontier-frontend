@@ -140,12 +140,17 @@ or hectares).
   copied from the science backend's reports (github.com/NASA-NOVA-FRONTIER/nova-frontier-model); layer crops and
   report figures are static files in `public/cases/`. Pass timeline dates in `cases.ts` are DEMO
   (12-day spacing) until the backend serves real ones. **One demo case per phenomenon** (issue #28,
-  `Case.hazard`): Qadirabad (flood), Chocó (earthquake), Bug Fire (wildfire), Rowe Creek
-  (vegetation) and Sköllersta (agriculture). They are copied from the gateway's precomputed cases,
-  which the backend relays at `/api/v1/cases` (52 today); the frontend doesn't fetch them at run time.
+  `Case.hazard`, the five phenomena of the issue): Qadirabad (flood, kept for the guided story),
+  Chocó (earthquake), Bug Fire (wildfire), Pará event 02 (deforestation) and Niscemi (landslide).
+  The last four are the featured stops of the model's `docs/PHENOMENA_EXAMPLES.md`. Niscemi's lens
+  is `observed_dynamics`, offline only: it is out of `V8LensId`, `QUESTION_ICONS` and the `?lens=`
+  deep link, so no live question can ask it. They are copied from the gateway's precomputed cases,
+  which the backend lists at `/api/v1/cases` (only these five; all 52 open by id); the frontend doesn't fetch them at run time.
   `tests/fixtures/gateway-cases.json` records that answer and `gatewayCases.test.ts` checks the copy
-  against it. Bug Fire, Rowe Creek and Sköllersta are `radar_evaluated` (layers, no comparator), so
-  they read "Measured, not a verdict" with only the cells, passes and limit the gateway returns. Each
+  against it. Bug Fire, Pará event 02 and Niscemi have no comparator, so they read "Measured, not a
+  verdict" with only the cells, passes and limit the gateway returns. Chocó sits on the gateway's
+  measured window, lists the gateway's `limitations` verbatim (`Case.limitations`) and has zero
+  common phase cells, so it never shows a phase. Each
   case shows the `offline` chip (OFFLINE, never hidden) and its lens is fixed: `LensPicker` gets
   `locked` with the reason and `chooseLens` never turns a case into a live question.
 - **Demo values:** the band chart series of the measured cases (`src/features/cases/demoBand.ts`,

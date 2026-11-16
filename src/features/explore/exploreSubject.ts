@@ -188,6 +188,7 @@ export const exploreSubject = (view: ExplorationView, context: Context): Subject
     quality: qualityOf(view, result),
     plainLimit: plain,
     techLimit: rest.join(" "),
+    limitations: [],
     alternatives: LENS_ALTERNATIVES[lens] ?? [],
     empties: LIVE_EMPTIES,
     sources: fireContext === undefined ? LIVE_SOURCES : [...LIVE_SOURCES, FIRMS_SOURCE],

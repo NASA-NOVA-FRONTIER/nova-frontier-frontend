@@ -15,8 +15,19 @@ describe("measured cases", () => {
       "flood qadirabad",
       "earthquake choco",
       "wildfire bug-fire",
-      "deforestation rowe-creek",
-      "agriculture skollersta",
+      "deforestation para-event-02",
+      "landslide niscemi-aftermath",
+    ]);
+  });
+
+  // Issue #28 lists earthquake, wildfire, deforestation, flood and landslide: agriculture is retired.
+  it("cover the five phenomena of issue #28", () => {
+    expect(CASES.map((item) => item.hazard).sort()).toEqual([
+      "deforestation",
+      "earthquake",
+      "flood",
+      "landslide",
+      "wildfire",
     ]);
   });
 

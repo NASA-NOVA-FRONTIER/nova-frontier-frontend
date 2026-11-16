@@ -266,8 +266,7 @@ test.describe("Explorer: live questions", () => {
     const api = await globe.mockExplorations({ first: succeededView() });
     const LOCKED = [
       ["bug-fire", "wildfire", "Bug Fire, USA"],
-      ["rowe-creek", "vegetation_disturbance", "Rowe Creek, USA"],
-      ["skollersta", "agriculture", "Sköllersta, Sweden"],
+      ["para-event-02", "vegetation_disturbance", "Pará event 02, Brazil"],
     ] as const;
     for (const [id, lens, title] of LOCKED) {
       await globe.goto(`?case=${id}`);
@@ -277,7 +276,35 @@ test.describe("Explorer: live questions", () => {
       await expect(globe.lens("flood_wetland")).toBeDisabled();
       await expect(page.getByTestId("lens-locked")).toBeVisible();
     }
+    // Niscemi's descriptive view is offline only: no live lens is offered and none is pressed.
+    await globe.goto("?case=niscemi-aftermath");
+    await expect(globe.panelTitle).toHaveText("Niscemi, Italy");
+    await expect(globe.panel.getByTestId("prov-offline")).toHaveText("OFFLINE");
+    await expect(page.getByTestId("lens-locked")).toContainText(
+      "“Do the passes bracket the event?”",
+    );
+    for (const lens of [
+      "flood_wetland",
+      "vegetation_disturbance",
+      "wildfire",
+      "agriculture",
+      "insar",
+    ])
+      await expect(globe.lens(lens)).toBeDisabled();
     expect(api.posts).toHaveLength(0);
+  });
+
+  test("Chocó lists the gateway's limitations and never offers a phase", async ({ page }) => {
+    const globe = new GlobePage(page);
+    await globe.mockObservationPlan();
+    await globe.goto("?case=choco");
+    const list = globe.panel.getByTestId("case-limitations");
+    await expect(list.getByRole("listitem")).toHaveCount(6);
+    await expect(list).toContainText("No earthquake detection, earthquake attribution");
+    await expect(globe.panel).toContainText("Common phase");
+    await expect(globe.panel).toContainText("0 cells");
+    // Only the SGC report slot is still to fill; the gateway's facts are REAL.
+    await expect(globe.panel.locator(".x-facts").getByTestId("prov-todo")).toHaveCount(1);
   });
 
   test("hovering land shows its NISAR frame; a click picks the spot and Analyze asks about it", async ({

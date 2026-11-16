@@ -25,7 +25,7 @@ test.describe("Measured cases page", () => {
   // Issue #28: one demo case per phenomenon, each marked as computed offline.
   test("each demo case carries the OFFLINE chip", async ({ page }) => {
     await page.goto("/cases");
-    for (const id of ["qadirabad", "choco", "bug-fire", "rowe-creek", "skollersta"]) {
+    for (const id of ["qadirabad", "choco", "bug-fire", "para-event-02", "niscemi-aftermath"]) {
       const chip = page.getByTestId(`case-card-${id}`).getByTestId("prov-offline");
       await expect(chip).toHaveText("OFFLINE");
       await expect(chip).toHaveAttribute("title", /analysis is fixed/);

@@ -3213,6 +3213,18 @@
   text-wrap: pretty;
 }
 
+.x-limits__list ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
 .x-tags {
   display: flex;
   flex-wrap: wrap;

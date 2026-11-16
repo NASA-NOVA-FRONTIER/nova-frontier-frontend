@@ -40,6 +40,8 @@ export type Subject = {
   quality: QualityItem[];
   plainLimit: string;
   techLimit: string;
+  // A demo case's gateway limitations, verbatim; empty for live answers (they fold into the limits).
+  limitations: string[];
   alternatives: string[];
   empties: string[];
   sources: Source[];
@@ -92,6 +94,7 @@ export const caseSubject = (item: Case): Subject => ({
   quality: item.quality,
   plainLimit: item.plainLimit,
   techLimit: item.techLimit,
+  limitations: item.limitations ?? [],
   alternatives: item.alternatives,
   empties: item.empties,
   sources: item.sources,

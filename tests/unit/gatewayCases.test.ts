@@ -26,7 +26,8 @@ type GatewayDetail = {
 
 const LIST: GatewayCase[] = gateway.cases;
 const DETAILS: Record<string, GatewayDetail | undefined> = gateway.details;
-const RADAR_EVALUATED = ["bug-fire", "rowe-creek", "skollersta"];
+// The model's featured stops with no comparator: the gateway returns layers, passes and a limit.
+const NO_COMPARATOR = ["bug-fire", "para-event-02", "niscemi-aftermath"];
 
 const listed = (id: string): GatewayCase => {
   const found = LIST.find((item) => item.id === id);
@@ -40,8 +41,8 @@ describe("demo cases against the gateway's precomputed cases", () => {
   });
 
   it("sit on the gateway's point", () => {
-    // Chocó's marker predates the gateway case, whose coherence window is centred elsewhere.
-    for (const item of CASES.filter(({ id }) => id !== "choco")) {
+    // Chocó included: its marker used to sit about 100 km from its measured window.
+    for (const item of CASES) {
       const [lon, lat] = listed(item.id).point;
       expect(item.focus[0], item.id).toBeCloseTo(lon ?? Number.NaN, 3);
       expect(item.focus[1], item.id).toBeCloseTo(lat ?? Number.NaN, 3);
@@ -58,20 +59,35 @@ describe("demo cases against the gateway's precomputed cases", () => {
     expect(choco?.stat).toBe(DETAILS["choco"]?.medianCoherence?.toFixed(3));
   });
 
-  it("show only what a radar_evaluated case returns: cells, passes and its own limit", () => {
-    for (const id of RADAR_EVALUATED) {
+  it("show only what a case without comparator returns: passes and its own limit", () => {
+    for (const id of NO_COMPARATOR) {
       const item = CASES.find((entry) => entry.id === id);
       const detail = DETAILS[id];
       const served = listed(id);
-      expect(detail?.state, id).toBe("radar_evaluated");
+      expect(detail, id).toBeDefined();
       expect(item?.verdict, id).toBe("measured");
       expect(item?.quality.find(({ k }) => k === "Passes")?.v, id).toBe(
         `${served.baselineDates.length} + ${served.assessmentDates.length}`,
       );
       expect(detail?.limitations, id).toContain(item?.plainLimit);
-      expect(`${item?.verdictLine} ${item?.techLimit}`, id).toContain(
-        (detail?.radarSupportCells ?? 0).toLocaleString("en-US"),
-      );
+      const cells = detail?.radarSupportCells;
+      if (cells !== null && cells !== undefined)
+        expect(`${item?.verdictLine} ${item?.techLimit}`, id).toContain(
+          cells.toLocaleString("en-US"),
+        );
     }
+  });
+
+  it("copy every gateway limitation of a case that lists them", () => {
+    for (const item of CASES.filter(({ limitations }) => limitations !== undefined))
+      expect(item.limitations, item.id).toEqual(DETAILS[item.id]?.limitations);
+  });
+
+  // Regression (issue #28): Chocó has no common phase cell, so it must never offer a phase.
+  it("never give Chocó a phase it does not have", () => {
+    const choco = CASES.find(({ id }) => id === "choco");
+    expect(choco?.quality.find(({ k }) => k === "Common phase")?.v).toBe("0 cells");
+    expect(choco?.techLimit).not.toMatch(/phase is wrapped/);
+    expect(choco?.coherenceOnly).toBe(true);
   });
 });

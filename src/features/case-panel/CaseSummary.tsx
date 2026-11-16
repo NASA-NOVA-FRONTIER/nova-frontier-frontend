@@ -1,3 +1,4 @@
+import { CASE_LIMITATIONS } from "@/content/copyV8";
 import { FireContextCard } from "@/features/case-panel/FireContextCard";
 import { Icon } from "@/features/case-panel/icons";
 import { InsarCard } from "@/features/case-panel/InsarCard";
@@ -89,11 +90,28 @@ export const PendingSummary = ({ item }: { item: Case }) => (
           <span>{fact.k}</span>
           <span className="x-facts__v">
             {fact.v}
-            <Prov kind="todo" source={`${fact.why} ${SOURCE.todo}`} />
+            {/* Only a bracketed slot ("[Report]") is still to fill; the rest is the gateway's. */}
+            {fact.v.startsWith("[") ? (
+              <Prov kind="todo" source={`${fact.why} ${SOURCE.todo}`} />
+            ) : (
+              <Prov kind="real" source={fact.why} />
+            )}
           </span>
         </li>
       ))}
     </ul>
+    {item.limitations !== undefined && item.limitations.length > 0 && (
+      <div className="x-limits__list" data-testid="case-limitations">
+        <p className="x-muted x-small">
+          {CASE_LIMITATIONS.title} <Prov kind="real" source={CASE_LIMITATIONS.source} />
+        </p>
+        <ul>
+          {item.limitations.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </div>
+    )}
     <ul className="x-sources">
       {item.sources.map((source) => (
         <li key={source.href}>

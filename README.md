@@ -143,15 +143,19 @@ Shareable explorer links: `/explore?case=qadirabad` opens a measured case;
 All numbers live in `src/features/cases/cases.ts`, copied from the
 [nova-frontier-model](https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model) reports. There is
 exactly one demo case per phenomenon, computed offline and marked **OFFLINE**; its analysis is fixed,
-so the lens buttons can't turn it into a live question.
+so the lens buttons can't turn it into a live question. The five are the phenomena of issue #28
+(flood, earthquake, wildfire, deforestation, landslide). Bug Fire, Pará event 02 and Niscemi are the
+featured stops of the model's `docs/PHENOMENA_EXAMPLES.md`; Qadirabad stays the flood case because
+the guided story is built on it. Niscemi uses the gateway's descriptive `observed_dynamics` view,
+which exists only offline, so no live lens card offers it.
 
-| Case                        | Question                      | Verdict                         | Headline                                         |
-| --------------------------- | ----------------------------- | ------------------------------- | ------------------------------------------------ |
-| Qadirabad, Chenab, Pakistan | Did it flood?                 | Changed beyond its normal range | 64.3% vs 1.0% of new-water vs dry cells flagged  |
-| Chocó, Colombia             | Did the ground keep its echo? | Coherence only · 0.247          | Coherence 0.247 between two passes               |
-| Bug Fire, Nevada, USA       | Did fire scar it?             | Measured, not a verdict         | 4,096 cells read on a 10 m grid, no comparator   |
-| Rowe Creek, Oregon, USA     | Did vegetation disappear?     | Measured, not a verdict         | 262,142 cells read on a 10 m grid, no comparator |
-| Sköllersta, Sweden          | Did a field change?           | Measured, not a verdict         | +1.78 dB HH step, rye trial vs its surroundings  |
+| Case                        | Question                         | Verdict                         | Headline                                          |
+| --------------------------- | -------------------------------- | ------------------------------- | ------------------------------------------------- |
+| Qadirabad, Chenab, Pakistan | Did it flood?                    | Changed beyond its normal range | 64.3% vs 1.0% of new-water vs dry cells flagged   |
+| Chocó, Colombia             | Did the ground keep its echo?    | Coherence only · 0.247          | Coherence 0.247 between two passes                |
+| Bug Fire, Nevada, USA       | Did fire scar it?                | Measured, not a verdict         | 4,096 cells read on a 10 m grid, no comparator    |
+| Pará event 02, Brazil       | Did vegetation disappear?        | Measured, not a verdict         | 6,889 cells read on a 20 m grid, no comparator    |
+| Niscemi, Sicily, Italy      | Do the passes bracket the event? | Measured, not a verdict         | 8 aftermath passes on an 80 m grid, no comparator |
 
 ## Data sources and where they are fetched
 
@@ -186,7 +190,7 @@ The full element-by-element list is the design handoff's `DATA_PROVENANCE.md`. I
 
 Nova's answers are demo too (rule-based, see below), and the report's summary is a template.
 
-**To fill:** Chocó's event facts (Servicio Geológico Colombiano) and its NISAR frame; in the guided
+**To fill:** Chocó's event facts (Servicio Geológico Colombiano: date, magnitude, epicentre) and its NISAR frame; in the guided
 story, chapter 1's areas and people affected and chapter 5's photos and news. On the measured cases HV and
 HH−HV layers are not drawn at all; a live answer draws the layers the backend returns.
 

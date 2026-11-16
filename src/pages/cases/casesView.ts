@@ -50,7 +50,8 @@ export const caseHref = (item: Case): string => `/explore?case=${item.id}`;
 export const statSource = (item: Case): string =>
   item.statSource ?? "nova-frontier-model · flood_pilot_summary.json and FLOOD_CHARACTERIZATION.md";
 
-// The bottom card's icons: the four questions a live point answers (ground motion asks for a pair).
+// The bottom card's icons: the four questions a live point answers (ground motion asks for a pair,
+// observed_dynamics is offline only).
 export const QUESTION_ICONS: { id: IconId; label: string }[] = LENSES.filter(
-  ({ id }) => id !== "insar",
+  ({ id }) => id !== "insar" && id !== "observed_dynamics",
 ).map(({ icon, chip }) => ({ id: icon, label: chip }));
