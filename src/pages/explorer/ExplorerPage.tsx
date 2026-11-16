@@ -70,6 +70,14 @@ import { LiveProblem, LiveProgress } from "@/features/live/LiveStatus";
 import { LensPicker, type LensRun } from "@/features/lenses/LensPicker";
 import { LensResultCard } from "@/features/lenses/LensResultCard";
 import { isCardLens } from "@/features/lenses/lensSlots";
+import { LegendCard } from "@/features/result/LegendCard";
+import { ResultCard } from "@/features/result/ResultCard";
+import {
+  defaultResultView,
+  isV9Lens,
+  layerOptions,
+  selectedOption,
+} from "@/features/result/resultLayers";
 import { PlanState } from "@/features/live/LiveSummary";
 import { useFramePlan } from "@/features/live/useFramePlan";
 import { NovaChat } from "@/features/nova/NovaChat";
@@ -110,7 +118,13 @@ import { LEGEND, type DrapeKind } from "@/pages/explorer/drapeLegend";
 import { LayerDock } from "@/pages/explorer/LayerDock";
 import { LiveLayerDock } from "@/pages/explorer/LiveLayerDock";
 import { MobileBar } from "@/pages/explorer/MobileBar";
-import { hasLayerPills, layerPills, sheetFraction, sheetStep } from "@/pages/explorer/mobileSheet";
+import {
+  hasLayerPills,
+  layerPills,
+  resultPills,
+  sheetFraction,
+  sheetStep,
+} from "@/pages/explorer/mobileSheet";
 import { SheetHandle } from "@/pages/explorer/SheetHandle";
 import { SourceSwitch } from "@/pages/explorer/SourceSwitch";
 import { SquareBar } from "@/pages/explorer/SquareBar";
@@ -678,8 +692,17 @@ export const ExplorerPage = () => {
           })
         : undefined;
   // Live answers of the four lenses read as the v8 lens result; cases and ground motion keep v7.
+  // v9 (#15): the four live lenses read as the v9 result card; agriculture keeps the v8 lens card.
+  const resultLens =
+    subject?.kind === "live" && exploredView !== undefined && isV9Lens(subject.lens)
+      ? subject.lens
+      : undefined;
   const showLensCard =
-    subject?.kind === "live" && exploredView !== undefined && isCardLens(subject.lens);
+    subject?.kind === "live" &&
+    exploredView !== undefined &&
+    isCardLens(subject.lens) &&
+    resultLens === undefined;
+  const resultPanel = showLensCard || resultLens !== undefined;
   const lensRun: LensRun | undefined =
     live !== undefined && live.lensSwitch && liveRuns && running && isCardLens(live.lens)
       ? { lens: live.lens, view: exploredView, receivedAt }
@@ -696,7 +719,19 @@ export const ExplorerPage = () => {
     [phase, exploredView, framePlan.plan],
   );
   const livePasses = useMemo(() => measuredPasses(liveTimeline?.passes ?? []), [liveTimeline]);
-  const dockDefault = useMemo(() => defaultView(layers, livePasses), [layers, livePasses]);
+  // The v9 layer switch: a run starts on its lens's first layer, so a lens change resets it.
+  const liveV9Lens = live !== undefined && isV9Lens(live.lens) ? live.lens : undefined;
+  const resultOptions = useMemo(
+    () => (liveV9Lens === undefined ? [] : layerOptions(liveV9Lens, layers)),
+    [liveV9Lens, layers],
+  );
+  const dockDefault = useMemo(
+    () =>
+      liveV9Lens === undefined
+        ? defaultView(layers, livePasses)
+        : defaultResultView(liveV9Lens, layers, livePasses),
+    [liveV9Lens, layers, livePasses],
+  );
   const dockView = dockChoice?.runKey === runKey ? dockChoice : dockDefault;
   const liveLayer = shownLayer(layers, dockView.pick, dockView.date);
   const layerId = liveLayer?.id;
@@ -739,7 +774,9 @@ export const ExplorerPage = () => {
   const showTimeline = item?.timeline !== undefined && item.coherenceOnly !== true && !sheetOpen;
   const showLiveTimeline = liveTimeline !== undefined && !sheetOpen;
   const showDock = item?.crops !== undefined && !sheetOpen;
-  const showLiveDock = layers.length > 0 && !sheetOpen;
+  const showLiveDock = layers.length > 0 && !sheetOpen && liveV9Lens === undefined;
+  const showLegend = layers.length > 0 && !sheetOpen && liveV9Lens !== undefined;
+  const selectedLayer = selectedOption(resultOptions, dockView.pick)?.id;
 
   // Phones: the bottom sheet of steps 2–6 and 8, the layer pills and the timeline above them.
   const failed =
@@ -761,9 +798,11 @@ export const ExplorerPage = () => {
   const sheetKey = step === undefined ? "" : `${step}|${runKey}|${place?.id ?? ""}`;
   const expanded = sheetKey !== "" && expandedFor === sheetKey;
   const pills =
-    hasLayerPills(step) && layers.length > 0
-      ? layerPills(dockRows(layers, dockView.date, dockView.pick))
-      : [];
+    !hasLayerPills(step) || layers.length === 0
+      ? []
+      : liveV9Lens === undefined
+        ? layerPills(dockRows(layers, dockView.date, dockView.pick))
+        : resultPills(resultOptions, selectedLayer);
   const sheetStyle = {
     "--x-sheet-f": step === undefined ? "0" : String(sheetFraction(step, expanded)),
   } as CSSProperties;
@@ -772,7 +811,7 @@ export const ExplorerPage = () => {
   const lensChip = lensId === undefined ? "" : (findLens(lensId)?.chip ?? "");
   // Nova reads the v8 lens card through the same pure functions the card draws with.
   const cardFacts =
-    showLensCard && subject !== undefined && exploredView !== undefined
+    resultPanel && subject !== undefined && exploredView !== undefined
       ? cardFactsOf(subject, exploredView)
       : undefined;
   const novaContext: NovaContext = {
@@ -1094,11 +1133,11 @@ export const ExplorerPage = () => {
             lens={item?.lens ?? live?.lens ?? DEFAULT_LENS}
             chip={item !== undefined && <ProvenanceChip kind="offline" />}
             collapsed={collapsed || sheetOpen}
-            result={showLensCard}
+            result={resultPanel}
             picker={
               <LensPicker
                 lens={item?.lens ?? live?.lens ?? DEFAULT_LENS}
-                tabs={showLensCard}
+                tabs={resultPanel}
                 running={lensRun}
                 locked={item && CASE_LOCK.note(findLens(item.lens)?.chip ?? item.lens)}
                 onLens={chooseLens}
@@ -1132,7 +1171,21 @@ export const ExplorerPage = () => {
                 onMore={openSheet}
               />
             )}
-            {subject !== undefined && !showLensCard && (
+            {resultLens !== undefined &&
+              live !== undefined &&
+              subject !== undefined &&
+              exploredView !== undefined && (
+                <ResultCard
+                  lens={resultLens}
+                  view={exploredView}
+                  subject={subject}
+                  point={live.point}
+                  passes={livePasses}
+                  onNewSquare={close}
+                  onMore={openSheet}
+                />
+              )}
+            {subject !== undefined && !resultPanel && (
               <ResultSummary subject={subject} mode={mode} onMore={openSheet} />
             )}
             {live !== undefined && needsPair && (
@@ -1199,6 +1252,16 @@ export const ExplorerPage = () => {
             kind={drapeKind}
             opacity={opacity}
             onKind={setDrapeKind}
+            onOpacity={setOpacity}
+          />
+        )}
+
+        {showLegend && (
+          <LegendCard
+            options={resultOptions}
+            selected={selectedLayer}
+            opacity={opacity}
+            onPick={pickDock}
             onOpacity={setOpacity}
           />
         )}
