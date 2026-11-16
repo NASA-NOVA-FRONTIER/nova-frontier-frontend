@@ -124,10 +124,10 @@ export const SpotCard = ({
               <span className="x-spot__k">{STEP_2.areaLabel}</span>
               <span className="x-spot__v">{STEP_2.areaValue(view.sideKm)}</span>
             </div>
-            <div className="x-spot__card" data-testid="spot-wait">
+            <div className="x-spot__card" data-testid="spot-wait" data-offline={view.wait.offline}>
               <span className="x-spot__k">{STEP_2.waitLabel}</span>
-              <span className="x-spot__v">{STEP_2.waitValue}</span>
-              <span className="x-spot__s">{STEP_2.waitSub}</span>
+              <span className="x-spot__v">{view.wait.value}</span>
+              <span className="x-spot__s">{view.wait.sub}</span>
             </div>
           </div>
           <div className="x-spot__catalog" data-testid="spot-catalog">

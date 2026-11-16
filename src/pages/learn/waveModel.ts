@@ -2,7 +2,9 @@ import { tr } from "@/i18n/translate";
 import { localized } from "@/i18n/localized";
 // The Learn "Play with the wave" cross-section (#33): strings, band facts and the pure geometry of
 // the drawing, ported from the v9 handoff `reference/Radar Waves.dc.html` so it can be tested
-// without a canvas. Drawing lives in drawRadarWaves.ts, the loop in RadarWaves.tsx.
+// without a canvas. Drawing lives in drawRadarWaves.ts, the loop in RadarWaves.tsx. This file's name
+// differs from the component's by more than case, so Windows resolves `@/pages/learn/RadarWaves` to
+// the component and not to this file.
 //
 // Sources (read 2026-11-15):
 // - NASA Science, About the NISAR satellite (https://science.nasa.gov/mission/nisar/about-the-satellite/):

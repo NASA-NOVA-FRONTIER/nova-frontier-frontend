@@ -23,7 +23,7 @@ import {
   type BandId,
   type PolId,
   type Scene,
-} from "@/pages/learn/radarWaves";
+} from "@/pages/learn/waveModel";
 
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 

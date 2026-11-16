@@ -1,5 +1,7 @@
+import { CONFIRM, PROCESSING, RESULT } from "@/content/copyV9";
 import { formatCount, STEP_2, TOP_BAR } from "@/content/copyV8";
 import type { Case } from "@/features/cases/cases";
+import { formatEstimate } from "@/features/explore/exploreWait";
 import type { LonLat } from "@/features/frames/frame.types";
 import { greatCircleKm } from "@/features/geo/measure";
 import type { Coverage } from "@/features/spot/coverageApi";
@@ -61,8 +63,25 @@ export type SpotView =
       direction: string | undefined;
       chips: string[];
       gapNote: string | undefined;
+      wait: SpotWait;
     }
   | { state: "noCoverage" };
+
+// #25: the wait the backend expects here, before anything runs. A prepared answer opens at once;
+// otherwise its p80 of comparable runs (backend #5), and no number when it has none (v9 C7).
+export type SpotWait = { value: string; sub: string; offline: boolean };
+
+export const spotWait = (coverage: Coverage): SpotWait => {
+  if (coverage.cache === "hit")
+    return { value: CONFIRM.waitLineOffline, sub: RESULT.offline, offline: true };
+  const eta = coverage.etaSeconds ?? null;
+  return {
+    value:
+      eta !== null && eta > 0 ? PROCESSING.estimate(formatEstimate(eta)) : CONFIRM.waitLineOnline,
+    sub: STEP_2.waitSub,
+    offline: false,
+  };
+};
 
 // Everything the card says comes from the coverage answer; nothing is filled in for it.
 export const spotView = (coverage: Coverage): SpotView => {
@@ -75,5 +94,6 @@ export const spotView = (coverage: Coverage): SpotView => {
     direction: directionOf(seriesKey),
     chips: [...dates].sort().map((date) => formatDay(date, false)),
     gapNote: gap === undefined ? undefined : STEP_2.gapNote(gap.days, formatDay(gap.after, false)),
+    wait: spotWait(coverage),
   };
 };

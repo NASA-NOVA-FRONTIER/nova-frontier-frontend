@@ -4,7 +4,7 @@
 // `{x}` placeholders are small functions; callers pass values from the API, never invented ones.
 // Dates, coordinates and directions arrive formatted (coordinates via formatLonLat, as in copyV8).
 // Not here on purpose: per-case lines (cases are kept elsewhere), the 40 facts (facts.ts, T6b) and the
-// Radar Waves strings (radarWaves.ts, T11).
+// Radar Waves strings (waveModel.ts, T11).
 
 import { formatCount, passOf } from "@/content/copyV8";
 import type { LensId } from "@/features/cases/cases";

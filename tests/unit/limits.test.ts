@@ -50,10 +50,10 @@ describe("reset time", () => {
 });
 
 describe("facts", () => {
-  it("every fact names a source, and the five v8 facts come with their title and image", () => {
+  it("every fact names a source, and the five v8 facts still open the pool", () => {
     const facts = getFacts();
     for (const fact of facts) expect(fact.source.href).toMatch(/^https:\/\//);
-    expect(facts.filter((fact) => fact.image !== undefined).map((fact) => fact.title)).toEqual([
+    expect(facts.slice(0, 5).map((fact) => fact.title)).toEqual([
       "Radar sees through clouds",
       "A 24 cm wave",
       "Calm water looks dark",

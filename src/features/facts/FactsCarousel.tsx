@@ -91,25 +91,21 @@ export const FactsCarousel = ({ reduceMotion, facts = getFacts() }: FactsCarouse
         </span>
       </div>
       <div className="x-facts-carousel__body" aria-live="polite" data-testid="fact-body">
-        {fact.image !== undefined && (
-          <img
-            className="x-facts-carousel__img"
-            src={fact.image.src}
-            alt=""
-            data-pixel={fact.image.pixel}
-            data-testid="fact-image"
-          />
-        )}
-        {fact.image?.credit !== undefined && (
+        <img
+          className="x-facts-carousel__img"
+          src={fact.image.src}
+          alt={fact.image.alt}
+          data-pixel={fact.image.pixel}
+          data-testid="fact-image"
+        />
+        {fact.image.credit !== undefined && (
           <p className="x-facts-carousel__credit" data-testid="fact-credit">
             {fact.image.credit}
           </p>
         )}
-        {fact.title !== undefined && (
-          <p className="x-facts-carousel__title" data-testid="fact-title">
-            {fact.title}
-          </p>
-        )}
+        <p className="x-facts-carousel__title" data-testid="fact-title">
+          {fact.title}
+        </p>
         <p className="x-facts-carousel__text" data-testid="fact-text">
           {fact.text}
         </p>
