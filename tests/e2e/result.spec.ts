@@ -76,8 +76,9 @@ test.describe("Explorer v9: the result card, the legend card and the layer switc
     await expect(page.getByTestId("result-range")).toHaveText(
       "14 JUL 2026 → 11 NOV 2026 · 5 PASSES",
     );
+    // Anchored at the start only: the stat's ⓘ button follows the label.
     await expect(globe.resultStat).toHaveText(
-      "208,344 of 1,048,576analysis cells met the darkening signature",
+      /^208,344 of 1,048,576analysis cells met the darkening signature/,
     );
     await expect(page.getByTestId("result-could-be")).toHaveText(
       "Could also be:wet soil, or calm water that was already there.",
@@ -212,7 +213,9 @@ test.describe("Explorer v9: the result card, the legend card and the layer switc
     await expect(page.getByTestId("result-body")).toHaveText(
       /^The pair 21 Jul 2026 → 14 Aug 2026 kept its phase/,
     );
-    await expect(globe.resultStat).toHaveText("39,584 of 62,500window cells with phase above 0.35");
+    await expect(globe.resultStat).toHaveText(
+      /^39,584 of 62,500window cells with phase above 0\.35/,
+    );
 
     await expect(globe.layerRadio("coh")).toHaveAttribute("aria-checked", "true");
     await expect(page.getByTestId("legend-ends")).toHaveText("0 · changed1 · alike");
@@ -231,17 +234,21 @@ test.describe("Explorer v9: the result card, the legend card and the layer switc
     await expect(page.locator("main")).not.toContainText("12 cm");
   });
 
-  // TODO(#59): the ⓘ arrives with InfoTip; then this checks the tip's text.
-  test.fixme("the phase ⓘ carries the 12 cm line and says it is not a displacement", async ({
-    page,
-  }) => {
+  test("the phase ⓘ carries the 12 cm line and says it is not a displacement", async ({ page }) => {
     await globe.mockExplorations({ first: insarView() });
     await globe.mockInsarPairs();
     await globe.goto(`?frame=${LIVE_FRAME.id}&lens=insar&pair=${PAIR}`);
     await globe.layerRadio("phase").click();
-    await page.getByTestId("legend-card").getByTestId("info-tip").click();
-    await expect(page.getByRole("tooltip")).toContainText("about 12 cm");
-    await expect(page.getByRole("tooltip")).toContainText("not a displacement");
+    await page.getByTestId("legend-tip").click();
+    const tip = page.getByTestId("legend-tip-pop");
+    await expect(tip).toContainText("Wrapped phase");
+    await expect(tip).toContainText("about 12 cm");
+    await expect(tip).toContainText("not a displacement");
+    // Only the phase layer's tip says it: coherence's doesn't.
+    await page.keyboard.press("Escape");
+    await globe.layerRadio("coh").click();
+    await page.getByTestId("legend-tip").click();
+    await expect(tip).not.toContainText("12 cm");
   });
 
   test("a lens change resets the layer to the new lens's first one", async ({ page }) => {

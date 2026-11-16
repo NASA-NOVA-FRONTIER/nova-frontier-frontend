@@ -3,9 +3,10 @@ import "@/features/result/result.css";
 import { useRef, type KeyboardEvent } from "react";
 
 import { STEP_4 } from "@/content/copyV8";
-import { LEGEND, RESULT, type V9LayerId } from "@/content/copyV9";
+import { INFO_TIP, LEGEND, RESULT, TIPS, type V9LayerId } from "@/content/copyV9";
 import type { DockPick } from "@/features/explore/exploreDock";
 import { RAMP, type LayerOption } from "@/features/result/resultLayers";
+import { InfoTip } from "@/lib/InfoTip";
 
 type Props = {
   options: LayerOption[];
@@ -78,8 +79,13 @@ export const LegendCard = ({ options, selected, opacity, onPick, onOpacity }: Pr
           <p className="x-dock__text" data-testid="legend-what">
             {legend.what}
           </p>
-          {/* TODO(#59): InfoTip title={label of `selected`} text={TIPS.layer[selected]}; the phase
-              tip carries the 12 cm line with "not a displacement" (C13). */}
+          {/* The phase tip carries the 12 cm line with "not a displacement" (C13); nowhere else does. */}
+          <InfoTip
+            label={INFO_TIP.label}
+            title={options.find((option) => option.id === selected)?.label ?? RESULT.layerLabel}
+            text={TIPS.layer[selected]}
+            testId="legend-tip"
+          />
         </div>
       )}
       <p className="x-dock__grey">

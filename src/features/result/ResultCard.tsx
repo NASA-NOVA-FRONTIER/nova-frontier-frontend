@@ -1,7 +1,7 @@
 import "@/features/result/result.css";
 
-import { STEP_6, STEP_7 } from "@/content/copyV8";
-import { RESULT, RESULT_CARD, statOf, type V9LensId } from "@/content/copyV9";
+import { CHIP_COPY, STEP_6, STEP_7 } from "@/content/copyV8";
+import { INFO_TIP, RESULT, RESULT_CARD, statOf, TIPS, type V9LensId } from "@/content/copyV9";
 import { Icon } from "@/features/case-panel/icons";
 import { VerdictGlyph } from "@/features/case-panel/Verdict";
 import type { Subject } from "@/features/case-panel/subject";
@@ -24,6 +24,7 @@ import { SurroundingsBlock } from "@/features/lenses/SurroundingsBlock";
 import { VERDICT_LABEL } from "@/features/lenses/verdictLabel";
 import { formatLonLat } from "@/features/live/liveQuestion";
 import { originOf, rangeLineOf, resultBody, resultStat } from "@/features/result/resultStat";
+import { InfoTip } from "@/lib/InfoTip";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
 const ACTIVE: readonly string[] = ACTIVE_STATUSES;
@@ -72,7 +73,13 @@ export const ResultCard = ({ lens, view, subject, point, passes, onNewSquare, on
             {RESULT.measured}
           </span>
         )}
-        {/* TODO(#59): InfoTip title={RESULT.measured} text={TIPS.chips} */}
+        {/* Titled by the chips it explains: copyV9 has no title of its own for this tip. */}
+        <InfoTip
+          label={INFO_TIP.label}
+          title={`${origin === "offline" ? RESULT.offline : RESULT.online} · ${result.isDemo ? CHIP_COPY.demo : RESULT.measured}`}
+          text={TIPS.chips}
+          testId="result-chips-tip"
+        />
       </p>
 
       <div className="x-result__place">
@@ -123,7 +130,12 @@ export const ResultCard = ({ lens, view, subject, point, passes, onNewSquare, on
         <p className="x-result__stat" data-testid="result-stat">
           <span className="x-result__k">{statOf(stat.k, stat.n)}</span>
           <span className="x-result__label">{stat.label}</span>
-          {/* TODO(#59): InfoTip title={RESULT.measured} text={TIPS.stat} */}
+          <InfoTip
+            label={INFO_TIP.label}
+            title={statOf(stat.k, stat.n)}
+            text={TIPS.stat}
+            testId="result-stat-tip"
+          />
         </p>
       )}
 
