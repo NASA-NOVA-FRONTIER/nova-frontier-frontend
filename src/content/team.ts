@@ -60,7 +60,7 @@ export const TEAM: TeamMember[] = localized([
     handle: "@Ch0comilo",
     degree: "Statistical Engineering",
     photo: "/team/daniel-martinez.jpg",
-    role: "Machine learning · radar science",
+    role: "Spatio-temporal ML · SAR science",
     built: "nova-frontier-model and NISAR-Models",
     github: "https://github.com/Ch0comilo",
     linkedin: "https://www.linkedin.com/in/daniel-martinez-313792361",
