@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { NovaGlyph } from "@/features/nova/NovaGlyph";
 import { ONBOARDING_STEPS, type OnboardingTarget } from "@/features/onboarding/onboardingState";
 
+import { tr } from "@/i18n/translate";
 const TEST_ID: Record<OnboardingTarget, string> = {
   cases: "start-card",
   panel: "case-panel",
@@ -129,12 +130,12 @@ export const Onboarding = ({ step, onNext, onSkip }: OnboardingProps) => {
         ref={cardRef}
         className="x-onboard__card"
         role="dialog"
-        aria-label="Quick tour"
+        aria-label={tr("Quick tour")}
         style={placement === undefined ? { visibility: "hidden" } : placement.card}
       >
         <div className="x-onboard__head">
           <NovaGlyph size={32} />
-          <span>Nova</span>
+          <span>{tr("Nova")}</span>
           <span className="x-top__fill" />
           <span className="x-onboard__count" data-testid="onboarding-count">
             {step + 1} / {ONBOARDING_STEPS.length}
@@ -149,7 +150,7 @@ export const Onboarding = ({ step, onNext, onSkip }: OnboardingProps) => {
             onClick={onSkip}
             data-testid="onboarding-skip"
           >
-            Skip
+            {tr("Skip")}
           </button>
           <span className="x-top__fill" />
           <button

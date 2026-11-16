@@ -7,6 +7,7 @@ import { Link } from "@/lib/Link";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import type { AsyncState } from "@/lib/useAsync";
 
+import { tr } from "@/i18n/translate";
 type StartCardProps = {
   frames: AsyncState<Frame[]> | undefined;
   onOpen: (item: Case) => void;
@@ -19,16 +20,17 @@ const country = (item: Case): string => item.place.split(",").at(-1)?.trim() ?? 
 
 // Nothing selected yet: the measured cases, and the way into a live question.
 export const StartCard = ({ frames, onOpen, onRetryFrames, onStory, onSearch }: StartCardProps) => (
-  <section className="x-start x-glass" aria-label="Start" data-testid="start-card">
-    <p className="x-kicker">Measured cases · real NISAR passes</p>
-    <h1 className="x-start__title">What did the radar see?</h1>
+  <section className="x-start x-glass" aria-label={tr("Start")} data-testid="start-card">
+    <p className="x-kicker">{tr("Measured cases · real NISAR passes")}</p>
+    <h1 className="x-start__title">{tr("What did the radar see?")}</h1>
     <p className="x-start__body">
-      At each marker our pipeline compared real NISAR passes with the place's own history. Pick one,
-      or click any land to ask the radar yourself.
+      {tr(
+        "At each marker our pipeline compared real NISAR passes with the place's own history. Pick one, or click any land to ask the radar yourself.",
+      )}
     </p>
     <button type="button" className="x-search-cta" onClick={onSearch} data-testid="search-cta">
       <Icon name="search" size={16} />
-      Search a place
+      {tr("Search a place")}
     </button>
     <ul className="x-cases">
       {CASES.map((item) => (
@@ -57,12 +59,12 @@ export const StartCard = ({ frames, onOpen, onRetryFrames, onStory, onSearch }: 
       ))}
     </ul>
     <button type="button" className="x-story-start" onClick={onStory} data-testid="story-start">
-      Watch the 1-minute story · Chenab flood
+      {tr("Watch the 1-minute story · Chenab flood")}
     </button>
     <FramesStatus state={frames} onRetry={onRetryFrames} />
     <p className="x-start__foot">
       <Link to="/about" testId="intro-team" className="x-start__team">
-        Nova Frontier · Space Apps 2026
+        {tr("Nova Frontier · Space Apps 2026")}
       </Link>
       <span>{DESIGN_VERSION}</span>
     </p>
@@ -76,16 +78,16 @@ const FramesStatus = ({ state, onRetry }: FramesStatusProps) => {
   if (state?.status === "error")
     return (
       <p role="alert" className="x-start__status" data-testid="frames-status">
-        Could not load the NISAR frames, so live questions are off.{" "}
+        {tr("Could not load the NISAR frames, so live questions are off.")}{" "}
         <button type="button" className="x-text" onClick={onRetry}>
-          Try again
+          {tr("Try again")}
         </button>
       </p>
     );
   if (state?.status === "success" && state.data.length === 0)
     return (
       <p role="status" className="x-start__status" data-testid="frames-status">
-        No NISAR frames in the snapshot, so live questions are off.
+        {tr("No NISAR frames in the snapshot, so live questions are off.")}
       </p>
     );
   return (

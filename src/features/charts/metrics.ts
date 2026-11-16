@@ -1,5 +1,6 @@
 import type { ChartMode } from "@/features/charts/chartTokens";
 
+import { localized } from "@/i18n/localized";
 /*
  * Scores of the experimental classifiers, as published in each NISAR-Models model card. A model
  * can carry several tests side by side (held-out next to development) so nothing is cherry-picked.
@@ -27,21 +28,21 @@ export type ModelScores = {
   tests: ModelTest[];
 };
 
-export const METRIC_ORDER: MetricId[] = ["precision", "recall", "f1", "iou"];
+export const METRIC_ORDER: MetricId[] = localized(["precision", "recall", "f1", "iou"]);
 
-export const METRIC_LABEL: Record<MetricId, string> = {
+export const METRIC_LABEL: Record<MetricId, string> = localized({
   precision: "Precision",
   recall: "Recall",
   f1: "F1",
   iou: "IoU",
-};
+});
 
-export const METRIC_MEANING: Record<MetricId, string> = {
+export const METRIC_MEANING: Record<MetricId, string> = localized({
   precision: "Of the cells the model marked, the share that were right.",
   recall: "Of the cells that really were the class, the share the model found.",
   f1: "One number balancing precision and recall.",
   iou: "Overlap between the model's map and the reference map.",
-};
+});
 
 // Plain shows F1; where a card reports no F1 it falls back to precision and recall, so a test
 // never disappears just because one number is missing.
@@ -56,7 +57,7 @@ export const formatMetric = (value: number): string =>
 
 const MODELS_REPO = "https://github.com/Ch0comilo/NISAR-Models/blob/main";
 
-export const MODEL_SCORES: ModelScores[] = [
+export const MODEL_SCORES: ModelScores[] = localized([
   {
     name: "Water",
     sub: "Water or not water on one date",
@@ -111,4 +112,4 @@ export const MODEL_SCORES: ModelScores[] = [
       },
     ],
   },
-];
+]);

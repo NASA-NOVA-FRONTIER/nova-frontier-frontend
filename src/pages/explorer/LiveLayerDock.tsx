@@ -9,6 +9,7 @@ import { formatDay } from "@/features/timeline/timelineLayout";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { RawThumbs } from "@/pages/explorer/RawThumbs";
 
+import { tr } from "@/i18n/translate";
 // Approximations of the palettes the backend renders (matplotlib), so the legend matches the map.
 const RAMPS: Record<string, string> = {
   gray: "linear-gradient(90deg,#000,#fff)",
@@ -94,7 +95,7 @@ export const LiveLayerDock = ({
   return (
     <section
       className="x-dock x-dock--live x-glass"
-      aria-label="Radar on the globe"
+      aria-label={tr("Radar on the globe")}
       data-testid="live-layer-dock"
     >
       {date !== undefined && passes.length > 0 && (

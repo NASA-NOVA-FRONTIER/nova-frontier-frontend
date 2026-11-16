@@ -204,6 +204,8 @@ const crossPolHistorySchema = z.looseObject({
   status: z.string(),
   polarization: z.string().optional(),
   samples: z.array(z.looseObject({ date: z.string(), decline_cells: z.number() })),
+  // Cells whose HV fell on both of the last two assessed passes (status "evaluated" only).
+  decline_on_last_two_cells: z.number().optional().catch(undefined),
 });
 
 const pixelCrossPolHistorySchema = z.looseObject({
@@ -567,6 +569,7 @@ export type CrossPolHistory = {
   polarization: string | undefined;
   commonCells: number | undefined;
   samples: { date: string; declineCells: number }[];
+  declineOnLastTwoCells: number | undefined;
   pixelDeclinePasses: number | undefined;
   pixelAssessedPasses: number | undefined;
 };
@@ -583,6 +586,7 @@ export const crossPolHistoryOf = (result: ExplorationResult): CrossPolHistory | 
       date: sample.date,
       declineCells: sample.decline_cells,
     })),
+    declineOnLastTwoCells: history.decline_on_last_two_cells,
     pixelDeclinePasses: pixel?.decline_dates,
     pixelAssessedPasses: pixel?.assessed_dates,
   };

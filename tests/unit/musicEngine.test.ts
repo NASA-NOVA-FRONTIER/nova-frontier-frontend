@@ -25,7 +25,7 @@ const COVERAGE_STEP = 0.05;
 // earlier than that. A fixed number, not the engine's own constant, so the test can catch a regression.
 const MIN_LEAD_SECONDS = 10;
 const STARFIRE: PlayableTrack = { id: "landing", src: "/assets/starfire.mp3", gain: 0.4 };
-const SOLACE: PlayableTrack = { id: "globe", src: "/assets/solace.mp3", gain: 0.25 };
+const SPACES: PlayableTrack = { id: "globe", src: "/assets/the-spaces-between.mp3", gain: 0.6 };
 
 type ParamCall = {
   method:
@@ -354,7 +354,7 @@ describe("createMusicEngine", () => {
     const changedAt = audio.now();
 
     // Act
-    await engine.play(SOLACE);
+    await engine.play(SPACES);
 
     // Assert
     const [oldVoice, newVoice] = voiceGains();
@@ -363,7 +363,7 @@ describe("createMusicEngine", () => {
     expect(fadeOut?.value).toBe(0);
     expect(fadeOut?.time).toBeCloseTo(changedAt + ROUTE_CROSSFADE_SECONDS, 6);
     const fadeIn = lastCall(newVoice?.gain, "linearRampToValueAtTime");
-    expect(fadeIn?.value).toBe(SOLACE.gain);
+    expect(fadeIn?.value).toBe(SPACES.gain);
     expect(fadeIn?.time).toBeCloseTo(changedAt + ROUTE_CROSSFADE_SECONDS, 6);
 
     audio.advance(ROUTE_CROSSFADE_SECONDS + 1);
@@ -384,7 +384,7 @@ describe("createMusicEngine", () => {
 
     // Act
     const slow = engine.play(STARFIRE);
-    await engine.play(SOLACE);
+    await engine.play(SPACES);
     finishFirst(new ArrayBuffer(8));
     await slow;
 

@@ -32,6 +32,7 @@ describe("crossPolHistoryOf", () => {
       polarization: "HV",
       commonCells: 1048312,
       samples: [{ date: "2026-10-24", declineCells: 96043 }],
+      declineOnLastTwoCells: undefined,
       pixelDeclinePasses: 0,
       pixelAssessedPasses: 1,
     });

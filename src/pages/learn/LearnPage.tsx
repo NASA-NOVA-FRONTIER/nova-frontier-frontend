@@ -19,6 +19,7 @@ import { useLearnMotion } from "@/pages/learn/useLearnMotion";
 import { SiteFooter } from "@/pages/site/SiteFooter";
 import { SiteNav } from "@/pages/site/SiteNav";
 
+import { tr } from "@/i18n/translate";
 // Sets a head tag for the page's lifetime and puts the previous value back on the way out.
 const usePageHead = (title: string, description: string): void => {
   useEffect(() => {
@@ -143,7 +144,7 @@ export const LearnPage = () => {
   return (
     <div ref={root} className="site learn">
       <a href="#main" className="s-skip">
-        Skip to content
+        {tr("Skip to content")}
       </a>
       <SiteNav page="learn" />
 

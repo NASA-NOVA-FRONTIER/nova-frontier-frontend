@@ -125,6 +125,23 @@ Reduced motion opens paused on the reference pass (COPY-flow-v9 §6). Each live 
 `display_<date>_<pol>` image; a pass without one shows nothing. A case with no image per pass (all of
 them today) can't play.
 
+## The v9 result
+
+`src/features/result/` (v9, #15/#26): a live answer of the four live lenses (`flood_wetland`,
+`wildfire`, `vegetation_disturbance`, `insar`) reads as `ResultCard` (chips ONLINE/OFFLINE from
+`cache`, MEASURED or DEMO DATA from `isDemo` · lens and place · title and the passes' real range, never an
+event date · stat "N of M" · "Could also be:" / "Not shown:" · "Place a new square" · More information).
+Below it, a closed "EVIDENCE AND QUALITY" section keeps the v8 OPERA witness, the surroundings row and
+flood's possible drivers (HYPOTHESIS). `LegendCard` replaces `LiveLayerDock` for those lenses: one radio per
+copyV9 `LAYERS` entry, the fixed v8 ramp with its two ends, and the opacity slider; on phones the
+same layers are the pills. `resultLayers.ts` maps each layer to a backend id **by id, never by kind**
+(`display_baseline_change_HH/HV`, `display_flood_signature_flags_dual_darkening`,
+`display_coherence_coherence`, `display_wrapped_phase_*`; HH/HV follow the timeline's pass), and
+`resultStat.ts` reads the stat (flood dual-darkening cells, HV decline on the last two passes only
+when `cross_pol_history` is `evaluated`, InSAR phase cells of window cells). Agriculture keeps the v8
+`LensResultCard` and `LiveLayerDock`. `result.spec.ts` scans the result for hectares, probability,
+cm, causes and "detected" (`[data-negation]`, the "Not shown:" line, is skipped).
+
 ## The live exploration flow
 
 `src/features/explore/` talks to the backend: `exploreSchemas.ts` (zod, the runtime truth, built from
@@ -180,12 +197,17 @@ or hectares).
   copied from the science backend's reports (github.com/NASA-NOVA-FRONTIER/nova-frontier-model); layer crops and
   report figures are static files in `public/cases/`. Pass timeline dates in `cases.ts` are DEMO
   (12-day spacing) until the backend serves real ones. **One demo case per phenomenon** (issue #28,
-  `Case.hazard`): Qadirabad (flood), Chocó (earthquake), Bug Fire (wildfire), Rowe Creek
-  (vegetation) and Sköllersta (agriculture). They are copied from the gateway's precomputed cases,
-  which the backend relays at `/api/v1/cases` (52 today); the frontend doesn't fetch them at run time.
+  `Case.hazard`, the five phenomena of the issue): Qadirabad (flood, kept for the guided story),
+  Chocó (earthquake), Bug Fire (wildfire), Pará event 02 (deforestation) and Niscemi (landslide).
+  The last four are the featured stops of the model's `docs/PHENOMENA_EXAMPLES.md`. Niscemi's lens
+  is `observed_dynamics`, offline only: it is out of `V8LensId`, `QUESTION_ICONS` and the `?lens=`
+  deep link, so no live question can ask it. They are copied from the gateway's precomputed cases,
+  which the backend lists at `/api/v1/cases` (only these five; all 52 open by id); the frontend doesn't fetch them at run time.
   `tests/fixtures/gateway-cases.json` records that answer and `gatewayCases.test.ts` checks the copy
-  against it. Bug Fire, Rowe Creek and Sköllersta are `radar_evaluated` (layers, no comparator), so
-  they read "Measured, not a verdict" with only the cells, passes and limit the gateway returns. Each
+  against it. Bug Fire, Pará event 02 and Niscemi have no comparator, so they read "Measured, not a
+  verdict" with only the cells, passes and limit the gateway returns. Chocó sits on the gateway's
+  measured window, lists the gateway's `limitations` verbatim (`Case.limitations`) and has zero
+  common phase cells, so it never shows a phase. Each
   case shows the `offline` chip (OFFLINE, never hidden) and its lens is fixed: `LensPicker` gets
   `locked` with the reason and `chooseLens` never turns a case into a live question.
 - **Demo values:** the band chart series of the measured cases (`src/features/cases/demoBand.ts`,

@@ -512,30 +512,30 @@
         "A perimeter can enclose unburned cells. Dated severity mapping and vegetation or field observations would help interpret the departures."
       ]
     },
-    "rowe-creek": {
+    "para-event-02": {
       "status": "evaluated",
-      "state": "radar_evaluated",
-      "radarSupportCells": 262142,
+      "state": "evaluated",
+      "radarSupportCells": 6889,
       "grid": {
-        "shape": [512, 512],
-        "postingM": [10.0, 10.0]
-      },
-      "medianCoherence": null,
-      "limitations": [
-        "Moisture, roughness and vegetation structure all affect the channels. The native replay uses radar only. Independent dated event and vegetation evidence would help."
-      ]
-    },
-    "skollersta": {
-      "status": "evaluated",
-      "state": "radar_evaluated",
-      "radarSupportCells": 4096,
-      "grid": {
-        "shape": [64, 64],
+        "shape": [83, 83],
         "postingM": [20.0, 20.0]
       },
       "medianCoherence": null,
       "limitations": [
-        "The independent record dates the trial. The harvested footprint, moisture and management across the full window remain unresolved."
+        "The map shows gamma-zero change on measured support. Moisture, geometry and surface structure can affect the return. Permanent forest conversion and its cause remain unverified."
+      ]
+    },
+    "niscemi-aftermath": {
+      "status": "measured",
+      "state": "measured",
+      "radarSupportCells": null,
+      "grid": {
+        "shape": [128, 128],
+        "postingM": [80.0, 80.0]
+      },
+      "medianCoherence": null,
+      "limitations": [
+        "Available radar passes begin months after the January 25 landslide. The baseline and target are both aftermath observations."
       ]
     }
   }

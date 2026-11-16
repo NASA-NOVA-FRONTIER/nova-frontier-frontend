@@ -2,6 +2,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 
+import { tr } from "@/i18n/translate";
 gsap.registerPlugin(ScrollTrigger);
 
 type CompareSliderProps = {
@@ -98,14 +99,16 @@ export const CompareSlider = ({ reducedMotion }: CompareSliderProps) => {
     >
       <img
         src="/landing/optical-north-dakota.jpg"
-        alt="Sentinel-2 view of farmland along the Forest River, North Dakota, mostly hidden under cumulus cloud"
+        alt={tr(
+          "Sentinel-2 view of farmland along the Forest River, North Dakota, mostly hidden under cumulus cloud",
+        )}
         width={1580}
         height={851}
         draggable={false}
       />
       <img
         src="/landing/radar-north-dakota.jpg"
-        alt="NISAR radar view of the same farmland, every field visible"
+        alt={tr("NISAR radar view of the same farmland, every field visible")}
         width={2048}
         height={1103}
         draggable={false}
@@ -116,7 +119,7 @@ export const CompareSlider = ({ reducedMotion }: CompareSliderProps) => {
           className="l-compare__handle"
           role="slider"
           tabIndex={0}
-          aria-label="Radar and optical split"
+          aria-label={tr("Radar and optical split")}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={value}
@@ -128,10 +131,10 @@ export const CompareSlider = ({ reducedMotion }: CompareSliderProps) => {
         </div>
       </div>
       <span className="s-chip l-compare__chip l-compare__chip--left">
-        NISAR RADAR · 23 AUG 2025
+        {tr("NISAR RADAR · 23 AUG 2025")}
       </span>
       <span className="s-chip l-compare__chip l-compare__chip--right">
-        SENTINEL-2 · 24 AUG 2025
+        {tr("SENTINEL-2 · 24 AUG 2025")}
       </span>
     </div>
   );

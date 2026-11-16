@@ -7,7 +7,7 @@ import { timelineJson, timelineRows } from "@/features/downloads/timelineExport"
 import { viewInsets } from "@/features/globe/framing";
 import { NO_IMPACT, novaAnswer, suggestionsFor } from "@/features/nova/novaAnswer";
 import { CHAPTERS, chapterCount, clampChapter, storyCase } from "@/features/story/chapters";
-import { reportSummary, SUMMARY_LABEL } from "@/pages/report/reportSummary";
+import { reportSummary, summaryLabel } from "@/pages/report/reportSummary";
 
 const caseOf = (id: string): Case => {
   const item = findCase(id);
@@ -153,7 +153,7 @@ describe("globe PNG strip", () => {
 
 describe("report summary (template)", () => {
   it("is labelled as a template, not AI", () => {
-    expect(SUMMARY_LABEL).toBe("Summary · written from the data above (template)");
+    expect(summaryLabel()).toBe("Summary · written from the data above (template)");
   });
 
   it("only uses the case's own fields", () => {

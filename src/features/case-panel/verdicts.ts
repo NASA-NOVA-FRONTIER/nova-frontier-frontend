@@ -2,31 +2,33 @@ import type { SubjectVerdict } from "@/features/case-panel/subject";
 import type { Verdict } from "@/features/cases/cases";
 import { bandsFor, isOutside, type BandPass } from "@/features/cases/demoBand";
 
+import { localized } from "@/i18n/localized";
 // The three backend outcomes in plain words (SPECS §2.7); the sheet shows all three side by side.
-export const VERDICT: Record<SubjectVerdict, { label: string; sub: string; state: string }> = {
-  departure: {
-    label: "Changed beyond its normal range",
-    sub: "At least one channel left the band built from earlier passes.",
-    state: "observed_departure",
-  },
-  within: {
-    label: "Within its normal range",
-    sub: "Both channels stayed inside the band.",
-    state: "within_observed_baseline",
-  },
-  insufficient: {
-    label: "Not enough radar yet",
-    sub: "Thin history, masked pixel or missing pass. We say why.",
-    state: "insufficient_data",
-  },
-  measured: {
-    label: "Measured, not a verdict",
-    sub: "This lens reports what the pair measured and no verdict.",
-    state: "measured",
-  },
-};
+export const VERDICT: Record<SubjectVerdict, { label: string; sub: string; state: string }> =
+  localized({
+    departure: {
+      label: "Changed beyond its normal range",
+      sub: "At least one channel left the band built from earlier passes.",
+      state: "observed_departure",
+    },
+    within: {
+      label: "Within its normal range",
+      sub: "Both channels stayed inside the band.",
+      state: "within_observed_baseline",
+    },
+    insufficient: {
+      label: "Not enough radar yet",
+      sub: "Thin history, masked pixel or missing pass. We say why.",
+      state: "insufficient_data",
+    },
+    measured: {
+      label: "Measured, not a verdict",
+      sub: "This lens reports what the pair measured and no verdict.",
+      state: "measured",
+    },
+  });
 
-export const VERDICT_ORDER: Verdict[] = ["departure", "within", "insufficient"];
+export const VERDICT_ORDER: Verdict[] = localized(["departure", "within", "insufficient"]);
 
 // The sentence under the full band chart, read from the series itself so it can't disagree with it.
 export const bandSentence = (passes: BandPass[]): string => {
@@ -49,7 +51,7 @@ export const bandSentence = (passes: BandPass[]): string => {
 };
 
 // Where each chip's number comes from, shown on hover (DATA_PROVENANCE.md).
-export const SOURCE = {
+export const SOURCE = localized({
   caseVerdict:
     "Verdict from the nova-frontier-model backend report for this case (status, interpretation_status); see Sources",
   liveVerdict:
@@ -76,4 +78,4 @@ export const SOURCE = {
   timeline:
     "Pass dates (12-day spacing) and the % outside range bars are demo until the backend serves the real ones",
   todo: "Left as a slot until it is copied from the cited source",
-} as const;
+} as const);

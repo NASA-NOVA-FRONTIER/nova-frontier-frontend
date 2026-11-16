@@ -117,6 +117,8 @@ export class GlobePage {
   readonly jobProgress: Locator;
   readonly normalRange: Locator;
   readonly liveLayerDock: Locator;
+  readonly resultCard: Locator;
+  readonly resultStat: Locator;
   readonly pairPicker: Locator;
   readonly pairMeasure: Locator;
   readonly insarCard: Locator;
@@ -178,6 +180,8 @@ export class GlobePage {
     this.jobProgress = page.getByTestId("job-progress");
     this.normalRange = page.getByTestId("normal-range");
     this.liveLayerDock = page.getByTestId("live-layer-dock");
+    this.resultCard = page.getByTestId("result-card");
+    this.resultStat = page.getByTestId("result-stat");
     this.pairPicker = page.getByTestId("pair-picker");
     this.pairMeasure = page.getByTestId("pair-measure");
     this.insarCard = page.getByTestId("insar-card");
@@ -281,6 +285,11 @@ export class GlobePage {
 
   caseRow(id: string): Locator {
     return this.page.getByTestId(`case-row-${id}`);
+  }
+
+  // v9 legend card: one radio per layer of the lens (copyV9 LAYERS ids).
+  layerRadio(id: string): Locator {
+    return this.page.getByTestId(`layer-radio-${id}`);
   }
 
   lens(id: string): Locator {

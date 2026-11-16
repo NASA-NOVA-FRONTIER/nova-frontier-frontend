@@ -6,6 +6,7 @@ import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { esriImageryUrl } from "@/pages/landing/eventImagery";
 import { caseCountry, caseHref, caseSummary } from "@/pages/cases/casesView";
 
+import { tr } from "@/i18n/translate";
 type LandingCaseCardProps = {
   item: Case;
 };
@@ -49,7 +50,7 @@ export const LandingCaseCard = ({ item }: LandingCaseCardProps) => {
           {item.name}, {caseCountry(item)}
         </span>
         <span className="l-card__summary">{caseSummary(item)}</span>
-        <span className="l-card__action">Open on the globe →</span>
+        <span className="l-card__action">{tr("Open on the globe →")}</span>
       </span>
     </Link>
   );

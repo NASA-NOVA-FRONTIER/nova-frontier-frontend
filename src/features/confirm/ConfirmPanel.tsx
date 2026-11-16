@@ -56,6 +56,7 @@ import { ApiError } from "@/lib/api/apiClient";
 import { InfoTip } from "@/lib/InfoTip";
 import { useAsync, type AsyncState } from "@/lib/useAsync";
 
+import { tr } from "@/i18n/translate";
 type ConfirmPanelProps = {
   place: Place;
   coverage: AsyncState<Coverage> | undefined;
@@ -210,7 +211,7 @@ export const ConfirmPanel = ({
                 className="x-primary x-primary--small"
                 onClick={onRetryCoverage}
               >
-                Try again
+                {tr("Try again")}
               </button>
             </div>
           </div>

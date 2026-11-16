@@ -1,14 +1,25 @@
 /// <reference types="node" />
-import { statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import { creditLine, TRACK_LIST, TRACKS, trackIdForRoute } from "@/features/music/tracks";
+import {
+  creditLine,
+  TRACK_LIST,
+  TRACKS,
+  trackIdForRoute,
+  type Track,
+} from "@/features/music/tracks";
 
 const AUDIO_DIR = new URL("../../src/features/music/audio/", import.meta.url);
 // Issue #36: about 3 MB per track at most, so the first listen stays light.
 const MAX_TRACK_BYTES = 3 * 1024 * 1024;
 const CONTENT_PAGES = ["/", "/cases", "/method", "/learn", "/about"];
+// Background music sits well under the loudness of music made to be the main thing (about -14 LUFS).
+const QUIET_LUFS = -20;
+
+// What a track measures once its gain is applied: its file's own loudness plus the gain in dB.
+const effectiveLufs = (track: Track): number => track.lufs + 20 * Math.log10(track.gain);
 
 describe("trackIdForRoute", () => {
   it.each(CONTENT_PAGES)("plays the landing track on %s", (pathname) => {
@@ -70,9 +81,16 @@ describe("TRACKS", () => {
     const { landing, globe } = TRACKS;
 
     // Assert
-    expect(landing.gain).toBeLessThanOrEqual(0.5);
-    expect(globe.gain).toBeGreaterThan(0);
-    expect(globe.gain).toBeLessThan(landing.gain);
+    expect(effectiveLufs(landing)).toBeLessThanOrEqual(QUIET_LUFS);
+    expect(effectiveLufs(globe)).toBeLessThan(effectiveLufs(landing));
+    TRACK_LIST.forEach((track) => {
+      expect(track.gain).toBeGreaterThan(0);
+      expect(track.gain).toBeLessThanOrEqual(1);
+    });
+  });
+
+  it("ships no audio file that a track does not use", () => {
+    expect(readdirSync(AUDIO_DIR).sort()).toEqual(TRACK_LIST.map((track) => track.file).sort());
   });
 });
 
@@ -82,7 +100,7 @@ describe("creditLine", () => {
       "'Starfire' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au",
     );
     expect(creditLine(TRACKS.globe)).toBe(
-      "'Solace' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au",
+      "'The Spaces Between' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au",
     );
   });
 });

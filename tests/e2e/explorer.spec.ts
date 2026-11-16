@@ -203,7 +203,7 @@ test.describe("Explorer: live questions", () => {
     await expect(page.getByTestId("plan-error")).toContainText(
       "We couldn't reach the radar archive",
     );
-    await expect(globe.verdict).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
     await page.getByTestId("plan-error").getByRole("button", { name: "Try again" }).click();
     await expect(globe.planPasses).toContainText("39 passes in the plan");
   });
@@ -251,8 +251,8 @@ test.describe("Explorer: live questions", () => {
     const api = await globe.mockExplorations({ first: succeededView() });
     const LOCKED = [
       ["bug-fire", "wildfire", "Bug Fire, USA"],
-      ["rowe-creek", "vegetation_disturbance", "Rowe Creek, USA"],
-      ["skollersta", "agriculture", "Sköllersta, Sweden"],
+      // Issue #28: Pará event 02 is the deforestation case (Niscemi is covered in landslide.spec).
+      ["para-event-02", "vegetation_disturbance", "Pará event 02, Brazil"],
     ] as const;
     for (const [id, lens, title] of LOCKED) {
       await globe.goto(`?case=${id}`);
@@ -263,6 +263,18 @@ test.describe("Explorer: live questions", () => {
       await expect(page.getByTestId("lens-locked")).toBeVisible();
     }
     expect(api.posts).toHaveLength(0);
+  });
+
+  // Issue #28: Chocó lists the gateway's limitations and has no common phase cell to show.
+  test("Chocó lists the gateway's limitations and never offers a phase", async ({ page }) => {
+    const globe = new GlobePage(page);
+    await globe.mockObservationPlan();
+    await globe.goto("?case=choco");
+    const list = globe.panel.getByTestId("case-limitations");
+    await expect(list.getByRole("listitem")).toHaveCount(6);
+    await expect(list).toContainText("No earthquake detection, earthquake attribution");
+    await expect(globe.panel).toContainText("Common phase");
+    await expect(globe.panel).toContainText("0 cells");
   });
 
   test(
@@ -316,10 +328,10 @@ test.describe("Explorer: v8 top bar", () => {
     // Hidden until the backend accepts a direction: a choice that isn't sent would mislead.
     await expect(page.getByTestId("direction-switch")).toHaveCount(0);
 
-    // The sound toggle (#36) shares this bar. The pill is its flexible item (flex: 0 1 340px), so
-    // with a case open at 1440 px it gives up the few pixels the toggle needs.
+    // The sound toggle (#36) and the language button (#39) share this bar. The pill is its flexible
+    // item (flex: 0 1 340px), so with a case open at 1440 px it gives up the pixels they need.
     const pill = await globe.searchPill.boundingBox();
-    expect(pill?.width).toBeGreaterThanOrEqual(300);
+    expect(pill?.width).toBeGreaterThan(250);
     expect(pill?.width).toBeLessThanOrEqual(340);
 
     // The mode switch hides below 1280 px and the page links below 1120 px.

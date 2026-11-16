@@ -1,3 +1,4 @@
+import { localized } from "@/i18n/localized";
 // Team data for /about, kept apart from the layout so the team can fill in roles, links and photos.
 // A missing field renders as grey placeholder copy.
 export type TeamMember = {
@@ -12,7 +13,7 @@ export type TeamMember = {
   linkedin?: string;
 };
 
-export const TEAM: TeamMember[] = [
+export const TEAM: TeamMember[] = localized([
   {
     name: "Jesús Alfonso Pinzón Vega",
     handle: "@JAPV-X2612",
@@ -59,7 +60,7 @@ export const TEAM: TeamMember[] = [
     handle: "@Ch0comilo",
     degree: "Statistical Engineering",
     photo: "/team/daniel-martinez.jpg",
-    role: "Machine learning · radar science",
+    role: "Spatio-temporal ML · SAR science",
     built: "nova-frontier-model and NISAR-Models",
     github: "https://github.com/Ch0comilo",
     linkedin: "https://www.linkedin.com/in/daniel-martinez-313792361",
@@ -74,7 +75,7 @@ export const TEAM: TeamMember[] = [
     github: "https://github.com/KillerZeus666",
     linkedin: "https://www.linkedin.com/in/katheryn-sof%C3%ADa-guasca-chavarro-73a93b35a/",
   },
-];
+]);
 
 // First name plus the first surname: the third word, or the second when there are only two.
 export const initials = (name: string): string => {

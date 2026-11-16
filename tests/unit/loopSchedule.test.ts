@@ -10,7 +10,7 @@ import {
 
 // The real lengths of the shipped tracks, plus a short one that forces a smaller crossfade.
 const STARFIRE_SECONDS = 325.224;
-const SOLACE_SECONDS = 340.846;
+const SPACES_SECONDS = 238.681;
 const SHORT_SECONDS = 20;
 const FIRST_START = 0.05;
 const SAMPLE_STEP = 0.05;
@@ -88,7 +88,7 @@ describe("planPass", () => {
 describe("the loop never goes quiet or loud at the seam", () => {
   it.each([
     ["Starfire", STARFIRE_SECONDS],
-    ["Solace", SOLACE_SECONDS],
+    ["The Spaces Between", SPACES_SECONDS],
     ["a short track", SHORT_SECONDS],
   ])("keeps the power constant across %s's passes", (_name, duration) => {
     // Arrange

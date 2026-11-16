@@ -221,16 +221,16 @@ test.describe("Background music", () => {
       "'Starfire' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au",
     );
     await expect(page.getByTestId("music-credit-globe")).toContainText(
-      "'Solace' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au",
+      "'The Spaces Between' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au",
     );
     await expect(credits).toContainText("Trimmed to a loop and re-encoded");
     await expect(credits.getByRole("link", { name: /Starfire/ })).toHaveAttribute(
       "href",
       "https://www.scottbuckley.com.au/library/starfire/",
     );
-    await expect(credits.getByRole("link", { name: /Solace/ })).toHaveAttribute(
+    await expect(credits.getByRole("link", { name: /The Spaces Between/ })).toHaveAttribute(
       "href",
-      "https://www.scottbuckley.com.au/library/solace/",
+      "https://www.scottbuckley.com.au/library/the-spaces-between/",
     );
     await expect(
       credits.getByRole("link", { name: /CC BY 4\.0 license/i }).first(),

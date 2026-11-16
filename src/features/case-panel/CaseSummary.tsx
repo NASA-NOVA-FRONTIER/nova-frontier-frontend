@@ -1,4 +1,4 @@
-import { LANDSLIDE } from "@/content/copyV8";
+import { CASE_LIMITATIONS, LANDSLIDE } from "@/content/copyV8";
 import { FireContextCard } from "@/features/case-panel/FireContextCard";
 import { Icon } from "@/features/case-panel/icons";
 import { InsarCard } from "@/features/case-panel/InsarCard";
@@ -14,6 +14,7 @@ import type { ChartMode } from "@/features/charts/chartTokens";
 import { ContrastBars } from "@/features/charts/ContrastBars";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
+import { tr } from "@/i18n/translate";
 const PANEL_CHART_PX = 108;
 
 // A bracketed value ("[Report]") is still a slot to fill; anything else was copied from its source.
@@ -36,7 +37,9 @@ export const ResultSummary = ({ subject, mode, onMore }: SummaryProps) => {
       {group !== undefined && (
         <div className="x-panel__block">
           <p className="x-kicker x-kicker--split">
-            <span>{group.title} · whole area</span>
+            <span>
+              {group.title} {tr("· whole area")}
+            </span>
             <Prov
               kind={subject.demo ? "demo" : "real"}
               source={subject.kind === "live" ? SOURCE.liveQuality : SOURCE.groups}
@@ -60,7 +63,7 @@ export const ResultSummary = ({ subject, mode, onMore }: SummaryProps) => {
       {subject.fireContext !== undefined && <FireContextCard context={subject.fireContext} />}
       <QualityStrip items={subject.quality} />
       <p className="x-panel__prov">
-        Quality strip <Prov kind={subject.demo ? "demo" : "real"} source={qualitySource} />
+        {tr("Quality strip ")} <Prov kind={subject.demo ? "demo" : "real"} source={qualitySource} />
         {subject.passes !== undefined && (
           <>
             {" · Chart "}
@@ -73,11 +76,11 @@ export const ResultSummary = ({ subject, mode, onMore }: SummaryProps) => {
       </p>
       {subject.figure !== undefined && subject.crops === undefined && (
         <a className="x-link" href={subject.figure} target="_blank" rel="noopener">
-          Open the report figure
+          {tr("Open the report figure")}
         </a>
       )}
       <button type="button" className="x-primary" onClick={onMore} data-testid="more-info">
-        More information
+        {tr("More information")}
         <Icon name="arrow" size={14} />
       </button>
     </>
@@ -109,6 +112,18 @@ export const PendingSummary = ({ item }: { item: Case }) => (
         </li>
       ))}
     </ul>
+    {item.limitations !== undefined && item.limitations.length > 0 && (
+      <div className="x-limits__list" data-testid="case-limitations">
+        <p className="x-muted x-small">
+          {CASE_LIMITATIONS.title} <Prov kind="real" source={CASE_LIMITATIONS.source} />
+        </p>
+        <ul>
+          {item.limitations.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </div>
+    )}
     <ul className="x-sources">
       {item.sources.map((source) => (
         <li key={source.href}>

@@ -1,6 +1,7 @@
 import { TOP_BAR } from "@/content/copyV8";
 import type { Direction } from "@/features/explore/exploreApi";
 
+import { tr } from "@/i18n/translate";
 type DirectionSwitchProps = { direction: Direction; onChange: (direction: Direction) => void };
 
 const OPTIONS = [
@@ -12,7 +13,7 @@ const OPTIONS = [
 export const DirectionSwitch = ({ direction, onChange }: DirectionSwitchProps) => (
   <div
     role="group"
-    aria-label="Orbit direction"
+    aria-label={tr("Orbit direction")}
     className="x-source x-direction"
     data-testid="direction-switch"
   >

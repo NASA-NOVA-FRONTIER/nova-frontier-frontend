@@ -27,6 +27,7 @@ import {
   WebGLRenderer,
 } from "three";
 
+import { tr } from "@/i18n/translate";
 // NASA Blue Marble with its cloud layer, an atmosphere, a starfield and NISAR's orbit. The page
 // drives it through mutable refs (no React state), so the scroll timeline never re-renders React.
 
@@ -331,7 +332,9 @@ export const EarthHero = ({ cloudCover, controls, onFrame, reducedMotion }: Eart
       ref={hostRef}
       className="l-story__space"
       role="img"
-      aria-label="Earth in a field of stars, from NASA Blue Marble imagery, with NISAR's orbit"
+      aria-label={tr(
+        "Earth in a field of stars, from NASA Blue Marble imagery, with NISAR's orbit",
+      )}
     />
   );
 };

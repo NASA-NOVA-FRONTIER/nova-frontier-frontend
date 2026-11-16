@@ -1,3 +1,5 @@
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 // The Learn "Play with the wave" cross-section (#33): strings, band facts and the pure geometry of
 // the drawing, ported from the v9 handoff `reference/Radar Waves.dc.html` so it can be tested
 // without a canvas. Drawing lives in drawRadarWaves.ts, the loop in RadarWaves.tsx. This file's name
@@ -40,7 +42,7 @@ export type Band = {
 // COPY-flow-v9 §8 verbatim, except where a decision (Cristian, 15 Nov) says otherwise:
 // "SCATTERS" replaces "STOPS" (the pulse isn't stopped), "REACHES DEEPEST" replaces "REACHES THE
 // GROUND", the L body is softened to the Earthdata source and the HV clause is trimmed to it.
-export const RADAR_WAVES_COPY = {
+export const RADAR_WAVES_COPY = localized({
   kicker: "PLAY WITH THE WAVE",
   heading: "Change the wave, change what comes back.",
   lede: "Pick a wavelength, a polarization and an angle. The pulse and its echo move in real time.",
@@ -67,7 +69,7 @@ export const RADAR_WAVES_COPY = {
   } satisfies Record<PolId, string>,
   steeperText: " A steeper angle looks more straight down and sees more of the ground.",
   shallowerText: " A shallower angle crosses more canopy on the way down.",
-} as const;
+} as const);
 
 const L_BAND: Band = {
   id: "L",
@@ -80,7 +82,7 @@ const L_BAND: Band = {
   body: "At 24 cm the pulse goes deeper into a tree canopy than shorter waves and interacts more with large branches and trunks.",
 };
 
-export const BANDS: readonly Band[] = [
+export const BANDS: readonly Band[] = localized([
   L_BAND,
   {
     id: "S",
@@ -102,14 +104,14 @@ export const BANDS: readonly Band[] = [
     title: "The short wave scatters at the leaves",
     body: "At about 5.6 cm most of the echo comes from the top of the canopy.",
   },
-];
+]);
 
-export const POLS: readonly { id: PolId; label: string }[] = [
+export const POLS: readonly { id: PolId; label: string }[] = localized([
   { id: "HH", label: "HH · sent H, heard H" },
   { id: "HV", label: "HV · sent H, heard V" },
-];
+]);
 
-export const INCIDENCE = { min: 33, max: 47, step: 1, initial: 40 } as const;
+export const INCIDENCE = localized({ min: 33, max: 47, step: 1, initial: 40 } as const);
 
 export const bandById = (id: BandId): Band => BANDS.find((band) => band.id === id) ?? L_BAND;
 
@@ -125,7 +127,12 @@ export const readout = (band: BandId, pol: PolId, inc: number): { title: string;
 };
 
 export const ariaLabel = (band: BandId, pol: PolId, inc: number): string =>
-  `Diagram: ${bandById(band).label} pulse at ${inc} degrees, ${pol} echo. ${bandById(band).title}.`;
+  tr("Diagram: {{label}} pulse at {{inc}} degrees, {{pol}} echo. {{title}}.", {
+    label: bandById(band).label,
+    inc,
+    pol,
+    title: bandById(band).title,
+  });
 
 // Roving tabindex: arrows move (and wrap), Home/End jump. Anything else isn't ours.
 export const rovingNext = (key: string, index: number, count: number): number | undefined => {
