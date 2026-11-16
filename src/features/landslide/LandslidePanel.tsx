@@ -16,7 +16,7 @@ import {
 
 import { LANDSLIDE } from "@/content/copyV8";
 import { Prov } from "@/features/case-panel/Prov";
-import { CHANNEL, type ChartMode } from "@/features/charts/chartTokens";
+import { CHANNEL } from "@/features/charts/chartTokens";
 import {
   assessmentPasses,
   baselineImage,
@@ -36,7 +36,7 @@ import { CompareSplit } from "@/features/sheet/CompareSplit";
 import { formatDay } from "@/features/timeline/timelineLayout";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
-type Props = { evidence: LandslideEvidence; mode: ChartMode };
+type Props = { evidence: LandslideEvidence };
 
 const PASS_VIEW = "pass";
 const GRAY = "linear-gradient(90deg,#000,#fff)";
@@ -45,11 +45,10 @@ const shortDay = (time: number): string => formatDay(new Date(time).toISOString(
 
 // #24: what the radar measured at a landslide case, read from its own series and layers. Numbers are
 // REAL; reading them as landslide evidence is EXPERIMENTAL, and the panel says so first.
-export const LandslidePanel = ({ evidence, mode }: Props) => {
+export const LandslidePanel = ({ evidence }: Props) => {
   const [viewId, setViewId] = useState(PASS_VIEW);
   const [channel, setChannel] = useState<Channel>("HH");
   const [date, setDate] = useState(evidence.target);
-  const tech = mode === "technical";
   const source = evidence.source.label;
   const baseline = baselinePasses(evidence);
   const assessed = assessmentPasses(evidence);
@@ -274,9 +273,7 @@ export const LandslidePanel = ({ evidence, mode }: Props) => {
               </button>
             );
           })}
-          <p className="x-muted x-small">
-            {LANDSLIDE.outsideText} {tech && evidence.band}
-          </p>
+          <p className="x-muted x-small">{LANDSLIDE.outsideText}</p>
         </div>
       </section>
 
@@ -308,51 +305,6 @@ export const LandslidePanel = ({ evidence, mode }: Props) => {
         </div>
       </section>
 
-      <details className="x-inset x-ls__table" open={tech} data-testid="landslide-table">
-        <summary>{LANDSLIDE.table}</summary>
-        <div className="x-radar__table">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">{LANDSLIDE.tableDate}</th>
-                <th scope="col">{LANDSLIDE.tableRole}</th>
-                {CHANNELS.map((key) => (
-                  <th key={`a${key}`} scope="col">
-                    {LANDSLIDE.tableArea(key)}
-                  </th>
-                ))}
-                {CHANNELS.map((key) => (
-                  <th key={`p${key}`} scope="col">
-                    {LANDSLIDE.tablePoint(key)}
-                  </th>
-                ))}
-                <th scope="col">{LANDSLIDE.tableOutside}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {evidence.passes.map((item) => {
-                const share = outsidePercent(item, evidence.cells);
-                return (
-                  <tr key={item.date}>
-                    <th scope="row">{item.date}</th>
-                    <td>
-                      {item.role === "baseline" ? LANDSLIDE.baselineRole : LANDSLIDE.assessmentRole}
-                    </td>
-                    {CHANNELS.map((key) => (
-                      <td key={`a${key}`}>{item.area[key].median.toFixed(2)}</td>
-                    ))}
-                    {CHANNELS.map((key) => (
-                      <td key={`p${key}`}>{item.point[key].toFixed(2)}</td>
-                    ))}
-                    <td>{share === undefined ? "—" : `${share.toFixed(1)}%`}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </details>
-
       <section className="x-sheet__section" aria-label={LANDSLIDE.how}>
         <p className="x-sheet__kicker">{LANDSLIDE.how}</p>
         <ol className="x-ls__how" data-testid="landslide-how">
@@ -372,6 +324,54 @@ export const LandslidePanel = ({ evidence, mode }: Props) => {
     </div>
   );
 };
+
+// The values by pass: the sheet shows them inside its closed "Technical detail".
+export const LandslideTable = ({ evidence }: Props) => (
+  <div className="x-ls__table" data-testid="landslide-table">
+    <p className="x-group__title">{LANDSLIDE.table}</p>
+    <div className="x-radar__table">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">{LANDSLIDE.tableDate}</th>
+            <th scope="col">{LANDSLIDE.tableRole}</th>
+            {CHANNELS.map((key) => (
+              <th key={`a${key}`} scope="col">
+                {LANDSLIDE.tableArea(key)}
+              </th>
+            ))}
+            {CHANNELS.map((key) => (
+              <th key={`p${key}`} scope="col">
+                {LANDSLIDE.tablePoint(key)}
+              </th>
+            ))}
+            <th scope="col">{LANDSLIDE.tableOutside}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {evidence.passes.map((item) => {
+            const share = outsidePercent(item, evidence.cells);
+            return (
+              <tr key={item.date}>
+                <th scope="row">{item.date}</th>
+                <td>
+                  {item.role === "baseline" ? LANDSLIDE.baselineRole : LANDSLIDE.assessmentRole}
+                </td>
+                {CHANNELS.map((key) => (
+                  <td key={`a${key}`}>{item.area[key].median.toFixed(2)}</td>
+                ))}
+                {CHANNELS.map((key) => (
+                  <td key={`p${key}`}>{item.point[key].toFixed(2)}</td>
+                ))}
+                <td>{share === undefined ? "—" : `${share.toFixed(1)}%`}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
 
 type LegendProps = { ramp: string | undefined; scale: [string, string]; text: string };
 

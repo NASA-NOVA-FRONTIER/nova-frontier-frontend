@@ -1303,8 +1303,6 @@ export const ExplorerPage = () => {
             subject={subject}
             exploration={subject.kind === "live" ? exploredView : undefined}
             isArea={live !== undefined && live.area.kind !== "point"}
-            mode={mode}
-            onMode={setMode}
             onClose={() => setSheetOpen(false)}
             onAskNova={() => setNovaOpen(true)}
           />

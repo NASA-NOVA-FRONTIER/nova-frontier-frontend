@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Icon } from "@/features/case-panel/icons";
 import { Prov } from "@/features/case-panel/Prov";
 import type { Subject } from "@/features/case-panel/subject";
@@ -7,15 +9,15 @@ import { NormalRangeCard } from "@/features/case-panel/NormalRangeCard";
 import { FireContextCard } from "@/features/case-panel/FireContextCard";
 import { findLens, OPTICAL, type Crops } from "@/features/cases/cases";
 import { BandChart } from "@/features/charts/BandChart";
-import type { ChartMode } from "@/features/charts/chartTokens";
 import { ContrastBars } from "@/features/charts/ContrastBars";
 import { MatchedWhisker } from "@/features/charts/MatchedWhisker";
-import { LandslidePanel } from "@/features/landslide/LandslidePanel";
+import { LandslidePanel, LandslideTable } from "@/features/landslide/LandslidePanel";
 import { EMPTIES_LINE, jobSteps } from "@/features/live/liveQuestion";
 import { NovaGlyph } from "@/features/nova/NovaGlyph";
 import { CompareSplit } from "@/features/sheet/CompareSplit";
 import { LiveSciencePanel } from "@/features/sheet/LiveSciencePanel";
-import { LiveTechnicalBlock } from "@/features/sheet/RegionalAnalysisPanel";
+import { PublishedFiles, RegionalAnalysisPanel } from "@/features/sheet/RegionalAnalysisPanel";
+import { canRunRegional } from "@/features/sheet/regionalRuns";
 import type { ExplorationView } from "@/features/explore/exploreSchemas";
 import { formatDay } from "@/features/timeline/timelineLayout";
 
@@ -37,10 +39,10 @@ const reportCrops = (crops: Crops | undefined) =>
     ? undefined
     : { ...crops, optical: crops.optical, signature: crops.signature };
 
+type SheetView = "plain" | "regional";
+
 type SheetProps = {
   subject: Subject;
-  mode: ChartMode;
-  onMode: (mode: ChartMode) => void;
   onClose: () => void;
   onAskNova?: () => void;
   exploration?: ExplorationView | undefined;
@@ -48,17 +50,17 @@ type SheetProps = {
 };
 
 // "More information": the five beats in full, with how it was computed, quality and sources.
-export const MoreInfoSheet = ({
-  subject,
-  mode,
-  onMode,
-  onClose,
-  onAskNova,
-  exploration,
-  isArea,
-}: SheetProps) => {
+export const MoreInfoSheet = ({ subject, onClose, onAskNova, exploration, isArea }: SheetProps) => {
   const lens = findLens(subject.lens);
-  const tech = mode === "technical";
+  // The sheet's own views; Nova keeps its Plain / Technical switch apart.
+  const [view, setView] = useState<SheetView>("plain");
+  const regionalId =
+    subject.kind === "live" && exploration !== undefined && canRunRegional(exploration)
+      ? exploration.id
+      : undefined;
+  const regional = view === "regional" && regionalId !== undefined;
+  const scored = subject.lens !== "insar" && subject.verdict !== "measured";
+  const products = subject.kind === "live" ? exploration?.result?.products : undefined;
   const [lon, lat] = subject.focus;
   const verdictProv = subject.kind === "live" ? SOURCE.liveVerdict : SOURCE.caseVerdict;
   const crops = reportCrops(subject.crops);
@@ -78,19 +80,21 @@ export const MoreInfoSheet = ({
                 : "at your point"}
           </h2>
         </div>
-        <div role="group" aria-label="Reading level" className="x-switch">
-          {(["plain", "technical"] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={mode === value}
-              onClick={() => onMode(value)}
-              data-testid={`read-${value}`}
-            >
-              {value === "plain" ? "Plain" : "Technical"}
-            </button>
-          ))}
-        </div>
+        {regionalId !== undefined && (
+          <div role="group" aria-label="Sheet view" className="x-switch">
+            {(["plain", "regional"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={view === value}
+                onClick={() => setView(value)}
+                data-testid={`read-${value}`}
+              >
+                {value === "plain" ? "Plain" : "Regional analysis"}
+              </button>
+            ))}
+          </div>
+        )}
         <button
           type="button"
           className="x-round x-round--big"
@@ -102,7 +106,14 @@ export const MoreInfoSheet = ({
         </button>
       </header>
 
-      <div className="x-sheet__body">
+      {regional && regionalId !== undefined && (
+        <div className="x-sheet__body x-sheet__body--single" data-testid="sheet-regional">
+          <div className="x-sheet__main">
+            <RegionalAnalysisPanel explorationId={regionalId} />
+          </div>
+        </div>
+      )}
+      <div className="x-sheet__body" hidden={regional} inert={regional} data-testid="sheet-plain">
         <div className="x-sheet__main">
           {subject.kind === "live" && exploration !== undefined && (
             <LiveSciencePanel key={exploration.id} view={exploration} subject={subject} />
@@ -161,15 +172,13 @@ export const MoreInfoSheet = ({
               <div className="x-inset">
                 <BandChart
                   passes={subject.passes}
-                  mode={mode}
+                  mode="plain"
                   height={240}
                   sentence={bandSentence(subject.passes)}
                 />
               </div>
             )}
-            {subject.landslide !== undefined && (
-              <LandslidePanel evidence={subject.landslide} mode={mode} />
-            )}
+            {subject.landslide !== undefined && <LandslidePanel evidence={subject.landslide} />}
             {crops !== undefined && (
               <>
                 <div className="x-tiles">
@@ -222,11 +231,7 @@ export const MoreInfoSheet = ({
             )}
           </section>
 
-          {subject.kind === "live" && exploration !== undefined && (
-            <LiveTechnicalBlock technical={tech} view={exploration} />
-          )}
-
-          {subject.lens !== "insar" && subject.verdict !== "measured" && (
+          {scored && (
             <section className="x-sheet__section">
               <p className="x-sheet__kicker x-kicker--split">
                 <span>
@@ -251,7 +256,6 @@ export const MoreInfoSheet = ({
                       <p className="x-verdicts__sub">
                         {on ? subject.verdictLine : VERDICT[verdict].sub}
                       </p>
-                      {tech && on && <p className="x-mono-sm">{VERDICT[verdict].state}</p>}
                     </div>
                   );
                 })}
@@ -290,7 +294,7 @@ export const MoreInfoSheet = ({
                     <p className="x-group__title">
                       {group.title} <span>{group.sub}</span>
                     </p>
-                    <ContrastBars group={group} mode={mode} />
+                    <ContrastBars group={group} mode="plain" />
                   </div>
                 ))}
                 <p className="x-muted x-small">
@@ -315,11 +319,6 @@ export const MoreInfoSheet = ({
             <div className="x-limits">
               <div className="x-limits__col">
                 <p className="x-limits__head">{subject.plainLimit}</p>
-                {tech && (
-                  <p className="x-muted" data-testid="tech-limit">
-                    {subject.techLimit}
-                  </p>
-                )}
                 {subject.alternatives.length > 0 && (
                   <>
                     <p className="x-muted x-small">Other things that change radar like this:</p>
@@ -338,6 +337,24 @@ export const MoreInfoSheet = ({
               </div>
             </div>
           </section>
+
+          {/* What Technical used to add, kept whole but out of the plain reading. */}
+          <details className="x-inset x-sheet__detail" data-testid="sheet-technical-detail">
+            <summary>Technical detail</summary>
+            {subject.passes !== undefined && (
+              <BandChart passes={subject.passes} mode="technical" height={240} />
+            )}
+            {subject.landslide !== undefined && <LandslideTable evidence={subject.landslide} />}
+            {scored && (
+              <p className="x-mono-sm">
+                {VERDICT[subject.verdict].label} · {VERDICT[subject.verdict].state}
+              </p>
+            )}
+            <p className="x-muted" data-testid="tech-limit">
+              {subject.techLimit}
+            </p>
+            {products && <PublishedFiles products={products} />}
+          </details>
         </div>
 
         <aside className="x-sheet__side">

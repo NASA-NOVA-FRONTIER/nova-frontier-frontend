@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import {
   CartesianGrid,
   Legend,
@@ -13,18 +12,13 @@ import {
 import { Prov } from "@/features/case-panel/Prov";
 import { SOURCE } from "@/features/case-panel/verdicts";
 import { CHANNEL } from "@/features/charts/chartTokens";
-import { getExploration } from "@/features/explore/exploreApi";
-import {
-  explorationSchema,
-  isFinal,
-  type ExplorationView,
-} from "@/features/explore/exploreSchemas";
+import { isFinal } from "@/features/explore/exploreSchemas";
 import type { ScienceProducts } from "@/features/explore/scienceProducts";
 import { gridDescription } from "@/features/sheet/radarViews";
-import { absoluteApiPath, apiRequest, ApiError } from "@/lib/api/apiClient";
+import { retryRegionalRun, useRegionalRun } from "@/features/sheet/regionalRuns";
+import { absoluteApiPath } from "@/lib/api/apiClient";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
-type Run = { view?: ExplorationView; error?: string; starting?: boolean };
 type Row = Record<string, string | number | null>;
 const COLOURS = [CHANNEL.hh.color, CHANNEL.hv.color, "#bb9bce", "#75c9af"];
 
@@ -243,9 +237,7 @@ const MeasurementTable = ({ rows, columns }: { rows: Row[]; columns: Record<stri
 );
 
 export const RegionalAnalysisPanel = ({ explorationId }: { explorationId: string }) => {
-  const [run, setRun] = useState<Run>({});
-  const controller = useRef<AbortController | undefined>(undefined);
-  const jobId = run.view?.id;
+  const run = useRegionalRun(explorationId);
   const status = run.view?.status;
   const active = status !== undefined && !isFinal(status);
   const products = run.view?.result?.products;
@@ -255,68 +247,6 @@ export const RegionalAnalysisPanel = ({ explorationId }: { explorationId: string
       ? (run.view?.error?.detail ?? "Regional analysis did not return measurements.")
       : undefined);
 
-  useEffect(() => () => controller.current?.abort(), []);
-  useEffect(() => {
-    if (!active || jobId === undefined || run.error !== undefined) return;
-    const poll = new AbortController();
-    let failures = 0;
-    let timer: number;
-    const tick = async () => {
-      try {
-        const view = await getExploration(jobId, poll.signal);
-        if (poll.signal.aborted) return;
-        failures = 0;
-        setRun({ view });
-        if (isFinal(view.status)) return;
-      } catch {
-        if (poll.signal.aborted) return;
-        if (++failures >= 3) {
-          setRun((current) => ({ ...current, error: "Could not check job status." }));
-          return;
-        }
-      }
-      timer = window.setTimeout(() => void tick(), 3500);
-    };
-    timer = window.setTimeout(() => void tick(), 3500);
-    return () => {
-      poll.abort();
-      window.clearTimeout(timer);
-    };
-  }, [active, jobId, run.error]);
-
-  const start = async () => {
-    if (run.error && active && run.view) {
-      setRun({ view: run.view });
-      return;
-    }
-    if (controller.current) return;
-    const request = new AbortController();
-    controller.current = request;
-    setRun({ starting: true });
-    try {
-      const view = await apiRequest(
-        `/explorations/${encodeURIComponent(explorationId)}/analysis`,
-        explorationSchema,
-        {
-          method: "POST",
-          signal: request.signal,
-        },
-      );
-      if (!request.signal.aborted) setRun({ view });
-    } catch (error) {
-      if (!request.signal.aborted) {
-        const message =
-          error instanceof ApiError && error.status === 404
-            ? "Regional analysis is unavailable on this server."
-            : error instanceof ApiError && [429, 503].includes(error.status)
-              ? "Analysis capacity is limited. Try again shortly."
-              : "Could not start regional analysis.";
-        setRun({ error: message });
-      }
-    } finally {
-      controller.current = undefined;
-    }
-  };
   return (
     <section className="x-sheet__section x-radar__regional" aria-label="Regional analysis">
       <h3 className="x-sheet__kicker x-kicker--split">
@@ -327,7 +257,7 @@ export const RegionalAnalysisPanel = ({ explorationId }: { explorationId: string
         Read a separate radar history for regional averages, candidate periods and historical fits.
         Archive reads can take several minutes.
       </p>
-      {(run.starting || (active && !failed)) && (
+      {!failed && (status === undefined || active) && (
         <p role="status" className="x-muted">
           {status === "queued"
             ? "Queued for analysis…"
@@ -347,37 +277,16 @@ export const RegionalAnalysisPanel = ({ explorationId }: { explorationId: string
           The regional sample had insufficient measured support.
         </p>
       )}
-      {!run.starting && (status === undefined || failed) && (
-        <button type="button" className="x-radar__action" onClick={() => void start()}>
-          {failed ? "Retry regional analysis" : "Run regional analysis"}
+      {failed && !run.starting && (
+        <button
+          type="button"
+          className="x-radar__action"
+          onClick={() => retryRegionalRun(explorationId)}
+        >
+          Retry regional analysis
         </button>
       )}
       {products != null && <RegionalCharts products={products} />}
     </section>
-  );
-};
-
-// The live result's technical extras. They mount on the first Technical view and then stay mounted
-// (hidden and inert in Plain), so a regional run keeps its state and Plain never fires its request.
-export const LiveTechnicalBlock = ({
-  technical,
-  view,
-}: {
-  technical: boolean;
-  view: ExplorationView;
-}) => {
-  const [opened, setOpened] = useState(technical);
-  if (technical && !opened) setOpened(true);
-  if (!opened) return null;
-  const result = view.result;
-  return (
-    <div hidden={!technical} inert={!technical} data-testid="sheet-technical">
-      {result?.products && <PublishedFiles products={result.products} />}
-      {result?.insar == null &&
-        view.plan?.seriesKey &&
-        ["succeeded", "partial"].includes(view.status) && (
-          <RegionalAnalysisPanel explorationId={view.id} />
-        )}
-    </div>
   );
 };
