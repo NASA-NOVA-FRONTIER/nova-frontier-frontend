@@ -594,7 +594,7 @@
 .c-metrics__v {
   font-family: var(--mono, "JetBrains Mono", monospace);
   font-size: 12.5px;
-  text-align: right;
+  text-align: end;
   color: #ebe9e4;
 }
 
@@ -714,7 +714,7 @@
 .c-range__value {
   font-family: var(--mono);
   font-size: 12px;
-  text-align: right;
+  text-align: end;
   color: var(--ink-3);
 }
 
@@ -759,7 +759,7 @@
 .c-fire__facts dd {
   margin: 0;
   font-family: var(--mono);
-  text-align: right;
+  text-align: end;
   color: var(--ink-3);
 }
 
@@ -794,7 +794,7 @@
 .c-insar__facts dd {
   margin: 0;
   font-family: var(--mono);
-  text-align: right;
+  text-align: end;
   color: var(--ink-3);
 }
 

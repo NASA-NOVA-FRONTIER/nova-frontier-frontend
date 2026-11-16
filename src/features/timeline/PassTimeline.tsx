@@ -17,6 +17,7 @@ import {
 } from "@/features/timeline/timelineLayout";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
+import { tr } from "@/i18n/translate";
 const PLAY_MS = 900;
 // Pixels from the top of the track: bars grow up from just above the radar axis.
 const BAR_BASE_PX = 34;
@@ -132,7 +133,7 @@ export const PassTimeline = ({
   const hasOptical = data.optical.length > 0;
 
   return (
-    <section className="x-timeline x-glass" aria-label="Pass timeline" data-testid="timeline">
+    <section className="x-timeline x-glass" aria-label={tr("Pass timeline")} data-testid="timeline">
       <div className="x-tl__head">
         <button
           type="button"
@@ -173,20 +174,20 @@ export const PassTimeline = ({
             }}
             data-testid="timeline-compare"
           >
-            Baseline ↔ Target
+            {tr("Baseline ↔ Target")}
           </button>
         )}
       </div>
 
       <div className="x-tl__track" ref={trackRef}>
         <span className="x-tl__lane x-tl__lane--bars">
-          Outside
+          {tr("Outside")}
           <br />
           range
         </span>
-        <span className="x-tl__lane x-tl__lane--radar">Radar</span>
+        <span className="x-tl__lane x-tl__lane--radar">{tr("Radar")}</span>
         <span className="x-tl__lane x-tl__lane--optical" data-off={!hasOptical}>
-          Optical
+          {tr("Optical")}
         </span>
         <div className="x-tl__axis" style={{ width: `${layout.today}%` }} />
         <div className="x-tl__axis x-tl__axis--planned" style={{ left: `${layout.today}%` }} />
@@ -201,7 +202,7 @@ export const PassTimeline = ({
         )}
         <div className="x-tl__today" style={{ left: `${layout.today}%` }} />
         <span className="x-tl__today-label" style={{ left: `${layout.today}%` }}>
-          Today
+          {tr("Today")}
         </span>
         {layout.baseline !== undefined && showBracket && (
           <>
@@ -222,7 +223,7 @@ export const PassTimeline = ({
             style={{ left: `${layout.next.left}%` }}
             data-testid="timeline-next"
           >
-            Next
+            {tr("Next")}
           </span>
         )}
         {layout.passes.map((item) => {
@@ -263,7 +264,7 @@ export const PassTimeline = ({
         })}
         {target !== undefined && (
           <span className="x-tl__target-label" style={{ left: `${target.left}%` }}>
-            Target
+            {tr("Target")}
           </span>
         )}
         {layout.optical.map((item) => (
@@ -284,22 +285,22 @@ export const PassTimeline = ({
       <div className="x-tl__legend">
         <span>
           <i className="x-tl__key x-tl__key--meas" />
-          Measured
+          {tr("Measured")}
         </span>
         <span>
           <i className="x-tl__key x-tl__key--target" />
-          Compared
+          {tr("Compared")}
         </span>
         <span data-testid="timeline-planned-legend">
           <i className="x-tl__key x-tl__key--plan" />
-          Planned · a promise, not data
+          {tr("Planned · a promise, not data")}
           {layout.next !== undefined && ` · next ${formatDay(layout.next.date, false)}`}
         </span>
         <span data-off={!hasOptical}>
           <i className="x-tl__key x-tl__key--optical" />
-          OPERA optical
+          {tr("OPERA optical")}
         </span>
-        <span className="x-tl__source">NISAR Observation Plan · 12-day repeat</span>
+        <span className="x-tl__source">{tr("NISAR Observation Plan · 12-day repeat")}</span>
       </div>
     </section>
   );

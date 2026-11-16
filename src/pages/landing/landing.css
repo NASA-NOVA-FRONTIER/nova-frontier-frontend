@@ -228,7 +228,7 @@
 
 .l-callout__value {
   font-family: var(--mono);
-  text-align: right;
+  text-align: end;
 }
 
 .l-callout__meta {

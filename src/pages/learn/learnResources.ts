@@ -1,3 +1,5 @@
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 // Every Learn link comes from the official challenge resource list or the provider's own page for that
 // exact resource. Copy is from the design reference `docs/design/v8/reference/Learn v8.dc.html`.
 // CHALLENGE = https://www.spaceappschallenge.org/2026/challenges/dancing-with-the-sars/ (read 2026-11-14).
@@ -38,7 +40,7 @@ export type OtherRadar = {
   extra?: LearnLink;
 };
 
-export const LEARN_COPY = {
+export const LEARN_COPY = localized({
   title: "Learn · NISAR Hazard Watch by Nova Frontier",
   kicker: "LEARN · FROM THE APP TO YOUR OWN ANALYSIS",
   heading: "Learn to read radar.",
@@ -58,11 +60,12 @@ export const LEARN_COPY = {
   ctaHeading: "Now try it on a place you know.",
   cta: "Open the explorer",
   footerHeadline: "Everything here is free to learn and open to use.",
-} as const;
+} as const);
 
-export const resourceCount = (step: LearnStep): string => `${step.items.length} RESOURCES`;
+export const resourceCount = (step: LearnStep): string =>
+  tr("{{length}} RESOURCES", { length: step.items.length });
 
-export const LEARN_STEPS: LearnStep[] = [
+export const LEARN_STEPS: LearnStep[] = localized([
   {
     anchor: "understand",
     n: "01",
@@ -205,9 +208,9 @@ export const LEARN_STEPS: LearnStep[] = [
       },
     ],
   },
-];
+]);
 
-export const OTHER_RADARS: OtherRadar[] = [
+export const OTHER_RADARS: OtherRadar[] = localized([
   {
     band: "L",
     // SAOCOM's L band is 1.275 GHz, about 23.5 cm (gate 2: keep the design's label).
@@ -242,7 +245,7 @@ export const OTHER_RADARS: OtherRadar[] = [
     // source: CHALLENGE, "RADARSAT 1 - Data"
     href: "https://donnees-data.asc-csa.gc.ca/en/dataset/radarsat1",
   },
-];
+]);
 
 // Every outbound link on the page, for tests and checks.
 export const allLearnLinks = (): string[] => [

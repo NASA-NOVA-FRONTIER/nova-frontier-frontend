@@ -27,6 +27,7 @@ import { useCasesMotion } from "@/pages/cases/useCasesMotion";
 import { SiteFooter } from "@/pages/site/SiteFooter";
 import { SiteNav } from "@/pages/site/SiteNav";
 
+import { tr } from "@/i18n/translate";
 const TITLE = "Measured cases · NISAR Hazard Watch";
 
 const OPTIONS = filterOptions();
@@ -86,7 +87,7 @@ const CaseCard = ({ item }: { item: Case }) => {
             className="k-card__thumb"
             src={item.crops.change}
             alt={`Radar change map over ${item.name}, from the science team's report`}
-            title="Radar change crop from the nova-frontier-model report"
+            title={tr("Radar change crop from the nova-frontier-model report")}
             width={72}
             height={72}
             loading="lazy"
@@ -105,7 +106,7 @@ const CaseCard = ({ item }: { item: Case }) => {
           </a>
         )}
         <Link to={caseHref(item)} className="k-card__cta" testId={`case-open-${item.id}`}>
-          Open on the globe
+          {tr("Open on the globe")}
         </Link>
       </div>
     </article>
@@ -130,22 +131,22 @@ export const CasesPage = () => {
   return (
     <div ref={root} className="site cases">
       <a href="#main" className="s-skip">
-        Skip to content
+        {tr("Skip to content")}
       </a>
       <SiteNav page="cases" />
 
       <main id="main" className="k-main">
         <header className="k-intro" data-intro>
-          <p className="k-intro__kicker">MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED</p>
-          <h1 className="k-intro__title">Four places, measured honestly.</h1>
+          <p className="k-intro__kicker">{tr("MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED")}</p>
+          <h1 className="k-intro__title">{tr("Four places, measured honestly.")}</h1>
           <p className="k-intro__lead">
-            Each case compares real radar passes with the place&apos;s own history and, where it
-            exists, a second witness. Numbers come from the science team&apos;s published reports.
-            Open any case to see it on the globe.
+            {tr(
+              "Each case compares real radar passes with the place's own history and, where it exists, a second witness. Numbers come from the science team's published reports. Open any case to see it on the globe.",
+            )}
           </p>
         </header>
 
-        <div className="k-filters" role="group" aria-label="Filter by question">
+        <div className="k-filters" role="group" aria-label={tr("Filter by question")}>
           {OPTIONS.map(({ id, label, icon, count }) => (
             <button
               key={id}
@@ -164,7 +165,9 @@ export const CasesPage = () => {
 
         {shown.length === 0 ? (
           <p className="k-empty" data-testid="cases-empty">
-            No measured case asks this question yet. The lens works on any point in the explorer.
+            {tr(
+              "No measured case asks this question yet. The lens works on any point in the explorer.",
+            )}
           </p>
         ) : (
           <div className="k-grid" data-testid="cases-grid">
@@ -176,13 +179,14 @@ export const CasesPage = () => {
 
         <section className="k-ask" data-card aria-labelledby="ask-heading">
           <div className="k-ask__copy">
-            <p className="k-ask__kicker">ANY PLACE ON LAND</p>
+            <p className="k-ask__kicker">{tr("ANY PLACE ON LAND")}</p>
             <h2 id="ask-heading" className="k-ask__title">
-              Your place isn&apos;t here? Ask the radar.
+              {tr("Your place isn't here? Ask the radar.")}
             </h2>
             <p className="k-ask__body">
-              Search any place in the explorer and read its last five NISAR passes in one to four
-              minutes, through the same four questions.
+              {tr(
+                "Search any place in the explorer and read its last five NISAR passes in one to four minutes, through the same four questions.",
+              )}
             </p>
           </div>
           <div className="k-ask__actions">
@@ -201,7 +205,7 @@ export const CasesPage = () => {
               ))}
             </div>
             <Link to="/explore" className="s-button k-ask__cta" testId="cases-ask-cta">
-              Open the explorer
+              {tr("Open the explorer")}
             </Link>
           </div>
         </section>

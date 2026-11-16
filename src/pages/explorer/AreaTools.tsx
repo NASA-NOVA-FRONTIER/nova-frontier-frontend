@@ -1,13 +1,15 @@
 import { Icon, type IconName } from "@/features/case-panel/icons";
 import type { DrawTool } from "@/features/geo/geo.types";
 
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 type ToolSpec = { id: DrawTool; label: string; icon: IconName };
 
-const TOOLS: ToolSpec[] = [
+const TOOLS: ToolSpec[] = localized([
   { id: "point", label: "Point: a 10 × 10 km square around a click", icon: "pin" },
   { id: "rectangle", label: "Rectangle: press, drag, release", icon: "rectangle" },
   { id: "polygon", label: "Polygon: click the corners, double-click to close", icon: "polygon" },
-];
+]);
 
 type AreaToolsProps = {
   tool: DrawTool | undefined;
@@ -18,7 +20,7 @@ type AreaToolsProps = {
 
 // Pressing the tool that is on turns it off, so the same click that started it ends it.
 export const AreaTools = ({ tool, disabledWhy, onTool }: AreaToolsProps) => (
-  <div role="group" aria-label="Choose an area" className="x-tools" data-testid="area-tools">
+  <div role="group" aria-label={tr("Choose an area")} className="x-tools" data-testid="area-tools">
     {TOOLS.map(({ id, label, icon }) => (
       <button
         key={id}

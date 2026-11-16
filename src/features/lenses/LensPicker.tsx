@@ -7,6 +7,7 @@ import type { ExplorationView } from "@/features/explore/exploreSchemas";
 import type { CardLens } from "@/features/lenses/lensSlots";
 import { useNow } from "@/lib/useNow";
 
+import { tr } from "@/i18n/translate";
 const CARD_LENSES = Object.keys(LENS_COPY) as CardLens[];
 
 const iconOf = (lens: LensId) => findLens(lens)?.icon ?? "flood";
@@ -83,7 +84,7 @@ export const LensPicker = ({ lens, tabs, running, locked, onLens, onCancel }: Pr
   );
   if (tabs)
     return (
-      <div role="group" aria-label="Lens" className="x-ltabs" data-testid="lens-tabs">
+      <div role="group" aria-label={tr("Lens")} className="x-ltabs" data-testid="lens-tabs">
         {CARD_LENSES.map((id) => (
           <button
             key={id}
@@ -110,7 +111,7 @@ export const LensPicker = ({ lens, tabs, running, locked, onLens, onCancel }: Pr
           {locked}
         </p>
       )}
-      <div role="group" aria-label="Lens" className="x-lgrid">
+      <div role="group" aria-label={tr("Lens")} className="x-lgrid">
         {CARD_LENSES.map((id) => (
           <button
             key={id}

@@ -17,6 +17,7 @@ import { aboutKm, spotView, type Nearest } from "@/features/spot/spot";
 import { ApiError } from "@/lib/api/apiClient";
 import type { AsyncState } from "@/lib/useAsync";
 
+import { tr } from "@/i18n/translate";
 const SOURCE_DATES =
   "Exploration API → GET /api/v1/coverage plan.dates (the NISAR catalog, one series)";
 
@@ -71,7 +72,7 @@ export const SpotCard = ({
   return (
     <section
       className="x-place x-glass"
-      aria-label="Picked spot"
+      aria-label={tr("Picked spot")}
       data-testid="place-card"
       data-state={view?.state ?? coverage?.status ?? "loading"}
     >
@@ -86,7 +87,7 @@ export const SpotCard = ({
           type="button"
           className="x-icon-button x-place__close"
           onClick={onClose}
-          aria-label="Close"
+          aria-label={tr("Close")}
           data-testid="place-close"
         >
           <Icon name="close" size={16} />
@@ -110,7 +111,7 @@ export const SpotCard = ({
           <p>{problemOf(coverage.error).body}</p>
           <div className="x-problem__actions">
             <button type="button" className="x-primary x-primary--small" onClick={onRetry}>
-              Try again
+              {tr("Try again")}
             </button>
           </div>
         </div>
@@ -141,7 +142,7 @@ export const SpotCard = ({
                 <Prov kind="realDates" source={SOURCE_DATES} />
               </span>
             </p>
-            <ul className="x-spot__chips" aria-label="Measured dates">
+            <ul className="x-spot__chips" aria-label={tr("Measured dates")}>
               {view.chips.map((chip) => (
                 <li key={chip} className="x-spot__chip">
                   {chip}

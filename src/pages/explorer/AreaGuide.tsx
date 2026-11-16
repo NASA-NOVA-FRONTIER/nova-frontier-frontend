@@ -9,6 +9,7 @@ import {
 } from "@/features/geo/limits";
 import type { DraftView } from "@/features/globe/drawTools";
 
+import { tr } from "@/i18n/translate";
 export type AreaIssue =
   { kind: "tooLarge"; area: Area; km2: number } | { kind: "rejected"; reason: DrawRejection };
 
@@ -63,15 +64,16 @@ export const AreaGuide = ({
         data-testid="area-guide"
       >
         <p className="x-guide__title">
-          {formatKm2(issue.km2)} is over the {MAX_AREA_KM2} km² limit
+          {formatKm2(issue.km2)} {tr("is over the ")} {MAX_AREA_KM2} {tr("km² limit")}
         </p>
         <p className="x-guide__text">
-          The radar reads at most 20 × 20 km, and 10 × 10 km is ideal. Draw a smaller area, or use
-          the 10 × 10 km square centred on this one.
+          {tr(
+            "The radar reads at most 20 × 20 km, and 10 × 10 km is ideal. Draw a smaller area, or use the 10 × 10 km square centred on this one.",
+          )}
         </p>
         <div className="x-guide__actions">
           <button type="button" onClick={onUseSquare} data-testid="area-use-square">
-            Use the centred 10 × 10 km square
+            {tr("Use the centred 10 × 10 km square")}
           </button>
           <button
             type="button"
@@ -79,7 +81,7 @@ export const AreaGuide = ({
             onClick={onDismiss}
             data-testid="area-dismiss"
           >
-            Discard
+            {tr("Discard")}
           </button>
         </div>
       </section>
@@ -119,7 +121,12 @@ export const AreaGuide = ({
       <p className="x-guide__title">{HOW[tool]}</p>
       <p className="x-guide__size" data-testid="area-size">
         {SIZE_GUIDE}
-        {draft !== undefined && draft.closed && <> · now {formatKm2(draft.km2)}</>}
+        {draft !== undefined && draft.closed && (
+          <>
+            {" "}
+            {tr("· now ")} {formatKm2(draft.km2)}
+          </>
+        )}
       </p>
       {draft !== undefined && draft.closed && tool !== "point" && (
         <p className="x-guide__text">{LEVEL_TEXT[draft.level]}</p>
@@ -132,7 +139,7 @@ export const AreaGuide = ({
             disabled={corners < MIN_VERTICES}
             data-testid="area-finish"
           >
-            Finish
+            {tr("Finish")}
           </button>
           <button
             type="button"
@@ -140,7 +147,7 @@ export const AreaGuide = ({
             onClick={onCancel}
             data-testid="area-cancel"
           >
-            Cancel
+            {tr("Cancel")}
           </button>
         </div>
       )}

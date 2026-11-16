@@ -8,6 +8,7 @@ import { RadarHistory } from "@/features/sheet/RadarHistory";
 import { RadarImagePanel } from "@/features/sheet/RadarImagePanel";
 import { PublishedFiles, RegionalAnalysisPanel } from "@/features/sheet/RegionalAnalysisPanel";
 
+import { tr } from "@/i18n/translate";
 const count = z.number().int().nonnegative();
 const radarCounts = z.object({
   common_cells: count.optional(),
@@ -81,16 +82,16 @@ export const LiveSciencePanel = ({
         target={target}
         onDate={setSelectedDate}
       />
-      <section className="x-sheet__section" aria-label="Lens features">
-        <h3 className="x-sheet__kicker">Lens evidence</h3>
+      <section className="x-sheet__section" aria-label={tr("Lens features")}>
+        <h3 className="x-sheet__kicker">{tr("Lens evidence")}</h3>
         {view.status === "partial" && (
           <p className="x-muted" role="status">
-            Partial result. Some measurements are unavailable.
+            {tr("Partial result. Some measurements are unavailable.")}
           </p>
         )}
         {view.status === "noData" && (
           <p className="x-muted" role="status">
-            Insufficient measured support for this exploration.
+            {tr("Insufficient measured support for this exploration.")}
           </p>
         )}
         {subject.insar ? (
@@ -98,27 +99,39 @@ export const LiveSciencePanel = ({
         ) : (
           <div className="x-inset x-radar__legend">
             <strong>{subject.verdictLine}</strong>
-            {baseline.length > 0 && <span>Baseline acquisitions · {baseline.join(" · ")}</span>}
+            {baseline.length > 0 && (
+              <span>
+                {tr("Baseline acquisitions · ")} {baseline.join(" · ")}
+              </span>
+            )}
             {assessment.length > 0 && (
-              <span>Assessment acquisitions · {assessment.join(" · ")}</span>
+              <span>
+                {tr("Assessment acquisitions · ")} {assessment.join(" · ")}
+              </span>
             )}
             {counts?.common_cells !== undefined && (
-              <span>Shared radar support · {cells(counts.common_cells)} cells</span>
+              <span>
+                {tr("Shared radar support · ")} {cells(counts.common_cells)} cells
+              </span>
             )}
             {counts?.dual_darkening_cells !== undefined && counts.common_cells !== undefined && (
               <span>
-                Dual-polarization darkening · {cells(counts.dual_darkening_cells)} of{" "}
-                {cells(counts.common_cells)} shared cells
+                {tr("Dual-polarization darkening · ")} {cells(counts.dual_darkening_cells)} of{" "}
+                {cells(counts.common_cells)} {tr("shared cells")}
               </span>
             )}
             {counts?.co_pol_brightening_cells !== undefined &&
               counts.common_cells !== undefined && (
                 <span>
-                  Co-polarization brightening · {cells(counts.co_pol_brightening_cells)} of{" "}
-                  {cells(counts.common_cells)} shared cells
+                  {tr("Co-polarization brightening · ")} {cells(counts.co_pol_brightening_cells)} of{" "}
+                  {cells(counts.common_cells)} {tr("shared cells")}
                 </span>
               )}
-            {farm?.reason && <span>Matched surroundings · {farm.reason.replaceAll("_", " ")}</span>}
+            {farm?.reason && (
+              <span>
+                {tr("Matched surroundings · ")} {farm.reason.replaceAll("_", " ")}
+              </span>
+            )}
             {Object.entries(farm?.steps ?? {}).map(([channel, step]) => {
               const synch = step.synchrony;
               const bracket = step.intervals.find(
@@ -128,30 +141,41 @@ export const LiveSciencePanel = ({
                 <div key={channel}>
                   <p>
                     {channel.replace("_over_", " / ")} · {cells(synch.synchronous_cells)} of{" "}
-                    {cells(synch.focal_cells)} matched focal cells shared the selected step (
+                    {cells(synch.focal_cells)}{" "}
+                    {tr("matched focal cells shared the selected step (")}
                     {(100 * synch.fraction).toFixed(1)}%).
                   </p>
-                  {bracket && <p>Observed bracket · {bracket.dates.join(" to ")}</p>}
+                  {bracket && (
+                    <p>
+                      {tr("Observed bracket · ")} {bracket.dates.join(" to ")}
+                    </p>
+                  )}
                   {synch.spatial_95_interval && (
                     <p>
-                      Conditional spatial interval (95%) ·{" "}
+                      {tr("Conditional spatial interval (95%) ·")}{" "}
                       {synch.spatial_95_interval
                         .map((value) => `${(100 * value).toFixed(1)}%`)
                         .join(" to ")}
                     </p>
                   )}
-                  {synch.reason && <p>Synchrony support · {synch.reason.replaceAll("_", " ")}</p>}
+                  {synch.reason && (
+                    <p>
+                      {tr("Synchrony support · ")} {synch.reason.replaceAll("_", " ")}
+                    </p>
+                  )}
                 </div>
               );
             })}
             {fireHistory?.decline_dates != null && (
               <span>
-                Cross-polarized declines at the point · {fireHistory.decline_dates} of{" "}
-                {fireHistory.assessed_dates} assessment dates
+                {tr("Cross-polarized declines at the point · ")} {fireHistory.decline_dates} of{" "}
+                {fireHistory.assessed_dates} {tr("assessment dates")}
               </span>
             )}
             {fireHistory?.pattern && (
-              <span>Sampled return pattern · {fireHistory.pattern.replaceAll("_", " ")}</span>
+              <span>
+                {tr("Sampled return pattern · ")} {fireHistory.pattern.replaceAll("_", " ")}
+              </span>
             )}
             {subject.reason && <span>{subject.reason}</span>}
           </div>
@@ -161,12 +185,12 @@ export const LiveSciencePanel = ({
         <RadarHistory observations={result.observations} date={date} onDate={setSelectedDate} />
       ) : (
         result.insar == null && (
-          <p className="x-muted">Point-return history is unavailable for this result.</p>
+          <p className="x-muted">{tr("Point-return history is unavailable for this result.")}</p>
         )
       )}
       {newContract && (
         <details className="x-inset x-radar__files">
-          <summary>Acquisition provenance</summary>
+          <summary>{tr("Acquisition provenance")}</summary>
           <ul>
             {result.observations.map((row) => (
               <li key={row.date}>
@@ -178,12 +202,13 @@ export const LiveSciencePanel = ({
           </ul>
           {typeof result.quality.revision === "string" && (
             <p>
-              Modeling revision · <code>{result.quality.revision}</code>
+              {tr("Modeling revision · ")} <code>{result.quality.revision}</code>
             </p>
           )}
           {Array.isArray(result.quality.measuredPoint) && (
             <p>
-              Measured center (longitude, latitude) · {result.quality.measuredPoint.join(", ")}°
+              {tr("Measured center (longitude, latitude) · ")}{" "}
+              {result.quality.measuredPoint.join(", ")}°
             </p>
           )}
         </details>

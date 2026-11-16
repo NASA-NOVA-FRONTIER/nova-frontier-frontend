@@ -11,6 +11,7 @@ import { CHAPTERS, chapterCount, LAST_CHAPTER, type Chapter } from "@/features/s
 import { STORY_NEWS } from "@/features/story/storyNews";
 import { formatDay } from "@/features/timeline/timelineLayout";
 
+import { tr } from "@/i18n/translate";
 const CHANGE_RAMP = "linear-gradient(90deg,#2f6db5,#f2f0eb,#c2473a)";
 const PHOTO_SLOTS = 3;
 const SLOT_SOURCE = "Left as a slot until a credited, linked item is copied from its source";
@@ -60,7 +61,7 @@ export const StoryMode = ({
         </article>
       </div>
 
-      <section className="x-story__bar" aria-label="Story narration" data-testid="story-bar">
+      <section className="x-story__bar" aria-label={tr("Story narration")} data-testid="story-bar">
         <div className="x-story__progress">
           {CHAPTERS.map((entry, index) => (
             <button
@@ -88,7 +89,7 @@ export const StoryMode = ({
         </div>
         <div className="x-story__controls">
           <button type="button" className="x-story__exit" onClick={onExit} data-testid="story-exit">
-            Exit story
+            {tr("Exit story")}
           </button>
           <span className="x-top__fill" />
           {voiceAvailable && (
@@ -109,10 +110,10 @@ export const StoryMode = ({
             className="x-story__button"
             onClick={() => onGo(chapter - 1)}
             disabled={chapter === 0}
-            aria-label="Previous chapter"
+            aria-label={tr("Previous chapter")}
             data-testid="story-back"
           >
-            Back
+            {tr("Back")}
           </button>
           <button
             type="button"
@@ -155,9 +156,9 @@ const ChapterBody = ({ chapter, item, onExplore }: BodyProps) => {
       return (
         <>
           <p className="x-story__body">
-            At Qadirabad the radar caught most new water, and also flagged existing water. The
-            report says so. That honesty is the point: the radar shows what changed and leaves the
-            cause open.
+            {tr(
+              "At Qadirabad the radar caught most new water, and also flagged existing water. The report says so. That honesty is the point: the radar shows what changed and leaves the cause open.",
+            )}
           </p>
           <button
             type="button"
@@ -165,7 +166,7 @@ const ChapterBody = ({ chapter, item, onExplore }: BodyProps) => {
             onClick={onExplore}
             data-testid="story-explore"
           >
-            Explore it yourself
+            {tr("Explore it yourself")}
           </button>
         </>
       );
@@ -202,11 +203,12 @@ const WhatHappened = ({ item }: { item: Case }) => {
         ]}
       />
       <p className="x-story__note">
-        River facts come from the PMD/FFD bulletin, which reports flows, not impacts. Bracketed
-        items stay empty until PDMA or NDMA publish an official figure.{" "}
+        {tr(
+          "River facts come from the PMD/FFD bulletin, which reports flows, not impacts. Bracketed items stay empty until PDMA or NDMA publish an official figure.",
+        )}{" "}
         {bulletin !== undefined && (
           <a href={bulletin.href} target="_blank" rel="noopener">
-            Open the bulletin
+            {tr("Open the bulletin")}
           </a>
         )}
       </p>
@@ -266,12 +268,14 @@ const MapTiles = ({ item }: { item: Case }) =>
       </div>
       <div className="x-story__ramp" style={{ background: CHANGE_RAMP }} />
       <p className="x-story__scale">
-        <span>−8 dB darker</span>
+        <span>{tr("−8 dB darker")}</span>
         <span>0</span>
-        <span>+8 dB brighter</span>
+        <span>{tr("+8 dB brighter")}</span>
       </p>
       <p className="x-story__note">
-        Real change map, first assessment minus the baseline median. Blue darkened, red brightened.
+        {tr(
+          "Real change map, first assessment minus the baseline median. Blue darkened, red brightened.",
+        )}
       </p>
     </>
   );
@@ -296,7 +300,9 @@ const Witness = ({ item }: { item: Case }) => {
       {group !== undefined && (
         <div className="x-story__bars">
           <p className="x-kicker x-kicker--split">
-            <span>{group.title} · whole area</span>
+            <span>
+              {group.title} {tr("· whole area")}
+            </span>
             <Prov kind="real" source={SOURCE.groups} />
           </p>
           <ContrastBars group={group} mode="plain" compact />
@@ -314,7 +320,7 @@ const OnTheGround = () => {
   return (
     <>
       <div className="x-story__photo" data-testid="story-photo-slot">
-        <span>Credited photo goes here</span>
+        <span>{tr("Credited photo goes here")}</span>
         <span className="x-story__photo-n">
           {photo + 1} / {PHOTO_SLOTS}
         </span>
@@ -323,17 +329,17 @@ const OnTheGround = () => {
         <button
           type="button"
           className="x-story__round"
-          aria-label="Previous photo"
+          aria-label={tr("Previous photo")}
           onClick={() => step(-1)}
         >
           ‹
         </button>
-        <p className="x-story__slot">[Photographer · outlet · licence]</p>
+        <p className="x-story__slot">{tr("[Photographer · outlet · licence]")}</p>
         <Prov kind="todo" source={SLOT_SOURCE} />
         <button
           type="button"
           className="x-story__round"
-          aria-label="Next photo"
+          aria-label={tr("Next photo")}
           onClick={() => step(1)}
         >
           ›
@@ -341,7 +347,7 @@ const OnTheGround = () => {
       </div>
       <div className="x-story__news">
         <p className="x-kicker x-kicker--split">
-          <span>In the news</span>
+          <span>{tr("In the news")}</span>
           <Prov kind="real" source={NEWS_SOURCE} />
         </p>
         <ul>
@@ -357,7 +363,9 @@ const OnTheGround = () => {
           ))}
         </ul>
       </div>
-      <p className="x-story__note">Photos are slots: add only credited, licensed material.</p>
+      <p className="x-story__note">
+        {tr("Photos are slots: add only credited, licensed material.")}
+      </p>
     </>
   );
 };

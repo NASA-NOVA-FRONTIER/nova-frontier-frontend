@@ -5,6 +5,7 @@ import { PROCESSING } from "@/content/copyV9";
 import { getFacts, type Fact } from "@/content/facts";
 import { FACTS_PER_RUN } from "@/features/explore/exploreWait";
 
+import { tr } from "@/i18n/translate";
 // SPECS-v8 §3: "auto-advance every 7 s".
 const ROTATE_MS = 7000;
 
@@ -61,7 +62,7 @@ export const FactsCarousel = ({ reduceMotion, facts = getFacts() }: FactsCarouse
     <section
       ref={rootRef}
       className="x-facts-carousel"
-      aria-label="Did you know"
+      aria-label={tr("Did you know")}
       data-testid="facts-carousel"
       data-paused={paused}
     >
@@ -72,7 +73,7 @@ export const FactsCarousel = ({ reduceMotion, facts = getFacts() }: FactsCarouse
             : STEP_3.didYouKnow(index + 1, facts.length)}
         </p>
         <span className="x-facts-carousel__nav">
-          <button type="button" onClick={() => step(-1)} aria-label="Previous fact">
+          <button type="button" onClick={() => step(-1)} aria-label={tr("Previous fact")}>
             ‹
           </button>
           <button
@@ -84,7 +85,7 @@ export const FactsCarousel = ({ reduceMotion, facts = getFacts() }: FactsCarouse
           >
             {held ? "▶" : "❚❚"}
           </button>
-          <button type="button" onClick={() => step(1)} aria-label="Next fact">
+          <button type="button" onClick={() => step(1)} aria-label={tr("Next fact")}>
             ›
           </button>
         </span>

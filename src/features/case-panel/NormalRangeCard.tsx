@@ -3,6 +3,7 @@ import type { NormalRange } from "@/features/case-panel/subject";
 import { SOURCE } from "@/features/case-panel/verdicts";
 import { CHANNEL, type ChannelId } from "@/features/charts/chartTokens";
 
+import { tr } from "@/i18n/translate";
 // Room around the larger of the two numbers, so the marker never sits on the edge of the axis.
 const HEADROOM = 1.3;
 const PERCENT = 100;
@@ -23,7 +24,7 @@ export const NormalRangeCard = ({ range, compact = false, heading = true }: Card
   <div className="x-panel__block c-range" data-testid="normal-range">
     {heading && (
       <p className="x-kicker x-kicker--split">
-        <span>Target pass vs normal range</span>
+        <span>{tr("Target pass vs normal range")}</span>
         <Prov kind="real" source={SOURCE.liveRange} />
       </p>
     )}
@@ -67,9 +68,9 @@ export const NormalRangeCard = ({ range, compact = false, heading = true }: Card
     </ul>
     {!compact && (
       <p className="c-range__note">
-        Shaded: the normal range, ±
-        {range.channels.map((item) => item.halfWidth.toFixed(1)).join(" / ")} dB around the median
-        of {range.baselinePasses} earlier passes.
+        {tr("Shaded: the normal range, ±")}
+        {range.channels.map((item) => item.halfWidth.toFixed(1)).join(" / ")}{" "}
+        {tr("dB around the median of ")} {range.baselinePasses} {tr("earlier passes.")}
       </p>
     )}
   </div>

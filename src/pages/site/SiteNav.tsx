@@ -1,21 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 
+import { LanguageSwitcher } from "@/i18n";
 import { APP_NAME } from "@/lib/appName";
 import { BrandMark } from "@/lib/BrandMark";
 import { Link } from "@/lib/Link";
 
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 export type SitePage = "landing" | "cases" | "method" | "learn" | "about";
 
 type SiteNavProps = {
   page: SitePage;
 };
 
-const PAGE_LINKS: { page: SitePage; to: string; label: string; testId: string }[] = [
+const PAGE_LINKS: { page: SitePage; to: string; label: string; testId: string }[] = localized([
   { page: "cases", to: "/cases", label: "Cases", testId: "nav-cases" },
   { page: "method", to: "/method", label: "Method", testId: "nav-method" },
   { page: "learn", to: "/learn", label: "Learn", testId: "nav-learn" },
   { page: "about", to: "/about", label: "About", testId: "nav-about" },
-];
+]);
 
 const LINKS_ID = "s-nav-links";
 
@@ -48,7 +51,7 @@ export const SiteNav = ({ page }: SiteNavProps) => {
   const classes = ["s-nav", page === "landing" ? "" : "s-nav--glass", open ? "s-nav--open" : ""];
 
   return (
-    <nav ref={navRef} className={classes.filter(Boolean).join(" ")} aria-label="Main">
+    <nav ref={navRef} className={classes.filter(Boolean).join(" ")} aria-label={tr("Main")}>
       <Link to="/" className="s-nav__mark">
         <BrandMark size={24} />
         {APP_NAME}
@@ -63,7 +66,7 @@ export const SiteNav = ({ page }: SiteNavProps) => {
           data-testid="nav-menu"
           onClick={() => setOpen((was) => !was)}
         >
-          Menu
+          {tr("Menu")}
         </button>
         <div id={LINKS_ID} className="s-nav__links" data-testid="nav-links">
           {PAGE_LINKS.map(({ page: target, to, label, testId }) =>
@@ -84,10 +87,11 @@ export const SiteNav = ({ page }: SiteNavProps) => {
             ),
           )}
         </div>
+        <LanguageSwitcher variant="site" />
         <Link to="/explore" className="s-nav__pill" testId="nav-explore">
           {/* Phones keep the short label so the mark, Menu and the pill share 390 px. */}
-          <span className="s-nav__pill-long">Open the explorer</span>
-          <span className="s-nav__pill-short">Explore</span>
+          <span className="s-nav__pill-long">{tr("Open the explorer")}</span>
+          <span className="s-nav__pill-short">{tr("Explore")}</span>
         </Link>
       </div>
     </nav>

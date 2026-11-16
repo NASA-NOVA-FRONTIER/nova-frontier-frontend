@@ -19,14 +19,18 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
-    "diagram": "tsx --tsconfig tsconfig.node.json scripts/render-architecture.ts"
+    "diagram": "tsx --tsconfig tsconfig.node.json scripts/render-architecture.ts",
+    "i18n:wrap": "tsx --tsconfig tsconfig.node.json scripts/i18n/wrap.ts",
+    "i18n:extract": "tsx --tsconfig tsconfig.node.json scripts/i18n/extract.ts"
   },
   "dependencies": {
     "cesium": "^1.146.0",
     "gsap": "^3.15.0",
+    "i18next": "^27.1.2",
     "lenis": "^1.3.27",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "react-i18next": "^18.0.1",
     "recharts": "^3",
     "three": "^0.186.1",
     "zod": "^4.6.7"

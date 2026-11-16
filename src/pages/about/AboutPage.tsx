@@ -9,9 +9,11 @@ import { useAboutMotion } from "@/pages/about/useAboutMotion";
 import { SiteFooter, type FooterColumn } from "@/pages/site/SiteFooter";
 import { SiteNav } from "@/pages/site/SiteNav";
 
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 const TITLE = "About · NISAR Hazard Watch by Nova Frontier";
 
-const FOOTER_COLUMNS: FooterColumn[] = [
+const FOOTER_COLUMNS: FooterColumn[] = localized([
   {
     title: "DATA",
     items: [
@@ -30,9 +32,9 @@ const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Team Nova Frontier", href: "/about" },
     ],
   },
-];
+]);
 
-const PROJECT_LINKS: { tag: string; title: string; sub: string; href: string }[] = [
+const PROJECT_LINKS: { tag: string; title: string; sub: string; href: string }[] = localized([
   {
     tag: "CODE",
     title: "GitHub repository",
@@ -46,7 +48,7 @@ const PROJECT_LINKS: { tag: string; title: string; sub: string; href: string }[]
     sub: "One honest question, asked of real radar",
     href: "/method",
   },
-];
+]);
 
 const degreeShort = (member: TeamMember): string =>
   member.degree === "Systems Engineering" ? "SYSTEMS" : "STATISTICS";
@@ -105,10 +107,11 @@ const MemberCard = ({ member, index }: { member: TeamMember; index: number }) =>
     <span className="a-card__tick a-card__tick--br" data-tick aria-hidden="true" />
     <div className="a-card__top">
       <span>
-        MEMBER 0{index + 1} · {degreeShort(member)}
+        {tr("MEMBER 0")}
+        {index + 1} · {degreeShort(member)}
       </span>
       <span className="a-card__status" data-status>
-        ACQUIRED
+        {tr("ACQUIRED")}
       </span>
     </div>
     <div className="a-card__identity">
@@ -116,15 +119,15 @@ const MemberCard = ({ member, index }: { member: TeamMember; index: number }) =>
         <Avatar member={member} size="card" />
       </div>
       <div className="a-card__names" data-dim>
-        {member.owner === true && <p className="a-card__owner">TEAM OWNER</p>}
+        {member.owner === true && <p className="a-card__owner">{tr("TEAM OWNER")}</p>}
         <h3 className="a-card__name">{member.name}</h3>
         <p className="a-card__handle">{member.handle}</p>
       </div>
     </div>
     <div className="a-card__details" data-dim>
       <Detail label="Degree" value={member.degree} placeholder="" />
-      <Detail label="Role" value={member.role} placeholder="Role to fill" />
-      <Detail label="Built" value={member.built} placeholder="What they built to fill" />
+      <Detail label="Role" value={member.role} placeholder={tr("Role to fill")} />
+      <Detail label="Built" value={member.built} placeholder={tr("What they built to fill")} />
     </div>
     <div className="a-card__links" data-dim>
       <ProfileLink label="GitHub" href={member.github} person={firstName(member.name)} />
@@ -153,7 +156,7 @@ export const AboutPage = () => {
   return (
     <div ref={root} className="site about">
       <a href="#main" className="s-skip">
-        Skip to content
+        {tr("Skip to content")}
       </a>
       <SiteNav page="about" />
 
@@ -161,17 +164,18 @@ export const AboutPage = () => {
         <header className="a-hero">
           <div className="a-hero__copy">
             <p className="s-mono-label" data-intro>
-              ABOUT · TEAM NOVA FRONTIER
+              {tr("ABOUT · TEAM NOVA FRONTIER")}
             </p>
             <h1 className="a-hero__title" data-intro>
-              Six people, one orbit.
+              {tr("Six people, one orbit.")}
             </h1>
             <p className="a-hero__lead" data-intro>
-              NISAR passes over the same ground every 12 days. We built a way to read what changed
-              between passes, for the NASA Space Apps Challenge 2026 in Chía, Colombia.
+              {tr(
+                "NISAR passes over the same ground every 12 days. We built a way to read what changed between passes, for the NASA Space Apps Challenge 2026 in Chía, Colombia.",
+              )}
             </p>
             <div className="a-hero__chips" data-intro>
-              <span>NASA SPACE APPS 2026</span>
+              <span>{tr("NASA SPACE APPS 2026")}</span>
               <span>CHÍA · 4.86° N, 74.05° W</span>
             </div>
           </div>
@@ -182,7 +186,7 @@ export const AboutPage = () => {
             <div className="a-orbit__logo">
               <img
                 src="/team/nova-frontier-logo.png"
-                alt="Nova Frontier team logo"
+                alt={tr("Nova Frontier team logo")}
                 width={512}
                 height={512}
               />
@@ -213,14 +217,14 @@ export const AboutPage = () => {
         <section className="a-manifest" aria-labelledby="manifest-heading">
           <div className="a-manifest__head">
             <div>
-              <p className="a-manifest__kicker">CREW MANIFEST</p>
+              <p className="a-manifest__kicker">{tr("CREW MANIFEST")}</p>
               <h2 id="manifest-heading" className="a-manifest__title">
-                Scroll to acquire the team.
+                {tr("Scroll to acquire the team.")}
               </h2>
             </div>
             <p className="a-manifest__count">
-              {TEAM.length} MEMBERS · {countBy("Systems Engineering")} SYSTEMS ENGINEERING ·{" "}
-              {countBy("Statistical Engineering")} STATISTICS
+              {TEAM.length} {tr("MEMBERS · ")} {countBy("Systems Engineering")}{" "}
+              {tr("SYSTEMS ENGINEERING ·")} {countBy("Statistical Engineering")} {tr("STATISTICS")}
             </p>
           </div>
           <div className="a-manifest__grid" data-grid>
@@ -234,7 +238,7 @@ export const AboutPage = () => {
           </div>
           {hasPlaceholders && (
             <p className="a-manifest__note">
-              Grey text and dashed links are placeholders for the team to fill in.
+              {tr("Grey text and dashed links are placeholders for the team to fill in.")}
             </p>
           )}
         </section>
@@ -242,11 +246,12 @@ export const AboutPage = () => {
         <section className="a-project" aria-labelledby="project-heading">
           <div className="a-project__intro" data-rise>
             <h2 id="project-heading" className="a-manifest__title">
-              The project
+              {tr("The project")}
             </h2>
             <p>
-              A map of surface change after earthquakes, fires, floods and forest loss, built on
-              NISAR radar passes. The method and its validation are on their own page.
+              {tr(
+                "A map of surface change after earthquakes, fires, floods and forest loss, built on NISAR radar passes. The method and its validation are on their own page.",
+              )}
             </p>
           </div>
           {PROJECT_LINKS.map(({ tag, title, sub, href }) => {
@@ -287,8 +292,8 @@ export const AboutPage = () => {
         photo={{
           src: "/footer/cattleya-trianae.jpg",
           tag: "FLOR NACIONAL",
-          title: "Cattleya trianae",
-          sub: "Colombia's national orchid, found only in the Colombian Andes.",
+          title: tr("Cattleya trianae"),
+          sub: tr("Colombia's national orchid, found only in the Colombian Andes."),
           credit: "Photo: Mario Carvajal · CC BY 2.0",
           creditHref:
             "https://commons.wikimedia.org/wiki/File:Cattleya_trianae,_Flor_Nacional_de_Colombia.jpg",

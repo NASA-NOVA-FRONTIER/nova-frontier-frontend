@@ -38,6 +38,8 @@ export default defineConfig({
   timeout: 60_000,
   expect: { timeout: 10_000 },
   use: {
+    // The suite asserts English copy and the app follows the browser language, so pin it.
+    locale: "en-US",
     // Stops the idle spin so the frame under the screen centre is predictable.
     reducedMotion: "reduce",
     trace: "on-first-retry",

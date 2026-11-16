@@ -126,6 +126,7 @@ import { SourceSwitch } from "@/pages/explorer/SourceSwitch";
 import { HintPill, StartCard } from "@/pages/explorer/StartCard";
 import { TopBar, type DownloadItem } from "@/pages/explorer/TopBar";
 
+import { tr } from "@/i18n/translate";
 type Selection =
   | { kind: "case"; item: Case }
   | {
@@ -942,8 +943,8 @@ export const ExplorerPage = () => {
   const downloads: DownloadItem[] = [
     {
       id: "png",
-      label: "Screenshot of the globe",
-      sub: "PNG of this view, with its place, dates and legend",
+      label: tr("Screenshot of the globe"),
+      sub: tr("PNG of this view, with its place, dates and legend"),
       disabledWhy: unavailable ? "The 3D globe isn't available in this browser" : undefined,
       onPick: () => void downloadPng(),
     },
@@ -993,8 +994,8 @@ export const ExplorerPage = () => {
     },
     {
       id: "pdf",
-      label: "PDF report",
-      sub: "Data blocks plus a template summary, ready to print",
+      label: tr("PDF report"),
+      sub: tr("Data blocks plus a template summary, ready to print"),
       disabledWhy: exportsLive
         ? undefined
         : live !== undefined
@@ -1030,7 +1031,9 @@ export const ExplorerPage = () => {
       >
         {unavailable ? (
           <div className="x-nogl" data-testid="no-webgl">
-            <p className="x-nogl__pill">3D globe unavailable in this browser · panels still work</p>
+            <p className="x-nogl__pill">
+              {tr("3D globe unavailable in this browser · panels still work")}
+            </p>
           </div>
         ) : (
           <GlobeView
@@ -1287,7 +1290,7 @@ export const ExplorerPage = () => {
               )}
             {subject?.kind === "live" && exploredView?.status === "partial" && (
               <p className="x-reason" data-testid="partial-note">
-                Partial answer: only some of the planned passes could be measured.
+                {tr("Partial answer: only some of the planned passes could be measured.")}
               </p>
             )}
             {live !== undefined && <PlanState framePlan={framePlan} today={today} />}

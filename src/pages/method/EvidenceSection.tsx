@@ -14,6 +14,7 @@ import {
   type Interval,
 } from "@/pages/method/methodContent";
 
+import { tr } from "@/i18n/translate";
 const pct = (value: number): string => `${toPercent(value, INTERVAL_DOMAIN).toFixed(2)}%`;
 
 // A matched contrast with its resampling interval against a marked zero, one row per channel.
@@ -64,7 +65,7 @@ const EvidenceCard = ({ item, mode }: { item: Evidence; mode: ChartMode }) => (
         {item.intervals.map((interval) => (
           <IntervalRow key={interval.channel} interval={interval} />
         ))}
-        <p className="m-card__note">Vertical line · zero difference · dB</p>
+        <p className="m-card__note">{tr("Vertical line · zero difference · dB")}</p>
       </div>
     )}
     {item.stat !== undefined && <p className="m-card__stat">{item.stat}</p>}
@@ -82,18 +83,20 @@ const Benchmark = () => (
   <div className="m-bench" data-reveal data-testid="method-benchmark">
     <div className="m-bench__copy">
       <span className="m-card__tag m-bench__tag">
-        <span className="m-bench__glyph" aria-hidden="true" />A learned model that loses
+        <span className="m-bench__glyph" aria-hidden="true" />
+        {tr("A learned model that loses")}
       </span>
       <h3 className="m-bench__title">
-        Our Transformer rebuilds hidden passes worse than two simple baselines.
+        {tr("Our Transformer rebuilds hidden passes worse than two simple baselines.")}
       </h3>
       <p className="m-bench__body">
-        So it stays an experiment and never labels anything. Error in dB, lower is better, on two
-        cases left out of training, from the same regions.
+        {tr(
+          "So it stays an experiment and never labels anything. Error in dB, lower is better, on two cases left out of training, from the same regions.",
+        )}
       </p>
       <p className="m-card__foot">
         <a href={BENCH_SOURCE} target="_blank" rel="noopener noreferrer">
-          Benchmark results →
+          {tr("Benchmark results →")}
         </a>
         <ProvenanceChip
           kind="real"
@@ -139,13 +142,14 @@ const Benchmark = () => (
 export const EvidenceSection = ({ mode }: { mode: ChartMode }) => (
   <section className="m-section" data-section aria-labelledby="evidence-heading">
     <div className="m-section__head" data-reveal>
-      <p className="m-kicker">07 · Where it works, where it fails</p>
+      <p className="m-kicker">{tr("07 · Where it works, where it fails")}</p>
       <h2 id="evidence-heading" className="m-h2">
-        Held-out places, real numbers, failures included.
+        {tr("Held-out places, real numbers, failures included.")}
       </h2>
       <p className="m-lead">
-        These sites were chosen by fixed rules before seeing results. Showing where the method
-        breaks is how you know the rest isn&apos;t cherry-picked.
+        {tr(
+          "These sites were chosen by fixed rules before seeing results. Showing where the method breaks is how you know the rest isn't cherry-picked.",
+        )}
       </p>
     </div>
     <div className="m-cards" data-testid="method-evidence">

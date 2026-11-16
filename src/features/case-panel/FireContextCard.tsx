@@ -2,6 +2,7 @@ import { Prov } from "@/features/case-panel/Prov";
 import type { FireContextView } from "@/features/case-panel/subject";
 import { SOURCE } from "@/features/case-panel/verdicts";
 
+import { tr } from "@/i18n/translate";
 type CardProps = {
   context: FireContextView;
   // The report page brings its own heading.
@@ -14,7 +15,7 @@ export const FireContextCard = ({ context, heading = true }: CardProps) => (
   <div className="x-panel__block c-fire" data-testid="fire-context" data-status={context.status}>
     {heading && (
       <p className="x-kicker x-kicker--split">
-        <span>Independent fire context</span>
+        <span>{tr("Independent fire context")}</span>
         {context.status === "available" && <Prov kind="real" source={SOURCE.liveFire} />}
       </p>
     )}

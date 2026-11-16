@@ -2,6 +2,8 @@ import { NISCEMI } from "@/features/cases/niscemi";
 import type { LonLat } from "@/features/frames/frame.types";
 import type { LandslideEvidence } from "@/features/landslide/landslideEvidence";
 
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 /*
  * Measured cases from the science backend (github.com/NASA-NOVA-FRONTIER/nova-frontier-model). Every number here
  * is copied from its reports; DATA_PROVENANCE in design_handoff_v7 says where each one comes from.
@@ -95,7 +97,7 @@ export type Case = {
 
 export type Lens = { id: LensId; chip: string; icon: IconId; compares: string };
 
-export const LENSES: Lens[] = [
+export const LENSES: Lens[] = localized([
   {
     id: "flood_wetland",
     chip: "Did it flood?",
@@ -126,28 +128,28 @@ export const LENSES: Lens[] = [
     icon: "earthquake",
     compares: "Where the echo kept or lost coherence between two passes",
   },
-];
+]);
 
 // Docs/design/v8 PLAN-content-pages-v8 §0: "the radar checks whether passes bracket the event and
 // whether the slope kept its echo".
-export const OBSERVED_DYNAMICS = {
+export const OBSERVED_DYNAMICS = localized({
   chip: "Did the slope keep its echo?",
   icon: "landslide",
   compares: "Every pass against the median of the first four, all after the event",
-} as const satisfies Omit<Lens, "id">;
+} as const satisfies Omit<Lens, "id">);
 
 export const findLens = (id: CaseLensId): Omit<Lens, "id"> | undefined =>
   id === "observed_dynamics" ? OBSERVED_DYNAMICS : LENSES.find((lens) => lens.id === id);
 
 // OPERA's optical classes (Okabe–Ito), so the colours match the backend legend.
-export const OPTICAL = {
+export const OPTICAL = localized({
   newWater: "#0072b2",
   stableWater: "#56b4e9",
   dry: "#a8997a",
   loss: "#e69f00",
   mixed: "#cc79a7",
   unsupported: "#62666d",
-} as const;
+} as const);
 
 const EMPTY_FLOOD = ["Flood depth", "Probability", "Cause", "Validated extent"];
 const MODELING = "https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model/blob/main/docs";
@@ -165,7 +167,7 @@ const crops = (id: string): Crops => ({
 
 // Issue #28: exactly one demo case per phenomenon (Case.hazard), each precomputed and shown
 // OFFLINE, with its lens fixed. Phenomena without real precomputed numbers have no case.
-export const CASES: Case[] = [
+export const CASES: Case[] = localized([
   {
     id: "qadirabad",
     lens: "flood_wetland",
@@ -444,10 +446,11 @@ export const CASES: Case[] = [
   },
   // Landslide (#24): the model's only landslide case, aftermath only.
   NISCEMI,
-];
+]);
 
 // PLAN-content-pages-v8 §0: name the actual state, never "Pending". The median is the case stat.
-export const coherenceOnlyLabel = (item: Case): string => `Coherence only · ${item.stat}`;
+export const coherenceOnlyLabel = (item: Case): string =>
+  tr("Coherence only · {{stat}}", { stat: item.stat });
 
 export const findCase = (id: string | null): Case | undefined =>
   CASES.find((item) => item.id === id);

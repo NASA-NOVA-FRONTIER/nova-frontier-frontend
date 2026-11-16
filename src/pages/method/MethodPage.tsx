@@ -27,18 +27,20 @@ import { useMethodMotion } from "@/pages/method/useMethodMotion";
 import { SiteFooter, type FooterColumn } from "@/pages/site/SiteFooter";
 import { SiteNav } from "@/pages/site/SiteNav";
 
-const MODES: { value: ChartMode; label: string }[] = [
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
+const MODES: { value: ChartMode; label: string }[] = localized([
   { value: "plain", label: "Plain" },
   { value: "technical", label: "Technical" },
-];
+]);
 
-const BAND_CARDS: { verdict: Verdict; label: string; height: number }[] = [
+const BAND_CARDS: { verdict: Verdict; label: string; height: number }[] = localized([
   { verdict: "departure", label: "Changed beyond its range · hover a pass", height: 240 },
   { verdict: "within", label: "Within its range", height: 150 },
   { verdict: "insufficient", label: "Not enough radar yet", height: 150 },
-];
+]);
 
-const FOOTER_COLUMNS: FooterColumn[] = [
+const FOOTER_COLUMNS: FooterColumn[] = localized([
   {
     title: "RADAR DATA",
     items: [
@@ -63,11 +65,11 @@ const FOOTER_COLUMNS: FooterColumn[] = [
       },
     ],
   },
-];
+]);
 
 // The reading level lives on this page only; the shared nav stays untouched.
 const ModeSwitch = ({ mode, onChange }: { mode: ChartMode; onChange: (m: ChartMode) => void }) => (
-  <div className="m-mode" role="group" aria-label="Reading level">
+  <div className="m-mode" role="group" aria-label={tr("Reading level")}>
     {MODES.map(({ value, label }) => (
       <button
         key={value}
@@ -112,7 +114,7 @@ export const MethodPage = () => {
   return (
     <div ref={root} className="site method">
       <a href="#main" className="s-skip">
-        Skip to content
+        {tr("Skip to content")}
       </a>
       <SiteNav page="method" />
       <ModeSwitch mode={mode} onChange={setMode} />
@@ -120,15 +122,15 @@ export const MethodPage = () => {
       <main id="main">
         <header className="m-hero">
           <p className="m-hero__kicker" data-intro data-testid="method-intro-kicker">
-            Method · What the radar measures
+            {tr("Method · What the radar measures")}
           </p>
           <h1 className="m-hero__title" data-intro>
-            One honest question, asked of real radar.
+            {tr("One honest question, asked of real radar.")}
           </h1>
           <p className="m-hero__lead" data-intro>
-            Did the radar echo at this place change beyond its own normal range, and what else
-            agrees? Every answer is a measurement, compared with the place&apos;s own history and
-            checked against a second satellite.
+            {tr(
+              "Did the radar echo at this place change beyond its own normal range, and what else agrees? Every answer is a measurement, compared with the place's own history and checked against a second satellite.",
+            )}
           </p>
         </header>
 
@@ -141,7 +143,7 @@ export const MethodPage = () => {
             <SectionHead
               id="pipeline-heading"
               kicker="01 · From a click to an answer"
-              title="Six steps, every time."
+              title={tr("Six steps, every time.")}
             />
             <div className="m-pipe">
               <div className="m-pipe__rail" aria-hidden="true" />
@@ -159,11 +161,9 @@ export const MethodPage = () => {
               </ol>
             </div>
             <p className="m-note" data-reveal>
-              A live question will read real radar in about a minute once the backend API is
-              connected; until then its answer is a demo, labelled as such. Measured cases are
-              precomputed and open instantly. Answers can be partial or insufficient: no usable
-              pixels, a thin history, a masked point. Those are normal outcomes, and the explorer
-              explains each one.
+              {tr(
+                "A live question will read real radar in about a minute once the backend API is connected; until then its answer is a demo, labelled as such. Measured cases are precomputed and open instantly. Answers can be partial or insufficient: no usable pixels, a thin history, a masked point. Those are normal outcomes, and the explorer explains each one.",
+              )}
             </p>
           </section>
 
@@ -171,13 +171,12 @@ export const MethodPage = () => {
             <SectionHead
               id="band-heading"
               kicker="02 · Reading the band chart"
-              title="A place's normal range, and the pass that left it."
+              title={tr("A place's normal range, and the pass that left it.")}
             >
               <p className="m-lead">
-                The solid line is HH, the dashed line HV; circles and squares tell them apart
-                without colour. Shaded bands are each channel&apos;s normal range from earlier
-                passes. A white ring marks a pass outside its band. A break in a line means no pass
-                was used that day. Hover to read any pass.
+                {tr(
+                  "The solid line is HH, the dashed line HV; circles and squares tell them apart without colour. Shaded bands are each channel's normal range from earlier passes. A white ring marks a pass outside its band. A break in a line means no pass was used that day. Hover to read any pass.",
+                )}
               </p>
             </SectionHead>
             <div className="m-band" data-testid="method-band-charts">
@@ -203,7 +202,7 @@ export const MethodPage = () => {
             <SectionHead
               id="lenses-heading"
               kicker="03 · Lenses are questions"
-              title="The same radar, asked five different things."
+              title={tr("The same radar, asked five different things.")}
             />
             <ul className="m-lenses" data-testid="method-lenses">
               {LENSES.map((lens) => (
@@ -240,12 +239,12 @@ export const MethodPage = () => {
             <SectionHead
               id="models-heading"
               kicker="08 · Experimental models"
-              title="Three classifiers we're still testing."
+              title={tr("Three classifiers we're still testing.")}
             >
               <p className="m-lead">
-                Our data scientist also trains water, tree-cover and tree-cover-disturbance models
-                on NISAR. They run, but they&apos;re marked not ready for general use, and the
-                explorer never mixes them into a verdict.
+                {tr(
+                  "Our data scientist also trains water, tree-cover and tree-cover-disturbance models on NISAR. They run, but they're marked not ready for general use, and the explorer never mixes them into a verdict.",
+                )}
               </p>
             </SectionHead>
             <div className="m-panel m-panel--wide" data-reveal>
@@ -260,7 +259,7 @@ export const MethodPage = () => {
               rel="noopener noreferrer"
               data-reveal
             >
-              NISAR-Models on GitHub · try each model in Colab →
+              {tr("NISAR-Models on GitHub · try each model in Colab →")}
             </a>
           </section>
 
@@ -268,7 +267,7 @@ export const MethodPage = () => {
             <SectionHead
               id="colours-heading"
               kicker="09 · Colours belong to the data"
-              title="How to read every map."
+              title={tr("How to read every map.")}
             />
             <div className="m-palettes" data-testid="method-palettes">
               {PALETTES.map((palette) => (
@@ -297,8 +296,10 @@ export const MethodPage = () => {
         photo={{
           src: "/footer/nevado-del-ruiz.jpg",
           tag: "SEEN FROM THE ISS",
-          title: "Nevado del Ruiz, 5,389 m",
-          sub: "In 1985 its mudflows buried the town of Armero and killed at least 23,000 people.",
+          title: tr("Nevado del Ruiz, 5,389 m"),
+          sub: tr(
+            "In 1985 its mudflows buried the town of Armero and killed at least 23,000 people.",
+          ),
           credit: "Photo: NASA Expedition 23 crew · ISS023-E-27737",
           creditHref:
             "https://earthobservatory.nasa.gov/images/43859/nevado-del-ruiz-volcano-colombia",

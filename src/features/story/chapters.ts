@@ -1,5 +1,7 @@
 import { CASES, type Case } from "@/features/cases/cases";
 
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 /*
  * The guided story (SPECS §5): six chapters on the case marked `tour` (Qadirabad, Chenab flood).
  * Captions and card copy come from the v7 prototype; every number is the case's REAL report value.
@@ -19,7 +21,7 @@ export type Chapter = {
 export const STORY_PLACE = "Chenab flood, Pakistan";
 export const STORY_ADVANCE_MS = 9000;
 
-export const CHAPTERS: Chapter[] = [
+export const CHAPTERS: Chapter[] = localized([
   {
     kicker: "01 · What happened",
     title: "Flood bulletins for the Chenab, July 2026",
@@ -67,12 +69,12 @@ export const CHAPTERS: Chapter[] = [
     view: "chip",
     card: "end",
   },
-];
+]);
 
 export const LAST_CHAPTER = CHAPTERS.length - 1;
 
 // Chapter 1 looks at the Punjab plains around the river, not at the chip.
-export const REGION_CENTRE: [number, number] = [73.5, 31.5];
+export const REGION_CENTRE: [number, number] = localized([73.5, 31.5]);
 
 // The case the story tells; the first case is the fallback so the story never breaks.
 export const storyCase = (): Case | undefined =>
@@ -81,4 +83,8 @@ export const storyCase = (): Case | undefined =>
 export const clampChapter = (index: number): number => Math.min(LAST_CHAPTER, Math.max(0, index));
 
 export const chapterCount = (index: number): string =>
-  `Chapter ${index + 1} of ${CHAPTERS.length} · ${STORY_PLACE}`;
+  tr("Chapter {{v0}} of {{length}} · {{STORY_PLACE}}", {
+    v0: index + 1,
+    length: CHAPTERS.length,
+    STORY_PLACE,
+  });

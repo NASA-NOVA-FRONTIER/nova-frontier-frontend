@@ -314,8 +314,15 @@ test.describe("Site nav on a phone", () => {
     await expect(page.getByTestId("nav-links")).toBeVisible();
     await expect(page.getByTestId("nav-learn")).toHaveAttribute("aria-current", "page");
 
-    // Tab order follows the screen: Menu, the four links, then the explorer pill.
-    for (const id of ["nav-cases", "nav-method", "nav-learn", "nav-about", "nav-explore"]) {
+    // Tab order follows the screen: Menu, the four links, the language button, then the explorer pill.
+    for (const id of [
+      "nav-cases",
+      "nav-method",
+      "nav-learn",
+      "nav-about",
+      "language-button",
+      "nav-explore",
+    ]) {
       await page.keyboard.press("Tab");
       await expect(page.getByTestId(id)).toBeFocused();
     }

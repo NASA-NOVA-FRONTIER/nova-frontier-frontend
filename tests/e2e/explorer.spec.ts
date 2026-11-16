@@ -315,8 +315,10 @@ test.describe("Explorer: v8 top bar", () => {
     // Hidden until the backend accepts a direction: a choice that isn't sent would mislead.
     await expect(page.getByTestId("direction-switch")).toHaveCount(0);
 
+    // 340 px by design; a full top row (the language button included) lets it give a little.
     const pill = await globe.searchPill.boundingBox();
-    expect(pill?.width).toBeCloseTo(340, 0);
+    expect(pill?.width).toBeGreaterThan(300);
+    expect(pill?.width).toBeLessThanOrEqual(340);
 
     // The mode switch hides below 1280 px and the page links below 1120 px.
     await page.setViewportSize({ width: 1300, height: 900 });

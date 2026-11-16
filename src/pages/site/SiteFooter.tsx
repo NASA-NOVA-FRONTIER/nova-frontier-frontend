@@ -1,6 +1,8 @@
 import { Link } from "@/lib/Link";
 import { mapOffset } from "@/pages/site/footerMap";
 
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 type FooterLink = { label: string; href: string };
 
 export type FooterColumn = { title: string; items: FooterLink[] };
@@ -31,13 +33,13 @@ type SiteFooterProps = {
 
 export const SITE_VERSION = "Design v7 · 0.7.0";
 
-const PROJECT: FooterLink[] = [
+const PROJECT: FooterLink[] = localized([
   { label: "Home", href: "/" },
   { label: "Explorer", href: "/explore" },
   { label: "Measured cases", href: "/cases" },
   { label: "Method", href: "/method" },
   { label: "About us", href: "/about" },
-];
+]);
 
 const isInternal = (href: string): boolean => href.startsWith("/");
 
@@ -79,29 +81,29 @@ export const SiteFooter = ({
             {lede !== undefined && <p className="s-foot__lede">{lede}</p>}
             <div className="s-foot__actions">
               <Link to="/explore" className="s-foot__button">
-                Open the globe
+                {tr("Open the globe")}
               </Link>
               <a
                 href="https://github.com/NASA-NOVA-FRONTIER/nova-frontier-frontend"
                 className="s-foot__button s-foot__button--ghost"
               >
-                GitHub
+                {tr("GitHub")}
               </a>
             </div>
             <div className="s-foot__signature">
               <Link to="/about" className="s-foot__team">
                 <img src="/team/nova-frontier-logo.png" alt="" width={44} height={44} />
-                <span>Built by Nova Frontier</span>
+                <span>{tr("Built by Nova Frontier")}</span>
               </Link>
               <span className="s-foot__divider" aria-hidden="true" />
               <a
                 href="https://www.spaceappschallenge.org/"
                 className="s-foot__spaceapps"
-                aria-label="NASA Space Apps Challenge"
+                aria-label={tr("NASA Space Apps Challenge")}
               >
                 <img
                   src="/brand/space-apps-horizontal.png"
-                  alt="NASA Space Apps Challenge"
+                  alt={tr("NASA Space Apps Challenge")}
                   width={87}
                   height={34}
                 />
@@ -126,7 +128,7 @@ export const SiteFooter = ({
         </div>
 
         <div className="s-foot__cols">
-          {[{ title: "PROJECT", items: PROJECT }, ...columns].map(({ title, items }) => (
+          {[{ title: tr("PROJECT"), items: PROJECT }, ...columns].map(({ title, items }) => (
             <nav key={title} className="s-foot__col" aria-label={title}>
               <p className="s-foot__col-title">{title}</p>
               {items.map((item) => (
@@ -140,19 +142,20 @@ export const SiteFooter = ({
       </div>
 
       <p className="s-foot__wordmark" aria-hidden="true">
-        NOVA FRONTIER
+        {tr("NOVA FRONTIER")}
       </p>
 
       <div className="s-foot__base">
         <span className="s-foot__credit">
-          <span>Team Nova Frontier · NASA Space Apps 2026 · Chía</span>
+          <span>{tr("Team Nova Frontier · NASA Space Apps 2026 · Chía")}</span>
           <span className="s-foot__version" data-testid="site-version">
             {SITE_VERSION}
           </span>
         </span>
         <span className="s-foot__disclaimer">
-          Earth: NASA Blue Marble. NISAR is a joint mission of NASA and ISRO; this project is not
-          affiliated with either agency.
+          {tr(
+            "Earth: NASA Blue Marble. NISAR is a joint mission of NASA and ISRO; this project is not affiliated with either agency.",
+          )}
         </span>
       </div>
     </footer>

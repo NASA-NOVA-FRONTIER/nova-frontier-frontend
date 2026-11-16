@@ -31,7 +31,7 @@
   background: rgba(235, 233, 228, 0.03);
   color: var(--ink);
   font-size: 13.5px;
-  text-align: left;
+  text-align: start;
   line-height: 1.25;
   cursor: pointer;
   transition:
@@ -124,7 +124,7 @@
   background: none;
   color: var(--muted);
   font-size: 13px;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 
@@ -147,7 +147,7 @@
   background: transparent;
   color: var(--ink-2);
   font-size: 13px;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 

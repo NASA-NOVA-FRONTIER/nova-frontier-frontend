@@ -23,6 +23,7 @@ import type { ScienceProducts } from "@/features/explore/scienceProducts";
 import { gridDescription } from "@/features/sheet/radarViews";
 import { absoluteApiPath, apiRequest, ApiError } from "@/lib/api/apiClient";
 
+import { tr } from "@/i18n/translate";
 type Run = { view?: ExplorationView; error?: string; starting?: boolean };
 type Row = Record<string, string | number | null>;
 const COLOURS = [CHANNEL.hh.color, CHANNEL.hv.color, "#bb9bce", "#75c9af"];
@@ -30,7 +31,7 @@ const COLOURS = [CHANNEL.hh.color, CHANNEL.hv.color, "#bb9bce", "#75c9af"];
 export const PublishedFiles = ({ products }: { products: ScienceProducts }) =>
   products.assets.length > 0 && (
     <details className="x-inset x-radar__files">
-      <summary>Published artifacts and SHA-256 hashes</summary>
+      <summary>{tr("Published artifacts and SHA-256 hashes")}</summary>
       <ul>
         {products.assets.map((asset) => (
           <li key={asset.name}>
@@ -58,26 +59,35 @@ const RegionalCharts = ({ products }: { products: ScienceProducts }) => {
   return (
     <>
       <div className="x-radar__legend">
-        <strong>Regional sample</strong>
-        <span>Catalog-selected acquisitions and native chip for this job.</span>
-        <span>Acquisitions · {observations.dates?.join(" · ") || "Unavailable"}</span>
+        <strong>{tr("Regional sample")}</strong>
+        <span>{tr("Catalog-selected acquisitions and native chip for this job.")}</span>
+        <span>
+          {tr("Acquisitions · ")} {observations.dates?.join(" · ") || "Unavailable"}
+        </span>
         {observations.grid && <span>{gridDescription(observations.grid)}</span>}
         {observations.grid && (
-          <span>Native bounds W, S, E, N · {observations.grid.bounds_native.join(", ")} m</span>
+          <span>
+            {tr("Native bounds W, S, E, N · ")} {observations.grid.bounds_native.join(", ")} m
+          </span>
         )}
         {analysis.point && (
-          <span>Job center · {analysis.point.join(", ")}° (longitude, latitude)</span>
+          <span>
+            {tr("Job center · ")} {analysis.point.join(", ")}
+            {tr("° (longitude, latitude)")}
+          </span>
         )}
       </div>
       {regionalRows.length > 0 && (
         <details className="x-inset">
-          <summary>Regional means and spatial intervals</summary>
+          <summary>{tr("Regional means and spatial intervals")}</summary>
           <p className="x-muted x-small">
-            Intervals resample spatial blocks on common support. Observation noise is unestimated.
+            {tr(
+              "Intervals resample spatial blocks on common support. Observation noise is unestimated.",
+            )}
           </p>
           {observations.regional_aggregation && (
             <p className="x-small">
-              Common support ·{" "}
+              {tr("Common support ·")}{" "}
               {observations.regional_aggregation.supported_pixels.toLocaleString("en-US")} cells
             </p>
           )}
@@ -94,7 +104,7 @@ const RegionalCharts = ({ products }: { products: ScienceProducts }) => {
           />
         </details>
       )}
-      <h4>Temporal spectrum</h4>
+      <h4>{tr("Temporal spectrum")}</h4>
       {keys.length === 0 ? (
         <p className="x-muted">
           {capabilities.spectral?.reason?.replaceAll("_", " ") ??
@@ -102,7 +112,7 @@ const RegionalCharts = ({ products }: { products: ScienceProducts }) => {
         </p>
       ) : (
         <figure className="x-inset">
-          <figcaption>Candidate periods on measured dates</figcaption>
+          <figcaption>{tr("Candidate periods on measured dates")}</figcaption>
           <div className="x-radar__plot">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={sorted}>
@@ -139,16 +149,17 @@ const RegionalCharts = ({ products }: { products: ScienceProducts }) => {
             </ResponsiveContainer>
           </div>
           <p className="x-muted x-small">
-            Normalized fit power is dimensionless. The dashed line describes the acquisition
-            schedule. Candidate periods are tentative.
+            {tr(
+              "Normalized fit power is dimensionless. The dashed line describes the acquisition schedule. Candidate periods are tentative.",
+            )}
           </p>
         </figure>
       )}
-      <h4>Spatial image spectrum</h4>
+      <h4>{tr("Spatial image spectrum")}</h4>
       {!assets.has("spatial_spectrum.png") && (
-        <p className="x-muted">This job did not publish a 2D spatial-frequency figure.</p>
+        <p className="x-muted">{tr("This job did not publish a 2D spatial-frequency figure.")}</p>
       )}
-      <h4>Historical Gaussian-process fit</h4>
+      <h4>{tr("Historical Gaussian-process fit")}</h4>
       {!supportedGP && (
         <p className="x-muted">
           {capabilities.stochastic?.reason ?? "No supported historical fit was returned."}
@@ -156,10 +167,11 @@ const RegionalCharts = ({ products }: { products: ScienceProducts }) => {
       )}
       {supportedGP && (
         <details className="x-inset">
-          <summary>Fitted values and conditional bands</summary>
+          <summary>{tr("Fitted values and conditional bands")}</summary>
           <p className="x-muted x-small">
-            Conditional latent bands use the fitted model at observed dates. Coverage is
-            uncalibrated and sensor error is unestimated.
+            {tr(
+              "Conditional latent bands use the fitted model at observed dates. Coverage is uncalibrated and sensor error is unestimated.",
+            )}
           </p>
           <MeasurementTable
             rows={series.gp_historical_series ?? []}
@@ -199,7 +211,7 @@ const RegionalCharts = ({ products }: { products: ScienceProducts }) => {
         );
       })}
       <details className="x-inset">
-        <summary>Regional analysis limitations</summary>
+        <summary>{tr("Regional analysis limitations")}</summary>
         <ul>
           {analysis.limitations.map((line) => (
             <li key={line}>{line}</li>
@@ -212,7 +224,7 @@ const RegionalCharts = ({ products }: { products: ScienceProducts }) => {
 };
 
 const MeasurementTable = ({ rows, columns }: { rows: Row[]; columns: Record<string, string> }) => (
-  <div className="x-radar__table" role="region" aria-label="Measurement values">
+  <div className="x-radar__table" role="region" aria-label={tr("Measurement values")}>
     <table>
       <thead>
         <tr>
@@ -317,11 +329,12 @@ export const RegionalAnalysisPanel = ({ explorationId }: { explorationId: string
     }
   };
   return (
-    <section className="x-sheet__section x-radar__regional" aria-label="Regional analysis">
-      <h3 className="x-sheet__kicker">Regional analysis</h3>
+    <section className="x-sheet__section x-radar__regional" aria-label={tr("Regional analysis")}>
+      <h3 className="x-sheet__kicker">{tr("Regional analysis")}</h3>
       <p className="x-muted">
-        Read a separate radar history for regional averages, candidate periods and historical fits.
-        Archive reads can take several minutes.
+        {tr(
+          "Read a separate radar history for regional averages, candidate periods and historical fits. Archive reads can take several minutes.",
+        )}
       </p>
       {(run.starting || (active && !failed)) && (
         <p role="status" className="x-muted">
@@ -335,12 +348,12 @@ export const RegionalAnalysisPanel = ({ explorationId }: { explorationId: string
       {failed && <p role="alert">{failed}</p>}
       {status === "partial" && products != null && (
         <p role="status" className="x-muted">
-          Partial regional result.
+          {tr("Partial regional result.")}
         </p>
       )}
       {status === "noData" && (
         <p role="status" className="x-muted">
-          The regional sample had insufficient measured support.
+          {tr("The regional sample had insufficient measured support.")}
         </p>
       )}
       {!run.starting && (status === undefined || failed) && (

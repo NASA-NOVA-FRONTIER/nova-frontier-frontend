@@ -1,5 +1,6 @@
+import { localized } from "@/i18n/localized";
 // Hotspot copy verbatim from SPECS-content-pages-v8 §1 (and design reference nisar-satellite.js).
-export const SATELLITE_PARTS = [
+export const SATELLITE_PARTS = localized([
   {
     id: "reflector",
     title: "12 m reflector",
@@ -30,18 +31,18 @@ export const SATELLITE_PARTS = [
     title: "Solar array",
     body: "Keeps both radars and the recorder powered around the orbit.",
   },
-] as const;
+] as const);
 
 export type SatellitePartId = (typeof SATELLITE_PARTS)[number]["id"];
 
 // UI strings of the design reference nisar-satellite.js; the fallback alt describes the NASA/JPL
 // artist's concept photo.
-export const SATELLITE_COPY = {
+export const SATELLITE_COPY = localized({
   loading: "LOADING NISAR…",
   hint: "DRAG TO ROTATE",
   canvasLabel: "3D model of the NISAR satellite. Drag to rotate.",
   fallbackAlt:
     "Artist's concept of NISAR above Earth, its 12 m gold mesh reflector open on a long boom",
-} as const;
+} as const);
 
 export const SATELLITE_FALLBACK_IMAGE = "/landing/nisar-concept.jpg";

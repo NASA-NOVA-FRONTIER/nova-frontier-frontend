@@ -22,6 +22,7 @@ import { VERSION } from "@/pages/explorer/StartCard";
 import { LiveReport } from "@/pages/report/LiveReport";
 import { areaOf, reportSummary, SUMMARY_LABEL } from "@/pages/report/reportSummary";
 
+import { tr } from "@/i18n/translate";
 const REPORT_CHART_PX = 220;
 
 // /report?case=<id>: one printable A4 page per measured case (Report v7). DATA blocks come straight
@@ -48,7 +49,7 @@ export const ReportPage = () => {
           to={item === undefined ? "/explore" : `/explore?case=${item.id}`}
           className="r-button"
         >
-          Back to the explorer
+          {tr("Back to the explorer")}
         </Link>
         {item !== undefined && (
           <button
@@ -57,7 +58,7 @@ export const ReportPage = () => {
             onClick={() => window.print()}
             data-testid="report-print"
           >
-            Save as PDF
+            {tr("Save as PDF")}
           </button>
         )}
       </div>
@@ -68,11 +69,11 @@ export const ReportPage = () => {
 
 const NoCase = ({ id }: { id: string | null }) => (
   <article className="r-sheet" data-testid="report-empty">
-    <p className="r-kicker">NISAR Hazard Watch · Radar evidence report</p>
+    <p className="r-kicker">{tr("NISAR Hazard Watch · Radar evidence report")}</p>
     <h1 className="r-title">
       {id === null ? "Pick a case to report on" : `No measured case called “${id}”`}
     </h1>
-    <p>Reports cover the measured cases. Choose one:</p>
+    <p>{tr("Reports cover the measured cases. Choose one:")}</p>
     <ul className="r-cases">
       {CASES.filter((entry) => entry.coherenceOnly !== true).map((entry) => (
         <li key={entry.id}>
@@ -95,7 +96,7 @@ const Report = ({ item }: { item: Case }) => {
     <article className="r-sheet">
       <header className="r-head">
         <div className="r-head__main">
-          <p className="r-kicker">NISAR Hazard Watch · Radar evidence report</p>
+          <p className="r-kicker">{tr("NISAR Hazard Watch · Radar evidence report")}</p>
           <h1 className="r-title" data-testid="report-title">
             {item.name}, {item.place}
           </h1>
@@ -104,24 +105,24 @@ const Report = ({ item }: { item: Case }) => {
           </p>
         </div>
         <p className="r-meta">
-          Case {item.id}
+          {tr("Case ")} {item.id}
           <br />
           {lat.toFixed(3)}, {lon.toFixed(3)}
           <br />
-          Generated {generated}
+          {tr("Generated ")} {generated}
         </p>
       </header>
 
       <section className="r-summary" data-testid="report-summary">
         <p className="r-summary__head">
           <span>{SUMMARY_LABEL}</span>
-          <span>Not AI-written · check every number against the data blocks</span>
+          <span>{tr("Not AI-written · check every number against the data blocks")}</span>
         </p>
         <p className="r-summary__text">{reportSummary(item)}</p>
       </section>
 
       <section className="r-block">
-        <p className="r-kicker">Data 1 · The question and the verdict</p>
+        <p className="r-kicker">{tr("Data 1 · The question and the verdict")}</p>
         <dl className="r-facts">
           <Fact k="Question" v={lens?.chip ?? ""} />
           <Fact k="Target pass" v={item.target === undefined ? "—" : formatDay(item.target)} />
@@ -141,12 +142,14 @@ const Report = ({ item }: { item: Case }) => {
       </section>
 
       <section className="r-block r-keep">
-        <p className="r-kicker">Data 2 · The measurement at the point</p>
+        <p className="r-kicker">{tr("Data 2 · The measurement at the point")}</p>
         {item.landslide !== undefined ? (
           <LandslideTable evidence={item.landslide} />
         ) : bandPasses === undefined ? (
           <p className="r-empty">
-            No point time series for this lens yet. Nothing is drawn rather than a made-up line.
+            {tr(
+              "No point time series for this lens yet. Nothing is drawn rather than a made-up line.",
+            )}
           </p>
         ) : (
           <div className="r-dark">
@@ -158,7 +161,7 @@ const Report = ({ item }: { item: Case }) => {
       {group !== undefined && (
         <section className="r-block r-keep">
           <p className="r-kicker r-kicker--split">
-            <span>Data 3 · Inside versus nearby, whole area</span>
+            <span>{tr("Data 3 · Inside versus nearby, whole area")}</span>
             <ProvenanceChip kind="real" source={SOURCE.groups} />
           </p>
           <div className="r-dark">
@@ -173,7 +176,7 @@ const Report = ({ item }: { item: Case }) => {
       <section className="r-cols r-keep">
         <div className="r-block">
           <p className="r-kicker r-kicker--split">
-            <span>Data 4 · Evidence and quality</span>
+            <span>{tr("Data 4 · Evidence and quality")}</span>
             <ProvenanceChip
               kind={item.coherenceOnly === true ? "todo" : "real"}
               source={SOURCE.caseQuality}
@@ -190,7 +193,7 @@ const Report = ({ item }: { item: Case }) => {
           </dl>
         </div>
         <div className="r-block">
-          <p className="r-kicker">Data 5 · What this can't tell you</p>
+          <p className="r-kicker">{tr("Data 5 · What this can't tell you")}</p>
           <p>{item.plainLimit}</p>
           <p className="r-small">{item.techLimit}</p>
           <p className="r-mono">{EMPTIES_LINE}</p>
@@ -198,7 +201,7 @@ const Report = ({ item }: { item: Case }) => {
       </section>
 
       <section className="r-block r-keep">
-        <p className="r-kicker">Sources</p>
+        <p className="r-kicker">{tr("Sources")}</p>
         <ul className="r-sources">
           {item.sources.map((source) => (
             <li key={source.href}>
@@ -212,8 +215,10 @@ const Report = ({ item }: { item: Case }) => {
       </section>
 
       <footer className="r-foot">
-        <span>Nova Frontier · NASA Space Apps 2026 · Chía</span>
-        <span>{VERSION} · illustrative point series marked demo</span>
+        <span>{tr("Nova Frontier · NASA Space Apps 2026 · Chía")}</span>
+        <span>
+          {VERSION} {tr("· illustrative point series marked demo")}
+        </span>
       </footer>
     </article>
   );

@@ -18,17 +18,19 @@ import { LiveSciencePanel } from "@/features/sheet/LiveSciencePanel";
 import type { ExplorationView } from "@/features/explore/exploreSchemas";
 import { formatDay } from "@/features/timeline/timelineLayout";
 
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 const CHANGE_RAMP = "linear-gradient(90deg,#2f6db5,#f2f0eb,#c2473a)";
 const VIRIDIS = "linear-gradient(90deg,#440154,#3b528b,#21918c,#5ec962,#fde725)";
 
-const OPTICAL_LEGEND = [
+const OPTICAL_LEGEND = localized([
   { color: OPTICAL.newWater, label: "New open water" },
   { color: OPTICAL.stableWater, label: "Stable open water" },
   { color: OPTICAL.dry, label: "Stable non-water" },
   { color: OPTICAL.loss, label: "Open-water loss" },
   { color: OPTICAL.mixed, label: "Mixed or partial" },
   { color: OPTICAL.unsupported, label: "Unsupported" },
-];
+]);
 
 // The flood cases' four report crops; a case without an optical stage has none of these tiles.
 const reportCrops = (crops: Crops | undefined) =>
@@ -62,14 +64,14 @@ export const MoreInfoSheet = ({
   const verdictProv = subject.kind === "live" ? SOURCE.liveVerdict : SOURCE.caseVerdict;
   const crops = reportCrops(subject.crops);
   return (
-    <div className="x-sheet" role="dialog" aria-label="More information" data-testid="sheet">
+    <div className="x-sheet" role="dialog" aria-label={tr("More information")} data-testid="sheet">
       <header className="x-sheet__head">
         <div className="x-sheet__heading">
           <p className="x-kicker">
             {subject.name} · {lens?.chip} · {lat.toFixed(3)}, {lon.toFixed(3)}
           </p>
           <h2 className="x-sheet__title">
-            What the radar measured{" "}
+            {tr("What the radar measured")}{" "}
             {subject.kind === "case"
               ? `at ${subject.name}`
               : isArea
@@ -77,7 +79,7 @@ export const MoreInfoSheet = ({
                 : "at your point"}
           </h2>
         </div>
-        <div role="group" aria-label="Reading level" className="x-switch">
+        <div role="group" aria-label={tr("Reading level")} className="x-switch">
           {(["plain", "technical"] as const).map((value) => (
             <button
               key={value}
@@ -94,7 +96,7 @@ export const MoreInfoSheet = ({
           type="button"
           className="x-round x-round--big"
           onClick={onClose}
-          aria-label="Close (Esc)"
+          aria-label={tr("Close (Esc)")}
           data-testid="sheet-close"
         >
           <Icon name="close" size={16} />
@@ -107,7 +109,7 @@ export const MoreInfoSheet = ({
             <LiveSciencePanel key={exploration.id} view={exploration} subject={subject} />
           )}
           <section className="x-sheet__section">
-            <p className="x-sheet__kicker">01 · The question</p>
+            <p className="x-sheet__kicker">{tr("01 · The question")}</p>
             <div className="x-cards">
               <Fact
                 k="Where"
@@ -132,7 +134,7 @@ export const MoreInfoSheet = ({
           </section>
 
           <section className="x-sheet__section">
-            <p className="x-sheet__kicker">02 · The measurement</p>
+            <p className="x-sheet__kicker">{tr("02 · The measurement")}</p>
             {subject.figure !== undefined && (
               <figure className="x-figure">
                 <img
@@ -141,7 +143,7 @@ export const MoreInfoSheet = ({
                   loading="lazy"
                 />
                 <figcaption>
-                  Real figure · nova-frontier-model report{" "}
+                  {tr("Real figure · nova-frontier-model report")}{" "}
                   <Prov kind="real" source={SOURCE.figure} />
                 </figcaption>
               </figure>
@@ -174,19 +176,19 @@ export const MoreInfoSheet = ({
                 <div className="x-tiles">
                   <Tile
                     src={crops.base}
-                    title="Before · HH"
+                    title={tr("Before · HH")}
                     ramp={VIRIDIS}
                     scale={["−30 dB", "0 dB"]}
                     text="Median of the baseline passes."
                   />
                   <Tile
                     src={crops.signature}
-                    title="Signature"
+                    title={tr("Signature")}
                     text="Cells meeting the declared darkening rule, both channels."
                   />
                   <Tile
                     src={crops.change}
-                    title="Change · HH"
+                    title={tr("Change · HH")}
                     ramp={CHANGE_RAMP}
                     scale={["−8", "+8 dB"]}
                     text="Blue darker, red brighter, grey no data."
@@ -194,17 +196,17 @@ export const MoreInfoSheet = ({
                 </div>
                 <div className="x-compare x-inset">
                   <CompareSplit
-                    left={{ src: crops.change, label: "Radar change" }}
-                    right={{ src: crops.optical, label: "Optical classes" }}
+                    left={{ src: crops.change, label: tr("Radar change") }}
+                    right={{ src: crops.optical, label: tr("Optical classes") }}
                   />
                   <div className="x-compare__text">
                     <p className="x-compare__title">
-                      Drag to compare the radar with the optical map
+                      {tr("Drag to compare the radar with the optical map")}
                     </p>
                     <p>
-                      Left of the handle: the radar change in HH. Right: OPERA's optical classes for
-                      the same square. Where the optical map shows new water, look for blue (darker)
-                      radar change, and for blue change where there was no new water.
+                      {tr(
+                        "Left of the handle: the radar change in HH. Right: OPERA's optical classes for the same square. Where the optical map shows new water, look for blue (darker) radar change, and for blue change where there was no new water.",
+                      )}
                     </p>
                     <ul className="x-swatches">
                       {OPTICAL_LEGEND.map((item) => (
@@ -255,7 +257,7 @@ export const MoreInfoSheet = ({
           )}
 
           <section className="x-sheet__section">
-            <p className="x-sheet__kicker">04 · The second witness</p>
+            <p className="x-sheet__kicker">{tr("04 · The second witness")}</p>
             {subject.fireContext !== undefined && <FireContextCard context={subject.fireContext} />}
             {subject.witness === undefined && subject.fireContext === undefined ? (
               <p className="x-muted">
@@ -289,8 +291,9 @@ export const MoreInfoSheet = ({
                   </div>
                 ))}
                 <p className="x-muted x-small">
-                  Shares of cells in each group. Neighbouring cells are not independent, so these
-                  describe the scene, not accuracy.
+                  {tr(
+                    "Shares of cells in each group. Neighbouring cells are not independent, so these describe the scene, not accuracy.",
+                  )}
                 </p>
                 {subject.matched !== undefined && (
                   <div className="x-group x-group--rule">
@@ -306,7 +309,7 @@ export const MoreInfoSheet = ({
           </section>
 
           <section className="x-sheet__section">
-            <p className="x-sheet__kicker">05 · What this can't tell you</p>
+            <p className="x-sheet__kicker">{tr("05 · What this can't tell you")}</p>
             <div className="x-limits">
               <div className="x-limits__col">
                 <p className="x-limits__head">{subject.plainLimit}</p>
@@ -317,7 +320,9 @@ export const MoreInfoSheet = ({
                 )}
                 {subject.alternatives.length > 0 && (
                   <>
-                    <p className="x-muted x-small">Other things that change radar like this:</p>
+                    <p className="x-muted x-small">
+                      {tr("Other things that change radar like this:")}
+                    </p>
                     <ul className="x-tags">
                       {subject.alternatives.map((item) => (
                         <li key={item}>{item}</li>
@@ -339,7 +344,7 @@ export const MoreInfoSheet = ({
           {subject.compute !== undefined && subject.compute.length > 0 && (
             <div className="x-card">
               <p className="x-kicker x-kicker--split">
-                <span>How this was computed</span>
+                <span>{tr("How this was computed")}</span>
                 <Prov kind="real" source={SOURCE.liveQuality} />
               </p>
               <ol className="x-steps x-steps--done" data-testid="sheet-compute">
@@ -362,7 +367,7 @@ export const MoreInfoSheet = ({
             subject.compute === undefined && (
               <div className="x-card">
                 <p className="x-kicker x-kicker--split">
-                  <span>How this was computed</span>
+                  <span>{tr("How this was computed")}</span>
                   <Prov kind="real" source={SOURCE.steps} />
                 </p>
                 <ol className="x-steps x-steps--done">
@@ -392,7 +397,7 @@ export const MoreInfoSheet = ({
             )}
           <div className="x-card">
             <p className="x-kicker x-kicker--split">
-              <span>Evidence and quality</span>
+              <span>{tr("Evidence and quality")}</span>
               <Prov
                 kind={subject.demo ? "demo" : "real"}
                 source={subject.kind === "live" ? SOURCE.liveQuality : SOURCE.caseQuality}
@@ -409,7 +414,7 @@ export const MoreInfoSheet = ({
             </dl>
           </div>
           <div className="x-card">
-            <p className="x-kicker">Sources</p>
+            <p className="x-kicker">{tr("Sources")}</p>
             <ul className="x-sources">
               {subject.sources.map((source) => (
                 <li key={source.href}>
@@ -423,7 +428,7 @@ export const MoreInfoSheet = ({
           {onAskNova !== undefined && (
             <button type="button" className="x-ask-nova" onClick={onAskNova} data-testid="ask-nova">
               <NovaGlyph size={32} />
-              Ask Nova about this result
+              {tr("Ask Nova about this result")}
             </button>
           )}
         </aside>

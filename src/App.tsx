@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 
+import { useLanguage } from "@/i18n";
 import { usePathname } from "@/lib/navigation";
 
 // Pages load on demand: the landing page must not pull in Cesium (the explorer) or vice versa.
@@ -51,6 +52,8 @@ const CurrentPage = ({ pathname }: { pathname: string }) => {
 
 export const App = () => {
   const pathname = usePathname();
+  // Subscribing here re-renders every page (none is memoized) when the language changes.
+  useLanguage();
   return (
     <Suspense fallback={<div className="h-dvh bg-[#04070e]" aria-busy="true" />}>
       <CurrentPage pathname={pathname} />
