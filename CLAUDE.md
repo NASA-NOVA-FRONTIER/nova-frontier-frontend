@@ -103,7 +103,7 @@ always sends the centre as a GeoJSON `Point`, and the backend builds the exact U
 for ground motion; real-date ticks, gap labels, the event line only with a sourced date, readout and
 globe stamp), `sequencePlayer.ts` (pure reducer: play/pause, prev/next, seek, speed, loop, pause) and
 `usePassPlayer.ts` (timer at 1.6 s ÷ speed, pause on a hidden tab, prefetch of the next image).
-Reduced motion opens paused on the result's pass. Each live pass drapes its own
+Reduced motion opens paused on the reference pass (COPY-flow-v9 §6). Each live pass drapes its own
 `display_<date>_<pol>` image; a pass without one shows nothing. A case with no image per pass (all of
 them today) can't play.
 

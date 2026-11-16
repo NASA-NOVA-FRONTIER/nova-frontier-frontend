@@ -253,6 +253,11 @@ export class GlobePage {
     return this.timeline.locator(`[data-testid^="timeline-pass-"][data-kind="${kind}"]`);
   }
 
+  // One measured pass on the track, by its order in the run (0 = the reference pass).
+  timelinePass(index: number): Locator {
+    return this.page.getByTestId(`timeline-pass-${index}`);
+  }
+
   timelinePair(index: number): Locator {
     return this.page.getByTestId(`timeline-pair-${index}`);
   }

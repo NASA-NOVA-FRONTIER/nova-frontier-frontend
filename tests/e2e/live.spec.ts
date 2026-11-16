@@ -997,20 +997,19 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
   }) => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(globe.timelineReadout).toHaveText("Pass 3 of 5 · 12 Sep 2026");
-    // The globe drapes the selected pass's own HH image.
-    await globe.expectScene((scene) =>
-      expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-09-12_HH"),
-    );
-    await expect(globe.timelineCompare).toHaveCount(0);
-    await expect(globe.timeline).toContainText("BASELINE · 4 PASSES");
-    const first = globe.timelinePasses("base").first();
-    await first.click();
+    // Reduced motion opens paused on the reference pass (COPY-flow-v9 §6), with its own HH image.
     await expect(globe.timelineReadout).toHaveText("Pass 1 of 5 · 14 Jul 2026");
     await globe.expectScene((scene) =>
       expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-07-14_HH"),
     );
-    await page.keyboard.press("ArrowRight");
+    await expect(globe.timelineCompare).toHaveCount(0);
+    await expect(globe.timeline).toContainText("BASELINE · 4 PASSES");
+    await globe.timelinePasses("base").nth(2).click();
+    await expect(globe.timelineReadout).toHaveText("Pass 3 of 5 · 12 Sep 2026");
+    await globe.expectScene((scene) =>
+      expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-09-12_HH"),
+    );
+    await page.keyboard.press("ArrowLeft");
     await expect(globe.timelineReadout).toHaveText("Pass 2 of 5 · 19 Aug 2026");
     await globe.timelinePasses("target").click();
     await expect(globe.timelineReadout).toHaveText("Pass 5 of 5 · 11 Nov 2026");
@@ -1020,7 +1019,11 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
     page,
   }) => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
+    await expect(page.getByTestId("raw-kicker")).toHaveText(
+      "RAW RADAR · 14 JUL 2026 · PASS 1 OF 5",
+    );
 
+    await globe.timelinePass(2).click();
     await expect(page.getByTestId("raw-kicker")).toHaveText(
       "RAW RADAR · 12 SEP 2026 · PASS 3 OF 5",
     );

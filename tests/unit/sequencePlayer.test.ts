@@ -25,9 +25,9 @@ describe("sequence player", () => {
       speed: 1,
       loop: true,
     });
-    // Reduced motion opens paused on the pass the result is about (Cristian, T7).
+    // Reduced motion opens paused on the reference pass (COPY-flow-v9 §6).
     expect(initPlayer({ n: 5, index: 3, canPlay: true, reducedMotion: true })).toMatchObject({
-      index: 3,
+      index: 0,
       playing: false,
     });
   });

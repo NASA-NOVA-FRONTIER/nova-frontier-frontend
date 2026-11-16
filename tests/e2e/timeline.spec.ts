@@ -109,12 +109,12 @@ test.describe("Sequence timeline: controls", () => {
     await globe.mockObservationPlan();
   });
 
-  test("under reduced motion it opens paused on the pass the result is about", async () => {
+  test("under reduced motion it opens paused on the reference pass", async () => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
     await globe.expectTimelinePlaying(false);
-    await expect(globe.timelineReadout).toHaveText("Pass 3 of 5 · 12 Sep 2026");
+    await expect(globe.timelineReadout).toHaveText("Pass 1 of 5 · 14 Jul 2026");
     await expect(globe.timelineSub).toHaveText(
       "5 MEASURED PASSES · 14 JUL 2026 → 11 NOV 2026 · TRACK 84 ASCENDING",
     );
@@ -125,6 +125,9 @@ test.describe("Sequence timeline: controls", () => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
+    await expect(globe.stamp).toHaveText("14 JUL 2026PASS 1 OF 5 · REFERENCE");
+    await globe.timelinePass(2).click();
+    await expect(globe.timelineReadout).toHaveText("Pass 3 of 5 · 12 Sep 2026");
     await expect(globe.stamp).toHaveText("12 SEP 2026PASS 3 OF 5 · 24 DAYS AFTER PASS 2");
     await globe.timelineStepNext.click();
     await expect(globe.timelineReadout).toHaveText("Pass 4 of 5 · 18 Oct 2026");
