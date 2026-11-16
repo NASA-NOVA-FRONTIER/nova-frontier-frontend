@@ -92,8 +92,10 @@ largest gap, 3 or fewer or none disable Start with the reason in the sticky foot
 draws the newest pair's series (its 5 most recent passes, an arc per real pair, tap or arrow keys to
 choose) and offers every series plus the coherence threshold (0.1–0.9, default 0.35) under
 Advanced; the globe then draws the 5 × 5 km window it measures (`square.innerKm`,
-`INSAR_WINDOW_KM`). The footer says ONLINE or OFFLINE (`coverage.precomputedCase`) and "Computed
-live · we stop at 8 min" with no number. Nothing is POSTed until Start; Start sends the lens (plus
+`INSAR_WINDOW_KM`). The footer says ONLINE or OFFLINE (`coverage.precomputedCase`, or a cache
+hit for the image lenses) and the wait (`confirmWait`): for the image lenses the backend's own
+estimate from `/coverage` ("Usually under 4 min", its p80), else "Computed live · we stop at 8 min"
+with no number; Earthquake never gets a number. Nothing is POSTed until Start; Start sends the lens (plus
 `pairId` and `coherenceThreshold` for Earthquake) and never a date. Move unlocks the square, Cancel
 goes back to the cases. On phones it is the bottom sheet at 62 %, never expanded; its body scrolls.
 Pure rules: `confirmView.ts`. The full pass total and the date range (Change) wait for backend #18.
