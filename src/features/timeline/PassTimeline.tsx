@@ -251,7 +251,11 @@ export const PassTimeline = ({
           </button>
         </div>
         {/* Announced when the user moves it, not every step while it plays. */}
-        <div className="x-tl__readout" aria-live={player.playing ? "off" : "polite"}>
+        <div
+          className="x-tl__readout"
+          aria-live={player.playing ? "off" : "polite"}
+          data-testid="timeline-announcer"
+        >
           <span className="x-tl__line" data-testid="timeline-readout">
             {readout.line}
           </span>

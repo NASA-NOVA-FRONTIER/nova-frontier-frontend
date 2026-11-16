@@ -72,6 +72,8 @@ export class GlobePage {
   readonly timeline: Locator;
   readonly timelineCompare: Locator;
   readonly timelineReadout: Locator;
+  // The readout block that carries aria-live (quiet while playing).
+  readonly timelineAnnouncer: Locator;
   readonly timelineSub: Locator;
   readonly timelinePlay: Locator;
   readonly timelinePrev: Locator;
@@ -133,6 +135,7 @@ export class GlobePage {
     this.timeline = page.getByTestId("timeline");
     this.timelineCompare = page.getByTestId("timeline-compare");
     this.timelineReadout = page.getByTestId("timeline-readout");
+    this.timelineAnnouncer = page.getByTestId("timeline-announcer");
     this.timelineSub = page.getByTestId("timeline-sub");
     this.timelinePlay = page.getByTestId("timeline-play");
     this.timelinePrev = page.getByTestId("timeline-prev");
