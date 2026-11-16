@@ -1,13 +1,12 @@
-import type { DrawEvent, Pointer } from "@/features/geo/drawMachine";
-
 // What the E2E stub globe (GlobeView.stub.tsx) hands to tests in place of a Cesium canvas.
 // Each hook calls the same GlobeView callback a real click, hover or drag would.
 export type GlobeHooks = {
-  // `px` is where on screen the click would be; the draw machine compares corners in pixels.
-  click: (lon: number, lat: number, px?: Pointer["px"]) => void;
+  // A click on the globe: places the square there.
+  click: (lon: number, lat: number) => void;
+  // A drag of the placed square released with its centre here; nothing when it can't move.
+  dragSquare: (lon: number, lat: number) => void;
   hover: (lon: number, lat: number) => void;
   leave: () => void;
-  draw: (events: DrawEvent[]) => void;
   openCase: (id: string) => void;
 };
 

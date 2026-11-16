@@ -283,8 +283,9 @@ test.describe("Explorer: live questions", () => {
       await expect(globe.tooltip).toContainText("click to ask the radar");
 
       const before = await globe.panelTitle.textContent();
+      // The click places the square; "Use this square" checks the catalog; nothing runs until Analyze.
       await globe.clickLand();
-      // Step 2: the click only checks the catalog; nothing runs until Analyze.
+      await globe.useSquare.click();
       await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
       await expect(globe.panel).toBeHidden();
       await globe.placeAnalyse.click();
@@ -349,6 +350,7 @@ test.describe("Explorer: pick a spot (step 2)", () => {
     await globe.goto();
     await globe.searchInput.fill("32.30, 73.50");
     await globe.searchInput.press("Enter");
+    await globe.useSquare.click();
 
     await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
     await expect(globe.placeCard).toContainText("NEW SPOT · LIVE ANALYSIS");
@@ -373,9 +375,12 @@ test.describe("Explorer: pick a spot (step 2)", () => {
     "an ocean click shows No NISAR data here and the nearest known case",
     { tag: "@globe" },
     async ({ page }) => {
+      // Every click now flies the camera to its square, and close-up tiles render slowly in software WebGL.
+      test.slow();
       await globe.mockCoverage({ mock: "coverage-open-ocean" });
       await globe.goto();
       await globe.clickOcean();
+      await globe.useSquare.click();
 
       await expect(globe.placeCard).toHaveAttribute("data-state", "noCoverage");
       await expect(globe.placeCard).toContainText("CLICKED POINT · NO COVERAGE");
@@ -391,6 +396,7 @@ test.describe("Explorer: pick a spot (step 2)", () => {
       await expect(globe.startCard).toBeVisible();
 
       await globe.clickOcean();
+      await globe.useSquare.click();
       await globe.spotNearest.click();
       await expect(globe.panel).toBeVisible();
       await expect(globe.placeCard).toBeHidden();
@@ -402,6 +408,7 @@ test.describe("Explorer: pick a spot (step 2)", () => {
     await globe.goto();
     await globe.searchInput.fill("32.30, 73.50");
     await globe.searchInput.press("Enter");
+    await globe.useSquare.click();
 
     await expect(page.getByTestId("spot-error")).toContainText(
       "We couldn't reach the radar archive",

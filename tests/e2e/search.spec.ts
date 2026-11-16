@@ -57,6 +57,7 @@ test.describe("Explorer: place search", () => {
     await globe.searchInput.press("Enter");
 
     await expect(globe.searchMenu).toBeHidden();
+    await globe.useSquare.click();
     await expect(globe.placeCard).toContainText("Qadirabad");
     await expect(page.getByTestId("spot-area")).toContainText("10.24 km square");
     await expect(globe.startCard).toBeHidden();
@@ -78,6 +79,7 @@ test.describe("Explorer: place search", () => {
     await globe.searchInput.fill("South Atlantic");
     await globe.searchInput.press("Enter");
     await globe.placeOption(0).click();
+    await globe.useSquare.click();
 
     await expect(globe.placeCard).toHaveAttribute("data-state", "noCoverage");
     await expect(page.getByTestId("place-title")).toHaveText("No NISAR data here");
@@ -89,6 +91,7 @@ test.describe("Explorer: place search", () => {
     await globe.goto();
     await globe.searchInput.fill("-30, -10");
     await globe.searchInput.press("Enter");
+    await globe.useSquare.click();
 
     await expect(globe.placeAnalyse).toBeEnabled();
     const submitted = page.waitForRequest(
@@ -151,6 +154,7 @@ test.describe("Explorer: place search", () => {
     await globe.searchInput.click();
     await globe.searchInput.press("Enter");
     await globe.placeOption(0).click();
+    await globe.useSquare.click();
     await expect(globe.placeCard).toBeVisible();
     await page.getByTestId("place-close").click();
     await expect(globe.placeCard).toBeHidden();
@@ -162,6 +166,7 @@ test.describe("Explorer: place search", () => {
     await globe.goto();
     await globe.searchInput.fill("32.30, 73.50");
     await globe.searchInput.press("Enter");
+    await globe.useSquare.click();
 
     await expect(globe.placeCard).toContainText("32.30° N, 73.50° E");
     await expect(globe.placeAnalyse).toBeEnabled();

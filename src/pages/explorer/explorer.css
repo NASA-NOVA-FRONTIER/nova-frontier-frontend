@@ -221,56 +221,6 @@
   border-color: var(--gold);
 }
 
-/* Area tools: point, rectangle and polygon, in the top bar */
-.x-tools {
-  height: 40px;
-  box-sizing: border-box;
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 4px;
-  border-radius: 999px;
-  background: rgba(8, 16, 31, 0.8);
-  border: 1px solid rgba(235, 233, 228, 0.1);
-  backdrop-filter: blur(16px);
-}
-
-.x-tools__button {
-  width: 32px;
-  height: 32px;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--muted);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition:
-    background 200ms,
-    color 200ms;
-}
-
-.x-tools__button:hover:not(:disabled) {
-  color: var(--ink);
-  background: rgba(235, 233, 228, 0.08);
-}
-
-.x-tools__button[aria-pressed="true"] {
-  background: var(--ink);
-  color: var(--space);
-}
-
-.x-tools__button:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-.x-tools__button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
 /* Place search: the top bar's 340 px pill and its result list (#24), the start card button and the
    searched-place card */
 .x-top__search {
@@ -1078,80 +1028,154 @@
   opacity: 0.45;
 }
 
-/* Size guide: what to do next while drawing, and why an area can't be asked */
-.x-guide {
+/* The placed square (SPECS-flow-v9 §1.2): DOM over the canvas, its corners set every frame. The
+   SVG lets clicks through; only the square itself takes the pointer, so a drag never spins the globe. */
+.x-square {
   position: absolute;
-  top: 64px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.x-square__shape {
+  fill: rgba(235, 233, 228, 0.06);
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-dasharray: 8 6;
+  paint-order: stroke;
+  filter: drop-shadow(0 0 1px #04070e);
+  pointer-events: all;
+  touch-action: none;
+  cursor: default;
+}
+
+.x-square[data-movable="true"] .x-square__shape {
+  cursor: grab;
+}
+
+.x-square[data-dragging="true"] .x-square__shape {
+  cursor: grabbing;
+}
+
+.x-square__shape:focus {
+  outline: none;
+}
+
+/* Keyboard focus reads by width too, not only by colour. */
+.x-square__shape:focus-visible {
+  stroke: var(--gold);
+  stroke-width: 3;
+}
+
+/* Once used, the square only shows: clicks, drags and pinches inside it reach the globe. */
+.x-square[data-movable="false"] .x-square__shape {
+  stroke: var(--gold);
+  stroke-dasharray: none;
+  pointer-events: none;
+  touch-action: auto;
+}
+
+.x-square__handle {
+  fill: var(--ink);
+  pointer-events: none;
+}
+
+.x-square__label,
+.x-square__hint {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  margin: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.x-square__label {
+  margin-top: 10px;
+  text-shadow: 0 1px 4px #04070e;
+}
+
+.x-square__hint {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(4, 7, 14, 0.72);
+}
+
+/* Step 2 bar: centred on the free globe on desktop, a bottom sheet on phones. */
+.x-square-bar {
+  position: absolute;
   left: calc(50% + (var(--x-panel-w) + 2 * var(--inset)) / 2);
+  bottom: 24px;
   transform: translateX(-50%);
-  z-index: 12;
-  width: min(440px, calc(100vw - 32px));
+  z-index: 15;
+  width: max-content;
+  max-width: calc(100vw - 32px);
   box-sizing: border-box;
-  padding: 12px 16px;
-  border-radius: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 12px 20px;
+  border-radius: 999px;
+  background: rgba(8, 16, 31, 0.92);
+  border: 1px solid rgba(235, 233, 228, 0.12);
+  backdrop-filter: blur(16px);
+}
+
+.x-square-bar__text {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
+  flex: 1;
+  min-width: 180px;
 }
 
-.x-guide[data-level="large"] {
-  border-color: var(--gold);
-}
-
-.x-guide[data-level="tooLarge"] {
-  border-color: #f87171;
-}
-
-.x-guide__title {
+.x-square-bar__title {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--ink);
 }
 
-.x-guide__size {
+.x-square-bar__meta {
   margin: 0;
   font-family: var(--mono);
   font-size: 11px;
-  text-transform: uppercase;
   color: var(--muted);
 }
 
-.x-guide__text {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--ink-3);
-}
-
-.x-guide__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.x-guide__actions button {
-  height: 30px;
-  padding: 0 14px;
+.x-square-bar button {
+  height: 44px;
+  padding: 0 20px;
   border-radius: 999px;
-  border: 1px solid var(--gold);
-  background: var(--gold);
-  color: var(--gold-ink);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 14px;
   cursor: pointer;
 }
 
-.x-guide__actions button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.x-square-bar__quiet {
+  border: 1px solid rgba(235, 233, 228, 0.2);
+  background: transparent;
+  color: var(--ink);
 }
 
-.x-guide__actions .x-guide__quiet {
-  background: transparent;
-  border-color: var(--line);
-  color: var(--ink);
+.x-square-bar__use {
+  border: 0;
+  background: var(--gold);
+  color: var(--gold-ink);
+  font-weight: 500;
+}
+
+.x-square-bar button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .x-help {
@@ -3386,21 +3410,23 @@
 
 /* Phones: the panel sits over the lower half, the sheet is a full page (SPECS §4 next round). */
 @media (max-width: 760px) {
-  /* No room for the tools in the top bar: they stack under it, on the free left edge. */
-  .x-tools {
-    position: absolute;
-    top: 48px;
+  .x-square-bar {
     left: 0;
-    height: auto;
-    flex-direction: column;
-    border-radius: 20px;
+    right: 0;
+    bottom: 0;
+    transform: none;
+    width: auto;
+    max-width: none;
+    border-radius: 24px 24px 0 0;
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
   }
 
-  .x-guide {
-    top: 64px;
-    left: 64px;
-    transform: none;
-    width: calc(100vw - 80px);
+  .x-square-bar__text {
+    flex-basis: 100%;
+  }
+
+  .x-square-bar button {
+    flex: 1;
   }
 
   .x-pill--mark {
@@ -3637,11 +3663,6 @@
     white-space: nowrap;
   }
 
-  /* The tools hang under the top bar, and under the mobile bar when it shows. */
-  .explorer:has(.x-mobilebar) .x-tools {
-    top: 92px;
-  }
-
   /* The sheet: one geometry for the spot card, the waiting panel and the result panel. */
   .explorer:not([data-sheet="none"]) :is(.x-place, .x-panel, .x-jobmodal) {
     left: var(--x-sheet-edge);
@@ -3701,8 +3722,8 @@
     bottom: calc(var(--x-sheet-h) + 2 * var(--x-sheet-edge));
   }
 
-  /* Expanded, the sheet takes the room of the tools, the timeline and Nova; shrinking gives it back. */
-  .explorer[data-sheet-expanded="true"] :is(.x-tools, .x-timeline-wrap, .x-nova-bubble) {
+  /* Expanded, the sheet takes the room of the timeline and Nova; shrinking gives it back. */
+  .explorer[data-sheet-expanded="true"] :is(.x-timeline-wrap, .x-nova-bubble) {
     display: none;
   }
 

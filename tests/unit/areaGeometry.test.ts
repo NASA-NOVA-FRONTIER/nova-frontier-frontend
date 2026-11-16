@@ -3,9 +3,8 @@ import { describe, expect, it } from "vitest";
 import type { LonLat } from "@/features/frames/frame.types";
 import { splitAntimeridian } from "@/features/geo/antimeridian";
 import { boundsOf, continueLon, normalizeLon, unwrapRing, wrapBox } from "@/features/geo/longitude";
-import { areaKm2Of, centreOf, ringAreaKm2 } from "@/features/geo/measure";
+import { centreOf } from "@/features/geo/measure";
 import { squareAround, squareBounds } from "@/features/geo/square";
-import { formatKm2, levelOf } from "@/features/geo/limits";
 
 const QADIRABAD: LonLat = [73.713, 32.329];
 
@@ -107,46 +106,9 @@ describe("splitAntimeridian", () => {
     expect(parts).toHaveLength(2);
     expect(boundsOf(parts[0] as LonLat[])[0]).toBeCloseTo(-180, 9);
   });
-
-  it("keeps the area of both parts equal to the area of the whole", () => {
-    const whole = [
-      [179.9, 10],
-      [180.1, 10],
-      [180.1, 11],
-      [179.9, 11],
-    ] satisfies LonLat[];
-    const parts = splitAntimeridian(whole);
-    const total = parts.reduce((sum, part) => sum + ringAreaKm2(part), 0);
-    expect(total).toBeCloseTo(ringAreaKm2(whole), 3);
-  });
 });
 
 describe("area measures", () => {
-  it("measures a one-degree square at the equator close to 12,364 km²", () => {
-    const area = ringAreaKm2([
-      [0, 0],
-      [1, 0],
-      [1, 1],
-      [0, 1],
-    ]);
-    expect(area).toBeGreaterThan(12_300);
-    expect(area).toBeLessThan(12_450);
-  });
-
-  it("measures the same ring the same whichever way round it runs", () => {
-    const ring: LonLat[] = [
-      [0, 0],
-      [1, 0],
-      [1, 1],
-      [0, 1],
-    ];
-    expect(ringAreaKm2([...ring].reverse())).toBeCloseTo(ringAreaKm2(ring), 6);
-  });
-
-  it("measures a point as the 10.24 km contract square", () => {
-    expect(areaKm2Of({ kind: "point", point: QADIRABAD })).toBeCloseTo(10.24 * 10.24, 0);
-  });
-
   it("puts a drawn area's centre inside ±180° even when it was drawn across the antimeridian", () => {
     const [lon] = centreOf({
       kind: "rectangle",
@@ -190,22 +152,5 @@ describe("squareBounds", () => {
       [east, north],
       [west, north],
     ]);
-  });
-});
-
-describe("size levels", () => {
-  it.each([
-    [100, "ideal"],
-    [110, "ideal"],
-    [110.5, "large"],
-    [400, "large"],
-    [400.5, "tooLarge"],
-  ])("calls %f km² %s", (km2, level) => {
-    expect(levelOf(km2)).toBe(level);
-  });
-
-  it("formats small and large areas", () => {
-    expect(formatKm2(4.26)).toBe("4.3 km²");
-    expect(formatKm2(1234.4)).toBe("1,234 km²");
   });
 });

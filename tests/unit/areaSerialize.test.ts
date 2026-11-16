@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { LonLat } from "@/features/frames/frame.types";
-import { areaFromParams, areaToParams, pointToParams } from "@/features/geo/areaLink";
+import { pointFromParams, pointToParams, squareFromParams } from "@/features/geo/areaLink";
 import type { Area, AreaGeometry } from "@/features/geo/geo.types";
 import { MAX_VERTICES } from "@/features/geo/limits";
 import { parseWkt, toBbox, toGeoJson, toWkt } from "@/features/geo/serialize";
@@ -114,53 +114,40 @@ describe("toBbox", () => {
 });
 
 describe("shared links", () => {
-  const roundTrip = (area: Area): Area | undefined => {
-    const params = areaToParams(area);
-    return params && areaFromParams(new URLSearchParams(params));
-  };
+  const square = (query: string): LonLat | undefined =>
+    squareFromParams(new URLSearchParams(query));
 
   it("keeps the requested point even when a frame link is present", () => {
     const params = new URLSearchParams({ frame: "84-18", ...pointToParams([1.23456, 2.34567]) });
-    expect(areaFromParams(params)).toEqual({ kind: "point", point: [1.23456, 2.34567] });
-    expect(areaFromParams(new URLSearchParams("point=,2"))).toBeUndefined();
+    expect(pointFromParams(params)).toEqual([1.23456, 2.34567]);
+    expect(pointFromParams(new URLSearchParams("point=,2"))).toBeUndefined();
   });
 
-  it("writes a rectangle as ?bbox= and reads it back", () => {
-    const rectangle: Area = {
-      kind: "rectangle",
-      ring: [
-        [73.7, 32.3],
-        [73.75, 32.3],
-        [73.75, 32.34],
-        [73.7, 32.34],
-      ],
-    };
-    expect(areaToParams(rectangle)).toEqual({ bbox: "73.7,32.3,73.75,32.34" });
-    expect(roundTrip(rectangle)).toEqual(rectangle);
+  it("places the square at the centre of an old ?bbox= link", () => {
+    const centre = square("bbox=73.7,32.3,73.75,32.34");
+    expect(centre?.[0]).toBeCloseTo(73.725, 9);
+    expect(centre?.[1]).toBeCloseTo(32.32, 9);
   });
 
-  it("reads a rectangle across ±180° back as the same continuous ring", () => {
-    expect(areaToParams(ACROSS_180)).toEqual({ bbox: "179.9,10,-179.9,11" });
-    expect(roundTrip(ACROSS_180)).toEqual(ACROSS_180);
+  it("finds the centre of a ?bbox= across ±180° on the antimeridian, not on the far side", () => {
+    const centre = square("bbox=179.9,10,-179.9,11");
+    expect(Math.abs(centre?.[0] ?? 0)).toBeCloseTo(180, 9);
+    expect(centre?.[1]).toBeCloseTo(10.5, 9);
   });
 
-  it("writes a polygon as ?geo= and reads it back", () => {
-    expect(areaToParams(SMALL_POLYGON)).toEqual({
-      geo: "73.7,32.3_73.75,32.3_73.75,32.34_73.7,32.34",
-    });
-    expect(roundTrip(SMALL_POLYGON)).toEqual(SMALL_POLYGON);
+  it("falls back to the centre of the corners for an old ?geo= link", () => {
+    const centre = square("geo=73.7,32.3_73.75,32.3_73.75,32.34_73.7,32.34");
+    expect(centre?.[0]).toBeCloseTo(73.725, 9);
+    expect(centre?.[1]).toBeCloseTo(32.32, 9);
   });
 
-  it("reads a polygon across ±180° back with continuous longitudes", () => {
-    const polygon: Area = {
-      kind: "polygon",
-      ring: [
-        [179.9, 10],
-        [180.1, 10],
-        [180.05, 11],
-      ],
-    };
-    expect(roundTrip(polygon)).toEqual(polygon);
+  it("keeps a ?geo= across ±180° next to the antimeridian", () => {
+    const centre = square("geo=179.9,10_-179.9,10_-179.95,11");
+    expect(centre?.[0]).toBeCloseTo(-179.983333, 5);
+  });
+
+  it("reads ?bbox= before ?geo=", () => {
+    expect(square("bbox=0,0,2,2&geo=10,10_11,10_11,11")).toEqual([1, 1]);
   });
 
   it.each([
@@ -176,10 +163,11 @@ describe("shared links", () => {
     ["geo", "1,95_3,4_5,6"],
     ["geo", Array.from({ length: MAX_VERTICES + 1 }, (_, i) => `${i % 100},${i % 80}`).join("_")],
   ])("ignores a broken ?%s=%s", (key, value) => {
-    expect(areaFromParams(new URLSearchParams({ [key]: value }))).toBeUndefined();
+    expect(squareFromParams(new URLSearchParams({ [key]: value }))).toBeUndefined();
   });
 
   it("finds nothing when the link has no area", () => {
-    expect(areaFromParams(new URLSearchParams("case=qadirabad"))).toBeUndefined();
+    expect(square("case=qadirabad")).toBeUndefined();
+    expect(pointFromParams(new URLSearchParams("case=qadirabad"))).toBeUndefined();
   });
 });

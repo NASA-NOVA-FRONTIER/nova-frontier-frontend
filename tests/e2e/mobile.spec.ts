@@ -89,6 +89,7 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await globe.searchInput.press("Enter");
     await expect(globe.searchMenu).toBeInViewport();
     await globe.searchMenu.getByRole("option", { name: /Phalia Tehsil/ }).click();
+    await globe.useSquare.click();
     await expect(page.getByTestId("spot-area")).toBeVisible();
 
     await expect(page.locator("main")).toHaveAttribute("data-sheet", "spot");
@@ -105,6 +106,7 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await globe.searchInput.fill("Qadirabad");
     await globe.searchInput.press("Enter");
     await globe.searchMenu.getByRole("option", { name: /Phalia Tehsil/ }).click();
+    await globe.useSquare.click();
 
     const error = page.getByTestId("spot-error");
     await expect(error).toBeVisible();
@@ -174,7 +176,6 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await expect(handle).toHaveAttribute("aria-expanded", "true");
     await expectSheet(globe.panel, SHEET.expanded);
     await expect(globe.timeline).toBeHidden();
-    await expect(globe.areaTools).toBeHidden();
     await expect(page.getByTestId("nova-bubble")).toBeHidden();
 
     await handle.click();
