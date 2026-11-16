@@ -4,6 +4,7 @@ import "@/pages/report/report.css";
 import { useEffect, useState } from "react";
 
 import { LANDSLIDE } from "@/content/copyV8";
+import { DESIGN_VERSION } from "@/content/version";
 import { SOURCE, VERDICT } from "@/features/case-panel/verdicts";
 import { CASES, findCase, findLens, type Case } from "@/features/cases/cases";
 import { caseBandPasses } from "@/features/cases/demoBand";
@@ -18,7 +19,6 @@ import { EMPTIES_LINE } from "@/features/live/liveQuestion";
 import { formatDay } from "@/features/timeline/timelineLayout";
 import { Link } from "@/lib/Link";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
-import { VERSION } from "@/pages/explorer/StartCard";
 import { LiveReport } from "@/pages/report/LiveReport";
 import { areaOf, reportSummary, SUMMARY_LABEL } from "@/pages/report/reportSummary";
 
@@ -213,7 +213,7 @@ const Report = ({ item }: { item: Case }) => {
 
       <footer className="r-foot">
         <span>Nova Frontier · NASA Space Apps 2026 · Chía</span>
-        <span>{VERSION} · illustrative point series marked demo</span>
+        <span>{DESIGN_VERSION} · illustrative point series marked demo</span>
       </footer>
     </article>
   );

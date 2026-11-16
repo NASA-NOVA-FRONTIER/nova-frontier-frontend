@@ -126,7 +126,7 @@ test.describe("Landing and about pages", () => {
   test("every site page shows the design version in the footer", async ({ page }) => {
     for (const path of ["/", "/cases", "/about"]) {
       await page.goto(path);
-      await expect(page.getByTestId("site-version")).toHaveText("Design v7 · 0.7.0");
+      await expect(page.getByTestId("site-version")).toHaveText("Design v9");
     }
   });
 
