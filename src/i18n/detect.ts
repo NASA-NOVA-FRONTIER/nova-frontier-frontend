@@ -1,20 +1,14 @@
-import {
-  DEFAULT_LANGUAGE,
-  QUERY_PARAM,
-  STORAGE_KEY,
-  languageByCode,
-  matchLanguage,
-} from "@/i18n/languages";
+import { DEFAULT_LANGUAGE, QUERY_PARAM, STORAGE_KEY, languageByCode } from "@/i18n/languages";
 import type { LanguageCode } from "@/i18n/languages";
 
 type Source = {
   search: string;
   stored: string | null;
-  preferences: readonly string[];
 };
 
-// A shared link wins (`?lang=es`), then the visitor's last choice, then the browser, then English.
-export const pickLanguage = ({ search, stored, preferences }: Source): LanguageCode => {
+// English unless the visitor chose otherwise: a link (`?lang=es`) or the language picked in the menu.
+// The browser's language is never consulted.
+export const pickLanguage = ({ search, stored }: Source): LanguageCode => {
   const asked = new URLSearchParams(search).get(QUERY_PARAM);
   for (const code of [asked, stored]) {
     if (code !== null) {
@@ -22,7 +16,7 @@ export const pickLanguage = ({ search, stored, preferences }: Source): LanguageC
       if (known !== undefined) return known.code as LanguageCode;
     }
   }
-  return matchLanguage(preferences) ?? DEFAULT_LANGUAGE;
+  return DEFAULT_LANGUAGE;
 };
 
 export const readStored = (): string | null => {
@@ -42,8 +36,4 @@ export const writeStored = (code: LanguageCode): void => {
 };
 
 export const detectLanguage = (): LanguageCode =>
-  pickLanguage({
-    search: window.location.search,
-    stored: readStored(),
-    preferences: window.navigator.languages ?? [window.navigator.language],
-  });
+  pickLanguage({ search: window.location.search, stored: readStored() });

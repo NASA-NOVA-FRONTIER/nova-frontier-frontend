@@ -43,7 +43,8 @@ The switcher, the detection order and the `lang` / `dir` attributes follow from 
 
 ## Behaviour
 
-- Detection order: `?lang=` → `localStorage["nova.language"]` → `navigator.languages` → English.
+- English is always the default. Only a link (`?lang=`) or the language the visitor picked in the menu
+  (kept in `localStorage["nova.language"]`) changes it; the browser's language is never consulted.
 - The switch is live: `useLanguage()` at the app root re-renders the tree; there is no reload.
 - Arabic sets `dir="rtl"`. The globe, the charts, sliders and the time axis stay left to right.
 - Text that comes from the backend (limitations, errors, case evidence) is not translated.

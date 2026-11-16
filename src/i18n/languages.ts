@@ -123,13 +123,3 @@ export const QUERY_PARAM = "lang";
 
 export const languageByCode = (code: string): Language | undefined =>
   LANGUAGES.find((language) => language.code === code);
-
-// "pt-BR" -> "pt", "zh-Hans-CN" -> "zh": the first supported language among the preferences.
-export const matchLanguage = (preferences: readonly string[]): LanguageCode | undefined => {
-  for (const preference of preferences) {
-    const primary = preference.toLowerCase().split("-")[0] ?? "";
-    const found = LANGUAGES.find((language) => language.code === primary);
-    if (found !== undefined) return found.code;
-  }
-  return undefined;
-};

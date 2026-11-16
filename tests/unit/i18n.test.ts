@@ -3,24 +3,16 @@ import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { pickLanguage } from "@/i18n/detect";
 import { formatDate, formatNumber } from "@/i18n/format";
 import { changeLanguage, initI18n } from "@/i18n/i18n";
-import { LANGUAGES, languageByCode, matchLanguage } from "@/i18n/languages";
+import { LANGUAGES, languageByCode } from "@/i18n/languages";
 import { localized } from "@/i18n/localized";
 import { i18next, tr } from "@/i18n/translate";
 
 describe("language detection", () => {
-  it("prefers a shared link, then the stored choice, then the browser, then English", () => {
-    expect(pickLanguage({ search: "?lang=fr", stored: "de", preferences: ["ja"] })).toBe("fr");
-    expect(pickLanguage({ search: "", stored: "de", preferences: ["ja"] })).toBe("de");
-    expect(pickLanguage({ search: "", stored: null, preferences: ["ja-JP", "en"] })).toBe("ja");
-    expect(pickLanguage({ search: "", stored: null, preferences: ["sw", "ko"] })).toBe("en");
-    expect(pickLanguage({ search: "?lang=xx", stored: "yy", preferences: [] })).toBe("en");
-  });
-
-  it("matches regional preferences to the supported language", () => {
-    expect(matchLanguage(["pt-BR"])).toBe("pt");
-    expect(matchLanguage(["zh-Hans-CN"])).toBe("zh");
-    expect(matchLanguage(["sw", "ar-EG"])).toBe("ar");
-    expect(matchLanguage(["sw"])).toBeUndefined();
+  it("is English unless a link or the visitor's own choice says otherwise", () => {
+    expect(pickLanguage({ search: "?lang=fr", stored: "de" })).toBe("fr");
+    expect(pickLanguage({ search: "", stored: "de" })).toBe("de");
+    expect(pickLanguage({ search: "", stored: null })).toBe("en");
+    expect(pickLanguage({ search: "?lang=xx", stored: "yy" })).toBe("en");
   });
 });
 

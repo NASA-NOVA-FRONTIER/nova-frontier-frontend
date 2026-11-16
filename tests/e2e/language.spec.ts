@@ -58,7 +58,7 @@ test.describe("Language switcher", () => {
     await expect(page.getByTestId("language-button")).toHaveText("DE");
   });
 
-  test("the lang query parameter wins over the browser language", async ({ page }) => {
+  test("the lang query parameter opens that language", async ({ page }) => {
     await page.goto("/?lang=fr");
 
     await expect(html(page)).toHaveAttribute("lang", "fr");
@@ -96,5 +96,17 @@ test.describe("Language switcher", () => {
 
     await expect(page.getByTestId("language-button")).toBeVisible();
     await expect(page.getByTestId("language-button")).toHaveText("EN");
+  });
+});
+
+test.describe("A browser set to another language", () => {
+  test.use({ locale: "es-ES" });
+
+  test("still opens in English: only the visitor's own choice changes it", async ({ page }) => {
+    await page.goto("/");
+
+    await expect(html(page)).toHaveAttribute("lang", "en");
+    await expect(page.getByTestId("language-button")).toHaveText("EN");
+    await expect(page.locator(".s-nav__pill-long")).toHaveText("Open the explorer");
   });
 });
