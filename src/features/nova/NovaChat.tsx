@@ -1,23 +1,40 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
+import { NOVA_AI } from "@/content/copyV8";
 import { Icon } from "@/features/case-panel/icons";
 import type { ChartMode } from "@/features/charts/chartTokens";
+import {
+  ASSISTANT_CAPS,
+  askAssistant,
+  fetchAssistantStatus,
+  type AssistantTurn,
+} from "@/features/nova/assistantApi";
+import { assistantContextOf, clip, historyOf } from "@/features/nova/assistantContext";
 import { NovaGlyph } from "@/features/nova/NovaGlyph";
 import { useBubbleLift } from "@/features/nova/useBubbleLift";
 import {
+  citesOf,
+  isImpactQuestion,
   novaAnswer,
   suggestionsFor,
+  type Citation,
   type NovaContext,
   type NovaReply,
 } from "@/features/nova/novaAnswer";
+import { useAsync } from "@/lib/useAsync";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
 const THINK_MS = 650;
 const REDUCED_THINK_MS = 100;
-const NOVA_SOURCE =
-  "Rule-based answers from the data on screen. Real version: a language model that cites the case sources";
 
-type Message = { id: number; q: string; reply: NovaReply | undefined };
+// A turn is answered by Claude (streamed, then whole) or by the rules, also when Claude failed.
+type Message = {
+  id: number;
+  q: string;
+  ai?: { text: string; done: boolean; cites: Citation[] };
+  reply?: NovaReply;
+  fellBack?: boolean;
+};
 
 type NovaChatProps = {
   open: boolean;
@@ -30,7 +47,11 @@ type NovaChatProps = {
   onOpen: (open: boolean) => void;
 };
 
+const textOf = (message: Message): string =>
+  message.ai?.done === true ? message.ai.text : (message.reply?.text ?? "");
+
 // The bottom-right bubble and its 380 × 540 chat (SPECS §1, §3 "Nova no-data", §6; SPECS-v8 §10).
+// Claude answers when the backend has a key (#31); otherwise, and whenever Claude fails, the rules do.
 export const NovaChat = ({
   open,
   context,
@@ -52,26 +73,78 @@ export const NovaChat = ({
     latest.current = context;
   });
   const timers = useRef<number[]>([]);
-  useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), []);
+  const streams = useRef<AbortController[]>([]);
+  useEffect(
+    () => () => {
+      timers.current.forEach((timer) => window.clearTimeout(timer));
+      streams.current.forEach((controller) => controller.abort());
+    },
+    [],
+  );
+  const { state: status } = useAsync(fetchAssistantStatus, open ? "assistant" : undefined);
+  const claude =
+    status?.status === "success" && status.data.available
+      ? (status.data.model ?? "Claude")
+      : undefined;
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [messages]);
 
+  const update = (id: number, change: (message: Message) => Message) =>
+    setMessages((list) => list.map((item) => (item.id === id ? change(item) : item)));
+
+  const answerWithRules = (id: number, q: string, fellBack: boolean) => {
+    const timer = window.setTimeout(
+      () =>
+        update(id, (item) => ({ id, q: item.q, reply: novaAnswer(q, latest.current), fellBack })),
+      fellBack || reduceMotion ? REDUCED_THINK_MS : THINK_MS,
+    );
+    timers.current.push(timer);
+  };
+
+  const answerWithClaude = (id: number, q: string, earlier: Message[]) => {
+    const controller = new AbortController();
+    streams.current.push(controller);
+    const subject = latest.current.subject ?? latest.current.pending;
+    const cites = citesOf(subject?.sources ?? []);
+    const history: AssistantTurn[] = earlier.flatMap((item) => [
+      { role: "user", content: item.q },
+      { role: "assistant", content: textOf(item) },
+    ]);
+    const request = {
+      message: clip(q, ASSISTANT_CAPS.message),
+      history: historyOf(history),
+      context: assistantContextOf(latest.current),
+    };
+    askAssistant(
+      request,
+      (text) =>
+        update(id, (item) => ({
+          ...item,
+          ai: { text: (item.ai?.text ?? "") + text, done: false, cites },
+        })),
+      controller.signal,
+    )
+      .then((outcome) => {
+        if (outcome.kind === "done")
+          update(id, (item) => ({ ...item, ai: { text: item.ai?.text ?? "", done: true, cites } }));
+        else answerWithRules(id, q, true);
+      })
+      .catch(() => {
+        // Aborted: the chat was closed for good, nothing is left to update.
+      });
+  };
+
   const ask = (question: string) => {
     const q = question.trim();
     if (q === "") return;
     const id = nextId.current++;
+    const earlier = messages.filter((item) => textOf(item) !== "");
     setDraft("");
-    setMessages((list) => [...list, { id, q, reply: undefined }]);
-    const timer = window.setTimeout(
-      () => {
-        const reply = novaAnswer(q, latest.current);
-        setMessages((list) => list.map((item) => (item.id === id ? { ...item, reply } : item)));
-      },
-      reduceMotion ? REDUCED_THINK_MS : THINK_MS,
-    );
-    timers.current.push(timer);
+    setMessages((list) => [...list, { id, q }]);
+    if (claude === undefined || isImpactQuestion(q)) answerWithRules(id, q, false);
+    else answerWithClaude(id, q, earlier);
   };
 
   const submit = (event: FormEvent) => {
@@ -81,6 +154,7 @@ export const NovaChat = ({
 
   const hasSelection =
     context.subject !== undefined || context.pending !== undefined || context.running;
+  const writing = messages.some((item) => item.ai !== undefined && !item.ai.done);
 
   return (
     <>
@@ -89,7 +163,11 @@ export const NovaChat = ({
           <header className="x-nova__head">
             <NovaGlyph size={32} />
             <span className="x-nova__name">Nova</span>
-            <ProvenanceChip kind="demo" source={NOVA_SOURCE} />
+            {claude === undefined ? (
+              <ProvenanceChip kind="demo" source={NOVA_AI.ruleChip} />
+            ) : (
+              <ProvenanceChip kind="experimental" source={NOVA_AI.aiChip(claude)} />
+            )}
             <span className="x-top__fill" />
             <div role="group" aria-label="Answer style" className="x-switch x-switch--small">
               {(["plain", "technical"] as const).map((value) => (
@@ -114,11 +192,22 @@ export const NovaChat = ({
               <Icon name="close" size={13} />
             </button>
           </header>
-          <p className="x-nova__rule" data-testid="nova-rule">
-            Rule-based assistant · not an AI model yet
+          <p
+            className="x-nova__rule"
+            data-testid="nova-rule"
+            data-engine={claude === undefined ? "rules" : "claude"}
+          >
+            {claude === undefined ? NOVA_AI.ruleLine : NOVA_AI.aiLine}
           </p>
           <p className="x-nova__context">Looking at · {lookingAt}</p>
-          <div className="x-nova__list" ref={listRef} data-testid="nova-messages">
+          <div
+            className="x-nova__list"
+            ref={listRef}
+            role="log"
+            aria-live="polite"
+            aria-busy={writing}
+            data-testid="nova-messages"
+          >
             {messages.length === 0 && (
               <p className="x-nova__empty">
                 I know what's on screen: the place, the question, the passes and the result. I cite
@@ -128,7 +217,15 @@ export const NovaChat = ({
             {messages.map((message) => (
               <div key={message.id} className="x-nova__turn">
                 <p className="x-nova__q">{message.q}</p>
-                <Reply reply={message.reply} />
+                {message.ai !== undefined ? (
+                  <AiReply text={message.ai.text} done={message.ai.done} cites={message.ai.cites} />
+                ) : (
+                  <Reply
+                    reply={message.reply}
+                    fellBack={message.fellBack === true}
+                    ai={claude !== undefined}
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -152,6 +249,7 @@ export const NovaChat = ({
                 onChange={(event) => setDraft(event.target.value)}
                 placeholder="Ask about this place or result"
                 aria-label="Ask Nova"
+                maxLength={ASSISTANT_CAPS.message}
                 data-testid="nova-input"
               />
               <button type="submit" aria-label="Send" data-testid="nova-send">
@@ -189,18 +287,65 @@ export const NovaChat = ({
   );
 };
 
-const Reply = ({ reply }: { reply: NovaReply | undefined }) => {
+const Cites = ({ cites }: { cites: Citation[] }) => (
+  <div className="x-nova__cites">
+    {cites.map((cite) => (
+      <a key={cite.href} href={cite.href} target="_blank" rel="noopener">
+        <span>{cite.n}</span>
+        {cite.label}
+      </a>
+    ))}
+  </div>
+);
+
+const AiReply = ({ text, done, cites }: { text: string; done: boolean; cites: Citation[] }) => {
+  if (text === "")
+    return (
+      <p className="x-nova__thinking" role="status">
+        {NOVA_AI.writing}
+      </p>
+    );
+  return (
+    <div className="x-nova__answer" data-testid="nova-ai-answer" data-done={done}>
+      <p className="x-nova__ai-text">{text}</p>
+      {done && (
+        <>
+          <p className="x-nova__fields" data-testid="nova-ai-by">
+            {NOVA_AI.by}
+          </p>
+          <Cites cites={cites} />
+        </>
+      )}
+    </div>
+  );
+};
+
+const Reply = ({
+  reply,
+  fellBack,
+  ai,
+}: {
+  reply: NovaReply | undefined;
+  fellBack: boolean;
+  ai: boolean;
+}) => {
   if (reply === undefined)
     return (
       <p className="x-nova__thinking" role="status">
-        Reading the result…
+        {ai ? NOVA_AI.writing : "Reading the result…"}
       </p>
     );
+  const note = fellBack && (
+    <p className="x-nova__fields" data-testid="nova-fallback">
+      {NOVA_AI.fallback}
+    </p>
+  );
   if (reply.kind === "nodata")
     return (
       <div className="x-nova__nodata" data-testid="nova-nodata">
         <p className="x-kicker">No data</p>
         <p>{reply.text}</p>
+        {note}
       </div>
     );
   return (
@@ -211,14 +356,8 @@ const Reply = ({ reply }: { reply: NovaReply | undefined }) => {
           On screen · {reply.fields.join(" · ")}
         </p>
       )}
-      <div className="x-nova__cites">
-        {reply.cites.map((cite) => (
-          <a key={cite.href} href={cite.href} target="_blank" rel="noopener">
-            <span>{cite.n}</span>
-            {cite.label}
-          </a>
-        ))}
-      </div>
+      {note}
+      <Cites cites={reply.cites} />
     </div>
   );
 };

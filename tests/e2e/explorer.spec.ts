@@ -17,7 +17,7 @@ test.describe("Explorer: measured cases", () => {
     await expect(globe.caseRow("qadirabad")).toContainText("Did it flood?");
     await expect(globe.caseRow("choco")).toContainText("Coherence only · 0.247");
     await expect(globe.caseRow("choco")).not.toContainText("Pending");
-    await expect(globe.startCard).toContainText("Design v7 · 0.7.0");
+    await expect(globe.startCard).toContainText("Design v9");
     await expect(globe.startCard.getByTestId("intro-team")).toHaveAttribute("href", "/about");
   });
 
@@ -355,7 +355,8 @@ test.describe("Explorer: pick a spot (step 2)", () => {
     await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
     await expect(globe.placeCard).toContainText("NEW SPOT · LIVE ANALYSIS");
     await expect(page.getByTestId("spot-area")).toHaveText(/AREA\s*10\.24 km square/);
-    await expect(page.getByTestId("spot-wait")).toContainText("1–4 min");
+    // #25: the backend's p80 for this spot (228.9 s in the recorded answer), not a fixed range.
+    await expect(page.getByTestId("spot-wait")).toContainText("Usually under 4 min");
     await expect(page.getByTestId("spot-wait")).toContainText("plus any queue");
     await expect(page.getByTestId("spot-catalog")).toContainText("IN THE CATALOG · ASCENDING");
     await expect(page.getByTestId("spot-catalog")).toContainText("LAST 5 MONTHS");

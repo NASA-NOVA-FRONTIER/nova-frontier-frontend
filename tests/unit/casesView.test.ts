@@ -22,7 +22,12 @@ describe("cases page filter", () => {
 
   it("lists every lens with its count: one demo case each (issue #28)", () => {
     const options = filterOptions();
-    expect(options.map(({ id }) => id)).toEqual(["all", ...LENSES.map(({ id }) => id)]);
+    // The landslide question has no live lens; it is listed because Niscemi asks it.
+    expect(options.map(({ id }) => id)).toEqual([
+      "all",
+      ...LENSES.map(({ id }) => id),
+      "observed_dynamics",
+    ]);
     expect(options.find(({ id }) => id === "all")?.count).toBe(CASES.length);
     for (const option of options.filter(({ id }) => id !== "all"))
       expect(option.count, option.id).toBe(1);

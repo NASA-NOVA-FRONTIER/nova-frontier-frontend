@@ -33,12 +33,12 @@ test.describe("Explorer v8: the waiting panel", () => {
     const steps = page.getByTestId("job-stages");
     await expect(steps.locator('[data-step="search"]')).toHaveAttribute("data-state", "done");
     await expect(steps.locator('[data-step="search"]')).toContainText(
-      "5 passes found · Ascending · 14 Jul → 11 Nov",
+      "5 passes · Ascending · 14 Jul → 11 Nov",
     );
     await expect(steps.locator('[data-step="read"]')).toHaveAttribute("data-state", "current");
-    await expect(steps.locator('[data-step="read"]')).toContainText("in progress");
-    await expect(steps.locator('[data-step="measure"]')).toContainText("waiting");
-    await expect(steps.locator('[data-step="draw"]')).toContainText("waiting");
+    await expect(steps.locator('[data-step="read"]')).toContainText("In progress");
+    await expect(steps.locator('[data-step="measure"]')).toContainText("Waiting");
+    await expect(steps.locator('[data-step="draw"]')).toContainText("Waiting");
     await expect(page.getByTestId("job-queue")).toHaveCount(0);
   });
 
@@ -49,9 +49,7 @@ test.describe("Explorer v8: the waiting panel", () => {
     });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(page.getByTestId("job-stages")).toContainText(
-      "2 of 5 read · each appears on the timeline",
-    );
+    await expect(page.getByTestId("job-stages")).toContainText("2 of 5 read");
   });
 
   test("a queued job shows the queue line and nothing under way", async ({ page }) => {
@@ -76,6 +74,8 @@ test.describe("Explorer v8: the waiting panel", () => {
     const band = page.getByTestId("job-band");
     await expect(band).toHaveAttribute("data-estimated", "false");
     await expect(band).toHaveAttribute("style", /left: 20(\.0)?%; width: 60(\.0)?%/);
+    // C7: no number before the backend sends one.
+    await expect(page.getByTestId("job-estimate")).toHaveText("Computed live · we stop at 8 min");
   });
 
   test("the facts carry an image and dots, and pause while hovered or focused", async ({
@@ -86,11 +86,6 @@ test.describe("Explorer v8: the waiting panel", () => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
     const facts = page.getByTestId("facts-carousel");
-    await expect(page.getByTestId("fact-image")).toHaveAttribute(
-      "src",
-      "/landing/radar-north-dakota.jpg",
-    );
-    await expect(page.getByTestId("fact-credit")).toHaveText("NISAR image · NASA/JPL-Caltech");
     await expect(page.getByTestId("fact-body")).toHaveAttribute("aria-live", "polite");
     await expect(facts).toHaveAttribute("data-paused", "false");
     await facts.hover();
@@ -99,7 +94,55 @@ test.describe("Explorer v8: the waiting panel", () => {
     await expect(facts).toHaveAttribute("data-paused", "false");
     await page.getByRole("button", { name: "Next fact" }).focus();
     await expect(facts).toHaveAttribute("data-paused", "true");
-    await expect(page.getByTestId("fact-count")).toHaveText(/^DID YOU KNOW\? · 1 OF/);
+    // It may already have rotated while the page loaded; it is one of the ten drawn for this run.
+    await expect(page.getByTestId("fact-count")).toHaveText(/^FACT ([1-9]|10) OF 10$/);
+
+    // Every fact carries an image, described for screen readers: ours, or a credited one.
+    const image = page.getByTestId("fact-image");
+    await expect(image).toHaveAttribute("src", /^\/(facts|cases|insar|atlas)\//);
+    await expect(image).toHaveAttribute("alt", /\S/);
+  });
+
+  // #25: top right, so the square in the middle of the globe stays in view; it can be collapsed.
+  test("the processing panel sits at the top right and collapses to its clock and step", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await globe.mockExplorations();
+    await globe.goto(`?frame=${LIVE_FRAME.id}`);
+
+    const panel = globe.jobModal;
+    await expect(panel).toBeVisible();
+    const box = await panel.boundingBox();
+    expect(box?.x ?? 0).toBeGreaterThan(720);
+    expect(Math.round((box?.x ?? 0) + (box?.width ?? 0))).toBe(1424);
+    expect(box?.y ?? 0).toBeGreaterThanOrEqual(80);
+
+    const toggle = page.getByTestId("job-collapse");
+    await expect(toggle).toHaveText("Collapse");
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(toggle).toHaveText("Expand");
+    await expect(page.getByTestId("job-stages")).toHaveCount(0);
+    await expect(page.getByTestId("facts-carousel")).toHaveCount(0);
+    await expect(globe.jobElapsed).toBeVisible();
+    await expect(page.getByTestId("job-estimate")).toHaveText("Reading passes");
+    await expect(page.getByTestId("job-cancel")).toBeVisible();
+    await toggle.click();
+    await expect(page.getByTestId("job-stages")).toBeVisible();
+  });
+
+  test("an answer prepared earlier opens OFFLINE: steps done, no facts", async ({ page }) => {
+    const prepared = runningView({ cache: "hit" });
+    await globe.mockExplorations({ running: prepared, first: prepared });
+    await globe.goto(`?frame=${LIVE_FRAME.id}`);
+
+    await expect(page.getByTestId("job-mode")).toHaveText("OFFLINE");
+    await expect(globe.jobModal).toContainText("Opening the prepared result");
+    await expect(page.getByTestId("job-estimate")).toHaveText("Prepared ahead of time");
+    await expect(page.getByTestId("facts-carousel")).toHaveCount(0);
+    for (const step of ["search", "read", "measure", "draw"])
+      await expect(page.locator(`[data-step="${step}"]`)).toHaveAttribute("data-state", "done");
   });
 
   test("Cancel analysis from a searched place goes back to that place's card", async ({ page }) => {

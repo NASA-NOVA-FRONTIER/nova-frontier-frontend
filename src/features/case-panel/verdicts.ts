@@ -71,6 +71,8 @@ export const SOURCE = {
   crop: "Crop of the nova-frontier-model report figure (docs/cases/*.png). The API will serve it",
   figure: "nova-frontier-model report figure",
   plan: "NISAR Observation Plan (NASA), fetched live for this frame",
+  caseTimeline:
+    "Pass dates and the % outside the baseline band from this case's own series (nova-frontier-model release events-20261115)",
   timeline:
     "Pass dates (12-day spacing) and the % outside range bars are demo until the backend serves the real ones",
   todo: "Left as a slot until it is copied from the cited source",

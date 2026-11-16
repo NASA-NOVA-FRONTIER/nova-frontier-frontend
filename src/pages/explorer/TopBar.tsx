@@ -1,13 +1,13 @@
 import { useEffect, useRef, type ReactNode, type Ref } from "react";
 
 import { TOP_BAR } from "@/content/copyV8";
+import { DESIGN_VERSION } from "@/content/version";
 import { Icon } from "@/features/case-panel/icons";
 import type { Case } from "@/features/cases/cases";
 import { PlaceSearch } from "@/features/search/PlaceSearch";
 import type { Place } from "@/features/search/placesApi";
 import { BrandMark } from "@/lib/BrandMark";
 import { Link } from "@/lib/Link";
-import { VERSION } from "@/pages/explorer/StartCard";
 
 export type DownloadItem = {
   id: "png" | "json" | "csv" | "pdf";
@@ -200,7 +200,7 @@ export const TopBar = ({
             </p>
             <p className="x-menu__foot">
               <span>Nova Frontier</span>
-              <span>{VERSION}</span>
+              <span>{DESIGN_VERSION}</span>
             </p>
           </div>
         )}

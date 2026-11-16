@@ -59,6 +59,8 @@ type PassTimelineProps = {
   pauseSignal?: number;
   reduceMotion?: boolean;
   hidden?: boolean;
+  // Where real dates come from, when they are not a live run's (a case's own series).
+  realSource?: string;
 };
 
 const passClass = (item: LaidPass, comparing: boolean, selected: boolean): string => {
@@ -82,6 +84,7 @@ export const PassTimeline = ({
   pauseSignal = 0,
   reduceMotion = prefersReducedMotion(),
   hidden = false,
+  realSource = SOURCE.liveTimeline,
 }: PassTimelineProps) => {
   const layout = useMemo(() => layoutTimeline(data), [data]);
   const sequence = useMemo(() => sequenceOf(data, layout), [data, layout]);
@@ -266,7 +269,7 @@ export const PassTimeline = ({
         {demo ? (
           <ProvenanceChip kind="demoDates" source={SOURCE.timeline} />
         ) : (
-          <Prov kind="realDates" source={SOURCE.liveTimeline} />
+          <Prov kind="realDates" source={realSource} />
         )}
         {player.canPlay && (
           <div className="x-tl__options">

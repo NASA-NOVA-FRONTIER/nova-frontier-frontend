@@ -1,11 +1,12 @@
-import { STEP_3 } from "@/content/copyV8";
+import { CONFIRM, PROCESSING } from "@/content/copyV9";
 import type { ExplorationView } from "@/features/explore/exploreSchemas";
 import { directionOf } from "@/features/spot/spot";
 import { formatDay } from "@/features/timeline/timelineLayout";
 
 /*
- * The v8 waiting panel (SPECS-v8 §3) read from the backend's own view: an elapsed clock on a 0–5 min
- * bar and four steps. Nothing here is simulated: a step is done only when the backend says so.
+ * The processing panel (SPECS-v8 §3, v9 §1.4, #25) read from the backend's own view: an elapsed clock
+ * on a 0–5 min bar, the estimate as the backend gives it, four steps and the facts drawn for the run.
+ * Nothing here is simulated: a step is done only when the backend says so.
  */
 
 // The bar's axis: 0 to 5 minutes.
@@ -68,7 +69,7 @@ const searchDone = (view: ExplorationView): string | undefined => {
   const direction = directionOf(view.plan?.seriesKey);
   if (first === undefined || last === undefined || direction === undefined) return undefined;
   const pretty = direction.charAt(0) + direction.slice(1).toLowerCase();
-  return STEP_3.stepSearchDone(
+  return PROCESSING.stepPasses(
     dates.length,
     pretty,
     formatDay(first, false),
@@ -90,6 +91,61 @@ const currentIndex = (view: ExplorationView | undefined): number => {
   return 1;
 };
 
+// ONLINE computes the square now; OFFLINE opens an answer prepared earlier (a cache hit; v9 decision).
+export type WaitMode = "online" | "offline";
+export const waitMode = (view: ExplorationView | undefined): WaitMode =>
+  view?.cache === "hit" ? "offline" : "online";
+
+// "Usually under 3 min": the backend's p80, rounded up to what a person reads.
+export const formatEstimate = (seconds: number): string =>
+  seconds < 60 ? `${Math.ceil(seconds)} s` : `${Math.ceil(seconds / 60)} min`;
+
+// C7: one p80 from the backend, or no number at all before it sends one; past it, the estimate is
+// named as past.
+export const estimateLine = (view: ExplorationView | undefined, bar: WaitBar): string => {
+  if (waitMode(view) === "offline") return PROCESSING.offlineEstimate;
+  const eta = view?.etaSeconds ?? null;
+  if (!bar.estimated || eta === null) return CONFIRM.waitLineOnline;
+  return bar.overdue
+    ? PROCESSING.estimateExceeded(formatEstimate(eta))
+    : PROCESSING.estimate(formatEstimate(eta));
+};
+
+// Ten facts per wait, different between runs and stable within one (seeded by the run), no repeats.
+export const FACTS_PER_RUN = 10;
+
+const seedOf = (text: string): number => {
+  let hash = 2166136261;
+  for (const char of text) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+  return hash >>> 0;
+};
+
+// mulberry32: a small, well-mixed generator, enough to shuffle a list the same way for one seed.
+const generator = (seed: number) => {
+  let state = seed;
+  return (): number => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+};
+
+export const drawFacts = <T>(pool: readonly T[], seed: string, count = FACTS_PER_RUN): T[] => {
+  const next = generator(seedOf(seed));
+  const items = [...pool];
+  for (let index = items.length - 1; index > 0; index -= 1) {
+    const other = Math.floor(next() * (index + 1));
+    const kept = items[index];
+    const moved = items[other];
+    if (kept === undefined || moved === undefined) continue;
+    items[index] = moved;
+    items[other] = kept;
+  }
+  return items.slice(0, Math.min(count, items.length));
+};
+
 export const waitSteps = (view: ExplorationView | undefined): WaitStep[] => {
   const current = currentIndex(view);
   const queued = view?.status === "queued";
@@ -100,32 +156,44 @@ export const waitSteps = (view: ExplorationView | undefined): WaitStep[] => {
   const steps: Array<Omit<WaitStep, "state" | "line"> & { done: string; running: string }> = [
     {
       id: "search",
-      label: STEP_3.stepSearch,
-      // #25: without a direction in the series key the done-line would have to guess, so it stays empty.
-      done: searched ?? "",
-      running: STEP_3.stepCurrent,
+      label: PROCESSING.steps[0],
+      // Without a direction in the series key the done-line would have to guess, so it says Done.
+      done: searched ?? PROCESSING.done,
+      running: PROCESSING.inProgress,
     },
     {
       id: "read",
-      label: STEP_3.stepRead,
-      done: read !== null && total > 0 ? STEP_3.stepReadDone(read, total) : "",
+      label: PROCESSING.steps[1],
+      done: read !== null && total > 0 ? PROCESSING.stepRead(read, total) : PROCESSING.done,
       running:
-        read !== null && total > 0 ? STEP_3.stepReadRunning(read, total) : STEP_3.stepCurrent,
+        read !== null && total > 0 ? PROCESSING.stepRead(read, total) : PROCESSING.inProgress,
     },
     {
       id: "measure",
-      label: STEP_3.stepMeasure,
-      done: STEP_3.stepMeasureDone,
-      running: STEP_3.stepCurrent,
+      label: PROCESSING.steps[2],
+      done: PROCESSING.done,
+      running: PROCESSING.inProgress,
     },
-    { id: "draw", label: STEP_3.stepDraw, done: STEP_3.stepDrawDone, running: STEP_3.stepCurrent },
+    {
+      id: "draw",
+      label: PROCESSING.steps[3],
+      done: PROCESSING.done,
+      running: PROCESSING.inProgress,
+    },
   ];
+  // OFFLINE: the answer was prepared earlier, so every step is already done (v9 §1.4).
+  const offline = waitMode(view) === "offline";
 
   return steps.map(({ id, label, done, running }, index) => {
     // A queued job has its plan but nothing under way yet.
-    const state: WaitStepState =
-      index < current ? "done" : index === current && !queued ? "current" : "waiting";
-    const line = state === "done" ? done : state === "current" ? running : STEP_3.stepPending;
+    const state: WaitStepState = offline
+      ? "done"
+      : index < current
+        ? "done"
+        : index === current && !queued
+          ? "current"
+          : "waiting";
+    const line = state === "done" ? done : state === "current" ? running : PROCESSING.waiting;
     return { id, label, state, line };
   });
 };

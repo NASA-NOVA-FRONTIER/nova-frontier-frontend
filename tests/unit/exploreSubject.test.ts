@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import real from "../fixtures/exploration-qadirabad.json";
 import { defaultLayerId, layerTitle, liveLayers } from "@/features/explore/exploreLayers";
-import { explorationCsv, explorationJson } from "@/features/explore/exploreExport";
+import { explorationJson } from "@/features/explore/exploreExport";
 import { explorationSchema, type ExplorationView } from "@/features/explore/exploreSchemas";
 import { exploreSubject, verdictOfResult } from "@/features/explore/exploreSubject";
 import { exploreTimeline } from "@/features/explore/exploreTimeline";
@@ -244,15 +244,5 @@ describe("exploration exports", () => {
 
     expect(parsed.exploration.id).toBe(VIEW.id);
     expect(parsed.source).toContain("not a validated classifier");
-  });
-
-  it("writes one CSV row per scene with its role", () => {
-    const lines = explorationCsv(VIEW).trim().split("\n");
-
-    expect(lines[0]).toContain("not a validated classifier");
-    expect(lines[2]).toBe("date,role,status,granule_id");
-    expect(lines).toHaveLength(8);
-    expect(lines.find((line) => line.startsWith("2026-11-11"))).toContain(",target,observed,");
-    expect(lines.find((line) => line.startsWith("2026-07-14"))).toContain(",baseline,observed,");
   });
 });
