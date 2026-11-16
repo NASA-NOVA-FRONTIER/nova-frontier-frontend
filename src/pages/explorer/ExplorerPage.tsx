@@ -1530,7 +1530,7 @@ const sceneOf = (
     target: { key: item.id, box, zoom: CHIP_ZOOM },
     outline: {
       ring: ringOfBox(box),
-      label: `Processed area · ${item.chipKm} km · ${gridMetres(item.chipKm)} m grid`,
+      label: `Processed area · ${item.chipKm} km · ${item.chipGridM ?? gridMetres(item.chipKm)} m grid`,
       processing: false,
     },
     selectedCaseId: item.id,
