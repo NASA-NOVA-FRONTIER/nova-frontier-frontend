@@ -511,7 +511,8 @@ test.describe("Explorer: live exploration", () => {
         "layer-option-display_flood_signature_flags_co_pol_brightening",
       );
       await expect(signature).toHaveAttribute("aria-pressed", "false");
-      await expect(globe.liveLayerDock).toContainText("HH on 12 Sep 2026, fixed −30 to 0 dB gray.");
+      // Under reduced motion the timeline opens on the reference pass (COPY-flow-v9 §6): its HH.
+      await expect(globe.liveLayerDock).toContainText("HH on 14 Jul 2026, fixed −30 to 0 dB gray.");
       await signature.click();
       await expect(signature).toHaveAttribute("aria-pressed", "true");
       await expect(hh).toHaveAttribute("aria-pressed", "false");
