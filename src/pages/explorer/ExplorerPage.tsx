@@ -27,21 +27,14 @@ import { caseCsv, exportName, explorationDataCsv } from "@/features/downloads/da
 import { saveBlob, timelineJson } from "@/features/downloads/timelineExport";
 import type { Frame, LonLat } from "@/features/frames/frame.types";
 import { findFrameAt, loadFrames } from "@/features/frames/frames";
-import { areaFromParams, areaToParams, pointToParams } from "@/features/geo/areaLink";
-import {
-  draftOf,
-  isDrawing,
-  reduceDraw,
-  startTool,
-  type DrawEvent,
-  type DrawState,
-} from "@/features/geo/drawMachine";
-import type { Area, DrawTool } from "@/features/geo/geo.types";
-import { formatKm2, levelOf } from "@/features/geo/limits";
+import { pointFromParams, pointToParams, squareFromParams } from "@/features/geo/areaLink";
+import type { Area } from "@/features/geo/geo.types";
+import { AOI_SIDE_KM } from "@/features/geo/limits";
 import { boundsOf } from "@/features/geo/longitude";
-import { areaKm2Of, centreOf, ringAreaKm2, ringOf } from "@/features/geo/measure";
+import { centreOf, ringOf } from "@/features/geo/measure";
 import { toGeoJson } from "@/features/geo/serialize";
-import { ringOfBox, squareAround, squareBounds } from "@/features/geo/square";
+import { ringOfBox, squareBounds } from "@/features/geo/square";
+import { clampCentre } from "@/features/geo/squareMove";
 import type { Drape } from "@/features/globe/frameEntities";
 import { GlobeView, type GlobeScene, type GlobeStamp } from "@/features/globe/GlobeView";
 import {
@@ -104,17 +97,16 @@ import { coordinatePlace } from "@/features/search/coordinates";
 import { placeFraming } from "@/features/search/placeFraming";
 import type { Place } from "@/features/search/placesApi";
 import { fetchCoverage } from "@/features/spot/coverageApi";
-import { nearestCase, squareSideKm } from "@/features/spot/spot";
+import { nearestCase } from "@/features/spot/spot";
 import { StoryMode } from "@/features/story/StoryMode";
 import { PassTimeline } from "@/features/timeline/PassTimeline";
 import { formatDay } from "@/features/timeline/timelineLayout";
 import { CASE_LOCK, STEP_4, passOf } from "@/content/copyV8";
+import { EMPTY_GLOBE } from "@/content/copyV9";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { useAsync } from "@/lib/useAsync";
 import { PHONE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import { useNow } from "@/lib/useNow";
-import { AreaGuide, type AreaIssue } from "@/pages/explorer/AreaGuide";
-import { AreaTools } from "@/pages/explorer/AreaTools";
 import { DirectionSwitch } from "@/pages/explorer/DirectionSwitch";
 import { SpotCard } from "@/pages/explorer/SpotCard";
 import { legendFor, type DrapeKind } from "@/pages/explorer/drapeLegend";
@@ -124,6 +116,7 @@ import { MobileBar } from "@/pages/explorer/MobileBar";
 import { hasLayerPills, layerPills, sheetFraction, sheetStep } from "@/pages/explorer/mobileSheet";
 import { SheetHandle } from "@/pages/explorer/SheetHandle";
 import { SourceSwitch } from "@/pages/explorer/SourceSwitch";
+import { SquareBar } from "@/pages/explorer/SquareBar";
 import { HintPill, StartCard } from "@/pages/explorer/StartCard";
 import { TopBar, type DownloadItem } from "@/pages/explorer/TopBar";
 
@@ -133,7 +126,7 @@ type Selection =
   | {
       kind: "live";
       frame: Frame | undefined;
-      // Where the question is asked: the clicked point, or the centre of a drawn area.
+      // Where the question is asked: the centre of the square.
       point: LonLat;
       area: Area;
       lens: LensId;
@@ -159,15 +152,19 @@ const today = new Date().toISOString().slice(0, 10);
 
 const isLens = (value: string | null): value is LensId => LENSES.some((lens) => lens.id === value);
 
-// Shared links: ?case=<id>, ?frame=<track-frame>[&lens=<id>] for a live question on a point,
-// ?bbox= or ?geo= (plus &lens=) for a drawn area, ?story=1. Ground motion adds &pair=<id>[&coherence=<0.1-0.9>].
+// Shared links: ?case=<id>, ?point= or ?frame=<track-frame>[&lens=<id>] for a live question on a
+// square, ?story=1. Ground motion adds &pair=<id>[&coherence=<0.1-0.9>]. Old ?bbox= and ?geo= links
+// place the square at their centre and run nothing (v9: nothing runs until the user goes on).
 const readParams = () => {
   const params = new URLSearchParams(window.location.search);
   const lens = params.get("lens");
+  const square = squareFromParams(params);
+  const point = square === undefined ? pointFromParams(params) : undefined;
   return {
     item: findCase(params.get("case")),
     frameId: params.get("frame"),
-    area: areaFromParams(params),
+    square: square && clampCentre(square),
+    area: point && ({ kind: "point", point } satisfies Area),
     lens: isLens(lens) ? lens : DEFAULT_LENS,
     insar: insarFromParams(params),
     story: params.get("story") === "1",
@@ -188,10 +185,8 @@ const paramsOf = (
     coherence: String(selection.insar.threshold),
   };
   const params = new URLSearchParams({
-    ...(areaToParams(selection.area) ?? {
-      ...(frame && { frame: frame.id }),
-      ...pointToParams(selection.point),
-    }),
+    ...(frame && { frame: frame.id }),
+    ...pointToParams(selection.point),
     ...lens,
     ...pair,
   });
@@ -209,13 +204,8 @@ const bboxCentre = ({ bbox: [west, south, east, north] }: Frame): LonLat => [
 
 const country = (item: Case): string => item.place.split(",").at(-1)?.trim() ?? item.place;
 
-const AREA_NAME = { point: "Point", rectangle: "Rectangle", polygon: "Polygon" } as const;
-
-// A drawn area is named by its shape and size; a point by where it is.
-const liveName = ({ area, point }: { area: Area; point: LonLat }): string =>
-  area.kind === "point"
-    ? formatLonLat(point)
-    : `${AREA_NAME[area.kind]} · ${formatKm2(areaKm2Of(area))}`;
+// A live question is named by where its square is.
+const liveName = ({ point }: { point: LonLat }): string => formatLonLat(point);
 
 const prefersReducedMotion = (): boolean =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -264,6 +254,7 @@ export const ExplorerPage = () => {
     initial.item === undefined &&
     initial.frameId === null &&
     initial.area === undefined &&
+    initial.square === undefined &&
     !hasSeenOnboarding()
       ? 0
       : undefined,
@@ -273,19 +264,26 @@ export const ExplorerPage = () => {
   const viewerRef = useRef<Viewer | undefined>(undefined);
   // Legacy frame links need the snapshot to derive a coordinate.
   const opensLink = initial.item === undefined && !initial.story;
-  const linkRef = useRef(opensLink && initial.area === undefined ? initial.frameId : null);
+  const linksArea = initial.area !== undefined || initial.square !== undefined;
+  const linkRef = useRef(opensLink && !linksArea ? initial.frameId : null);
   const [linkPending, setLinkPending] = useState(
-    opensLink && initial.area === undefined && initial.frameId !== null,
+    opensLink && !linksArea && initial.frameId !== null,
   );
-  const [draw, setDraw] = useState<DrawState>(() => startTool(undefined));
-  const drawRef = useRef(draw);
-  const [areaIssue, setAreaIssue] = useState<AreaIssue>();
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   // Sent with the question once the backend accepts it (DIRECTION_CHOICE_READY).
   const [direction, setDirection] = useState<Direction>("ascending");
-  // A picked spot (v8 step 2): a search hit or a clicked point, waiting for "Analyze this spot".
-  const [place, setPlace] = useState<Place>();
+  // The placed square (v9 step 2): a clicked point or a search hit, its centre in `point`. Until
+  // "Use this square" it can move and nothing is fetched; then the spot card asks about it.
+  const [place, setPlace] = useState<Place | undefined>(() =>
+    opensLink && initial.square !== undefined ? coordinatePlace(initial.square) : undefined,
+  );
+  // `id` changes with each placement, not with a move, so a drag never re-flies the camera.
+  const [placement, setPlacement] = useState({ id: 0, used: false });
+  // The lens an old ?bbox= / ?geo= link asked for, kept for the square's first run.
+  const [squareLens, setSquareLens] = useState<LensId>(
+    initial.square !== undefined ? initial.lens : DEFAULT_LENS,
+  );
   // The spot "Analyze this spot" ran on, so Cancel analysis can go back to it (SPECS-v8 §3).
   const [analysed, setAnalysed] = useState<Place>();
   const [collapsed, setCollapsed] = useState(false);
@@ -321,7 +319,6 @@ export const ExplorerPage = () => {
         run: previous?.kind === "live" ? previous.run + 1 : 0,
         lensSwitch,
       }));
-      setAreaIssue(undefined);
       setPlace(undefined);
       setCollapsed(false);
       setSheetOpen(false);
@@ -352,23 +349,17 @@ export const ExplorerPage = () => {
     [framesState],
   );
   // What the catalog holds at the spot: free, so it runs on every pick.
+  // Nothing is fetched while the square is only placed: coverage waits for "Use this square".
+  const spot = placement.used ? place : undefined;
   const { state: coverage, retry: retryCoverage } = useAsync(
     (signal) =>
-      place === undefined
-        ? Promise.reject(new Error("no spot"))
-        : fetchCoverage(place.point, signal),
-    place?.id,
+      spot === undefined ? Promise.reject(new Error("no spot")) : fetchCoverage(spot.point, signal),
+    spot?.id,
   );
   const nearest = useMemo(
     () => (place === undefined ? undefined : nearestCase(place.point, CASES)),
     [place],
   );
-  // The footprint, sized by the backend, appears once the catalog answers that it has passes here.
-  // Without coverage nothing is drawn and the camera stays put: no close-up of open ocean.
-  const spotSideKm =
-    coverage?.status === "success" && coverage.data.plan.status !== "noCoverage"
-      ? squareSideKm(coverage.data.areaKm2)
-      : undefined;
   const framesRef = useRef(frames);
   useEffect(() => {
     framesRef.current = frames;
@@ -376,9 +367,9 @@ export const ExplorerPage = () => {
 
   // The catalog decides coverage; the frame outline is optional context.
   const askArea = useCallback(
-    (area: Area) => {
+    (area: Area, lens: LensId = DEFAULT_LENS) => {
       const centre = centreOf(area);
-      ask(frameUnder(framesRef.current, centre), centre, DEFAULT_LENS, area);
+      ask(frameUnder(framesRef.current, centre), centre, lens, area);
     },
     [ask],
   );
@@ -444,7 +435,6 @@ export const ExplorerPage = () => {
 
   const openCase = useCallback((item: Case) => {
     setSelection({ kind: "case", item });
-    setAreaIssue(undefined);
     setPlace(undefined);
     setCollapsed(false);
     setSheetOpen(false);
@@ -464,50 +454,29 @@ export const ExplorerPage = () => {
     },
     [openCase],
   );
-  // A click picks a spot (step 2); the question runs only from "Analyze this spot".
-  const onGlobeAsk = useCallback((point: LonLat) => {
-    if (storyRef.current) return;
+  // v9 step 2: a click or a search hit places the square; nothing runs until "Use this square".
+  const placeSquare = useCallback((picked: Place) => {
     setSelection(undefined);
     setSheetOpen(false);
     setCollapsed(false);
-    setAreaIssue(undefined);
-    setPlace(coordinatePlace(point));
+    setHelpOpen(false);
+    setDownloadOpen(false);
+    setPlace({ ...picked, point: clampCentre(picked.point) });
+    setPlacement((previous) => ({ id: previous.id + 1, used: false }));
+    setSquareLens(DEFAULT_LENS);
   }, []);
 
-  const chooseTool = useCallback((tool: DrawTool | undefined) => {
-    const next = startTool(tool);
-    drawRef.current = next;
-    setDraw(next);
-    setAreaIssue(undefined);
-    if (tool !== undefined) {
-      setHelpOpen(false);
-      setDownloadOpen(false);
-    }
+  const onGlobePlace = useCallback(
+    (point: LonLat) => {
+      if (!storyRef.current) placeSquare(coordinatePlace(point));
+    },
+    [placeSquare],
+  );
+
+  // A moved square is no longer the searched place, so it is named by its coordinates.
+  const moveSquare = useCallback((centre: LonLat) => {
+    setPlace(coordinatePlace(clampCentre(centre)));
   }, []);
-
-  const finishArea = useCallback(
-    (area: Area) => {
-      const km2 = areaKm2Of(area);
-      if (levelOf(km2) === "tooLarge") setAreaIssue({ kind: "tooLarge", area, km2 });
-      else askArea(area);
-    },
-    [askArea],
-  );
-
-  // The reducer reads the ref, not the state, so events in the same frame never see a stale one.
-  const onDraw = useCallback(
-    (event: DrawEvent) => {
-      if (storyRef.current) return;
-      const step = reduceDraw(drawRef.current, event);
-      // One drawing, one question: a finished area puts the tool away.
-      const next = step.area === undefined ? step.state : startTool(undefined);
-      drawRef.current = next;
-      setDraw(next);
-      if (step.rejected !== undefined) setAreaIssue({ kind: "rejected", reason: step.rejected });
-      if (step.area !== undefined) finishArea(step.area);
-    },
-    [finishArea],
-  );
 
   useEffect(() => {
     if (linkPending) return;
@@ -526,6 +495,10 @@ export const ExplorerPage = () => {
     setSheetOpen(false);
   }, []);
 
+  const confirmSquare = useCallback(() => {
+    setPlacement((previous) => ({ ...previous, used: true }));
+  }, []);
+
   // SPECS-v8 §8: each category's buttons.
   const retryExploration = exploration.retry;
   const onProblemAction = useCallback(
@@ -538,33 +511,28 @@ export const ExplorerPage = () => {
   );
 
   // SPECS-v8 §3 "Cancel analysis → back to step 2": the backend is asked to stop and the spot's
-  // card comes back. A drawn area has no step 2, so it goes back to the start.
+  // card comes back for the same square.
   const cancelExploration = exploration.cancel;
   const cancelAnalysis = useCallback(() => {
     void cancelExploration();
     if (live === undefined || live.lensSwitch) return;
-    if (live.area.kind !== "point") {
-      close();
-      return;
-    }
     const same = analysed !== undefined && analysed.point.join(",") === live.point.join(",");
     setSelection(undefined);
     setSheetOpen(false);
     setPlace(same ? analysed : coordinatePlace(live.point));
-  }, [cancelExploration, live, analysed, close]);
+    setPlacement((previous) => ({ id: previous.id + 1, used: true }));
+  }, [cancelExploration, live, analysed]);
 
-  const pickPlace = useCallback((picked: Place) => {
-    setSelection(undefined);
-    setSheetOpen(false);
-    setCollapsed(false);
-    setAreaIssue(undefined);
-    setSearchOpen(false);
-    setPlace(picked);
-  }, []);
+  const pickPlace = useCallback(
+    (picked: Place) => {
+      setSearchOpen(false);
+      placeSquare(picked);
+    },
+    [placeSquare],
+  );
 
   const startStory = useCallback(() => {
     close();
-    chooseTool(undefined);
     setHelpOpen(false);
     setDownloadOpen(false);
     setNovaOpen(false);
@@ -572,7 +540,7 @@ export const ExplorerPage = () => {
     setChapter(0);
     setPlaying(false);
     setStory(true);
-  }, [close, chooseTool]);
+  }, [close]);
 
   const leaveStory = useCallback(() => {
     speak(undefined);
@@ -637,27 +605,19 @@ export const ExplorerPage = () => {
   const wholeGlobe = () => {
     if (story) leaveStory();
     close();
-    chooseTool(undefined);
     setHelpOpen(false);
     setHomeRequest((count) => count + 1);
   };
 
-  // Esc closes the innermost thing first: onboarding, story, a drawing, menus, Nova, sheet, selection
-  // (SPECS §4). A drawing gives way in steps: its notice, the shape in progress, then the tool.
+  // Esc closes the innermost thing first: onboarding, story, the job modal, menus, Nova, sheet, then
+  // the selection or the placed square (SPECS §4).
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      const typing = (event.target as HTMLElement | null)?.closest("input, textarea") != null;
-      if (event.key === "Enter" && draw.tool === "polygon" && isDrawing(draw) && !typing)
-        onDraw({ type: "finish" });
       if (event.key === "Escape") {
         if (onboarding !== undefined) setOnboarding(undefined);
         else if (story) exitStory();
         else if (modalOpen) setModalClosedFor(runKey);
-        else if (areaIssue !== undefined) setAreaIssue(undefined);
-        else if (draw.tool !== undefined) {
-          if (isDrawing(draw)) onDraw({ type: "cancel" });
-          else chooseTool(undefined);
-        } else if (helpOpen || downloadOpen || searchOpen) {
+        else if (helpOpen || downloadOpen || searchOpen) {
           setHelpOpen(false);
           setDownloadOpen(false);
           setSearchOpen(false);
@@ -676,10 +636,8 @@ export const ExplorerPage = () => {
     onboarding,
     story,
     chapter,
-    draw,
     modalOpen,
     runKey,
-    areaIssue,
     helpOpen,
     downloadOpen,
     searchOpen,
@@ -688,8 +646,6 @@ export const ExplorerPage = () => {
     close,
     exitStory,
     goChapter,
-    onDraw,
-    chooseTool,
   ]);
 
   const openSheet = () => {
@@ -796,8 +752,7 @@ export const ExplorerPage = () => {
   const scene =
     storyItem === undefined
       ? sceneOf(selection, !running, drapeKind, opacity, {
-          place,
-          spotSideKm,
+          square: place && { place, ...placement },
           liveDrape: liveLayer && { url: liveLayer.href, bounds: liveLayer.bounds },
           gridMetres: gridMetresOf(exploredView),
           stamp: lapseStep &&
@@ -812,14 +767,6 @@ export const ExplorerPage = () => {
             },
         })
       : storyScene(storyItem, chapter, opacity);
-  const draft = draftOf(draw);
-  const draftKm2 = draft?.closed === true ? ringAreaKm2(draft.ring) : 0;
-  const draftView = draft && { ...draft, km2: draftKm2, level: levelOf(draftKm2) };
-  const toolsOffWhy = story
-    ? "Not available during the guided tour"
-    : unavailable
-      ? "The 3D globe isn't available in this browser"
-      : undefined;
 
   const showTimeline = item?.timeline !== undefined && item.coherenceOnly !== true && !sheetOpen;
   const showLiveTimeline = liveTimeline !== undefined && !sheetOpen;
@@ -834,7 +781,7 @@ export const ExplorerPage = () => {
         story,
         moreInfo: sheetOpen,
         collapsed,
-        spot: place !== undefined,
+        spot: spot !== undefined,
         selection: selection?.kind,
         running: liveRuns && running,
         lensSwitch: live?.lensSwitch === true,
@@ -901,7 +848,7 @@ export const ExplorerPage = () => {
           ? (findLens(shown.lens)?.chip ?? "")
           : live !== undefined
             ? lensChip
-            : "Click any land to ask the radar",
+            : EMPTY_GLOBE.hintDesktop,
       dates: [
         shown?.target !== undefined ? `Target pass ${formatDay(shown.target)}` : undefined,
         `Exported ${today}`,
@@ -1049,10 +996,8 @@ export const ExplorerPage = () => {
             reduceMotion={reduceMotion}
             homeRequest={homeRequest}
             onOpenCase={onGlobeOpenCase}
-            onAsk={onGlobeAsk}
-            drawTool={story ? undefined : draw.tool}
-            draft={draftView}
-            onDraw={onDraw}
+            onPlace={onGlobePlace}
+            onMoveSquare={moveSquare}
             onUnavailable={() => setUnavailable(true)}
             onViewer={(viewer) => {
               viewerRef.current = viewer;
@@ -1069,7 +1014,6 @@ export const ExplorerPage = () => {
               )}
             </div>
           }
-          tools={<AreaTools tool={draw.tool} disabledWhy={toolsOffWhy} onTool={chooseTool} />}
           cases={CASES}
           searchInputRef={searchInputRef}
           helpOpen={helpOpen}
@@ -1135,20 +1079,8 @@ export const ExplorerPage = () => {
           />
         )}
 
-        {!story && (
-          <AreaGuide
-            tool={draw.tool}
-            draft={draftView}
-            issue={areaIssue}
-            corners={draw.corners.length}
-            onFinish={() => onDraw({ type: "finish" })}
-            onCancel={() => onDraw({ type: "cancel" })}
-            onUseSquare={() => {
-              if (areaIssue?.kind === "tooLarge")
-                askArea({ kind: "point", point: centreOf(areaIssue.area) });
-            }}
-            onDismiss={() => setAreaIssue(undefined)}
-          />
+        {selection === undefined && !story && place !== undefined && !placement.used && (
+          <SquareBar onCancel={close} onUse={confirmSquare} />
         )}
 
         {selection === undefined && !story && place === undefined && (
@@ -1160,13 +1092,13 @@ export const ExplorerPage = () => {
               onStory={startStory}
               onSearch={() => searchInputRef.current?.focus()}
             />
-            {draw.tool === undefined && <HintPill />}
+            <HintPill text={phone ? EMPTY_GLOBE.hintPhone : EMPTY_GLOBE.hintDesktop} />
           </>
         )}
 
-        {selection === undefined && !story && place !== undefined && (
+        {selection === undefined && !story && spot !== undefined && (
           <SpotCard
-            place={place}
+            place={spot}
             coverage={coverage}
             nearest={nearest}
             quota={quota}
@@ -1174,8 +1106,8 @@ export const ExplorerPage = () => {
             now={minuteNow}
             cases={CASES}
             onAnalyse={() => {
-              setAnalysed(place);
-              askArea({ kind: "point", point: place.point });
+              setAnalysed(spot);
+              askArea({ kind: "point", point: spot.point }, squareLens);
             }}
             onRetry={retryCoverage}
             onOpenCase={openCase}
@@ -1445,26 +1377,19 @@ const storyScene = (item: Case, chapter: number, opacity: number): GlobeScene =>
   };
 };
 
-// A picked spot: the point at once; the camera and the dashed square once there is coverage.
-const placeScene = (place: Place, sideKm: number | undefined, empty: GlobeScene): GlobeScene =>
-  sideKm === undefined
-    ? { ...empty, point: place.point }
-    : {
-        ...empty,
-        target: { key: `place|${place.id}`, ...placeFraming(place) },
-        outline: {
-          ring: squareAround(place.point, sideKm),
-          label: `${sideKm.toFixed(2)} km square · ${place.name}`,
-          processing: false,
-          spot: true,
-        },
-        point: place.point,
-      };
+type PlacedSquare = { place: Place; id: number; used: boolean };
+
+// The placed square: drawn at once, land or ocean. The camera flies to it once per placement (the
+// key ignores the centre), so a drag moves the square under a still camera.
+const squareScene = ({ place, id, used }: PlacedSquare, empty: GlobeScene): GlobeScene => ({
+  ...empty,
+  target: { key: `square|${id}`, ...placeFraming(place) },
+  square: { centre: place.point, sideKm: AOI_SIDE_KM, movable: !used },
+});
 
 type SceneExtras = {
-  // A picked spot waiting to be asked about, and its footprint's side (none without coverage).
-  place?: Place | undefined;
-  spotSideKm?: number | undefined;
+  // The placed square, before and after "Use this square".
+  square?: PlacedSquare | undefined;
   // The layer of the live result drawn on the globe.
   liveDrape?: Drape | undefined;
   // Posting the service reported for the live result, in metres.
@@ -1486,7 +1411,7 @@ const sceneOf = (
   opacity: number,
   extras: SceneExtras = {},
 ): GlobeScene => {
-  const { place, spotSideKm, liveDrape, gridMetres: liveGrid, stamp } = extras;
+  const { square, liveDrape, gridMetres: liveGrid, stamp } = extras;
   const empty: GlobeScene = {
     target: undefined,
     outline: undefined,
@@ -1496,9 +1421,9 @@ const sceneOf = (
     drape: undefined,
     drapeAlpha: opacity / 100,
     stamp: undefined,
+    square: undefined,
   };
-  if (selection === undefined)
-    return place === undefined ? empty : placeScene(place, spotSideKm, empty);
+  if (selection === undefined) return square === undefined ? empty : squareScene(square, empty);
   if (selection.kind === "live") {
     const { area } = selection;
     const ring = ringOf(area);
@@ -1507,10 +1432,7 @@ const sceneOf = (
       target: { key: `live|${area.kind}|${ring.join(";")}`, box: boundsOf(ring), zoom: CHIP_ZOOM },
       outline: {
         ring,
-        label:
-          area.kind === "point"
-            ? `Processed area · ${LIVE_CHIP_KM} km${liveGrid === undefined ? "" : ` · ${liveGrid} m grid`}`
-            : `Selected area · ${formatKm2(areaKm2Of(area))}`,
+        label: `Processed area · ${LIVE_CHIP_KM} km${liveGrid === undefined ? "" : ` · ${liveGrid} m grid`}`,
         processing: !ready,
       },
       point: selection.point,

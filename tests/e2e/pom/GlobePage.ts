@@ -4,7 +4,6 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 
 import type { BBox, LonLat } from "@/features/frames/frame.types";
 import { OBSERVATION_PLAN_QUERY_URL } from "@/features/frames/observationPlanApi";
-import type { DrawEvent, Pointer } from "@/features/geo/drawMachine";
 import "@/features/globe/globeHooks";
 import { ONBOARDING_KEY } from "@/features/onboarding/onboardingState";
 import { ExplorationMock, INSAR_PAIRS } from "./explorationMock";
@@ -35,20 +34,20 @@ type Offset = { dx: number; dy: number };
 // What the stub globe shows in data-scene: GlobeView's `scene` prop as JSON (undefined keys drop out).
 export type SceneJson = {
   target?: { key: string; box: BBox; zoom: number };
-  outline?: { ring: LonLat[]; label: string; processing: boolean; spot?: boolean };
+  outline?: { ring: LonLat[]; label: string; processing: boolean };
   point?: LonLat;
   frame?: { id: string };
   selectedCaseId?: string;
   drape?: { url: string; bounds: BBox };
   drapeAlpha: number;
   stamp?: { date: string; pass: string; target: boolean; box: BBox };
+  square?: { centre: LonLat; sideKm: number; movable: boolean };
 };
 
 // Stub twins of the pixel clicks: same outcome as the pixel they replace on the real globe.
 const LAND: LonLat = [-74.75, 2.89]; // inside frame 47-3, where clickLand lands with 47-3 open
 const OCEAN: LonLat = [-20, 18]; // the home view's centre, open ocean
-// Roughly what one pixel spans: at the whole-globe view (21,000 km up) and framed on a 10 km chip.
-const DEG_PER_PX_HOME = 0.1;
+// Roughly what one pixel spans with the camera framed on a 10 km square.
 const DEG_PER_PX_CLOSE = 0.0005;
 
 // The last path segment of a layer URL, e.g. ".../display_2026-09-12_HH" → "display_2026-09-12_HH".
@@ -78,11 +77,13 @@ export class GlobePage {
   readonly planPasses: Locator;
   readonly wholeGlobe: Locator;
   readonly helpButton: Locator;
-  readonly areaTools: Locator;
-  readonly areaGuide: Locator;
-  readonly areaSize: Locator;
-  readonly areaNotice: Locator;
+  readonly squareBar: Locator;
+  readonly squareCancel: Locator;
   readonly useSquare: Locator;
+  // The real globe's square overlay; the stub globe draws nothing.
+  readonly square: Locator;
+  // The overlay's polygon: what takes focus, the pointer and the arrow keys.
+  readonly squareShape: Locator;
   readonly searchPill: Locator;
   readonly searchMenu: Locator;
   readonly searchInput: Locator;
@@ -127,11 +128,11 @@ export class GlobePage {
     this.planPasses = page.getByTestId("plan-passes");
     this.wholeGlobe = page.getByTestId("whole-globe");
     this.helpButton = page.getByTestId("help-button");
-    this.areaTools = page.getByTestId("area-tools");
-    this.areaGuide = page.getByTestId("area-guide");
-    this.areaSize = page.getByTestId("area-size");
-    this.areaNotice = page.getByTestId("area-notice");
-    this.useSquare = page.getByTestId("area-use-square");
+    this.squareBar = page.getByTestId("square-bar");
+    this.squareCancel = page.getByTestId("square-cancel");
+    this.useSquare = page.getByTestId("square-use");
+    this.square = page.getByTestId("square");
+    this.squareShape = this.square.locator("polygon");
     this.searchPill = page.getByTestId("place-search");
     this.searchMenu = page.getByTestId("search-menu");
     this.searchInput = page.getByTestId("place-input");
@@ -223,10 +224,6 @@ export class GlobePage {
     });
   }
 
-  tool(id: "point" | "rectangle" | "polygon"): Locator {
-    return this.page.getByTestId(`tool-${id}`);
-  }
-
   caseRow(id: string): Locator {
     return this.page.getByTestId(`case-row-${id}`);
   }
@@ -287,37 +284,12 @@ export class GlobePage {
   }
 
   // The stub globe's test hooks (GlobeView.stub.tsx); each calls the callback a real gesture would.
-  private async stubClick([lon, lat]: LonLat, px?: Pointer["px"]): Promise<void> {
-    await this.page.evaluate((at) => window.__globe?.click(at.lon, at.lat, at.px), {
-      lon,
-      lat,
-      px,
-    });
+  private async stubClick([lon, lat]: LonLat): Promise<void> {
+    await this.page.evaluate((at) => window.__globe?.click(at.lon, at.lat), { lon, lat });
   }
 
   private async stubHover([lon, lat]: LonLat): Promise<void> {
     await this.page.evaluate((at) => window.__globe?.hover(at.lon, at.lat), { lon, lat });
-  }
-
-  // The lon/lat under a pixel offset from the free-screen centre, as the camera would frame it.
-  private async lonLatAt({ dx, dy }: Offset): Promise<LonLat> {
-    const { target } = await this.scene();
-    if (target === undefined)
-      return [OCEAN[0] + dx * DEG_PER_PX_HOME, OCEAN[1] - dy * DEG_PER_PX_HOME];
-    const [west, south, east, north] = target.box;
-    const centre: LonLat = [(west + east) / 2, (south + north) / 2];
-    return [centre[0] + dx * DEG_PER_PX_CLOSE, centre[1] - dy * DEG_PER_PX_CLOSE];
-  }
-
-  private async pointerAt(offset: Offset): Promise<Pointer> {
-    return {
-      lonLat: await this.lonLatAt(offset),
-      px: [FREE_CENTRE.x + offset.dx, FREE_CENTRE.y + offset.dy],
-    };
-  }
-
-  private async stubDraw(events: DrawEvent[]): Promise<void> {
-    await this.page.evaluate((list) => window.__globe?.draw(list), events);
   }
 
   // Marks the quick tour as seen before the page loads, as on any visit after the first.
@@ -348,42 +320,42 @@ export class GlobePage {
     await this.page.mouse.click(FREE_CENTRE.x + OFF_CENTRE_PX, FREE_CENTRE.y);
   }
 
-  // Drawing offsets are in pixels from the free-screen centre, where a close-up chip sits.
-  async dragFromCentre(from: Offset, to: Offset): Promise<void> {
+  // A click on land, then the step 2 bar: the square is placed and nothing has run.
+  async placeSquare(): Promise<void> {
+    await this.clickLand();
+    await expect(this.squareBar).toBeVisible();
+  }
+
+  // The square's centre as the explorer holds it (stub) or as the overlay draws it (real globe).
+  async squareCentre(): Promise<LonLat | undefined> {
+    if (this.stub) return (await this.scene()).square?.centre;
+    const text = await this.square.getAttribute("data-centre");
+    const [lon, lat] = (text ?? "").split(",").map(Number);
+    return lon === undefined || lat === undefined ? undefined : [lon, lat];
+  }
+
+  // Real globe: a mouse drag from the middle of the square, by pixels. Stub: the centre that drag
+  // would give at a close-up (east is +dx, north is −dy).
+  async dragSquare({ dx, dy }: Offset): Promise<void> {
     if (this.stub) {
-      const start = await this.pointerAt(from);
-      const end = await this.pointerAt(to);
-      return this.stubDraw([
-        { type: "down", pointer: start },
-        { type: "move", pointer: end },
-        { type: "up", pointer: end },
-      ]);
+      const centre = (await this.scene()).square?.centre;
+      if (centre === undefined) throw new Error("no square to drag");
+      const to: LonLat = [centre[0] + dx * DEG_PER_PX_CLOSE, centre[1] - dy * DEG_PER_PX_CLOSE];
+      await this.page.evaluate((at) => window.__globe?.dragSquare(at[0], at[1]), to);
+      return;
     }
+    const box = await this.square.locator("polygon").boundingBox();
+    if (box === null) throw new Error("the square is not on screen");
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
     const { mouse } = this.page;
-    await mouse.move(FREE_CENTRE.x + from.dx, FREE_CENTRE.y + from.dy);
+    await mouse.move(x, y);
     await mouse.down();
-    await mouse.move(FREE_CENTRE.x + to.dx, FREE_CENTRE.y + to.dy, { steps: 6 });
+    await mouse.move(x + dx, y + dy, { steps: 8 });
     await mouse.up();
   }
 
   async press(key: string): Promise<void> {
     await this.page.keyboard.press(key);
-  }
-
-  async clickFromCentre({ dx, dy }: Offset): Promise<void> {
-    if (this.stub) {
-      const { lonLat, px } = await this.pointerAt({ dx, dy });
-      return this.stubClick(lonLat, px);
-    }
-    await this.page.mouse.click(FREE_CENTRE.x + dx, FREE_CENTRE.y + dy);
-  }
-
-  // On the stub: the last corner's click, then the finish a double-click sends.
-  async doubleClickFromCentre({ dx, dy }: Offset): Promise<void> {
-    if (this.stub) {
-      await this.clickFromCentre({ dx, dy });
-      return this.stubDraw([{ type: "finish" }]);
-    }
-    await this.page.mouse.dblclick(FREE_CENTRE.x + dx, FREE_CENTRE.y + dy);
   }
 }

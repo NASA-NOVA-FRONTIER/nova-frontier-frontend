@@ -10,6 +10,7 @@ const pickQadirabad = async (globe: GlobePage, page: Page): Promise<void> => {
   await globe.searchInput.press("Enter");
   // The OpenStreetMap hit (from the mock), not the known case with the same name.
   await globe.searchMenu.getByRole("option", { name: /Phalia Tehsil/ }).click();
+  await globe.useSquare.click();
   await expect(globe.placeCard).toContainText("Qadirabad");
   await expect(page.getByTestId("spot-area")).toBeVisible();
 };

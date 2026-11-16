@@ -99,9 +99,12 @@ const FramesStatus = ({ state, onRetry }: FramesStatusProps) => {
   );
 };
 
-export const HintPill = () => (
+type HintPillProps = { text: string };
+
+// v9 step 1: the desktop or phone hint (COPY-flow-v9 §1).
+export const HintPill = ({ text }: HintPillProps) => (
   <p className="x-hint" data-testid="hint-pill">
     <span className="x-hint__ring" aria-hidden="true" />
-    {tr("Click any land to ask the radar")}
+    {text}
   </p>
 );
