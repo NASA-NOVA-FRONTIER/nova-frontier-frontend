@@ -31,7 +31,13 @@ export type LiveTimelineControl = {
 };
 
 // `demo` is true for a measured case (its pass dates are illustrative) and false for a live result.
-type PassTimelineProps = { data: TimelineData; demo?: boolean; live?: LiveTimelineControl };
+type PassTimelineProps = {
+  data: TimelineData;
+  demo?: boolean;
+  live?: LiveTimelineControl;
+  // Where real dates come from, when they are not a live run's (a case's own series).
+  realSource?: string;
+};
 
 const passClass = (item: LaidPass, comparing: boolean, selected: boolean): string => {
   const kind =
@@ -46,7 +52,12 @@ const passClass = (item: LaidPass, comparing: boolean, selected: boolean): strin
 };
 
 // SPECS §2.4: measured, compared (baseline bracket + target) and planned passes, with the optical lane.
-export const PassTimeline = ({ data, demo = true, live }: PassTimelineProps) => {
+export const PassTimeline = ({
+  data,
+  demo = true,
+  live,
+  realSource = SOURCE.liveTimeline,
+}: PassTimelineProps) => {
   const layout = useMemo(() => layoutTimeline(data), [data]);
   const trackRef = useRef<HTMLDivElement>(null);
   const hasTarget = layout.targetIndex >= 0;
@@ -149,7 +160,7 @@ export const PassTimeline = ({ data, demo = true, live }: PassTimelineProps) => 
         {demo ? (
           <ProvenanceChip kind="demoDates" source={SOURCE.timeline} />
         ) : (
-          <Prov kind="realDates" source={SOURCE.liveTimeline} />
+          <Prov kind="realDates" source={realSource} />
         )}
         {hasTarget && live === undefined && (
           <button

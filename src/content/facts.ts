@@ -121,6 +121,31 @@ const FACTS: Fact[] = [
     text: "The mission's goal is to measure and understand changes in Earth's land, ice, water and vegetation.",
     source: NASA_MISSION,
   },
+  // #25, from the v9 pool (COPY-flow-v9 §7); each checked against its page on 2026-11-15.
+  {
+    id: "swath",
+    title: "Wide swath",
+    text: "Each NISAR pass images a strip of ground more than 240 km (150 miles) wide.",
+    source: ABOUT_SATELLITE,
+  },
+  {
+    id: "two-radars",
+    title: "Two radars",
+    text: "NISAR carries two radars: NASA's L-band with a 24 cm wave and ISRO's S-band with a 9.4 cm wave.",
+    source: ABOUT_SATELLITE,
+  },
+  {
+    id: "sideways",
+    title: "Looking sideways",
+    text: "NISAR's radar doesn't look straight down: it looks to one side of its path, to the left.",
+    source: MISSION_OVERVIEW,
+  },
+  {
+    id: "gslv",
+    title: "Launched from India",
+    text: "NISAR launched on ISRO's GSLV Mark II rocket from the Satish Dhawan Space Centre.",
+    source: MISSION_OVERVIEW,
+  },
 ];
 
 // The seam for dynamic facts later: callers only ask for a list.
