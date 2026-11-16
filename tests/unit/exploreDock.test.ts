@@ -2,15 +2,7 @@ import real from "../fixtures/exploration-qadirabad.json";
 import insar from "../fixtures/exploration-kumamoto-insar.json";
 import { describe, expect, it } from "vitest";
 
-import {
-  defaultView,
-  dockRows,
-  nextStep,
-  otherLayers,
-  playStart,
-  shownLayer,
-  timeLapseSteps,
-} from "@/features/explore/exploreDock";
+import { defaultView, dockRows, otherLayers, shownLayer } from "@/features/explore/exploreDock";
 import {
   changeLayer,
   liveLayers,
@@ -19,7 +11,6 @@ import {
 } from "@/features/explore/exploreLayers";
 import { explorationSchema } from "@/features/explore/exploreSchemas";
 import { exploreTimeline } from "@/features/explore/exploreTimeline";
-import { layoutTimeline, liveReadout } from "@/features/timeline/timelineLayout";
 
 const view = explorationSchema.parse(real);
 const LAYERS = liveLayers(view);
@@ -148,50 +139,5 @@ describe("defaultView", () => {
 describe("shownLayer", () => {
   it("a pass with no image shows nothing, never another date", () => {
     expect(shownLayer(LAYERS, { kind: "pass", pol: "HH" }, "2026-10-18")).toBeUndefined();
-  });
-});
-
-describe("liveReadout", () => {
-  it("12 Sep → baseline pass 3 of 5; planned passes don't count", () => {
-    const data = exploreTimeline(view, [{ date: "2026-12-05", hasCrossPol: true }], "2026-11-13");
-    if (data === undefined) throw new Error("no timeline");
-    const layout = layoutTimeline(data);
-    const index = layout.passes.findIndex((item) => item.date === "2026-09-12");
-    expect(liveReadout(layout, index).line).toBe("12 Sep 2026 · baseline · pass 3 of 5");
-    expect(liveReadout(layout, layout.targetIndex).line).toBe("11 Nov 2026 · target · pass 5 of 5");
-  });
-
-  it("a pass that is neither baseline nor target reads as measured", () => {
-    const layout = layoutTimeline({
-      passes: [{ date: "2026-07-14", kind: "meas" }],
-      start: "2026-07-01",
-      end: "2026-08-01",
-      today: "2026-08-01",
-      optical: [],
-      opticalNote: "",
-    });
-    expect(liveReadout(layout, 0).line).toBe("14 Jul 2026 · measured · pass 1 of 1");
-  });
-});
-
-describe("time-lapse", () => {
-  it("HH from pass 1: three images, two empty steps, stops on the target", () => {
-    const steps = timeLapseSteps(PASSES, LAYERS, "HH");
-    expect(steps.map((step) => [step.date, step.layerId, step.role])).toEqual([
-      ["2026-07-14", "display_2026-07-14_HH", "BASELINE"],
-      ["2026-08-19", "display_2026-08-19_HH", "BASELINE"],
-      ["2026-09-12", "display_2026-09-12_HH", "BASELINE"],
-      ["2026-10-18", undefined, "BASELINE"],
-      ["2026-11-11", undefined, "TARGET"],
-    ]);
-    expect(steps.every((step) => step.n === 5)).toBe(true);
-  });
-
-  it("starts at the current pass unless it is the last, and never loops", () => {
-    expect(playStart(2, 5)).toBe(2);
-    expect(playStart(4, 5)).toBe(0);
-    expect(playStart(-1, 5)).toBe(0);
-    expect(nextStep(3, 5)).toBe(4);
-    expect(nextStep(4, 5)).toBeUndefined();
   });
 });

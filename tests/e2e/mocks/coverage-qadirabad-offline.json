@@ -1,0 +1,13 @@
+{
+  "_comment": "Derived from coverage-qadirabad.json (the backend's real answer, Nov 2026) with precomputedCase set to \"qadirabad\", the real prepared case id at this place in tests/fixtures/gateway-cases.json; the backend sets it when a prepared case covers the centre. No real answer with it is recorded yet.",
+  "plan": {
+    "status": "ready",
+    "seriesKey": "084_A_018_4005_DHDH",
+    "dates": ["2026-07-14", "2026-08-19", "2026-09-12", "2026-10-18", "2026-11-11"],
+    "maturityMixed": true,
+    "notes": []
+  },
+  "areaKm2": 104.89,
+  "warnings": [],
+  "precomputedCase": "qadirabad"
+}

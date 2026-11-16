@@ -42,7 +42,16 @@ export type QualityItem = { k: string; v: string; why: string };
 export type Source = { label: string; href: string };
 
 export type PassKind = "base" | "target" | "meas" | "plan";
-export type TimelinePass = { date: string; kind: PassKind; outsidePct?: number };
+// A pass's own display image per channel, when the data has one (live answers today; no case yet).
+export type PassImages = { HH?: string; HV?: string };
+export type TimelinePass = {
+  date: string;
+  kind: PassKind;
+  outsidePct?: number;
+  images?: PassImages;
+};
+// One interferometric pair (ground motion): the timeline steps through these instead of passes.
+export type TimelineInterval = { a: string; b: string; images?: string[] };
 export type TimelineData = {
   passes: TimelinePass[];
   start: string;
@@ -51,6 +60,12 @@ export type TimelineData = {
   onset?: { date: string; label: string };
   optical: Array<{ date: string; label: string }>;
   opticalNote: string;
+  // Ground motion only. `chain` is a measured case's sequence (never "all straddle the event").
+  intervals?: { items: TimelineInterval[]; chain: boolean };
+  // Only a case with a sourced event date has one (v9 correction: never an invented date).
+  event?: { date: string; source: string };
+  track?: number;
+  direction?: string;
   // The dates and "% outside range" come from the case's own series, not the 12-day demo.
   realDates?: boolean;
 };

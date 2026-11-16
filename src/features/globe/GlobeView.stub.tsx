@@ -35,6 +35,7 @@ export const GlobeView = (props: GlobeViewProps) => {
         setHover(frame && frameTooltip(frame, point));
       },
       leave: () => setHover(undefined),
+      interact: () => latest.current.onInteract?.(),
       openCase: (id) => {
         const item = latest.current.cases.find((entry) => entry.id === id);
         if (item !== undefined) latest.current.onOpenCase(item);

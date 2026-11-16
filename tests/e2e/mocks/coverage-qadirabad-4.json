@@ -1,0 +1,13 @@
+{
+  "_comment": "Derived from coverage-qadirabad.json (the backend's real answer, Nov 2026) by dropping 2026-11-11 (4 passes still pass MIN_IMAGES, so status stays ready); every other value is unchanged and nothing is invented. No real 4- or 3-pass answer is recorded yet.",
+  "plan": {
+    "status": "ready",
+    "seriesKey": "084_A_018_4005_DHDH",
+    "dates": ["2026-07-14", "2026-08-19", "2026-09-12", "2026-10-18"],
+    "maturityMixed": true,
+    "notes": []
+  },
+  "areaKm2": 104.89,
+  "warnings": [],
+  "precomputedCase": null
+}

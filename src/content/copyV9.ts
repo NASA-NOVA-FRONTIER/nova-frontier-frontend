@@ -265,6 +265,14 @@ export const LEGEND: Record<V9LayerId, { left: string; right: string; what: stri
   phase: { left: "−π", right: "+π", what: "Fringes of change between the passes" },
 });
 
+// COPY-flow-v9 §5 stamp, split into its date and pass parts (see RESULT.stamp*).
+const stampPass = (i: number, n: number, days: number) =>
+  tr("{{i}} · {{days}} DAYS AFTER PASS {{v2}}", { i: passOf(i, n), days, v2: i - 1 });
+const stampFirstPass = (n: number) => tr("{{n}} · REFERENCE", { n: passOf(1, n) });
+const stampQuakeDate = (a: string, b: string) => `${a} → ${b}`;
+const stampQuakePass = (i: number, n: number, days: number) =>
+  tr("INTERVAL {{i}} OF {{n}} · {{days}} DAYS", { i, n, days });
+
 export const RESULT = localized({
   online: "ONLINE",
   offline: "OFFLINE",
@@ -277,17 +285,16 @@ export const RESULT = localized({
   layerLabel: "Layer",
   altCoherence: "Coherence for the selected pair",
   altPhase: "Wrapped phase for the selected pair",
-  stamp: (date: string, i: number, n: number, days: number) =>
-    tr("{{date}} · {{i}} · {{days}} DAYS AFTER PASS {{v3}}", {
-      date,
-      i: passOf(i, n),
-      days,
-      v3: i - 1,
-    }),
-  stampFirst: (date: string, n: number) =>
-    tr("{{date}} · {{n}} · REFERENCE", { date, n: passOf(1, n) }),
+  // The stamp draws its date and its pass part on two lines, so each string also comes as parts:
+  // `stamp*` = date + " · " + `stamp*Pass` (a verbatim split, no new wording).
+  stampPass,
+  stampFirstPass,
+  stampQuakeDate,
+  stampQuakePass,
+  stamp: (date: string, i: number, n: number, days: number) => `${date} · ${stampPass(i, n, days)}`,
+  stampFirst: (date: string, n: number) => `${date} · ${stampFirstPass(n)}`,
   stampQuake: (a: string, b: string, i: number, n: number, days: number) =>
-    tr("{{a}} → {{b}} · INTERVAL {{i}} OF {{n}} · {{days}} DAYS", { a, b, i, n, days }),
+    `${stampQuakeDate(a, b)} · ${stampQuakePass(i, n, days)}`,
   rangeLine: (start: string, end: string, n: number) =>
     `${start} → ${end} · ${n} passes`.toUpperCase(),
   rangeLineQuake: (n: number, a: string, b: string) =>
