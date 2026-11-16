@@ -1,3 +1,4 @@
+import { CASE_LIMITATIONS } from "@/content/copyV8";
 import { Icon } from "@/features/case-panel/icons";
 import { Prov } from "@/features/case-panel/Prov";
 import type { Subject } from "@/features/case-panel/subject";
@@ -319,6 +320,18 @@ export const MoreInfoSheet = ({
                   <p className="x-muted" data-testid="tech-limit">
                     {subject.techLimit}
                   </p>
+                )}
+                {subject.limitations.length > 0 && (
+                  <div className="x-limits__list" data-testid="case-limitations">
+                    <p className="x-muted x-small">
+                      {CASE_LIMITATIONS.title} <Prov kind="real" source={CASE_LIMITATIONS.source} />
+                    </p>
+                    <ul>
+                      {subject.limitations.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
                 {subject.alternatives.length > 0 && (
                   <>

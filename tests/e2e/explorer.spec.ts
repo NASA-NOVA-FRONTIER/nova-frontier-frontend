@@ -251,8 +251,8 @@ test.describe("Explorer: live questions", () => {
     const api = await globe.mockExplorations({ first: succeededView() });
     const LOCKED = [
       ["bug-fire", "wildfire", "Bug Fire, USA"],
-      ["rowe-creek", "vegetation_disturbance", "Rowe Creek, USA"],
-      ["skollersta", "agriculture", "Sköllersta, Sweden"],
+      // Issue #28: Pará event 02 is the deforestation case (Niscemi is covered in landslide.spec).
+      ["para-event-02", "vegetation_disturbance", "Pará event 02, Brazil"],
     ] as const;
     for (const [id, lens, title] of LOCKED) {
       await globe.goto(`?case=${id}`);
@@ -263,6 +263,18 @@ test.describe("Explorer: live questions", () => {
       await expect(page.getByTestId("lens-locked")).toBeVisible();
     }
     expect(api.posts).toHaveLength(0);
+  });
+
+  // Issue #28: Chocó lists the gateway's limitations and has no common phase cell to show.
+  test("Chocó lists the gateway's limitations and never offers a phase", async ({ page }) => {
+    const globe = new GlobePage(page);
+    await globe.mockObservationPlan();
+    await globe.goto("?case=choco");
+    const list = globe.panel.getByTestId("case-limitations");
+    await expect(list.getByRole("listitem")).toHaveCount(6);
+    await expect(list).toContainText("No earthquake detection, earthquake attribution");
+    await expect(globe.panel).toContainText("Common phase");
+    await expect(globe.panel).toContainText("0 cells");
   });
 
   test(

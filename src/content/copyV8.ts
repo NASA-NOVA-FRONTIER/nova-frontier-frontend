@@ -68,6 +68,12 @@ export const CASE_LOCK = {
   buttonWhy: "Fixed for this demo case",
 } as const;
 
+// Issue #28: a demo case's own limitations, copied verbatim from the gateway's case.
+export const CASE_LIMITATIONS = {
+  title: "The analysis service's own limitations",
+  source: "Gateway case limitations, relayed by the backend at /api/v1/cases/<id>",
+} as const;
+
 // Phones (SPECS-v8 §1 Mobile). The pill labels are the short labels of `Explorer v8 v2.dc.html`;
 // the sheet handle's labels are new copy, needed because the handle is a button.
 export const MOBILE = {

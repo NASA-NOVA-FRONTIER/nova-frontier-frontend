@@ -1,4 +1,4 @@
-import { LANDSLIDE } from "@/content/copyV8";
+import { CASE_LIMITATIONS, LANDSLIDE } from "@/content/copyV8";
 import { FireContextCard } from "@/features/case-panel/FireContextCard";
 import { Icon } from "@/features/case-panel/icons";
 import { InsarCard } from "@/features/case-panel/InsarCard";
@@ -109,6 +109,18 @@ export const PendingSummary = ({ item }: { item: Case }) => (
         </li>
       ))}
     </ul>
+    {item.limitations !== undefined && item.limitations.length > 0 && (
+      <div className="x-limits__list" data-testid="case-limitations">
+        <p className="x-muted x-small">
+          {CASE_LIMITATIONS.title} <Prov kind="real" source={CASE_LIMITATIONS.source} />
+        </p>
+        <ul>
+          {item.limitations.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </div>
+    )}
     <ul className="x-sources">
       {item.sources.map((source) => (
         <li key={source.href}>

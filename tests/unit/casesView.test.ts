@@ -29,8 +29,9 @@ describe("cases page filter", () => {
       "observed_dynamics",
     ]);
     expect(options.find(({ id }) => id === "all")?.count).toBe(CASES.length);
+    // Agriculture stays a live lens with no demo case: landslide took its place in issue #28.
     for (const option of options.filter(({ id }) => id !== "all"))
-      expect(option.count, option.id).toBe(1);
+      expect(option.count, option.id).toBe(option.id === "agriculture" ? 0 : 1);
     const total = options.filter(({ id }) => id !== "all").reduce((sum, o) => sum + o.count, 0);
     expect(total).toBe(CASES.length);
   });
