@@ -5,17 +5,16 @@ import { useEffect, useRef, useState } from "react";
 
 import { Link } from "@/lib/Link";
 import {
-  BAND_WAVE_CM,
   LEARN_COPY,
   LEARN_STEPS,
   OTHER_RADARS,
   resourceCount,
-  wavePath,
   type LearnResource,
   type LearnStep,
   type OtherRadar,
 } from "@/pages/learn/learnResources";
 import { RadarCompare } from "@/pages/learn/RadarCompare";
+import { RadarWaves } from "@/pages/learn/RadarWaves";
 import { useLearnMotion } from "@/pages/learn/useLearnMotion";
 import { SiteFooter } from "@/pages/site/SiteFooter";
 import { SiteNav } from "@/pages/site/SiteNav";
@@ -114,14 +113,6 @@ const RadarCard = ({ radar }: { radar: OtherRadar }) => (
       <span className="lr-radar__band">{radar.band}</span>
       <span className="lr-radar__wave">{radar.wave}</span>
     </div>
-    <svg
-      viewBox="0 0 300 40"
-      preserveAspectRatio="none"
-      className="lr-radar__svg"
-      aria-hidden="true"
-    >
-      <path d={wavePath(BAND_WAVE_CM[radar.band])} />
-    </svg>
     <h3 className="lr-radar__name">
       <a className="lr-card__link" href={radar.href} target="_blank" rel="noopener">
         {radar.name}
@@ -205,6 +196,8 @@ export const LearnPage = () => {
             </div>
           </section>
         ))}
+
+        <RadarWaves />
 
         <section className="lr-others" data-section aria-labelledby="learn-others-heading">
           <div className="lr-others__intro" data-reveal>
