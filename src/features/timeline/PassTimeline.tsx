@@ -49,7 +49,8 @@ export type LiveTimelineControl = {
 
 // `demo` is true for a measured case (its pass dates are illustrative) and false for a live result.
 // `onStep` labels the globe for the step in focus; a new `pauseSignal` value pauses (a globe drag).
-// `reduceMotion` is the explorer's switch: it opens paused, and pauses when it turns on.
+// `reduceMotion` is the explorer's switch (opens paused, pauses when it turns on); `hidden` keeps the
+// player alive under the More information sheet, paused, so closing it returns to the same pass.
 type PassTimelineProps = {
   data: TimelineData;
   demo?: boolean;
@@ -57,6 +58,7 @@ type PassTimelineProps = {
   onStep?: (step: StepView | undefined) => void;
   pauseSignal?: number;
   reduceMotion?: boolean;
+  hidden?: boolean;
 };
 
 const passClass = (item: LaidPass, comparing: boolean, selected: boolean): string => {
@@ -79,6 +81,7 @@ export const PassTimeline = ({
   onStep,
   pauseSignal = 0,
   reduceMotion = prefersReducedMotion(),
+  hidden = false,
 }: PassTimelineProps) => {
   const layout = useMemo(() => layoutTimeline(data), [data]);
   const sequence = useMemo(() => sequenceOf(data, layout), [data, layout]);
@@ -106,8 +109,9 @@ export const PassTimeline = ({
     },
     nextImages,
   );
-  // Turning it on pauses where it is; turning it off never resumes on its own.
+  // Turning either on pauses where it is; turning it off never resumes on its own.
   usePauseWhen(reduceMotion, dispatch);
+  usePauseWhen(hidden, dispatch);
   // A live answer has no compare mode (Cristian, #20): the selected pass is always in focus.
   const [comparing, setComparing] = useState(hasTarget && live === undefined);
   const isComparing = comparing && hasTarget && live === undefined && !player.playing;

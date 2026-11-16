@@ -104,6 +104,27 @@ test.describe("Sequence timeline: autoplay", () => {
     await expect(globe.timelineReadout).toHaveText(pausedOn ?? "");
   });
 
+  test("More information pauses it while hidden; closing it returns to the same pass", async ({
+    page,
+  }) => {
+    await globe.goto(`?frame=${LIVE_FRAME.id}`);
+    await globe.expectTimelinePlaying(true);
+
+    await globe.moreInfo.click();
+    await expect(globe.sheet).toBeVisible();
+    await expect(globe.timeline).toBeHidden();
+    await globe.expectTimelinePlaying(false);
+    const pausedOn = await globe.timelineReadout.textContent();
+    await page.waitForTimeout(2_000);
+    await expect(globe.timelineReadout).toHaveText(pausedOn ?? "");
+
+    await page.keyboard.press("Escape");
+    await expect(globe.sheet).toBeHidden();
+    await expect(globe.timeline).toBeVisible();
+    await globe.expectTimelinePlaying(false);
+    await expect(globe.timelineReadout).toHaveText(pausedOn ?? "");
+  });
+
   test("with Loop off at 2×, it stops on the last pass", async () => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
@@ -162,6 +183,54 @@ test.describe("Sequence timeline: controls", () => {
     );
     await globe.timelinePasses("base").first().click();
     await expect(globe.stamp).toHaveText("14 JUL 2026PASS 1 OF 5 · REFERENCE");
+  });
+
+  test("opening and closing More information keeps the paused pass", async ({ page }) => {
+    await globe.mockExplorations({ first: succeededView() });
+    await globe.goto(`?frame=${LIVE_FRAME.id}`);
+
+    await globe.timelinePlay.click();
+    await globe.expectTimelinePlaying(true);
+    await globe.timelinePass(1).click();
+    await globe.expectTimelinePlaying(false);
+    await expect(globe.timelineReadout).toHaveText("Pass 2 of 5 · 19 Aug 2026");
+    await expect(globe.stamp).toHaveText("19 AUG 2026PASS 2 OF 5 · 36 DAYS AFTER PASS 1");
+
+    await globe.moreInfo.click();
+    await expect(globe.sheet).toBeVisible();
+    // Hidden and inert: out of the tab order and the accessibility tree, but still mounted.
+    await expect(globe.timeline).toBeHidden();
+    await expect(globe.timelineWrap).toHaveAttribute("inert", "");
+    await page.keyboard.press("Escape");
+    await expect(globe.sheet).toBeHidden();
+
+    await expect(globe.timeline).toBeVisible();
+    await expect(globe.timelineReadout).toHaveText("Pass 2 of 5 · 19 Aug 2026");
+    await globe.expectTimelinePlaying(false);
+    await expect(globe.stamp).toHaveText("19 AUG 2026PASS 2 OF 5 · 36 DAYS AFTER PASS 1");
+    await globe.expectScene((scene) =>
+      expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-08-19_HH"),
+    );
+  });
+
+  test("on a phone the timeline under the sheet can't take focus", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await globe.mockExplorations({ first: succeededView() });
+    await globe.goto(`?frame=${LIVE_FRAME.id}`);
+    await expect(globe.timeline).toBeVisible();
+
+    await globe.moreInfo.click();
+    await expect(globe.sheet).toBeVisible();
+    await expect(globe.timeline).toBeHidden();
+    await expect(globe.timelineWrap).toHaveAttribute("inert", "");
+    for (let press = 0; press < 25; press += 1) {
+      await page.keyboard.press("Tab");
+      expect(
+        await page.evaluate(
+          () => (document.activeElement?.closest(".x-timeline-wrap") ?? null) !== null,
+        ),
+      ).toBe(false);
+    }
   });
 
   test("play, then a click on a pass pauses on it; Home and End jump to the ends", async ({

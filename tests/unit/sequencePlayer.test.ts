@@ -33,7 +33,7 @@ describe("sequence player", () => {
   });
 
   it("Reduce motion turned on mid-play pauses on the same pass; nothing resumes it on its own", () => {
-    // usePauseWhen dispatches `pause` when the explorer's switch turns on.
+    // usePauseWhen dispatches `pause` when the explorer's switch (or the sheet) turns on.
     const midPlay = run(playing({ index: 0 }), { type: "tick" }, { type: "tick" });
     const paused = run(midPlay, { type: "pause" });
     expect(paused).toMatchObject({ index: 2, playing: false });

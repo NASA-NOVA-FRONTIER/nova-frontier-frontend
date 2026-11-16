@@ -269,6 +269,11 @@ export class GlobePage {
     return this.page.getByTestId(`timeline-speed-${speed}`);
   }
 
+  // The wrapper the explorer hides (and makes inert) under the More information sheet.
+  get timelineWrap(): Locator {
+    return this.page.locator(".x-timeline-wrap").filter({ has: this.timeline });
+  }
+
   // "true" while the sequence player runs.
   async expectTimelinePlaying(playing: boolean): Promise<void> {
     await expect(this.timeline).toHaveAttribute("data-playing", String(playing));

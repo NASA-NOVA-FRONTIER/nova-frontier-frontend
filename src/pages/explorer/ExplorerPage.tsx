@@ -737,7 +737,8 @@ export const ExplorerPage = () => {
       : storyScene(storyItem, chapter, opacity);
 
   const showTimeline = item?.timeline !== undefined && item.coherenceOnly !== true && !sheetOpen;
-  const showLiveTimeline = liveTimeline !== undefined && !sheetOpen;
+  // Kept mounted under the sheet (hidden, inert, paused) so closing it returns to the same pass.
+  const showLiveTimeline = liveTimeline !== undefined;
   const showDock = item?.crops !== undefined && !sheetOpen;
   const showLiveDock = layers.length > 0 && !sheetOpen;
 
@@ -1229,7 +1230,12 @@ export const ExplorerPage = () => {
         )}
 
         {showLiveTimeline && (
-          <div className="x-timeline-wrap" data-collapsed={collapsed}>
+          <div
+            className="x-timeline-wrap"
+            data-collapsed={collapsed}
+            hidden={sheetOpen}
+            inert={sheetOpen}
+          >
             <PassTimeline
               key={runKey}
               data={liveTimeline}
@@ -1241,6 +1247,7 @@ export const ExplorerPage = () => {
               onStep={onTimelineStep}
               pauseSignal={timelinePause}
               reduceMotion={reduceMotion}
+              hidden={sheetOpen}
             />
           </div>
         )}
