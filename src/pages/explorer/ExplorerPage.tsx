@@ -99,6 +99,7 @@ import type { Place } from "@/features/search/placesApi";
 import { fetchCoverage } from "@/features/spot/coverageApi";
 import { nearestCase } from "@/features/spot/spot";
 import { StoryMode } from "@/features/story/StoryMode";
+import { pickStoryVoice, STORY_SPEECH_RATE } from "@/features/story/storyVoice";
 import { PassTimeline } from "@/features/timeline/PassTimeline";
 import { formatDay } from "@/features/timeline/timelineLayout";
 import { CASE_LOCK, STEP_4, passOf } from "@/content/copyV8";
@@ -219,7 +220,12 @@ const speak = (text: string | undefined): void => {
     if (text === undefined) return;
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "en-US";
-    utterance.rate = 1;
+    utterance.rate = STORY_SPEECH_RATE;
+    const voice = pickStoryVoice(window.speechSynthesis.getVoices());
+    if (voice !== undefined) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
+    }
     window.speechSynthesis.speak(utterance);
   } catch {
     // Voice is optional.
