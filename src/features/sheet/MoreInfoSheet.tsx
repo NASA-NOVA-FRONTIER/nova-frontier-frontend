@@ -1,3 +1,4 @@
+import { EvidenceLimitations, EvidenceSources } from "@/features/case-panel/EvidenceNotes";
 import { Icon } from "@/features/case-panel/icons";
 import { Prov } from "@/features/case-panel/Prov";
 import type { Subject } from "@/features/case-panel/subject";
@@ -103,9 +104,6 @@ export const MoreInfoSheet = ({
 
       <div className="x-sheet__body">
         <div className="x-sheet__main">
-          {subject.kind === "live" && exploration !== undefined && (
-            <LiveSciencePanel key={exploration.id} view={exploration} subject={subject} />
-          )}
           <section className="x-sheet__section">
             <p className="x-sheet__kicker">01 · The question</p>
             <div className="x-cards">
@@ -130,6 +128,10 @@ export const MoreInfoSheet = ({
               <Fact k="Question" v={lens?.chip ?? ""} s={lens?.compares ?? ""} />
             </div>
           </section>
+
+          {subject.kind === "live" && exploration !== undefined && (
+            <LiveSciencePanel key={exploration.id} view={exploration} subject={subject} />
+          )}
 
           <section className="x-sheet__section">
             <p className="x-sheet__kicker">02 · The measurement</p>
@@ -305,34 +307,12 @@ export const MoreInfoSheet = ({
             )}
           </section>
 
-          <section className="x-sheet__section">
-            <p className="x-sheet__kicker">05 · What this can't tell you</p>
-            <div className="x-limits">
-              <div className="x-limits__col">
-                <p className="x-limits__head">{subject.plainLimit}</p>
-                {tech && (
-                  <p className="x-muted" data-testid="tech-limit">
-                    {subject.techLimit}
-                  </p>
-                )}
-                {subject.alternatives.length > 0 && (
-                  <>
-                    <p className="x-muted x-small">Other things that change radar like this:</p>
-                    <ul className="x-tags">
-                      {subject.alternatives.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-              </div>
-              <div className="x-limits__col">
-                <p className="x-muted x-small" data-testid="empties-line">
-                  {EMPTIES_LINE}
-                </p>
-              </div>
-            </div>
-          </section>
+          <EvidenceLimitations
+            plain={subject.plainLimit}
+            {...(tech ? { technical: subject.techLimit } : {})}
+            alternatives={subject.alternatives}
+            unavailable={EMPTIES_LINE}
+          />
         </div>
 
         <aside className="x-sheet__side">
@@ -408,18 +388,7 @@ export const MoreInfoSheet = ({
               ))}
             </dl>
           </div>
-          <div className="x-card">
-            <p className="x-kicker">Sources</p>
-            <ul className="x-sources">
-              {subject.sources.map((source) => (
-                <li key={source.href}>
-                  <a href={source.href} target="_blank" rel="noopener">
-                    {source.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <EvidenceSources sources={subject.sources} />
           {onAskNova !== undefined && (
             <button type="button" className="x-ask-nova" onClick={onAskNova} data-testid="ask-nova">
               <NovaGlyph size={32} />

@@ -5,7 +5,16 @@ import "@/pages/explorer/story.css";
 import "@/features/lenses/lenses.css";
 
 import type { Viewer } from "cesium";
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 
 import { CasePanel } from "@/features/case-panel/CasePanel";
 import { PendingSummary, ResultSummary } from "@/features/case-panel/CaseSummary";
@@ -91,7 +100,6 @@ import {
   markOnboardingSeen,
   ONBOARDING_STEPS,
 } from "@/features/onboarding/onboardingState";
-import { MoreInfoSheet } from "@/features/sheet/MoreInfoSheet";
 import {
   CHAPTERS,
   LAST_CHAPTER,
@@ -107,7 +115,7 @@ import { nearestCase, squareSideKm } from "@/features/spot/spot";
 import { StoryMode } from "@/features/story/StoryMode";
 import { PassTimeline } from "@/features/timeline/PassTimeline";
 import { formatDay } from "@/features/timeline/timelineLayout";
-import { CASE_LOCK, STEP_4, passOf } from "@/content/copyV8";
+import { CASE_LOCK, SHEET_EVIDENCE_COPY, STEP_4, passOf } from "@/content/copyV8";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { useAsync } from "@/lib/useAsync";
 import { PHONE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
@@ -141,6 +149,10 @@ type Selection =
       // A lens switch on the same area waits in the compact row; the first run of an area gets the modal.
       lensSwitch: boolean;
     };
+
+const MoreInfoSheet = lazy(async () => ({
+  default: (await import("@/features/sheet/MoreInfoSheet")).MoreInfoSheet,
+}));
 
 const DEFAULT_LENS: LensId = "flood_wetland";
 const CHIP_ZOOM = 3.2;
@@ -1361,15 +1373,23 @@ export const ExplorerPage = () => {
         )}
 
         {sheetOpen && subject !== undefined && (
-          <MoreInfoSheet
-            subject={subject}
-            exploration={subject.kind === "live" ? exploredView : undefined}
-            isArea={live !== undefined && live.area.kind !== "point"}
-            mode={mode}
-            onMode={setMode}
-            onClose={() => setSheetOpen(false)}
-            onAskNova={() => setNovaOpen(true)}
-          />
+          <Suspense
+            fallback={
+              <div className="x-sheet" role="status">
+                <p className="x-sheet__head">{SHEET_EVIDENCE_COPY.loading}</p>
+              </div>
+            }
+          >
+            <MoreInfoSheet
+              subject={subject}
+              exploration={subject.kind === "live" ? exploredView : undefined}
+              isArea={live !== undefined && live.area.kind !== "point"}
+              mode={mode}
+              onMode={setMode}
+              onClose={() => setSheetOpen(false)}
+              onAskNova={() => setNovaOpen(true)}
+            />
+          </Suspense>
         )}
 
         {storyItem !== undefined && (

@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import { InsarCard } from "@/features/case-panel/InsarCard";
 import type { Subject } from "@/features/case-panel/subject";
+import { SOURCE } from "@/features/case-panel/verdicts";
+import { SHEET_EVIDENCE_COPY } from "@/content/copyV8";
 import type { ExplorationView } from "@/features/explore/exploreSchemas";
 import { RadarHistory } from "@/features/sheet/RadarHistory";
 import { RadarImagePanel } from "@/features/sheet/RadarImagePanel";
@@ -68,9 +70,6 @@ export const LiveSciencePanel = ({
   const farm =
     subject.lens === "agriculture" ? agriculture.safeParse(lens?.evaluation).data : undefined;
   const fireHistory = fire.safeParse(lens?.point).data?.cross_pol_history;
-  const hasPower = result.observations.some((row) =>
-    Object.values(row.point_db ?? {}).some((value) => value !== null),
-  );
   const newContract = result.products != null;
   return (
     <>
@@ -157,12 +156,18 @@ export const LiveSciencePanel = ({
           </div>
         )}
       </section>
-      {hasPower ? (
-        <RadarHistory observations={result.observations} date={date} onDate={setSelectedDate} />
-      ) : (
-        result.insar == null && (
-          <p className="x-muted">Point-return history is unavailable for this result.</p>
-        )
+      {result.insar == null && (
+        <RadarHistory
+          returns={result.observations.map((row) => ({
+            date: row.date,
+            power: row.point_db ?? {},
+          }))}
+          date={date}
+          onDate={setSelectedDate}
+          provenance={view.cache === "hit" ? "offline" : "online"}
+          source={SOURCE.liveQuality}
+          unavailableReason={SHEET_EVIDENCE_COPY.pointHistoryUnavailable}
+        />
       )}
       {newContract && (
         <details className="x-inset x-radar__files">
