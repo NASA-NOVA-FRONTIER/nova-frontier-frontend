@@ -16,7 +16,8 @@ test.describe("Landing and about pages", () => {
 
   test("the landing cases carousel opens a case in the explorer", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("[data-testid^=landing-case-]")).toHaveCount(6);
+    // Issue #28: one demo case per phenomenon.
+    await expect(page.locator("[data-testid^=landing-case-]")).toHaveCount(5);
     await expect(page.getByTestId("landing-case-niscemi-aftermath")).toContainText(
       "DID THE SLOPE KEEP ITS ECHO?",
     );
