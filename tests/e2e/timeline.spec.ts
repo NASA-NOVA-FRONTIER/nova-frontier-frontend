@@ -83,6 +83,27 @@ test.describe("Sequence timeline: autoplay", () => {
     await globe.expectTimelinePlaying(false);
   });
 
+  test("the explorer's Reduce motion switch pauses it where it is, and never resumes it", async ({
+    page,
+  }) => {
+    await globe.goto(`?frame=${LIVE_FRAME.id}`);
+    await globe.helpButton.click();
+    await globe.expectTimelinePlaying(true);
+
+    await globe.motionSwitch.click();
+    await globe.expectTimelinePlaying(false);
+    const pausedOn = await globe.timelineReadout.textContent();
+    // Two seconds is more than one 1.6 s step: a running timer would have moved it.
+    await page.waitForTimeout(2_000);
+    await expect(globe.timelineReadout).toHaveText(pausedOn ?? "");
+    await expect(globe.timelinePlay).toHaveAttribute("aria-label", "Play");
+
+    await globe.motionSwitch.click();
+    await page.waitForTimeout(2_000);
+    await globe.expectTimelinePlaying(false);
+    await expect(globe.timelineReadout).toHaveText(pausedOn ?? "");
+  });
+
   test("with Loop off at 2×, it stops on the last pass", async () => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 

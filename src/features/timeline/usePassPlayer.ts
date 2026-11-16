@@ -55,3 +55,10 @@ export const usePassPlayer = (
 
   return [state, dispatch];
 };
+
+// Pauses whenever `flag` turns on (and on mount if it starts on, a no-op when already paused).
+export const usePauseWhen = (flag: boolean, dispatch: Dispatch<PlayerEvent>): void => {
+  useEffect(() => {
+    if (flag) dispatch({ type: "pause" });
+  }, [flag, dispatch]);
+};

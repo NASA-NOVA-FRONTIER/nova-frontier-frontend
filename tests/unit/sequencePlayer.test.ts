@@ -32,6 +32,16 @@ describe("sequence player", () => {
     });
   });
 
+  it("Reduce motion turned on mid-play pauses on the same pass; nothing resumes it on its own", () => {
+    // usePauseWhen dispatches `pause` when the explorer's switch turns on.
+    const midPlay = run(playing({ index: 0 }), { type: "tick" }, { type: "tick" });
+    const paused = run(midPlay, { type: "pause" });
+    expect(paused).toMatchObject({ index: 2, playing: false });
+    // Turning the switch off sends nothing: ticks from a stale timer can't move it either.
+    expect(run(paused, { type: "tick" }, { type: "tick" })).toBe(paused);
+    expect(run(paused, { type: "pause" })).toBe(paused);
+  });
+
   it("never plays one step, or a sequence with no images of its own", () => {
     expect(initPlayer({ n: 1, index: 0, canPlay: true, reducedMotion: false })).toMatchObject({
       playing: false,

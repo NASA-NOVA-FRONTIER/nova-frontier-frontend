@@ -1219,7 +1219,12 @@ export const ExplorerPage = () => {
 
         {showTimeline && item.timeline !== undefined && (
           <div className="x-timeline-wrap" data-collapsed={collapsed}>
-            <PassTimeline key={item.id} data={item.timeline} pauseSignal={timelinePause} />
+            <PassTimeline
+              key={item.id}
+              data={item.timeline}
+              pauseSignal={timelinePause}
+              reduceMotion={reduceMotion}
+            />
           </div>
         )}
 
@@ -1235,6 +1240,7 @@ export const ExplorerPage = () => {
               }}
               onStep={onTimelineStep}
               pauseSignal={timelinePause}
+              reduceMotion={reduceMotion}
             />
           </div>
         )}

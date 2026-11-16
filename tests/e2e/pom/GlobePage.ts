@@ -87,6 +87,8 @@ export class GlobePage {
   readonly planPasses: Locator;
   readonly wholeGlobe: Locator;
   readonly helpButton: Locator;
+  // The explorer's own "Reduce motion" switch, in the help menu.
+  readonly motionSwitch: Locator;
   readonly squareBar: Locator;
   readonly squareCancel: Locator;
   readonly useSquare: Locator;
@@ -146,6 +148,7 @@ export class GlobePage {
     this.planPasses = page.getByTestId("plan-passes");
     this.wholeGlobe = page.getByTestId("whole-globe");
     this.helpButton = page.getByTestId("help-button");
+    this.motionSwitch = page.getByTestId("toggle-motion");
     this.squareBar = page.getByTestId("square-bar");
     this.squareCancel = page.getByTestId("square-cancel");
     this.useSquare = page.getByTestId("square-use");
