@@ -84,6 +84,11 @@ describe("spotWait (#25): the backend's own estimate before anything runs", () =
     });
   });
 
+  // Production estimates by plan (16 Nov 2026): 140 s with four scenes (Skollersta), 228.9 s with five.
+  it("differs between places as the backend's estimate does", () => {
+    expect(spotWait({ ...LAND, etaSeconds: 140 }).value).toBe("Usually under 3 min");
+  });
+
   // Production after a run at the same spot answered etaSeconds 0.0 with cache "hit" (16 Nov 2026).
   it("says a prepared answer opens at once, OFFLINE", () => {
     expect(spotWait({ ...LAND, etaSeconds: 0, cache: "hit" })).toEqual({
