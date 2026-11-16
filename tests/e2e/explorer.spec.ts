@@ -203,7 +203,7 @@ test.describe("Explorer: live questions", () => {
     await expect(page.getByTestId("plan-error")).toContainText(
       "We couldn't reach the radar archive",
     );
-    await expect(globe.verdict).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
     await page.getByTestId("plan-error").getByRole("button", { name: "Try again" }).click();
     await expect(globe.planPasses).toContainText("39 passes in the plan");
   });
