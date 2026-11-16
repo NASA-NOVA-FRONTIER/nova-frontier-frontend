@@ -156,19 +156,27 @@ test.describe("Explorer: Nova and downloads", () => {
     await expect(menu.getByTestId("download-pdf")).toHaveAttribute("aria-disabled", "true");
   });
 
-  test("with a case open, the CSV names its source and flags demo rows", async ({ page }) => {
+  test("with a case open, the CSV says where it comes from and leaves demo rows empty", async ({
+    page,
+  }) => {
     await globe.goto("?case=qadirabad");
     await page.getByTestId("download-button").click();
+    await expect(page.getByTestId("download-csv")).toContainText("Data · CSV");
     const downloading = page.waitForEvent("download");
     await page.getByTestId("download-csv").click();
     const download = await downloading;
-    expect(download.suggestedFilename()).toBe("nisar-qadirabad-timeline.csv");
-    const path = await download.path();
-    const csv = await readFile(path, "utf8");
-    const [comment, header, first] = csv.split("\n");
-    expect(comment).toMatch(/^# /);
-    expect(header).toBe("case,lens,date,role,cells_outside_range_pct,measured,demo");
-    expect(first).toMatch(/^qadirabad,flood_wetland,\d{4}-\d{2}-\d{2},\w+,.*,(true|false),true$/);
+    expect(download.suggestedFilename()).toMatch(
+      /^nisar-hazard-watch_qadirabad_\d{4}-\d{2}-\d{2}\.csv$/,
+    );
+    const text = await readFile(await download.path(), "utf8");
+    const lines = text.replace(/^﻿/, "").split("\r\n");
+    expect(lines[0]).toMatch(/^# NISAR Hazard Watch: Qadirabad/);
+    expect(lines).toContain("# Scientific status: diagnostic evidence, not a validated classifier");
+    const at = lines.findIndex((line) => !line.startsWith("#"));
+    expect(lines[at]).toBe(
+      "date,role,hh_point_db,hv_point_db,hh_area_median_db,hv_area_median_db,cells_outside_band,cells_eligible,outside_band_pct,demo",
+    );
+    expect(lines[at + 1]).toMatch(/^\d{4}-\d{2}-\d{2},baseline,,,,,,,,true$/);
   });
 
   test("the PNG download carries the context strip", { tag: "@globe" }, async ({ page }) => {

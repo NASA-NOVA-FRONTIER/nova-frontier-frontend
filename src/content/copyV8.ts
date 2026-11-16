@@ -103,6 +103,7 @@ export const STEP_2 = {
   areaSub: (posting: string, cells: number) => `${posting} grid · ${formatCount(cells)} cells`,
   waitLabel: "EXPECTED WAIT",
   // Decision 8 (docs/design/README.md) overrides fixed waits: the UI shows the backend's estimate.
+  // #25 (decision 8, v9 C7): the card shows the backend's estimate (spot.ts spotWait), not this.
   waitValue: "1–4 min",
   waitSub: "plus any queue",
   catalogLabel: (direction: string) => `IN THE CATALOG · ${direction}`,
@@ -578,4 +579,23 @@ export const LANDSLIDE = {
   bandRule: "Out-of-band rule",
   experimentalWhy:
     "No validated landslide lens exists: these are measured returns, read as candidate evidence only.",
+} as const;
+
+// Not in COPY-v8: the printable reports and their PDF (#37).
+export const REPORT = {
+  offline: "OFFLINE · measured ahead of time",
+  online: "ONLINE · computed live from NISAR L-band scenes",
+  scientificStatus: "Diagnostic evidence, not a validated classifier",
+  imagesKicker: "The measured images",
+  changeAlt: (name: string) => `Radar change layer at ${name}`,
+  baselineAlt: (name: string) => `Radar baseline layer at ${name}`,
+  figureAlt: (name: string) => `Backend report figure for ${name}`,
+  alternatives: "Other things that change radar like this:",
+  valuesKicker: "Measured values by date, at the point",
+  valuesNote: "gamma-zero dB at the measured point; an empty cell is a masked channel, never zero.",
+  limitsAll: "Limits the radar service states for this answer",
+  retry: "Try again",
+  loadFailed: "We couldn't load this answer",
+  loadFailedBody:
+    "The server didn't answer. Try again, or ask the question again from the explorer once it is done.",
 } as const;

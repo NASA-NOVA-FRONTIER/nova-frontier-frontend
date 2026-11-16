@@ -353,7 +353,8 @@ test.describe("Explorer: pick a spot (step 2)", () => {
     await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
     await expect(globe.placeCard).toContainText("NEW SPOT · LIVE ANALYSIS");
     await expect(page.getByTestId("spot-area")).toHaveText(/AREA\s*10\.24 km square/);
-    await expect(page.getByTestId("spot-wait")).toContainText("1–4 min");
+    // #25: the backend's p80 for this spot (228.9 s in the recorded answer), not a fixed range.
+    await expect(page.getByTestId("spot-wait")).toContainText("Usually under 4 min");
     await expect(page.getByTestId("spot-wait")).toContainText("plus any queue");
     await expect(page.getByTestId("spot-catalog")).toContainText("IN THE CATALOG · ASCENDING");
     await expect(page.getByTestId("spot-catalog")).toContainText("LAST 5 MONTHS");

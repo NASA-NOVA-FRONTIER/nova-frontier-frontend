@@ -4,14 +4,18 @@ import { DESIGN_VERSION } from "@/content/version";
 import { FireContextCard } from "@/features/case-panel/FireContextCard";
 import { InsarCard } from "@/features/case-panel/InsarCard";
 import { NormalRangeCard } from "@/features/case-panel/NormalRangeCard";
+import { REPORT } from "@/content/copyV8";
 import { SOURCE, VERDICT } from "@/features/case-panel/verdicts";
 import { findLens, type LensId } from "@/features/cases/cases";
 import { ContrastBars } from "@/features/charts/ContrastBars";
+import { exportName } from "@/features/downloads/dataCsv";
 import { getExploration } from "@/features/explore/exploreApi";
 import type { ExplorationView } from "@/features/explore/exploreSchemas";
 import { exploreSubject } from "@/features/explore/exploreSubject";
 import { EMPTIES_LINE, formatLonLat } from "@/features/live/liveQuestion";
 import { formatDay } from "@/features/timeline/timelineLayout";
+import { CHANNELS } from "@/features/landslide/landslideEvidence";
+import { absoluteApiPath, ApiError } from "@/lib/api/apiClient";
 import { Link } from "@/lib/Link";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { useAsync } from "@/lib/useAsync";
@@ -36,6 +40,22 @@ const centreOf = (view: ExplorationView): [number, number] => {
 
 const nameOf = (view: ExplorationView): string => formatLonLat(centreOf(view));
 
+// The measured images worth printing: the lens's own change (or coherence) layer first, then the
+// target pass as the radar saw it. Demo results have no layers to show.
+const figuresOf = (view: ExplorationView) => {
+  const layers = view.result?.layers ?? [];
+  const first = layers.find((layer) => ["change", "diagnostic", "coherence"].includes(layer.kind));
+  const target = view.result?.lens?.target_date;
+  const observed =
+    layers.find(
+      (layer) => layer.kind === "observed" && target !== undefined && layer.id.includes(target),
+    ) ?? layers.find((layer) => layer.kind === "observed");
+  return [first, observed].filter((layer) => layer !== undefined);
+};
+
+const db = (value: number | null | undefined): string =>
+  value === null || value === undefined ? "—" : `${value.toFixed(2)} dB`;
+
 const frameOf = (view: ExplorationView): string => {
   const scene = view.result?.scenes[0];
   return scene === undefined ? "NISAR frame" : `Track ${scene.track} · Frame ${scene.frame}`;
@@ -44,7 +64,7 @@ const frameOf = (view: ExplorationView): string => {
 // /report?exploration=<id>: the same printable page for a live answer. Every number comes from the
 // backend's answer; the summary is a template filled from those fields, never AI-written.
 export const LiveReport = ({ id }: { id: string }) => {
-  const { state } = useAsync((signal) => getExploration(id, signal), id);
+  const { state, retry } = useAsync((signal) => getExploration(id, signal), id);
   const view = state?.status === "success" ? state.data : undefined;
   const subject =
     view === undefined
@@ -55,9 +75,13 @@ export const LiveReport = ({ id }: { id: string }) => {
           point: centreOf(view),
         });
   const [generated] = useState(() => new Date().toISOString().slice(0, 10));
+  // An id the backend doesn't know is a missing answer; any other failure can be tried again.
+  const failed =
+    state?.status === "error" && !(state.error instanceof ApiError && state.error.status === 404);
 
   useEffect(() => {
-    document.title = `Live question ${id} · NISAR Hazard Watch report`;
+    // #37: "Save as PDF" names the file after the page title.
+    document.title = exportName(`exploration-${id}`, new Date().toISOString().slice(0, 10), "");
   }, [id]);
 
   const heading = (
@@ -93,17 +117,35 @@ export const LiveReport = ({ id }: { id: string }) => {
         {heading}
         <article className="r-sheet" role="alert" data-testid="report-empty">
           <p className="r-kicker">NISAR Hazard Watch · Radar evidence report</p>
-          <h1 className="r-title">No finished answer called “{id}”</h1>
-          <p>
-            The answer is missing or still running. Ask the question again from the explorer and
-            open the report once it is done.
-          </p>
+          {failed ? (
+            <>
+              <h1 className="r-title">{REPORT.loadFailed}</h1>
+              <p>{REPORT.loadFailedBody}</p>
+              <button
+                type="button"
+                className="r-button r-button--dark"
+                onClick={retry}
+                data-testid="report-retry"
+              >
+                {REPORT.retry}
+              </button>
+            </>
+          ) : (
+            <>
+              <h1 className="r-title">No finished answer called “{id}”</h1>
+              <p>
+                The answer is missing or still running. Ask the question again from the explorer and
+                open the report once it is done.
+              </p>
+            </>
+          )}
         </article>
       </main>
     );
 
   const lens = findLens(subject.lens as LensId);
   const group = subject.groups[0];
+  const figures = figuresOf(view);
   return (
     <main className="r-page" data-testid="report">
       {heading}
@@ -150,6 +192,11 @@ export const LiveReport = ({ id }: { id: string }) => {
               v={VERDICT[subject.verdict].label}
             />
             <Fact k="Area" v={`${(view.result?.areaKm2 ?? 0).toFixed(1)} km²`} />
+            <Fact k="Mode" v={view.cache === "hit" ? REPORT.offline : REPORT.online} />
+            <Fact
+              k="Scientific status"
+              v={view.result?.scientificStatus ?? REPORT.scientificStatus}
+            />
           </dl>
           <p className="r-line">
             {subject.verdictLine}{" "}
@@ -205,6 +252,63 @@ export const LiveReport = ({ id }: { id: string }) => {
             <FireContextCard context={subject.fireContext} heading={false} />
           </section>
         )}
+
+        {figures.length > 0 && (
+          <section className="r-block r-keep" data-testid="report-figures">
+            <p className="r-kicker r-kicker--split">
+              <span>{REPORT.imagesKicker}</span>
+              <ProvenanceChip kind={subject.demo ? "demo" : "real"} source={SOURCE.liveQuality} />
+            </p>
+            <div className="r-figures">
+              {figures.map((layer) => (
+                <figure key={layer.id}>
+                  <img src={absoluteApiPath(layer.url)} alt={layer.title} />
+                  <figcaption>
+                    {layer.title}
+                    {layer.dates !== undefined && layer.dates !== null && layer.dates.length > 0
+                      ? ` · ${layer.dates.join(" → ")}`
+                      : ""}
+                    {layer.units ? ` · ${layer.units}` : ""}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="r-block r-keep" data-testid="report-values">
+          <p className="r-kicker r-kicker--split">
+            <span>{REPORT.valuesKicker}</span>
+            <ProvenanceChip kind={subject.demo ? "demo" : "real"} source={SOURCE.liveQuality} />
+          </p>
+          <table className="r-table">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Status</th>
+                {CHANNELS.map((channel) => (
+                  <th key={channel} scope="col">
+                    {channel}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[...(view.result?.observations ?? [])]
+                .sort((a, b) => a.date.localeCompare(b.date))
+                .map((row) => (
+                  <tr key={row.date}>
+                    <th scope="row">{row.date}</th>
+                    <td>{row.status.replaceAll("_", " ")}</td>
+                    {CHANNELS.map((channel) => (
+                      <td key={channel}>{db(row.point_db?.[channel])}</td>
+                    ))}
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+          <p className="r-small">{REPORT.valuesNote}</p>
+        </section>
 
         <section className="r-cols r-keep">
           <div className="r-block">
