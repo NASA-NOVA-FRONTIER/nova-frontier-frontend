@@ -6,7 +6,7 @@ const CURSOR_OFFSET_PX = 16;
 
 export type TooltipContent = { title: string; sub: string };
 
-// The time-lapse stamp under the footprint (SPECS-v8 §4), shown while it plays.
+// The stamp under the footprint: the timeline step in focus (COPY-flow-v9 §5).
 export type GlobeStamp = { date: string; pass: string; target: boolean; box: BBox };
 
 type GlobeTooltipProps = { content: TooltipContent; x: number; y: number };

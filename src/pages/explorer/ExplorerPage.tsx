@@ -51,10 +51,7 @@ import {
   defaultView,
   dockRows,
   measuredPasses,
-  nextStep,
-  playStart,
   shownLayer,
-  timeLapseSteps,
   type DockPick,
 } from "@/features/explore/exploreDock";
 import { liveLayers } from "@/features/explore/exploreLayers";
@@ -100,8 +97,9 @@ import { fetchCoverage } from "@/features/spot/coverageApi";
 import { nearestCase } from "@/features/spot/spot";
 import { StoryMode } from "@/features/story/StoryMode";
 import { PassTimeline } from "@/features/timeline/PassTimeline";
+import { stampOf, type StepView } from "@/features/timeline/sequence";
 import { formatDay } from "@/features/timeline/timelineLayout";
-import { CASE_LOCK, STEP_4, passOf } from "@/content/copyV8";
+import { CASE_LOCK } from "@/content/copyV8";
 import { EMPTY_GLOBE } from "@/content/copyV9";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { useAsync } from "@/lib/useAsync";
@@ -142,8 +140,6 @@ const CHIP_ZOOM = 3.2;
 const REGION_KM = 240;
 const REGION_ZOOM = 1;
 const DEFAULT_OPACITY = 85;
-// SPECS-v8 §4: the time-lapse advances one pass every 1.1 s.
-const TIME_LAPSE_MS = 1100;
 // Chapter 1 shows the Punjab plains around the Chenab (SPECS §5: ~2,600 km altitude).
 const STORY_REGION_KM = 900;
 const STORY_REGION_SECONDS = 2.2;
@@ -429,8 +425,11 @@ export const ExplorerPage = () => {
     pick: DockPick;
     date: string | undefined;
   }>();
-  // The run whose time-lapse is playing; any other run (or none) means stopped.
-  const [lapseFor, setLapseFor] = useState("");
+  // Bumped to pause the timeline's player: a globe drag, the sheet, another lens or layer.
+  const [timelinePause, setTimelinePause] = useState(0);
+  const pauseTimeline = useCallback(() => setTimelinePause((count) => count + 1), []);
+  // The live timeline's step in focus, for the globe stamp; tagged with its run.
+  const [timelineStep, setTimelineStep] = useState<{ runKey: string; step: StepView }>();
 
   const openCase = useCallback((item: Case) => {
     setSelection({ kind: "case", item });
@@ -648,12 +647,12 @@ export const ExplorerPage = () => {
   ]);
 
   const openSheet = () => {
-    setLapseFor("");
+    pauseTimeline();
     setSheetOpen(true);
   };
 
   const chooseLens = (lens: LensId) => {
-    setLapseFor("");
+    pauseTimeline();
     // Issue #28: a demo case keeps the analysis it was computed with; it never becomes a live question.
     if (selection === undefined || selection.kind === "case") return;
     if (lens === selection.lens) return;
@@ -702,49 +701,29 @@ export const ExplorerPage = () => {
   const dockView = dockChoice?.runKey === runKey ? dockChoice : dockDefault;
   const liveLayer = shownLayer(layers, dockView.pick, dockView.date);
   const layerId = liveLayer?.id;
-  const lapsePlaying = lapseFor !== "" && lapseFor === runKey;
-  const stopLapse = () => setLapseFor("");
   const setDock = (pick: DockPick, date: string | undefined = dockView.date) =>
     setDockChoice({ runKey, pick, date });
-  // Any pick of a layer that is not a pass channel stops the time-lapse; HH ↔ HV keeps it going.
+  // Any pick of a layer that is not a pass channel stops the player; HH ↔ HV keeps it going.
   const pickDock = (pick: DockPick) => {
-    if (pick?.kind !== "pass") stopLapse();
+    if (pick?.kind !== "pass") pauseTimeline();
     setDock(pick);
   };
-  const pickPass = (date: string) => {
-    stopLapse();
-    setDock(dockView.pick, date);
-  };
-  const lapsePol = dockView.pick?.kind === "pass" ? dockView.pick.pol : "HH";
-  const lapseSteps = useMemo(
-    () => timeLapseSteps(livePasses, layers, lapsePol),
-    [livePasses, layers, lapsePol],
+  const pickPass = (date: string) => setDock(dockView.pick, date);
+  const onTimelineStep = useCallback(
+    (step: StepView | undefined) =>
+      setTimelineStep(step === undefined ? undefined : { runKey, step }),
+    [runKey],
   );
-  const lapseIndex = lapseSteps.findIndex((step) => step.date === dockView.date);
-  const togglePlay = () => {
-    if (lapsePlaying) {
-      stopLapse();
-      return;
-    }
-    const start = lapseSteps[playStart(lapseIndex, lapseSteps.length)];
-    if (start === undefined) return;
-    setDock({ kind: "pass", pol: lapsePol }, start.date);
-    setLapseFor(runKey);
-  };
-  // One step every 1.1 s; the step after the target ends the time-lapse on the target.
-  useEffect(() => {
-    if (!lapsePlaying) return;
-    const timer = window.setTimeout(() => {
-      const next = nextStep(lapseIndex, lapseSteps.length);
-      const step = next === undefined ? undefined : lapseSteps[next];
-      if (step === undefined) setLapseFor("");
-      else setDockChoice({ runKey, pick: { kind: "pass", pol: lapsePol }, date: step.date });
-    }, TIME_LAPSE_MS);
-    return () => window.clearTimeout(timer);
-  }, [lapsePlaying, lapseIndex, lapseSteps, lapsePol, runKey]);
-  const lapseStep = lapsePlaying ? lapseSteps[lapseIndex] : undefined;
-  // Under the footprint the user asked about, which is the box the images cover.
-  const lapseBox = live === undefined ? undefined : boundsOf(ringOf(live.area));
+  // v9: the stamp always names the step in focus, under the footprint the images cover. Only over a
+  // pass image or the pair's layers: a change map isn't any one pass.
+  const stampBox = live === undefined ? undefined : boundsOf(ringOf(live.area));
+  const focus = timelineStep?.runKey === runKey ? timelineStep.step : undefined;
+  const stamp =
+    focus !== undefined &&
+    stampBox !== undefined &&
+    (focus.mode === "intervals" || dockView.pick?.kind === "pass")
+      ? { ...stampOf(focus), box: stampBox }
+      : undefined;
 
   const tourItem = storyCase();
   const storyItem = story ? tourItem : undefined;
@@ -754,21 +733,13 @@ export const ExplorerPage = () => {
           square: place && { place, ...placement },
           liveDrape: liveLayer && { url: liveLayer.href, bounds: liveLayer.bounds },
           gridMetres: gridMetresOf(exploredView),
-          stamp: lapseStep &&
-            lapseBox && {
-              date: formatDay(lapseStep.date).toUpperCase(),
-              pass:
-                lapseStep.role === undefined
-                  ? passOf(lapseStep.k, lapseStep.n)
-                  : STEP_4.playStampPass(lapseStep.k, lapseStep.n, lapseStep.role),
-              target: lapseStep.role === "TARGET",
-              box: lapseBox,
-            },
+          stamp,
         })
       : storyScene(storyItem, chapter, opacity);
 
   const showTimeline = item?.timeline !== undefined && item.coherenceOnly !== true && !sheetOpen;
-  const showLiveTimeline = liveTimeline !== undefined && !sheetOpen;
+  // Kept mounted under the sheet (hidden, inert, paused) so closing it returns to the same pass.
+  const showLiveTimeline = liveTimeline !== undefined;
   const showDock = item?.crops !== undefined && !sheetOpen;
   const showLiveDock = layers.length > 0 && !sheetOpen;
 
@@ -995,6 +966,7 @@ export const ExplorerPage = () => {
             onOpenCase={onGlobeOpenCase}
             onPlace={onGlobePlace}
             onMoveSquare={moveSquare}
+            onInteract={pauseTimeline}
             onUnavailable={() => setUnavailable(true)}
             onViewer={(viewer) => {
               viewerRef.current = viewer;
@@ -1143,7 +1115,7 @@ export const ExplorerPage = () => {
               />
             }
             onToggle={() => {
-              stopLapse();
+              pauseTimeline();
               if (sheetOpen) setSheetOpen(false);
               else setCollapsed(!collapsed);
             }}
@@ -1260,6 +1232,8 @@ export const ExplorerPage = () => {
             <PassTimeline
               key={item.id}
               data={item.timeline}
+              pauseSignal={timelinePause}
+              reduceMotion={reduceMotion}
               demo={item.timeline.realDates !== true}
               realSource={SOURCE.caseTimeline}
             />
@@ -1267,17 +1241,24 @@ export const ExplorerPage = () => {
         )}
 
         {showLiveTimeline && (
-          <div className="x-timeline-wrap" data-collapsed={collapsed}>
+          <div
+            className="x-timeline-wrap"
+            data-collapsed={collapsed}
+            hidden={sheetOpen}
+            inert={sheetOpen}
+          >
             <PassTimeline
               key={runKey}
               data={liveTimeline}
               demo={false}
               live={{
                 date: dockView.date,
-                playing: lapsePlaying,
                 onPick: pickPass,
-                onPlay: togglePlay,
               }}
+              onStep={onTimelineStep}
+              pauseSignal={timelinePause}
+              reduceMotion={reduceMotion}
+              hidden={sheetOpen}
             />
           </div>
         )}
@@ -1391,7 +1372,7 @@ type SceneExtras = {
   liveDrape?: Drape | undefined;
   // Posting the service reported for the live result, in metres.
   gridMetres?: number | undefined;
-  // The time-lapse stamp, while it plays.
+  // The timeline's step in focus, named under the footprint.
   stamp?: GlobeStamp | undefined;
 };
 
