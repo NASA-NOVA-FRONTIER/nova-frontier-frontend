@@ -15,17 +15,9 @@ import { isCardLens } from "@/features/lenses/lensSlots";
 import { LENS_SLOTS } from "@/features/lenses/lensSlotsRegistry";
 import { lensReasons } from "@/features/lenses/reasons";
 import { surroundingsRow } from "@/features/lenses/surroundings";
+import { SurroundingsBlock } from "@/features/lenses/SurroundingsBlock";
 import { cardVerdictOf, VERDICT_LABEL } from "@/features/lenses/verdictLabel";
 import { popIn, revealBlocks } from "@/lib/motion";
-
-const SURROUNDINGS_GLYPH = {
-  same: "within",
-  darker: "departure",
-  insufficient: "insufficient",
-} as const;
-
-const SOURCE_SURROUNDINGS =
-  "Exploration API → result.lens.evaluation.surrounding_comparison (focal patch against matched cells)";
 
 const signed = (value: number): string =>
   `${value < 0 ? "−" : value > 0 ? "+" : ""}${Math.abs(value).toFixed(1)}`;
@@ -159,24 +151,7 @@ export const LensResultCard = ({
         </section>
       )}
 
-      {surroundings !== undefined && (
-        <section
-          className="x-lcard__section x-lsurround"
-          data-rv
-          data-testid="lens-surroundings"
-          data-state={surroundings.state}
-        >
-          <p className="x-kicker x-kicker--split">
-            <span>{STEP_6.surroundingsTitle}</span>
-            <Prov kind="real" source={SOURCE_SURROUNDINGS} />
-          </p>
-          <p className="x-lsurround__label">
-            <VerdictGlyph verdict={SURROUNDINGS_GLYPH[surroundings.state]} />
-            {surroundings.label}
-          </p>
-          <p className="x-lsurround__line">{surroundings.sentence}</p>
-        </section>
-      )}
+      {surroundings !== undefined && <SurroundingsBlock row={surroundings} />}
 
       {slots.drivers != null && (
         <section className="x-lcard__slot" data-rv data-testid="lens-slot-drivers">
