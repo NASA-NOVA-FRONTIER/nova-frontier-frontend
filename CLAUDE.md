@@ -125,6 +125,23 @@ Reduced motion opens paused on the reference pass (COPY-flow-v9 §6). Each live 
 `display_<date>_<pol>` image; a pass without one shows nothing. A case with no image per pass (all of
 them today) can't play.
 
+## The v9 result
+
+`src/features/result/` (v9, #15/#26): a live answer of the four live lenses (`flood_wetland`,
+`wildfire`, `vegetation_disturbance`, `insar`) reads as `ResultCard` (chips ONLINE/OFFLINE from
+`cache`, MEASURED or DEMO DATA from `isDemo` · lens and place · title and the passes' real range, never an
+event date · stat "N of M" · "Could also be:" / "Not shown:" · "Place a new square" · More information).
+Below it, a closed "EVIDENCE AND QUALITY" section keeps the v8 OPERA witness, the surroundings row and
+flood's possible drivers (HYPOTHESIS). `LegendCard` replaces `LiveLayerDock` for those lenses: one radio per
+copyV9 `LAYERS` entry, the fixed v8 ramp with its two ends, and the opacity slider; on phones the
+same layers are the pills. `resultLayers.ts` maps each layer to a backend id **by id, never by kind**
+(`display_baseline_change_HH/HV`, `display_flood_signature_flags_dual_darkening`,
+`display_coherence_coherence`, `display_wrapped_phase_*`; HH/HV follow the timeline's pass), and
+`resultStat.ts` reads the stat (flood dual-darkening cells, HV decline on the last two passes only
+when `cross_pol_history` is `evaluated`, InSAR phase cells of window cells). Agriculture keeps the v8
+`LensResultCard` and `LiveLayerDock`. `result.spec.ts` scans the result for hectares, probability,
+cm, causes and "detected" (`[data-negation]`, the "Not shown:" line, is skipped).
+
 ## The live exploration flow
 
 `src/features/explore/` talks to the backend: `exploreSchemas.ts` (zod, the runtime truth, built from

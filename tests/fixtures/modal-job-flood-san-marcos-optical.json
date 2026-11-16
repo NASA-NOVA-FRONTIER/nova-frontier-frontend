@@ -1,0 +1,1596 @@
+{
+  "api_version": "2.0",
+  "job_id": "cf3e5f2dcbae4318bac3ccf81547cf35",
+  "status": "succeeded",
+  "status_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35",
+  "cache": "miss",
+  "result": {
+    "operation": "explore",
+    "science_status": "complete",
+    "revision": "75f94b85d46b311f28c91c44",
+    "point": [-75.104, 8.657],
+    "isDemo": false,
+    "science": {
+      "observations": [
+        {
+          "date": "2026-08-28",
+          "sensing_start_utc": "2026-08-28T10:39:36.000Z",
+          "granule_id": "G4292403287-ASF",
+          "granule_title": "NISAR_L2_PR_GCOV_029_047_A_006_4005_DHDH_A_20260828T103936_20260828T104011_P05023_N_F_J_001",
+          "grid": {
+            "epsg": 32618,
+            "bounds_native": [488230.0, 956620.0, 488870.0, 957260.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "point_db": { "HH": -9.015619277954102, "HV": -13.70720100402832 },
+          "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+          "quality": {
+            "productVersion": "1.0.11",
+            "compositeReleaseId": "P05023",
+            "radarBand": "L",
+            "instrumentName": "LSAR",
+            "hasInputDataException": 0,
+            "noiseCorrectionApplied": "False",
+            "isFullCovariance": "False"
+          },
+          "status": "observed",
+          "layer": {
+            "role": "observed_gamma0",
+            "dates": ["2026-08-28"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/2026-08-28.tif"
+          }
+        },
+        {
+          "date": "2026-09-09",
+          "sensing_start_utc": "2026-09-09T10:39:36.000Z",
+          "granule_id": "G4311910207-ASF",
+          "granule_title": "NISAR_L2_PR_GCOV_030_047_A_006_4005_DHDH_A_20260909T103936_20260909T104011_P05023_N_F_J_001",
+          "grid": {
+            "epsg": 32618,
+            "bounds_native": [488230.0, 956620.0, 488870.0, 957260.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "point_db": { "HH": -7.816259860992432, "HV": -23.12179183959961 },
+          "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+          "quality": {
+            "productVersion": "1.0.11",
+            "compositeReleaseId": "P05023",
+            "radarBand": "L",
+            "instrumentName": "LSAR",
+            "hasInputDataException": 0,
+            "noiseCorrectionApplied": "False",
+            "isFullCovariance": "False"
+          },
+          "status": "observed",
+          "layer": {
+            "role": "observed_gamma0",
+            "dates": ["2026-09-09"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/2026-09-09.tif"
+          }
+        },
+        {
+          "date": "2026-09-21",
+          "sensing_start_utc": "2026-09-21T10:39:36.000Z",
+          "granule_id": "G4320565241-ASF",
+          "granule_title": "NISAR_L2_PR_GCOV_031_047_A_006_4005_DHDH_A_20260921T103936_20260921T104011_P05023_N_F_J_001",
+          "grid": {
+            "epsg": 32618,
+            "bounds_native": [488230.0, 956620.0, 488870.0, 957260.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "point_db": { "HH": -10.154494285583496, "HV": -18.732561111450195 },
+          "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+          "quality": {
+            "productVersion": "1.0.11",
+            "compositeReleaseId": "P05023",
+            "radarBand": "L",
+            "instrumentName": "LSAR",
+            "hasInputDataException": 0,
+            "noiseCorrectionApplied": "False",
+            "isFullCovariance": "False"
+          },
+          "status": "observed",
+          "layer": {
+            "role": "observed_gamma0",
+            "dates": ["2026-09-21"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/2026-09-21.tif"
+          }
+        },
+        {
+          "date": "2026-10-03",
+          "sensing_start_utc": "2026-10-03T10:39:36.000Z",
+          "granule_id": "G4341017201-ASF",
+          "granule_title": "NISAR_L2_PR_GCOV_032_047_A_006_4005_DHDH_A_20261003T103936_20261003T104011_P05023_N_F_J_001",
+          "grid": {
+            "epsg": 32618,
+            "bounds_native": [488230.0, 956620.0, 488870.0, 957260.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "point_db": { "HH": -9.783041000366211, "HV": -15.027050971984863 },
+          "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+          "quality": {
+            "productVersion": "1.0.11",
+            "compositeReleaseId": "P05023",
+            "radarBand": "L",
+            "instrumentName": "LSAR",
+            "hasInputDataException": 0,
+            "noiseCorrectionApplied": "False",
+            "isFullCovariance": "False"
+          },
+          "status": "observed",
+          "layer": {
+            "role": "observed_gamma0",
+            "dates": ["2026-10-03"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/2026-10-03.tif"
+          }
+        },
+        {
+          "date": "2026-10-15",
+          "sensing_start_utc": "2026-10-15T10:39:36.000Z",
+          "granule_id": "G4372378340-ASF",
+          "granule_title": "NISAR_L2_PR_GCOV_033_047_A_006_4005_DHDH_A_20261015T103936_20261015T104011_P05023_N_F_J_001",
+          "grid": {
+            "epsg": 32618,
+            "bounds_native": [488230.0, 956620.0, 488870.0, 957260.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "point_db": { "HH": -8.669557571411133, "HV": -15.736165046691895 },
+          "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+          "quality": {
+            "productVersion": "1.0.11",
+            "compositeReleaseId": "P05023",
+            "radarBand": "L",
+            "instrumentName": "LSAR",
+            "hasInputDataException": 0,
+            "noiseCorrectionApplied": "False",
+            "isFullCovariance": "False"
+          },
+          "status": "observed",
+          "layer": {
+            "role": "observed_gamma0",
+            "dates": ["2026-10-15"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/2026-10-15.tif"
+          }
+        }
+      ],
+      "comparison": {
+        "status": "available",
+        "dates": ["2026-09-21", "2026-10-15"],
+        "definition": "later minus earlier in dB on common valid pixels",
+        "grid": {
+          "epsg": 32618,
+          "bounds_native": [488230.0, 956620.0, 488870.0, 957260.0],
+          "pixel_spacing_m": [10.0, 10.0],
+          "width": 64,
+          "height": 64
+        },
+        "point_db": { "HH": 1.4849367141723633, "HV": 2.996396064758301 },
+        "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+        "explanation": "From 2026-09-21 to 2026-10-15, the clicked pixel changed by HH +1.48 dB, HV +3.00 dB.",
+        "layer": {
+          "role": "signed_gamma0_change",
+          "dates": ["2026-09-21", "2026-10-15"],
+          "polarizations": ["HH", "HV"],
+          "units": "dB",
+          "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/change.tif"
+        }
+      },
+      "status": "complete",
+      "phase": null,
+      "observed_date_count": 5,
+      "usable_window_date_count": 5,
+      "lens": {
+        "id": "flood_wetland",
+        "version": "1.0",
+        "status": "evaluated",
+        "reason": null,
+        "target_date": "2026-10-15",
+        "baseline_dates": ["2026-08-28", "2026-09-09", "2026-09-21"],
+        "radar": {
+          "polarizations": ["HH", "HV"],
+          "posting_m": 10.0,
+          "grid_cells": 4096,
+          "common_cells": 4096,
+          "comparator": "Target minus median of the prior measured dates",
+          "diagnostic_half_width_db": "max(3, 3 × max(1.4826 × MAD, 1))",
+          "cells": 4096,
+          "median_target_minus_baseline_db": {
+            "HH": -0.010768890380859375,
+            "HV": 0.2890357971191406
+          },
+          "mad_departure_cells": 1550,
+          "dual_darkening_cells": 410,
+          "co_pol_brightening_cells": 701,
+          "dual_darkening_max_delta_db": { "HH": -3.0, "HV": -1.5 },
+          "co_pol_brightening_min_delta_db": 3.0,
+          "grid": {
+            "epsg": 32618,
+            "bounds_native": [488230.0, 956620.0, 488870.0, 957260.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "layer": {
+            "role": "target_minus_observed_baseline_db",
+            "dates": ["2026-10-15"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/baseline_change.tif"
+          },
+          "layers": [
+            {
+              "role": "flood_signature_flags",
+              "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/flood_signature_flags.tif",
+              "units": "diagnostic flag",
+              "bands": ["dual_darkening", "co_pol_brightening"],
+              "legend": { "0": "absent_on_sampled_support", "1": "supports" },
+              "resampling": "nearest",
+              "sha256": "7581c2aeff9a343cc2e5599e8ba624f084c16c503197a4b461c83392d135e431"
+            }
+          ]
+        },
+        "evidence": {
+          "status": "optical_comparison_available",
+          "source": "OPERA DSWx-HLS optical surface water",
+          "epochs": {
+            "pre": {
+              "status": "selected",
+              "radar_date": "2026-09-21",
+              "date": "2026-09-24",
+              "source_id": "OPERA_L3_DSWx-HLS_T18PVQ_20260924T152651Z_20260928T231505Z_S2C_30_v1.1",
+              "absolute_date_offset_days": 3,
+              "usable_fraction_of_common_radar_cells": 1.0
+            },
+            "post": {
+              "status": "selected",
+              "radar_date": "2026-10-15",
+              "date": "2026-10-19",
+              "source_id": "OPERA_L3_DSWx-HLS_T18PVQ_20261019T154001Z_20261022T063325Z_S2A_30_v1.1",
+              "absolute_date_offset_days": 4,
+              "usable_fraction_of_common_radar_cells": 0.9296875
+            }
+          },
+          "max_offset_days": 4,
+          "min_joint_usable_fraction": 0.25,
+          "joint_usable_cells": 238,
+          "radar_denominator_cells": 256,
+          "joint_usable_fraction": 0.9296875,
+          "groups": {
+            "stable_nonwater": {
+              "cells": 221,
+              "median_target_minus_baseline_db": {
+                "HH": 0.033751487731933594,
+                "HV": 0.4848060607910156
+              },
+              "mad_departure_cells": 33,
+              "dual_darkening_cells": 12,
+              "co_pol_brightening_cells": 9
+            },
+            "new_open_water": {
+              "cells": 0,
+              "median_target_minus_baseline_db": { "HH": null, "HV": null },
+              "mad_departure_cells": 0,
+              "dual_darkening_cells": 0,
+              "co_pol_brightening_cells": 0
+            },
+            "stable_open_water": {
+              "cells": 0,
+              "median_target_minus_baseline_db": { "HH": null, "HV": null },
+              "mad_departure_cells": 0,
+              "dual_darkening_cells": 0,
+              "co_pol_brightening_cells": 0
+            },
+            "open_water_loss": {
+              "cells": 0,
+              "median_target_minus_baseline_db": { "HH": null, "HV": null },
+              "mad_departure_cells": 0,
+              "dual_darkening_cells": 0,
+              "co_pol_brightening_cells": 0
+            },
+            "mixed_or_partial": {
+              "cells": 17,
+              "median_target_minus_baseline_db": {
+                "HH": 0.7802953720092773,
+                "HV": 0.4128227233886719
+              },
+              "mad_departure_cells": 0,
+              "dual_darkening_cells": 0,
+              "co_pol_brightening_cells": 0
+            }
+          },
+          "resolved_groups": [
+            "stable_nonwater",
+            "new_open_water",
+            "stable_open_water",
+            "open_water_loss"
+          ],
+          "interpretation": "Groups compare optical water classes at two snapshots. Mixed cells are descriptive.",
+          "comparison": {
+            "status": "evaluated",
+            "reason": null,
+            "claim": "New strict open water between the two optical snapshots in the comparison cell containing the point.",
+            "point_new_open_water_state": "contradicts",
+            "point_group_code": 0,
+            "point_selection": "requested_point",
+            "grid": { "epsg": 32618, "width": 16, "height": 16, "pixel_spacing_m": [40.0, 40.0] },
+            "matched_new_water_comparison": {
+              "status": "insufficient_data",
+              "reason": "insufficient_reference_groups_or_matches",
+              "matches": {
+                "positive_pixels": 0,
+                "matched_control_pixels": 0,
+                "matched_positive_pixels": 0,
+                "matched_fraction": null
+              },
+              "channels": {
+                "HH": {
+                  "status": "unavailable",
+                  "reason": "Both comparison groups require measured support"
+                },
+                "HV": {
+                  "status": "unavailable",
+                  "reason": "Both comparison groups require measured support"
+                }
+              }
+            }
+          },
+          "grid": {
+            "epsg": 32618,
+            "bounds_native": [488230.0, 956620.0, 488870.0, 957260.0],
+            "pixel_spacing_m": [40.0, 40.0],
+            "width": 16,
+            "height": 16
+          },
+          "radar_aggregation_pixels_per_side": 4,
+          "point_group": "stable_nonwater",
+          "layer": {
+            "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/optical_groups.tif",
+            "role": "optical_water_class_comparison",
+            "units": "optical class code",
+            "legend": {
+              "0": "stable_nonwater",
+              "1": "new_open_water",
+              "2": "stable_open_water",
+              "3": "open_water_loss",
+              "4": "mixed_or_partial"
+            }
+          }
+        },
+        "point": {
+          "status": "within_observed_baseline",
+          "target_minus_baseline_db": { "HH": 0.34606170654296875, "HV": 2.996396064758301 },
+          "diagnostic_half_width_db": { "HH": 5.065488258934021, "HV": 19.522420432662962 }
+        },
+        "evaluation": {
+          "contract_version": "1.0",
+          "policy_id": "explore_flood_observations_v1",
+          "status": "evaluated",
+          "reason": null,
+          "target_date": "2026-10-15",
+          "baseline_dates": ["2026-08-28", "2026-09-09", "2026-09-21"],
+          "signature_policy": {
+            "dual_darkening_max_change_db": { "co": -3.0, "cross": -1.5 },
+            "co_pol_brightening_min_change_db": 3.0,
+            "interpretation": "Evidence states refer to measured signatures or the explicitly named optical claim."
+          },
+          "grid": { "epsg": 32618, "width": 64, "height": 64, "pixel_spacing_m": [10.0, 10.0] },
+          "point": {
+            "selection": "requested_point",
+            "inside_grid": true,
+            "x": 488558.3752180149,
+            "y": 956932.9642541282,
+            "row": 32,
+            "column": 32,
+            "status": "evaluated",
+            "reason": null,
+            "signature_states": {
+              "dual_darkening": "absent_on_sampled_support",
+              "co_pol_brightening": "absent_on_sampled_support"
+            },
+            "baseline_db": { "HH": -9.015619277954102, "HV": -18.732561111450195 },
+            "baseline_scaled_mad_db": { "HH": 1.6884960863113403, "HV": 6.507473477554321 },
+            "change_db": { "HH": 0.34606170654296875, "HV": 2.996396064758301 },
+            "cross_minus_co_change_db": 1.5114593505859375,
+            "observation_bracket": ["2026-09-21", "2026-10-15"],
+            "series": [
+              {
+                "date": "2026-08-28",
+                "db": { "HH": -9.015619277954102, "HV": -13.70720100402832 }
+              },
+              {
+                "date": "2026-09-09",
+                "db": { "HH": -7.816259860992432, "HV": -23.12179183959961 }
+              },
+              {
+                "date": "2026-09-21",
+                "db": { "HH": -10.154494285583496, "HV": -18.732561111450195 }
+              },
+              {
+                "date": "2026-10-15",
+                "db": { "HH": -8.669557571411133, "HV": -15.736165046691895 }
+              }
+            ]
+          },
+          "grid_signatures": {
+            "dual_darkening": {
+              "state": "supports",
+              "signature_cells": 410,
+              "supported_cells": 4096,
+              "fraction": 0.10009765625
+            },
+            "co_pol_brightening": {
+              "state": "supports",
+              "signature_cells": 701,
+              "supported_cells": 4096,
+              "fraction": 0.171142578125
+            }
+          },
+          "surrounding_comparison": {
+            "status": "evaluated",
+            "reason": null,
+            "definition": "Change in a 60 m focal patch minus change in unique baseline-level matched cells 120–300 m away.",
+            "focal_radius_m": 60,
+            "comparison_annulus_m": [120, 300],
+            "minimum_cells": 5,
+            "minimum_supported_fraction": 0.5,
+            "minimum_matched_fraction": 0.5,
+            "independently_stable_controls": false,
+            "focal_cells": 112,
+            "surrounding_cells": 2374,
+            "focal_grid_cells": 112,
+            "surrounding_grid_cells": 2374,
+            "matches": {
+              "positive_pixels": 112,
+              "matched_control_pixels": 112,
+              "matched_positive_pixels": 112,
+              "matched_fraction": 1.0,
+              "baseline_mean_positive_minus_control_db_by_channel": [
+                -0.005584921155657087, -0.004587301186152867
+              ],
+              "criterion": "unique baseline co-/cross-pol levels within declared dB tolerance; at most 128 nearest candidates; contrast uses matched positives only; not causal matching on all confounders"
+            },
+            "channels": {
+              "HH": {
+                "status": "conditional_spatial_resampling",
+                "positive_pixels": 112,
+                "control_pixels": 112,
+                "positive_mean_db": -0.4732446585382734,
+                "control_mean_db": -0.05488671149526324,
+                "positive_median_db": -0.2399749755859375,
+                "control_median_db": 0.21347379684448242,
+                "mean_contrast_db": -0.41835794704301016,
+                "spatial_resampling_95_interval_db": [-1.2598843392870753, 0.5958430259947385],
+                "positive_blocks": 4,
+                "control_blocks": 41,
+                "valid_resampling_draws": 391,
+                "interval_limit": "Conditional resampling of fixed spatial blocks; spatial independence, measurement errors, reference errors and causal identification are not established"
+              },
+              "HV": {
+                "status": "conditional_spatial_resampling",
+                "positive_pixels": 112,
+                "control_pixels": 112,
+                "positive_mean_db": -0.6456164121627808,
+                "control_mean_db": 0.4574392778532846,
+                "positive_median_db": -0.6464328765869141,
+                "control_median_db": 0.15404987335205078,
+                "mean_contrast_db": -1.1030556900160653,
+                "spatial_resampling_95_interval_db": [-3.451927061731338, 1.2764219498107412],
+                "positive_blocks": 4,
+                "control_blocks": 41,
+                "valid_resampling_draws": 391,
+                "interval_limit": "Conditional resampling of fixed spatial blocks; spatial independence, measurement errors, reference errors and causal identification are not established"
+              }
+            },
+            "spatial_block_size_m": [80.0, 80.0],
+            "series": [
+              {
+                "date": "2026-08-28",
+                "focal_mean_db": { "HH": -11.946584701538086, "HV": -19.683765411376953 },
+                "control_mean_db": { "HH": -11.778746604919434, "HV": -19.558225631713867 }
+              },
+              {
+                "date": "2026-09-09",
+                "focal_mean_db": { "HH": -11.64603328704834, "HV": -19.242626190185547 },
+                "control_mean_db": { "HH": -11.382149696350098, "HV": -19.01461410522461 }
+              },
+              {
+                "date": "2026-09-21",
+                "focal_mean_db": { "HH": -10.37534236907959, "HV": -17.70383644104004 },
+                "control_mean_db": { "HH": -11.107667922973633, "HV": -18.385284423828125 }
+              },
+              {
+                "date": "2026-10-15",
+                "focal_mean_db": { "HH": -11.743547439575195, "HV": -19.595529556274414 },
+                "control_mean_db": { "HH": -11.31960391998291, "HV": -18.487884521484375 }
+              }
+            ],
+            "differential_darkening": {
+              "state": "absent_on_sampled_support",
+              "reason": null,
+              "claim": "Focal-minus-control mean change is at most -3 dB co-pol and -1.5 dB cross-pol."
+            }
+          },
+          "water_comparison": {
+            "status": "evaluated",
+            "reason": null,
+            "claim": "New strict open water between the two optical snapshots in the comparison cell containing the point.",
+            "point_new_open_water_state": "contradicts",
+            "point_group_code": 0,
+            "point_selection": "requested_point",
+            "grid": { "epsg": 32618, "width": 16, "height": 16, "pixel_spacing_m": [40.0, 40.0] },
+            "matched_new_water_comparison": {
+              "status": "insufficient_data",
+              "reason": "insufficient_reference_groups_or_matches",
+              "matches": {
+                "positive_pixels": 0,
+                "matched_control_pixels": 0,
+                "matched_positive_pixels": 0,
+                "matched_fraction": null
+              },
+              "channels": {
+                "HH": {
+                  "status": "unavailable",
+                  "reason": "Both comparison groups require measured support"
+                },
+                "HV": {
+                  "status": "unavailable",
+                  "reason": "Both comparison groups require measured support"
+                }
+              }
+            },
+            "epochs": {
+              "pre": {
+                "status": "selected",
+                "radar_date": "2026-09-21",
+                "date": "2026-09-24",
+                "source_id": "OPERA_L3_DSWx-HLS_T18PVQ_20260924T152651Z_20260928T231505Z_S2C_30_v1.1",
+                "absolute_date_offset_days": 3,
+                "usable_fraction_of_common_radar_cells": 1.0
+              },
+              "post": {
+                "status": "selected",
+                "radar_date": "2026-10-15",
+                "date": "2026-10-19",
+                "source_id": "OPERA_L3_DSWx-HLS_T18PVQ_20261019T154001Z_20261022T063325Z_S2A_30_v1.1",
+                "absolute_date_offset_days": 4,
+                "usable_fraction_of_common_radar_cells": 0.9296875
+              }
+            },
+            "groups": {
+              "stable_nonwater": {
+                "cells": 221,
+                "median_target_minus_baseline_db": {
+                  "HH": 0.033751487731933594,
+                  "HV": 0.4848060607910156
+                },
+                "mad_departure_cells": 33,
+                "dual_darkening_cells": 12,
+                "co_pol_brightening_cells": 9
+              },
+              "new_open_water": {
+                "cells": 0,
+                "median_target_minus_baseline_db": { "HH": null, "HV": null },
+                "mad_departure_cells": 0,
+                "dual_darkening_cells": 0,
+                "co_pol_brightening_cells": 0
+              },
+              "stable_open_water": {
+                "cells": 0,
+                "median_target_minus_baseline_db": { "HH": null, "HV": null },
+                "mad_departure_cells": 0,
+                "dual_darkening_cells": 0,
+                "co_pol_brightening_cells": 0
+              },
+              "open_water_loss": {
+                "cells": 0,
+                "median_target_minus_baseline_db": { "HH": null, "HV": null },
+                "mad_departure_cells": 0,
+                "dual_darkening_cells": 0,
+                "co_pol_brightening_cells": 0
+              },
+              "mixed_or_partial": {
+                "cells": 17,
+                "median_target_minus_baseline_db": {
+                  "HH": 0.7802953720092773,
+                  "HV": 0.4128227233886719
+                },
+                "mad_departure_cells": 0,
+                "dual_darkening_cells": 0,
+                "co_pol_brightening_cells": 0
+              }
+            },
+            "source": "OPERA DSWx-HLS optical surface water"
+          },
+          "uncertainty": {
+            "observation": {
+              "status": "unavailable",
+              "reason": "Sensor error and speckle uncertainty are unestimated."
+            },
+            "spatial_heterogeneity": {
+              "kind": "cell_distribution",
+              "scope": "common_radar_grid",
+              "units": "dB",
+              "cells": 4096,
+              "change_quantiles_25_50_75": {
+                "HH": [-2.296241521835327, -0.010768890380859375, 2.1770241260528564],
+                "HV": [-1.9241511821746826, 0.2890357971191406, 2.43837833404541]
+              }
+            },
+            "model": {
+              "status": "unavailable",
+              "reason": "Diagnostic thresholds have no fitted probability model."
+            }
+          },
+          "confounders": [
+            { "id": "existing_water", "status": "observed", "evidence": 0 },
+            { "id": "rain_or_soil_moisture", "status": "unavailable" },
+            { "id": "freeze_thaw", "status": "unavailable" },
+            { "id": "wind", "status": "unavailable" },
+            { "id": "incidence_and_track", "status": "unavailable" },
+            { "id": "speckle_and_noise", "status": "unavailable" },
+            { "id": "layover_or_shadow", "status": "unavailable" }
+          ],
+          "questions": [
+            "Did both radar channels darken relative to this pixel's observed baseline?",
+            "Did a baseline-matched surrounding population change differently from the focal patch?",
+            "Do independently dated optical snapshots show new water or water already present?"
+          ],
+          "phenomenon_class": null,
+          "phenomenon_probability": null,
+          "causal_attribution": null,
+          "displacement_cm": null
+        },
+        "observation_bracket": ["2026-09-21", "2026-10-15"],
+        "temporal_analysis": {
+          "dates": ["2026-08-28", "2026-09-09", "2026-09-21", "2026-10-15"],
+          "elapsed_days": [0.0, 12.0, 24.0, 48.0],
+          "acquisition_gaps_days": [12.0, 12.0, 24.0],
+          "common_cells": 4096,
+          "spectral": {
+            "status": "insufficient_temporal_support",
+            "reason": "Need at least six observed dates"
+          },
+          "stochastic": {
+            "status": "insufficient_data",
+            "reason": "Need five measured dates for a lens GP",
+            "calibrated": false
+          },
+          "observation_noise_db": null
+        },
+        "excluded_unusable_dates": [],
+        "requested_baseline_end_date": "2026-09-21"
+      },
+      "coverage": {
+        "contract_version": "1.0",
+        "point": { "longitude": -75.104, "latitude": 8.657 },
+        "date_window": ["2026-08-28", "2026-10-15"],
+        "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+        "catalog_queried_at_utc": "2026-11-13T23:04:52.884114+00:00",
+        "catalog_hits": 13,
+        "coverage_status": "catalog_match",
+        "pixel_support": "unchecked",
+        "series": [
+          {
+            "key": "011_D_084_4005_DHDH",
+            "dates": ["2026-09-06", "2026-09-18", "2026-09-30", "2026-10-12"],
+            "frequency_a_supported": true
+          },
+          {
+            "key": "047_A_006_4005_DHDH",
+            "dates": ["2026-08-28", "2026-09-09", "2026-09-21", "2026-10-03", "2026-10-15"],
+            "frequency_a_supported": true
+          },
+          {
+            "key": "119_A_006_2005_DHDH",
+            "dates": ["2026-09-02", "2026-09-14", "2026-09-26", "2026-10-08"],
+            "frequency_a_supported": true
+          }
+        ]
+      },
+      "series_key": "047_A_006_4005_DHDH",
+      "series_attempts": [
+        { "series_key": "047_A_006_4005_DHDH", "status": "complete", "usable_window_date_count": 5 }
+      ],
+      "timings": { "measure_s": 153.24, "total_s": 183.784 }
+    },
+    "layers": [
+      {
+        "id": "display_2026-08-28_HH",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-08-28_HH.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-08-28_HH.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-08-28_HV",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-08-28_HV.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-08-28_HV.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-09-09_HH",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-09_HH.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-09_HH.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-09-09_HV",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-09_HV.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-09_HV.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-09-21_HH",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-21_HH.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-21_HH.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-09-21_HV",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-21_HV.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-21_HV.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-10-03_HH",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-03_HH.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-03_HH.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-10-03_HV",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-03_HV.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-03_HV.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-10-15_HH",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-15_HH.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-15_HH.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-10-15_HV",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-15_HV.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-15_HV.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_baseline_change_HH",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_baseline_change_HH.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_baseline_change_HH.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "RdBu_r",
+        "range": [-8, 8],
+        "legend": null
+      },
+      {
+        "id": "display_baseline_change_HV",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_baseline_change_HV.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_baseline_change_HV.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "RdBu_r",
+        "range": [-8, 8],
+        "legend": null
+      },
+      {
+        "id": "display_change_HH",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_change_HH.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_change_HH.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "RdBu_r",
+        "range": [-8, 8],
+        "legend": null
+      },
+      {
+        "id": "display_change_HV",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_change_HV.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_change_HV.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "RdBu_r",
+        "range": [-8, 8],
+        "legend": null
+      },
+      {
+        "id": "display_flood_signature_flags_dual_darkening",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_flood_signature_flags_dual_darkening.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_flood_signature_flags_dual_darkening.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "diagnostic mask",
+        "colormap": "diagnostic_categories",
+        "range": [0, 1],
+        "legend": { "0": "absent", "1": "present" }
+      },
+      {
+        "id": "display_flood_signature_flags_co_pol_brightening",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_flood_signature_flags_co_pol_brightening.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_flood_signature_flags_co_pol_brightening.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "diagnostic mask",
+        "colormap": "diagnostic_categories",
+        "range": [0, 1],
+        "legend": { "0": "absent", "1": "present" }
+      },
+      {
+        "id": "display_optical_groups_optical_group",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_optical_groups_optical_group.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_optical_groups_optical_group.tif",
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "optical group code",
+        "colormap": "optical_reference_groups",
+        "range": [0, 4],
+        "legend": {
+          "0": "stable_nonwater",
+          "1": "new_open_water",
+          "2": "stable_open_water",
+          "3": "open_water_loss",
+          "4": "mixed_or_partial"
+        }
+      }
+    ],
+    "artifacts": [
+      {
+        "name": "display_2026-08-28_HH.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-08-28_HH.png",
+        "media_type": "image/png",
+        "bytes": 9702,
+        "sha256": "ed61d3a19e2eeec095984a9c77f7e0828859fcfcfb7e0f30f7310f14e14a918a"
+      },
+      {
+        "name": "display_2026-08-28_HV.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-08-28_HV.png",
+        "media_type": "image/png",
+        "bytes": 9634,
+        "sha256": "f618f4634ec69131ea1c2c394822876bbac015fa32bf845462dbb5ded9efe111"
+      },
+      {
+        "name": "display_2026-09-09_HH.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-09_HH.png",
+        "media_type": "image/png",
+        "bytes": 9882,
+        "sha256": "3ead161aac0ee597b40535d3f6d8ef09634cfd1d26673f7ce0b2ee1e7f8d0893"
+      },
+      {
+        "name": "display_2026-09-09_HV.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-09_HV.png",
+        "media_type": "image/png",
+        "bytes": 9636,
+        "sha256": "399bd373d3435ac7eaa3de4362ff2caa57f3a005b23006f61415b5cf289f96fe"
+      },
+      {
+        "name": "display_2026-09-21_HH.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-21_HH.png",
+        "media_type": "image/png",
+        "bytes": 9949,
+        "sha256": "c31a4581aba8d432e707d313f5cc6cf3be2a3ca99856e2ab88f4787739d2127a"
+      },
+      {
+        "name": "display_2026-09-21_HV.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-21_HV.png",
+        "media_type": "image/png",
+        "bytes": 9714,
+        "sha256": "20bf565a8a31782aa6074836e85020f525154c0cf8354a7aaa7023b7c4ea1b53"
+      },
+      {
+        "name": "display_2026-10-03_HH.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-03_HH.png",
+        "media_type": "image/png",
+        "bytes": 9773,
+        "sha256": "054070a119ba6c89449e68eacee7c1a7cad06d9cdfb57f6a9899f495ff700f41"
+      },
+      {
+        "name": "display_2026-10-03_HV.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-03_HV.png",
+        "media_type": "image/png",
+        "bytes": 9624,
+        "sha256": "e306212208e8840feebcdf9c16a79e0c3c03f5ece94d5c6e323388e352f77ecd"
+      },
+      {
+        "name": "display_2026-10-15_HH.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-15_HH.png",
+        "media_type": "image/png",
+        "bytes": 9865,
+        "sha256": "55d71934a75dc0aa11159332fae3d15e27c817140e4d1c0d5aab66398e6bed33"
+      },
+      {
+        "name": "display_2026-10-15_HV.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-15_HV.png",
+        "media_type": "image/png",
+        "bytes": 9817,
+        "sha256": "0815d0223c8f05c68053c6cf834092f3487b835aa6eb78d79a2c6d467aabbdc5"
+      },
+      {
+        "name": "display_baseline_change_HH.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_baseline_change_HH.png",
+        "media_type": "image/png",
+        "bytes": 13809,
+        "sha256": "bd8da1b83a6a2eaccdbfe790cc9518ff7415dc313fc8bb20426c69ae22189b84"
+      },
+      {
+        "name": "display_baseline_change_HV.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_baseline_change_HV.png",
+        "media_type": "image/png",
+        "bytes": 13751,
+        "sha256": "eab3e3b66c944681cef3a4931978d90d962f368971af1e937ec11b331db76877"
+      },
+      {
+        "name": "display_change_HH.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_change_HH.png",
+        "media_type": "image/png",
+        "bytes": 13841,
+        "sha256": "6b3b7469d145c79799e5f2c57d5bd90853782f1b18bf8e22e95bf595d7282012"
+      },
+      {
+        "name": "display_change_HV.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_change_HV.png",
+        "media_type": "image/png",
+        "bytes": 13839,
+        "sha256": "b719ee77d60c2e7f67cbe3a1d40316a66eedcf3b969c1f98ae15587fe95421b6"
+      },
+      {
+        "name": "display_flood_signature_flags_dual_darkening.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_flood_signature_flags_dual_darkening.png",
+        "media_type": "image/png",
+        "bytes": 863,
+        "sha256": "6bbbb77a9a5e421080c65e3111fca5a884b67969b49ee00b8fd529378b121218"
+      },
+      {
+        "name": "display_flood_signature_flags_co_pol_brightening.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_flood_signature_flags_co_pol_brightening.png",
+        "media_type": "image/png",
+        "bytes": 1214,
+        "sha256": "13db32ef34e333693c7c178f8f338ac56b634779ac48b1fc087af64f6ba39008"
+      },
+      {
+        "name": "display_optical_groups_optical_group.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_optical_groups_optical_group.png",
+        "media_type": "image/png",
+        "bytes": 164,
+        "sha256": "ae4dc26a2b2d515737173ff3ba17b23319f0259534794a8b74b56ba9a524efe5"
+      },
+      {
+        "name": "view_polarization_rgb_hh_hv.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_polarization_rgb_hh_hv.png",
+        "media_type": "image/png",
+        "bytes": 12981,
+        "sha256": "f10a563a275b8085a26dedd5d4b249b363efea7697a61d00c818b5b24fd7969a"
+      },
+      {
+        "name": "view_cross_co_ratio_hh_hv.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_cross_co_ratio_hh_hv.png",
+        "media_type": "image/png",
+        "bytes": 12916,
+        "sha256": "cd180599bf1b38f796610a78507fbd9ba57c95064a941f3486245a8a927c2dc4"
+      },
+      {
+        "name": "view_cross_co_ratio_change_hh_hv.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_cross_co_ratio_change_hh_hv.png",
+        "media_type": "image/png",
+        "bytes": 13332,
+        "sha256": "d86bd635dc1ae994738f60ac37f22b961c639e9959e4bd7d3da15159b7cbbba7"
+      },
+      {
+        "name": "view_temporal_median_hh.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_median_hh.png",
+        "media_type": "image/png",
+        "bytes": 8235,
+        "sha256": "5bb17f51c36afb875ef5b1c815d7d08b9222a907fe452a8998af2791464568e5"
+      },
+      {
+        "name": "view_temporal_mad_hh.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_mad_hh.png",
+        "media_type": "image/png",
+        "bytes": 13055,
+        "sha256": "829f5f97a39b74553a03e15d184464753254592ed28b73230346cd403f1f603d"
+      },
+      {
+        "name": "view_three_date_rgb_hh.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_three_date_rgb_hh.png",
+        "media_type": "image/png",
+        "bytes": 12470,
+        "sha256": "7b8ce5e52b35f5ada589bc44863d5e1f5360d50bf13657398c413b327dea18f4"
+      },
+      {
+        "name": "view_temporal_median_hv.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_median_hv.png",
+        "media_type": "image/png",
+        "bytes": 8100,
+        "sha256": "6d0efa3b187c4ff64dc2257ebc8120e4ca886d43365e2c8cf28ae579dbd90edf"
+      },
+      {
+        "name": "view_temporal_mad_hv.png",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_mad_hv.png",
+        "media_type": "image/png",
+        "bytes": 13090,
+        "sha256": "a667cdba037b7fd96c81bd95fc7d044f9532dd602ca63483304e796dd9305c9b"
+      },
+      {
+        "name": "2026-08-28.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/2026-08-28.tif",
+        "media_type": "image/tiff",
+        "bytes": 30359,
+        "sha256": "b72f58ea9e589bd9e4b2e5ac6f44026ba79e46b1ec119644e3617acd28d9e5d5"
+      },
+      {
+        "name": "2026-09-09.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/2026-09-09.tif",
+        "media_type": "image/tiff",
+        "bytes": 30453,
+        "sha256": "10022c9498f45e0101d706f0851516fe8595ee8937759c6210155a37789bba3d"
+      },
+      {
+        "name": "2026-09-21.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/2026-09-21.tif",
+        "media_type": "image/tiff",
+        "bytes": 30602,
+        "sha256": "fa5924d8b7f039ec3edf634da56443956387f37d75226122e538a63fae5a2e5b"
+      },
+      {
+        "name": "2026-10-03.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/2026-10-03.tif",
+        "media_type": "image/tiff",
+        "bytes": 30679,
+        "sha256": "4c67a36904805ce86c3ce140134b51090de08ac8284472cb90ae924e1b4f9919"
+      },
+      {
+        "name": "2026-10-15.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/2026-10-15.tif",
+        "media_type": "image/tiff",
+        "bytes": 30447,
+        "sha256": "beea079c96979d13aeb3889cab3311542fd8f905b64c2504f9b4f1a460ff5e2b"
+      },
+      {
+        "name": "baseline_change.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/baseline_change.tif",
+        "media_type": "image/tiff",
+        "bytes": 31596,
+        "sha256": "72b0ec4c37d58f94d953206e9956a741460a5628eda17309e60d8ddff22cc59c"
+      },
+      {
+        "name": "change.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/change.tif",
+        "media_type": "image/tiff",
+        "bytes": 31709,
+        "sha256": "9bf125d96cc48f190a2fe440a450710a85c4fd4acc84a0fa460e0d83dd1a5a8d"
+      },
+      {
+        "name": "display_2026-08-28_HH.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-08-28_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 15956,
+        "sha256": "c199dbf005ca2868ce329091f5ed68e31a6bd65b14926432e78877cb5d5a31dc"
+      },
+      {
+        "name": "display_2026-08-28_HV.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-08-28_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 15615,
+        "sha256": "7ca16991925207fffef8f309c7e01e8c7a1094ee78bcae62e95dafb9898f1b8c"
+      },
+      {
+        "name": "display_2026-09-09_HH.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-09_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 16022,
+        "sha256": "e3e8bfd8e5d9a0809e129bedd9b566ca6de1f334d6dd9b7aab485ce8864c85df"
+      },
+      {
+        "name": "display_2026-09-09_HV.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-09_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 15364,
+        "sha256": "ebb644fad84a76e041e55b962dee64d407de39f6252fc0daa0e66304c3b29fc3"
+      },
+      {
+        "name": "display_2026-09-21_HH.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-21_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 16074,
+        "sha256": "ee3bc02d7fc082ac123fea90e1eecbaad3960164d28580742d308df3ba06586d"
+      },
+      {
+        "name": "display_2026-09-21_HV.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-09-21_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 15349,
+        "sha256": "a3251b7156ce7ec699c328e33ab7de15f8d1da86ecfa000fc0165999fcc19524"
+      },
+      {
+        "name": "display_2026-10-03_HH.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-03_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 16107,
+        "sha256": "a5d8a1d42b84f30b3bbde3ac9f2bc38395ff7da007f85bfcd8470b5c46d906ca"
+      },
+      {
+        "name": "display_2026-10-03_HV.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-03_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 15620,
+        "sha256": "bb97db0917d842a4d8b132f5ba5e620d5f49583330c0676a84ea80d830088be6"
+      },
+      {
+        "name": "display_2026-10-15_HH.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-15_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 16013,
+        "sha256": "3a3ac857b76d0695f6438ba1019c348bd88e59b5aeffa308e6c6200f3101de30"
+      },
+      {
+        "name": "display_2026-10-15_HV.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_2026-10-15_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 15604,
+        "sha256": "f6ee8df06c5f0437d0cde9c56159cb81071db63155a6367fdc4e424d48b41a3a"
+      },
+      {
+        "name": "display_baseline_change_HH.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_baseline_change_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 16412,
+        "sha256": "5b141922de6de9073caf75b971c3e5836e9473311c6a9314a485e2d4a7cad196"
+      },
+      {
+        "name": "display_baseline_change_HV.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_baseline_change_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 16206,
+        "sha256": "f77e6c81a13c69b5723d74e8d54f92b0739ab96211b223fda287b911830612d7"
+      },
+      {
+        "name": "display_change_HH.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_change_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 16434,
+        "sha256": "fa1e56ec7bdd35dd587b3a5881e5170a7d303b2ebb20fcbccb916adf710a6634"
+      },
+      {
+        "name": "display_change_HV.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_change_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 16240,
+        "sha256": "92591ca938f0f00e6aa2b3c8836e265e75eb2e400aa308432aa25476a1ef4dbd"
+      },
+      {
+        "name": "display_flood_signature_flags_co_pol_brightening.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_flood_signature_flags_co_pol_brightening.tif",
+        "media_type": "image/tiff",
+        "bytes": 2005,
+        "sha256": "cca96a097450a1cf66883f1f6f165874f1ad85f9e9dea5a3ba3b2a79e7dab666"
+      },
+      {
+        "name": "display_flood_signature_flags_dual_darkening.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_flood_signature_flags_dual_darkening.tif",
+        "media_type": "image/tiff",
+        "bytes": 1703,
+        "sha256": "633a3fcf237cff11e85ceea67bc0dc7e7306b0dc441ed58f795379aea5872613"
+      },
+      {
+        "name": "display_optical_groups_optical_group.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/display_optical_groups_optical_group.tif",
+        "media_type": "image/tiff",
+        "bytes": 1200,
+        "sha256": "7ae1ea50f6e55a9cb089bc8f2472f75cf61db419181fc1bf319a7ce4d0e03dc0"
+      },
+      {
+        "name": "flood_signature_flags.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/flood_signature_flags.tif",
+        "media_type": "image/tiff",
+        "bytes": 2846,
+        "sha256": "7581c2aeff9a343cc2e5599e8ba624f084c16c503197a4b461c83392d135e431"
+      },
+      {
+        "name": "optical_groups.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/optical_groups.tif",
+        "media_type": "image/tiff",
+        "bytes": 1176,
+        "sha256": "481ede66c6d0c9e4965ba0d54d7aeb4ea749395ded85f10a58f7ae02b7c1a5c5"
+      },
+      {
+        "name": "view_cross_co_ratio_change_hh_hv.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_cross_co_ratio_change_hh_hv.tif",
+        "media_type": "image/tiff",
+        "bytes": 16431,
+        "sha256": "fc2e82fcb18ae3c1e37a02236091c5f97c52f1dcd6197f59d4fadae5446026b1"
+      },
+      {
+        "name": "view_cross_co_ratio_hh_hv.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_cross_co_ratio_hh_hv.tif",
+        "media_type": "image/tiff",
+        "bytes": 16113,
+        "sha256": "99ba959edcbcf2fe5c7fb29cde8867022d11e7293e8f9e9cf72b0c5148b417d9"
+      },
+      {
+        "name": "view_polarization_rgb_hh_hv.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_polarization_rgb_hh_hv.tif",
+        "media_type": "image/tiff",
+        "bytes": 45944,
+        "sha256": "d4c53bca163dc137e16e230f55c7c91b8646a38bafe2a2d008750e694532c4ec"
+      },
+      {
+        "name": "view_temporal_mad_hh.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_mad_hh.tif",
+        "media_type": "image/tiff",
+        "bytes": 16203,
+        "sha256": "8ac15c01d6752b0849d146bb100aa74035809f5653758cfa12a59d7edbd56292"
+      },
+      {
+        "name": "view_temporal_mad_hv.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_mad_hv.tif",
+        "media_type": "image/tiff",
+        "bytes": 16197,
+        "sha256": "1b0efc4c67880ea8b97b85276902e3bf77d1d793b54d8cf662908201516766c4"
+      },
+      {
+        "name": "view_temporal_median_hh.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_median_hh.tif",
+        "media_type": "image/tiff",
+        "bytes": 15991,
+        "sha256": "3e732721e109e5986f10aaeb7a7d3c145d865e037293a4955f040a1caaa13559"
+      },
+      {
+        "name": "view_temporal_median_hv.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_median_hv.tif",
+        "media_type": "image/tiff",
+        "bytes": 15393,
+        "sha256": "c34ec638caa4f8393fe980ded1aded3553be0a2fcc72ee63ee74049d63243904"
+      },
+      {
+        "name": "view_three_date_rgb_hh.tif",
+        "href": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_three_date_rgb_hh.tif",
+        "media_type": "image/tiff",
+        "bytes": 45677,
+        "sha256": "1eed2a16a5a839cf8989508580f260d6b8873c06a1953060ac2978e7c8f4017f"
+      }
+    ],
+    "visualizations": [
+      {
+        "id": "view_polarization_rgb_hh_hv",
+        "recipe": "polarization_rgb",
+        "title": "Polarization RGB · HH/HV",
+        "dates": ["2026-10-15"],
+        "interpretation": "False color combines co-pol return, cross-pol return and their balance. Roughness, structure, moisture and viewing geometry can all influence these channels.",
+        "components": [
+          { "band": "R", "label": "HH dB", "polarizations": ["HH"], "display_db": [-25.0, 0.0] },
+          { "band": "G", "label": "HV dB", "polarizations": ["HV"], "display_db": [-32.0, -5.0] },
+          {
+            "band": "B",
+            "label": "HV − HH dB",
+            "polarizations": ["HV", "HH"],
+            "display_db": [-18.0, -2.0]
+          }
+        ],
+        "colormap": "rgb",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32618",
+          "bounds": [488230.0, 956620.0, 488870.0, 957260.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_polarization_rgb_hh_hv.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_polarization_rgb_hh_hv.tif"
+      },
+      {
+        "id": "view_cross_co_ratio_hh_hv",
+        "recipe": "cross_co_ratio",
+        "title": "Polarization balance · HV/HH",
+        "dates": ["2026-10-15"],
+        "interpretation": "Cross-pol minus co-pol in dB. A change in this balance can come from either input channel.",
+        "components": [
+          {
+            "band": "value",
+            "label": "HV − HH dB",
+            "polarizations": ["HV", "HH"],
+            "display_db": [-18.0, 0.0]
+          }
+        ],
+        "colormap": "viridis",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32618",
+          "bounds": [488230.0, 956620.0, 488870.0, 957260.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_cross_co_ratio_hh_hv.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_cross_co_ratio_hh_hv.tif"
+      },
+      {
+        "id": "view_cross_co_ratio_change_hh_hv",
+        "recipe": "cross_co_ratio_change",
+        "title": "Change in polarization balance · HV/HH",
+        "dates": ["2026-09-21", "2026-10-15"],
+        "interpretation": "Later cross/co log ratio minus earlier cross/co log ratio. Both channels must be supported on both dates.",
+        "components": [
+          {
+            "band": "value",
+            "label": "Later minus earlier HV/HH log ratio",
+            "polarizations": ["HV", "HH"],
+            "display_db": [-8.0, 8.0]
+          }
+        ],
+        "colormap": "RdBu_r",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32618",
+          "bounds": [488230.0, 956620.0, 488870.0, 957260.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_cross_co_ratio_change_hh_hv.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_cross_co_ratio_change_hh_hv.tif"
+      },
+      {
+        "id": "view_temporal_median_hh",
+        "recipe": "temporal_median",
+        "title": "Temporal median · HH",
+        "dates": ["2026-08-28", "2026-09-09", "2026-09-21", "2026-10-03", "2026-10-15"],
+        "interpretation": "Cellwise median over the listed observations on complete per-channel support.",
+        "components": [
+          {
+            "band": "value",
+            "label": "Median HH dB",
+            "polarizations": ["HH"],
+            "display_db": [-30.0, 0.0]
+          }
+        ],
+        "colormap": "gray",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32618",
+          "bounds": [488230.0, 956620.0, 488870.0, 957260.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_median_hh.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_median_hh.tif"
+      },
+      {
+        "id": "view_temporal_mad_hh",
+        "recipe": "temporal_mad",
+        "title": "Temporal variability · HH",
+        "dates": ["2026-08-28", "2026-09-09", "2026-09-21", "2026-10-03", "2026-10-15"],
+        "interpretation": "Scaled median absolute deviation across the listed observations. This is observed variability in dB.",
+        "components": [
+          {
+            "band": "value",
+            "label": "Scaled HH MAD",
+            "polarizations": ["HH"],
+            "display_db": [0.0, 8.0]
+          }
+        ],
+        "colormap": "magma",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32618",
+          "bounds": [488230.0, 956620.0, 488870.0, 957260.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_mad_hh.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_mad_hh.tif"
+      },
+      {
+        "id": "view_three_date_rgb_hh",
+        "recipe": "three_date_rgb",
+        "title": "Three-date RGB · HH",
+        "dates": ["2026-08-28", "2026-09-21", "2026-10-15"],
+        "interpretation": "False color assigns three observed dates to red, green and blue. Equal returns across dates produce gray.",
+        "components": [
+          {
+            "band": "R",
+            "label": "HH dB · 2026-08-28",
+            "polarizations": ["HH"],
+            "display_db": [-25.0, 0.0]
+          },
+          {
+            "band": "G",
+            "label": "HH dB · 2026-09-21",
+            "polarizations": ["HH"],
+            "display_db": [-25.0, 0.0]
+          },
+          {
+            "band": "B",
+            "label": "HH dB · 2026-10-15",
+            "polarizations": ["HH"],
+            "display_db": [-25.0, 0.0]
+          }
+        ],
+        "colormap": "rgb",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32618",
+          "bounds": [488230.0, 956620.0, 488870.0, 957260.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_three_date_rgb_hh.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_three_date_rgb_hh.tif"
+      },
+      {
+        "id": "view_temporal_median_hv",
+        "recipe": "temporal_median",
+        "title": "Temporal median · HV",
+        "dates": ["2026-08-28", "2026-09-09", "2026-09-21", "2026-10-03", "2026-10-15"],
+        "interpretation": "Cellwise median over the listed observations on complete per-channel support.",
+        "components": [
+          {
+            "band": "value",
+            "label": "Median HV dB",
+            "polarizations": ["HV"],
+            "display_db": [-30.0, 0.0]
+          }
+        ],
+        "colormap": "gray",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32618",
+          "bounds": [488230.0, 956620.0, 488870.0, 957260.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_median_hv.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_median_hv.tif"
+      },
+      {
+        "id": "view_temporal_mad_hv",
+        "recipe": "temporal_mad",
+        "title": "Temporal variability · HV",
+        "dates": ["2026-08-28", "2026-09-09", "2026-09-21", "2026-10-03", "2026-10-15"],
+        "interpretation": "Scaled median absolute deviation across the listed observations. This is observed variability in dB.",
+        "components": [
+          {
+            "band": "value",
+            "label": "Scaled HV MAD",
+            "polarizations": ["HV"],
+            "display_db": [0.0, 8.0]
+          }
+        ],
+        "colormap": "magma",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32618",
+          "bounds": [488230.0, 956620.0, 488870.0, 957260.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-75.10698563743262, 8.654168339963968, -75.10116669688489, 8.659958876634766],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_mad_hv.png",
+        "cog_url": "/v2/jobs/cf3e5f2dcbae4318bac3ccf81547cf35/layers/view_temporal_mad_hv.tif"
+      }
+    ],
+    "previews": [],
+    "visualization_seconds": 0.242,
+    "elapsed_seconds": 189.171
+  },
+  "error": null
+}

@@ -135,31 +135,22 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
   }) => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(page.getByTestId("lens-card")).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
 
     await expect(page.locator("main")).toHaveAttribute("data-sheet", "result");
     await expectSheet(globe.panel, SHEET.result);
 
-    // The real answer has no rule layer, so its pill stays away (the unit test covers Rule).
+    // v9: the pills are the legend card's layer switch, with the layers this answer lacks disabled.
     const pills = page.getByTestId("layer-pills");
-    await expect(pills.getByRole("button")).toHaveText(["HH", "HV", "Δ dB"]);
+    await expect(pills.getByRole("button")).toHaveText([
+      "HH",
+      "Change vs baseline median",
+      "Darkening signature",
+    ]);
     await expect(page.getByTestId("layer-pill-hh")).toHaveAttribute("aria-pressed", "true");
     expect((await box(pills)).y).toBeGreaterThan((await box(globe.searchPill)).y);
-    // Same rows as the dock: the answer has no change layer and no HV image on 12 Sep. Reduced
-    // motion opens on the reference pass (14 Jul), so go to 12 Sep first.
     await expect(page.getByTestId("layer-pill-change")).toBeDisabled();
-    await globe.timelinePass(2).click();
-    await expect(globe.timelineReadout).toContainText("12 Sep 2026");
-    const hv = page.getByTestId("layer-pill-hv");
-    await expect(hv).toBeDisabled();
-    await expect(hv).toHaveAttribute("title", "No HV image for this pass");
-    // 14 Jul has both channels, so HV can be picked there.
-    await globe.timelinePasses("base").first().click();
-    await expect(globe.timelineReadout).toContainText("14 Jul 2026");
-    await expect(hv).toBeEnabled();
-    await hv.click();
-    await expect(hv).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByTestId("layer-pill-hh")).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByTestId("layer-pill-sig")).toBeDisabled();
 
     // The compact strip sits on the sheet: previous, play and next, no speed or loop (v9 frames).
     await expect(globe.timeline).toBeVisible();
@@ -176,7 +167,7 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
   }) => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(page.getByTestId("lens-card")).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
 
     const handle = page.getByTestId("sheet-handle");
     await expect(handle).toHaveAttribute("aria-expanded", "false");
@@ -211,18 +202,18 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
 test.describe("Explorer v8 on a desktop: no phone layout", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test("keeps the side panel, the dock and the time-lapse", async ({ page }) => {
+  test("keeps the side panel, the legend card and the time-lapse", async ({ page }) => {
     const globe = new GlobePage(page);
     await globe.skipOnboarding();
     await globe.mockObservationPlan();
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(page.getByTestId("lens-card")).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
 
     await expect(page.locator("main")).toHaveAttribute("data-sheet", "none");
     await expect(page.getByTestId("mobile-bar")).toHaveCount(0);
     await expect(page.getByTestId("sheet-handle")).toHaveCount(0);
-    await expect(globe.liveLayerDock).toBeVisible();
+    await expect(page.getByTestId("legend-card")).toBeVisible();
     await expect(page.getByTestId("timeline-play")).toBeVisible();
   });
 });

@@ -1,0 +1,1372 @@
+{
+  "api_version": "2.0",
+  "job_id": "cb391da11d954d6d96ea33d368911561",
+  "status": "succeeded",
+  "status_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561",
+  "cache": "miss",
+  "result": {
+    "operation": "explore",
+    "science_status": "complete",
+    "revision": "3db9864287bae6dc5bbb5258",
+    "point": [-120.26, 44.97],
+    "isDemo": false,
+    "science": {
+      "observations": [
+        {
+          "date": "2026-08-18",
+          "sensing_start_utc": "2026-08-18T03:11:02.000Z",
+          "granule_id": "G4285885793-ASF",
+          "granule_title": "NISAR_L2_PR_GCOV_028_071_D_066_4005_DHDH_A_20260818T031102_20260818T031137_P05023_N_F_J_001",
+          "grid": {
+            "epsg": 32610,
+            "bounds_native": [715740.0, 4982960.0, 716380.0, 4983600.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "point_db": { "HH": -6.273582458496094, "HV": -14.362913131713867 },
+          "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+          "quality": {
+            "productVersion": "1.0.11",
+            "compositeReleaseId": "P05023",
+            "radarBand": "L",
+            "instrumentName": "LSAR",
+            "hasInputDataException": 0,
+            "noiseCorrectionApplied": "False",
+            "isFullCovariance": "False"
+          },
+          "status": "observed",
+          "layer": {
+            "role": "observed_gamma0",
+            "dates": ["2026-08-18"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/2026-08-18.tif"
+          }
+        },
+        {
+          "date": "2026-08-30",
+          "sensing_start_utc": "2026-08-30T03:11:02.000Z",
+          "granule_id": "G4294473703-ASF",
+          "granule_title": "NISAR_L2_PR_GCOV_029_071_D_066_4005_DHDH_A_20260830T031102_20260830T031137_P05023_N_F_J_001",
+          "grid": {
+            "epsg": 32610,
+            "bounds_native": [715740.0, 4982960.0, 716380.0, 4983600.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "point_db": { "HH": -5.980823040008545, "HV": -13.666882514953613 },
+          "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+          "quality": {
+            "productVersion": "1.0.11",
+            "compositeReleaseId": "P05023",
+            "radarBand": "L",
+            "instrumentName": "LSAR",
+            "hasInputDataException": 0,
+            "noiseCorrectionApplied": "False",
+            "isFullCovariance": "False"
+          },
+          "status": "observed",
+          "layer": {
+            "role": "observed_gamma0",
+            "dates": ["2026-08-30"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/2026-08-30.tif"
+          }
+        },
+        {
+          "date": "2026-09-11",
+          "sensing_start_utc": "2026-09-11T03:11:02.000Z",
+          "granule_id": "G4310196553-ASF",
+          "granule_title": "NISAR_L2_PR_GCOV_030_071_D_066_4005_DHDH_A_20260911T031102_20260911T031137_P05023_N_F_J_001",
+          "grid": {
+            "epsg": 32610,
+            "bounds_native": [715740.0, 4982960.0, 716380.0, 4983600.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "point_db": { "HH": -6.129609107971191, "HV": -14.955033302307129 },
+          "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+          "quality": {
+            "productVersion": "1.0.11",
+            "compositeReleaseId": "P05023",
+            "radarBand": "L",
+            "instrumentName": "LSAR",
+            "hasInputDataException": 0,
+            "noiseCorrectionApplied": "False",
+            "isFullCovariance": "False"
+          },
+          "status": "observed",
+          "layer": {
+            "role": "observed_gamma0",
+            "dates": ["2026-09-11"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/2026-09-11.tif"
+          }
+        },
+        {
+          "date": "2026-09-23",
+          "sensing_start_utc": "2026-09-23T03:11:02.000Z",
+          "granule_id": "G4322912921-ASF",
+          "granule_title": "NISAR_L2_PR_GCOV_031_071_D_066_4005_DHDH_A_20260923T031102_20260923T031137_P05023_N_F_J_001",
+          "grid": {
+            "epsg": 32610,
+            "bounds_native": [715740.0, 4982960.0, 716380.0, 4983600.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "point_db": { "HH": -4.849160194396973, "HV": -13.478650093078613 },
+          "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+          "quality": {
+            "productVersion": "1.0.11",
+            "compositeReleaseId": "P05023",
+            "radarBand": "L",
+            "instrumentName": "LSAR",
+            "hasInputDataException": 0,
+            "noiseCorrectionApplied": "False",
+            "isFullCovariance": "False"
+          },
+          "status": "observed",
+          "layer": {
+            "role": "observed_gamma0",
+            "dates": ["2026-09-23"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/2026-09-23.tif"
+          }
+        },
+        {
+          "date": "2026-10-05",
+          "sensing_start_utc": "2026-10-05T03:11:02.000Z",
+          "granule_id": "G4346756487-ASF",
+          "granule_title": "NISAR_L2_PR_GCOV_032_071_D_066_4005_DHDH_A_20261005T031102_20261005T031137_P05023_N_F_J_001",
+          "grid": {
+            "epsg": 32610,
+            "bounds_native": [715740.0, 4982960.0, 716380.0, 4983600.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "point_db": { "HH": -7.50209903717041, "HV": -16.039094924926758 },
+          "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+          "quality": {
+            "productVersion": "1.0.11",
+            "compositeReleaseId": "P05023",
+            "radarBand": "L",
+            "instrumentName": "LSAR",
+            "hasInputDataException": 0,
+            "noiseCorrectionApplied": "False",
+            "isFullCovariance": "False"
+          },
+          "status": "observed",
+          "layer": {
+            "role": "observed_gamma0",
+            "dates": ["2026-10-05"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/2026-10-05.tif"
+          }
+        }
+      ],
+      "comparison": {
+        "status": "available",
+        "dates": ["2026-09-11", "2026-10-05"],
+        "definition": "later minus earlier in dB on common valid pixels",
+        "grid": {
+          "epsg": 32610,
+          "bounds_native": [715740.0, 4982960.0, 716380.0, 4983600.0],
+          "pixel_spacing_m": [10.0, 10.0],
+          "width": 64,
+          "height": 64
+        },
+        "point_db": { "HH": -1.3724899291992188, "HV": -1.084061622619629 },
+        "valid_pixel_count_by_pol": { "HH": 4096, "HV": 4096 },
+        "explanation": "From 2026-09-11 to 2026-10-05, the clicked pixel changed by HH -1.37 dB, HV -1.08 dB.",
+        "layer": {
+          "role": "signed_gamma0_change",
+          "dates": ["2026-09-11", "2026-10-05"],
+          "polarizations": ["HH", "HV"],
+          "units": "dB",
+          "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/change.tif"
+        }
+      },
+      "status": "complete",
+      "phase": null,
+      "observed_date_count": 5,
+      "usable_window_date_count": 5,
+      "lens": {
+        "id": "wildfire",
+        "version": "1.0",
+        "status": "evaluated",
+        "reason": null,
+        "target_date": "2026-10-05",
+        "baseline_dates": ["2026-08-18", "2026-08-30", "2026-09-11"],
+        "radar": {
+          "polarizations": ["HH", "HV"],
+          "posting_m": 10.0,
+          "grid_cells": 4096,
+          "common_cells": 4096,
+          "comparator": "Target minus median of the prior measured dates",
+          "diagnostic_half_width_db": "max(3, 3 × max(1.4826 × MAD, 1))",
+          "cells": 4096,
+          "median_target_minus_baseline_db": {
+            "HH": -0.39240264892578125,
+            "HV": -0.26533985137939453
+          },
+          "mad_departure_cells": 855,
+          "cross_pol_history": {
+            "polarization": "HV",
+            "status": "evaluated",
+            "rule": "Cross-polarized change below the negative median/MAD diagnostic bound",
+            "samples": [
+              {
+                "date": "2026-09-23",
+                "decline_cells": 284,
+                "median_change_db": -0.20313453674316406
+              },
+              {
+                "date": "2026-10-05",
+                "decline_cells": 312,
+                "median_change_db": -0.26533985137939453
+              }
+            ],
+            "decline_on_last_two_cells": 65,
+            "return_within_band_cells": 217,
+            "last_two_assessment_dates": ["2026-09-23", "2026-10-05"]
+          },
+          "grid": {
+            "epsg": 32610,
+            "bounds_native": [715740.0, 4982960.0, 716380.0, 4983600.0],
+            "pixel_spacing_m": [10.0, 10.0],
+            "width": 64,
+            "height": 64
+          },
+          "layer": {
+            "role": "target_minus_observed_baseline_db",
+            "dates": ["2026-10-05"],
+            "polarizations": ["HH", "HV"],
+            "units": "dB",
+            "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/baseline_change.tif"
+          },
+          "layers": [
+            {
+              "role": "cross_pol_decline_count",
+              "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/cross_pol_decline_count.tif",
+              "units": "observations",
+              "resampling": "nearest"
+            },
+            {
+              "role": "cross_pol_pattern",
+              "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/cross_pol_pattern.tif",
+              "units": "pattern code",
+              "resampling": "nearest",
+              "legend": {
+                "0": "no_sampled_decline",
+                "1": "decline_on_other_sampled_dates",
+                "2": "decline_on_last_two_assessments",
+                "3": "return_within_band_after_decline"
+              }
+            }
+          ]
+        },
+        "evidence": { "status": "unavailable" },
+        "point": {
+          "status": "within_observed_baseline",
+          "target_minus_baseline_db": { "HH": -1.3724899291992188, "HV": -1.6761817932128906 },
+          "diagnostic_half_width_db": { "HH": 3.0, "HV": 3.0 },
+          "cross_pol_history": {
+            "decline_dates": 0,
+            "assessed_dates": 2,
+            "pattern": "no_sampled_decline"
+          }
+        },
+        "evaluation": {
+          "surrounding_comparison": {
+            "status": "evaluated",
+            "reason": null,
+            "definition": "Change in a 60 m focal patch minus change in unique baseline-level matched cells 120–300 m away.",
+            "focal_radius_m": 60,
+            "comparison_annulus_m": [120, 300],
+            "minimum_cells": 5,
+            "minimum_supported_fraction": 0.5,
+            "minimum_matched_fraction": 0.5,
+            "independently_stable_controls": false,
+            "focal_cells": 114,
+            "surrounding_cells": 2374,
+            "focal_grid_cells": 114,
+            "surrounding_grid_cells": 2374,
+            "matches": {
+              "positive_pixels": 114,
+              "matched_control_pixels": 112,
+              "matched_positive_pixels": 112,
+              "matched_fraction": 0.9824561403508771,
+              "baseline_mean_positive_minus_control_db_by_channel": [
+                0.019850313663482666, -0.010445654392242432
+              ],
+              "criterion": "unique baseline co-/cross-pol levels within declared dB tolerance; at most 128 nearest candidates; contrast uses matched positives only; not causal matching on all confounders"
+            },
+            "channels": {
+              "HH": {
+                "status": "conditional_spatial_resampling",
+                "positive_pixels": 112,
+                "control_pixels": 112,
+                "positive_mean_db": 0.12412564669336591,
+                "control_mean_db": -0.8935851390872683,
+                "positive_median_db": -0.02318096160888672,
+                "control_median_db": -0.9780642986297607,
+                "mean_contrast_db": 1.0177107857806342,
+                "spatial_resampling_95_interval_db": [0.15206362143679586, 1.984526677937478],
+                "positive_blocks": 4,
+                "control_blocks": 29,
+                "valid_resampling_draws": 393,
+                "interval_limit": "Conditional resampling of fixed spatial blocks; spatial independence, measurement errors, reference errors and causal identification are not established"
+              },
+              "HV": {
+                "status": "conditional_spatial_resampling",
+                "positive_pixels": 112,
+                "control_pixels": 112,
+                "positive_mean_db": 0.06595476184572492,
+                "control_mean_db": -0.6385109850338527,
+                "positive_median_db": -0.06657791137695312,
+                "control_median_db": -0.4716978073120117,
+                "mean_contrast_db": 0.7044657468795776,
+                "spatial_resampling_95_interval_db": [-0.05529280128921827, 1.7657779908257014],
+                "positive_blocks": 4,
+                "control_blocks": 29,
+                "valid_resampling_draws": 393,
+                "interval_limit": "Conditional resampling of fixed spatial blocks; spatial independence, measurement errors, reference errors and causal identification are not established"
+              }
+            },
+            "spatial_block_size_m": [80.0, 80.0],
+            "series": [
+              {
+                "date": "2026-08-18",
+                "focal_mean_db": { "HH": -10.722517013549805, "HV": -16.894678115844727 },
+                "control_mean_db": { "HH": -10.979517936706543, "HV": -17.00557518005371 }
+              },
+              {
+                "date": "2026-08-30",
+                "focal_mean_db": { "HH": -10.97701358795166, "HV": -17.16826629638672 },
+                "control_mean_db": { "HH": -10.789599418640137, "HV": -16.852169036865234 }
+              },
+              {
+                "date": "2026-09-11",
+                "focal_mean_db": { "HH": -9.920730590820312, "HV": -16.679412841796875 },
+                "control_mean_db": { "HH": -10.677910804748535, "HV": -16.98052406311035 }
+              },
+              {
+                "date": "2026-09-23",
+                "focal_mean_db": { "HH": -10.419304847717285, "HV": -16.47669792175293 },
+                "control_mean_db": { "HH": -11.126185417175293, "HV": -17.27538299560547 }
+              },
+              {
+                "date": "2026-10-05",
+                "focal_mean_db": { "HH": -10.563810348510742, "HV": -16.811786651611328 },
+                "control_mean_db": { "HH": -11.601372718811035, "HV": -17.50580596923828 }
+              }
+            ]
+          }
+        },
+        "observation_bracket": ["2026-09-11", "2026-10-05"],
+        "assessment_dates": ["2026-09-23", "2026-10-05"],
+        "fire_context": { "status": "unavailable" },
+        "temporal_analysis": {
+          "dates": ["2026-08-18", "2026-08-30", "2026-09-11", "2026-09-23", "2026-10-05"],
+          "elapsed_days": [0.0, 12.0, 24.0, 36.0, 48.0],
+          "acquisition_gaps_days": [12.0, 12.0, 12.0, 12.0],
+          "common_cells": 4096,
+          "spectral": {
+            "status": "insufficient_temporal_support",
+            "reason": "Need at least six observed dates"
+          },
+          "stochastic": {
+            "status": "experimental",
+            "channels": {
+              "HH": {
+                "status": "fit_returned",
+                "supported_cells": 4096,
+                "series": [
+                  {
+                    "date": "2026-08-18",
+                    "observed_mean_db": -14.86059173411195,
+                    "latent_median_db": -14.758845830611424,
+                    "conditional_80_db": [-14.838497436682347, -14.716307090793052],
+                    "conditional_95_db": [-14.86309631556341, -14.686649267772005]
+                  },
+                  {
+                    "date": "2026-08-30",
+                    "observed_mean_db": -14.914691358222626,
+                    "latent_median_db": -14.753278459222305,
+                    "conditional_80_db": [-14.818087091571215, -14.693581575772493],
+                    "conditional_95_db": [-14.865702384887266, -14.677528257858885]
+                  },
+                  {
+                    "date": "2026-09-11",
+                    "observed_mean_db": -14.297512399552943,
+                    "latent_median_db": -14.771658326848463,
+                    "conditional_80_db": [-14.828095981505486, -14.689745495731534],
+                    "conditional_95_db": [-14.877055940570324, -14.64441135740883]
+                  },
+                  {
+                    "date": "2026-09-23",
+                    "observed_mean_db": -14.622308574194903,
+                    "latent_median_db": -14.764335197766398,
+                    "conditional_80_db": [-14.82700493409215, -14.700813208667991],
+                    "conditional_95_db": [-14.850623162114028, -14.678739182998331]
+                  },
+                  {
+                    "date": "2026-10-05",
+                    "observed_mean_db": -15.09165197313996,
+                    "latent_median_db": -14.761560206353382,
+                    "conditional_80_db": [-14.819137391583004, -14.689935993644081],
+                    "conditional_95_db": [-14.852455785401366, -14.658071928225567]
+                  }
+                ]
+              },
+              "HV": {
+                "status": "fit_returned",
+                "supported_cells": 4096,
+                "series": [
+                  {
+                    "date": "2026-08-18",
+                    "observed_mean_db": -20.271901067113504,
+                    "latent_median_db": -20.424803750306715,
+                    "conditional_80_db": [-20.503141312314327, -20.365485709991287],
+                    "conditional_95_db": [-20.540171441635195, -20.33957801867592]
+                  },
+                  {
+                    "date": "2026-08-30",
+                    "observed_mean_db": -20.443196297623217,
+                    "latent_median_db": -20.433332352346273,
+                    "conditional_80_db": [-20.487402301726576, -20.380571427330327],
+                    "conditional_95_db": [-20.514224310424186, -20.34414919394486]
+                  },
+                  {
+                    "date": "2026-09-11",
+                    "observed_mean_db": -20.29225666221464,
+                    "latent_median_db": -20.433410796171408,
+                    "conditional_80_db": [-20.5018335993435, -20.36918222488586],
+                    "conditional_95_db": [-20.52838074695158, -20.33818071575109]
+                  },
+                  {
+                    "date": "2026-09-23",
+                    "observed_mean_db": -20.535085896379314,
+                    "latent_median_db": -20.41884834777891,
+                    "conditional_80_db": [-20.48672962374259, -20.35166187143733],
+                    "conditional_95_db": [-20.51772835717953, -20.33050226337435]
+                  },
+                  {
+                    "date": "2026-10-05",
+                    "observed_mean_db": -20.60468659363687,
+                    "latent_median_db": -20.430779881736225,
+                    "conditional_80_db": [-20.481568908844025, -20.353471953437804],
+                    "conditional_95_db": [-20.532774390148337, -20.31859618985223]
+                  }
+                ]
+              }
+            },
+            "calibrated": false,
+            "interpretation": "Conditional empirical-Bayes latent-state distribution at observed dates. The representative regional process uses the fitted pixel covariance. Bands omit parameter and model uncertainty. Residual scale is not measured sensor noise."
+          },
+          "observation_noise_db": null
+        },
+        "excluded_unusable_dates": [],
+        "requested_baseline_end_date": "2026-09-11"
+      },
+      "coverage": {
+        "contract_version": "1.0",
+        "point": { "longitude": -120.26, "latitude": 44.97 },
+        "date_window": ["2026-08-18", "2026-10-05"],
+        "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+        "catalog_queried_at_utc": "2026-11-13T19:19:42.911342+00:00",
+        "catalog_hits": 15,
+        "coverage_status": "catalog_match",
+        "pixel_support": "unchecked",
+        "series": [
+          {
+            "key": "005_A_024_4005_DHDH",
+            "dates": ["2026-08-25", "2026-09-06", "2026-09-30"],
+            "frequency_a_supported": true
+          },
+          {
+            "key": "071_D_066_4005_DHDH",
+            "dates": ["2026-08-18", "2026-08-30", "2026-09-11", "2026-09-23", "2026-10-05"],
+            "frequency_a_supported": true
+          },
+          {
+            "key": "106_A_024_4005_DHDH",
+            "dates": ["2026-08-20", "2026-09-01", "2026-09-13", "2026-09-25"],
+            "frequency_a_supported": true
+          },
+          {
+            "key": "143_D_066_4005_DHDH",
+            "dates": ["2026-08-23", "2026-09-04", "2026-09-16"],
+            "frequency_a_supported": true
+          }
+        ]
+      },
+      "series_key": "071_D_066_4005_DHDH",
+      "series_attempts": [
+        { "series_key": "071_D_066_4005_DHDH", "status": "complete", "usable_window_date_count": 5 }
+      ],
+      "timings": { "measure_s": 0.166, "total_s": 0.318 }
+    },
+    "layers": [
+      {
+        "id": "display_2026-08-18_HH",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-18_HH.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-18_HH.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-08-18_HV",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-18_HV.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-18_HV.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-08-30_HH",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-30_HH.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-30_HH.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-08-30_HV",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-30_HV.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-30_HV.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-09-11_HH",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-11_HH.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-11_HH.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-09-11_HV",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-11_HV.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-11_HV.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-09-23_HH",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-23_HH.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-23_HH.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-09-23_HV",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-23_HV.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-23_HV.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-10-05_HH",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-10-05_HH.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-10-05_HH.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_2026-10-05_HV",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-10-05_HV.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-10-05_HV.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "gray",
+        "range": [-30, 0],
+        "legend": null
+      },
+      {
+        "id": "display_baseline_change_HH",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_baseline_change_HH.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_baseline_change_HH.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "RdBu_r",
+        "range": [-8, 8],
+        "legend": null
+      },
+      {
+        "id": "display_baseline_change_HV",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_baseline_change_HV.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_baseline_change_HV.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "RdBu_r",
+        "range": [-8, 8],
+        "legend": null
+      },
+      {
+        "id": "display_change_HH",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_change_HH.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_change_HH.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "RdBu_r",
+        "range": [-8, 8],
+        "legend": null
+      },
+      {
+        "id": "display_change_HV",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_change_HV.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_change_HV.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "dB",
+        "colormap": "RdBu_r",
+        "range": [-8, 8],
+        "legend": null
+      },
+      {
+        "id": "display_cross_pol_decline_count_cross_pol_decline_count",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_cross_pol_decline_count_cross_pol_decline_count.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_cross_pol_decline_count_cross_pol_decline_count.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "observations",
+        "colormap": "viridis",
+        "range": [0, 2],
+        "legend": null
+      },
+      {
+        "id": "display_cross_pol_pattern_cross_pol_pattern",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_cross_pol_pattern_cross_pol_pattern.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_cross_pol_pattern_cross_pol_pattern.tif",
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "north_up": true,
+        "units": "pattern code",
+        "colormap": "diagnostic_categories",
+        "range": [0, 3],
+        "legend": {
+          "0": "no_sampled_decline",
+          "1": "decline_on_other_sampled_dates",
+          "2": "decline_on_last_two_assessments",
+          "3": "return_within_band_after_decline"
+        }
+      }
+    ],
+    "artifacts": [
+      {
+        "name": "display_2026-08-18_HH.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-18_HH.png",
+        "media_type": "image/png",
+        "bytes": 8866,
+        "sha256": "3d94f401bf12740e4ad313b119ee069d55995079412acbd908531573e9261988"
+      },
+      {
+        "name": "display_2026-08-18_HV.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-18_HV.png",
+        "media_type": "image/png",
+        "bytes": 8892,
+        "sha256": "34afc63c8c6466f75995816a9fddc86b8244254276a72039977e87ddfdfb3e12"
+      },
+      {
+        "name": "display_2026-08-30_HH.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-30_HH.png",
+        "media_type": "image/png",
+        "bytes": 9098,
+        "sha256": "3e097e845c34a1e903679d2029e4fd4be39b03008b07a6983147bd88999837af"
+      },
+      {
+        "name": "display_2026-08-30_HV.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-30_HV.png",
+        "media_type": "image/png",
+        "bytes": 8823,
+        "sha256": "190a7bb7275fefc33b95f66ced4f64282f2c14ed4cbc33a4b4c30ec97542f8ac"
+      },
+      {
+        "name": "display_2026-09-11_HH.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-11_HH.png",
+        "media_type": "image/png",
+        "bytes": 9094,
+        "sha256": "b4a055a2a6baee026e880aaee665a2cfdcf824a272922a1e61241e866b66f78c"
+      },
+      {
+        "name": "display_2026-09-11_HV.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-11_HV.png",
+        "media_type": "image/png",
+        "bytes": 8927,
+        "sha256": "ac4d1e950b619e951781d8f1aebf88059ec86fa054787c13ee876f1ed7bb0df2"
+      },
+      {
+        "name": "display_2026-09-23_HH.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-23_HH.png",
+        "media_type": "image/png",
+        "bytes": 9107,
+        "sha256": "1ad3af682a4ebbfc9dd539d48e0eec5a44194f7ff4e63f78f577e5e1b9bc4467"
+      },
+      {
+        "name": "display_2026-09-23_HV.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-23_HV.png",
+        "media_type": "image/png",
+        "bytes": 8997,
+        "sha256": "97ceb2b0b863d6f9e710b32c34e96ede0a7e1cef8903e9ff71b9420ddf4a4085"
+      },
+      {
+        "name": "display_2026-10-05_HH.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-10-05_HH.png",
+        "media_type": "image/png",
+        "bytes": 9115,
+        "sha256": "a7d7efe57079ec1ad080af6e2b08570e96d7ba0998b2c4232784629e0436f156"
+      },
+      {
+        "name": "display_2026-10-05_HV.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-10-05_HV.png",
+        "media_type": "image/png",
+        "bytes": 8883,
+        "sha256": "044361684b58d313c2e6806464dd39e2dac0ddf054bba29124409e0f90c22257"
+      },
+      {
+        "name": "display_baseline_change_HH.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_baseline_change_HH.png",
+        "media_type": "image/png",
+        "bytes": 12424,
+        "sha256": "e146dd9972a05aa19eb82aaeae9b8ff7793dbc21ec7109f42c3a2570ad36c792"
+      },
+      {
+        "name": "display_baseline_change_HV.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_baseline_change_HV.png",
+        "media_type": "image/png",
+        "bytes": 12578,
+        "sha256": "189105ab4aaa011e3418577487e93a262c9313dd261b9c77e055aff7d273e5e5"
+      },
+      {
+        "name": "display_change_HH.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_change_HH.png",
+        "media_type": "image/png",
+        "bytes": 12722,
+        "sha256": "eafcaeab102ba8df7e0f9a6eda98b8ee4d22f8fc65268043d68e550f3bba2f6e"
+      },
+      {
+        "name": "display_change_HV.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_change_HV.png",
+        "media_type": "image/png",
+        "bytes": 12892,
+        "sha256": "72550fce22f4d442fd0564c9943327afed1ee91b724a3ed8fad87afe3398fca4"
+      },
+      {
+        "name": "display_cross_pol_decline_count_cross_pol_decline_count.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_cross_pol_decline_count_cross_pol_decline_count.png",
+        "media_type": "image/png",
+        "bytes": 1319,
+        "sha256": "075c11e7f77d4d3c94ec73eaa5ed59efb9645554f022ee7add13d29d1983a6dd"
+      },
+      {
+        "name": "display_cross_pol_pattern_cross_pol_pattern.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_cross_pol_pattern_cross_pol_pattern.png",
+        "media_type": "image/png",
+        "bytes": 1744,
+        "sha256": "941f1f3b06b5790d8805bda5568064453b2cc97129c00187f785bd95df818b77"
+      },
+      {
+        "name": "view_polarization_rgb_hh_hv.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_polarization_rgb_hh_hv.png",
+        "media_type": "image/png",
+        "bytes": 12113,
+        "sha256": "98201ee754f0376679e190824fdb5cc110ed7ee5040f31cdaede499517585896"
+      },
+      {
+        "name": "view_cross_co_ratio_hh_hv.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_cross_co_ratio_hh_hv.png",
+        "media_type": "image/png",
+        "bytes": 12659,
+        "sha256": "f69271491b69c428b7552b95f2eb2042605c88e2d5d90df9f42bf7fc63944897"
+      },
+      {
+        "name": "view_cross_co_ratio_change_hh_hv.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_cross_co_ratio_change_hh_hv.png",
+        "media_type": "image/png",
+        "bytes": 13030,
+        "sha256": "a9bb39f4544c53b384748d342d1c17dfab8f16ac3a7addb004bafbc1987ba051"
+      },
+      {
+        "name": "view_temporal_median_hh.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_median_hh.png",
+        "media_type": "image/png",
+        "bytes": 7589,
+        "sha256": "fa7239b7f9bfb1c0d010f1e66f953d56c341387f02ea28525662938d186f895e"
+      },
+      {
+        "name": "view_temporal_mad_hh.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_mad_hh.png",
+        "media_type": "image/png",
+        "bytes": 12184,
+        "sha256": "c05b8b6e00b7f8e25a5bc8dfe6ca187e29b0f6b53b0cd1758a0dad5ec13f4b46"
+      },
+      {
+        "name": "view_three_date_rgb_hh.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_three_date_rgb_hh.png",
+        "media_type": "image/png",
+        "bytes": 11656,
+        "sha256": "4247b20b9977d610cae07e2960f3a553b3035bc7cf65127dcca0310d0441c8e2"
+      },
+      {
+        "name": "view_temporal_median_hv.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_median_hv.png",
+        "media_type": "image/png",
+        "bytes": 7134,
+        "sha256": "5f3f867df3a3c6e69d2c66231a34b38ed98211d589e00a8aa8f96ca35e456201"
+      },
+      {
+        "name": "view_temporal_mad_hv.png",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_mad_hv.png",
+        "media_type": "image/png",
+        "bytes": 12208,
+        "sha256": "47f368a45805ad89a3ad71c03fec1c89dc7e44e12b634ae55f9d030820206a88"
+      },
+      {
+        "name": "2026-08-18.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/2026-08-18.tif",
+        "media_type": "image/tiff",
+        "bytes": 30076,
+        "sha256": "fc9f7e079dd77c40baa3b5fd9edbf3ed4d9dcde60ddb02613bfd48be23f948b6"
+      },
+      {
+        "name": "2026-08-30.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/2026-08-30.tif",
+        "media_type": "image/tiff",
+        "bytes": 30099,
+        "sha256": "ca437518c03172cc9b0c09439d0c48b5bf8ee5c74ac0717f9768a227d93f3fff"
+      },
+      {
+        "name": "2026-09-11.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/2026-09-11.tif",
+        "media_type": "image/tiff",
+        "bytes": 30099,
+        "sha256": "49c5c12fdaa5cd313ef0674fd779bc4893205e04d38dc130708da71f172c698b"
+      },
+      {
+        "name": "2026-09-23.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/2026-09-23.tif",
+        "media_type": "image/tiff",
+        "bytes": 30054,
+        "sha256": "06207825f0d3736312844c2bc74492d96f6277d24e5cd16b62a8e6636663a62f"
+      },
+      {
+        "name": "2026-10-05.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/2026-10-05.tif",
+        "media_type": "image/tiff",
+        "bytes": 30044,
+        "sha256": "556e2abe59c8535d356ba6d315c18735debef3f3df4140a6d9f853ffb7cbb41e"
+      },
+      {
+        "name": "baseline_change.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/baseline_change.tif",
+        "media_type": "image/tiff",
+        "bytes": 30989,
+        "sha256": "0cca7fea8b92631abfff718f7f9be61162692798dd8ee4d5aad40c4ac8c60de9"
+      },
+      {
+        "name": "change.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/change.tif",
+        "media_type": "image/tiff",
+        "bytes": 31083,
+        "sha256": "1a6b871faa50f61d1e5f98c22699e4e583f88c782f1589917373c4fe73dec3e6"
+      },
+      {
+        "name": "cross_pol_decline_count.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/cross_pol_decline_count.tif",
+        "media_type": "image/tiff",
+        "bytes": 1983,
+        "sha256": "dc5d936942f88fc317dcebb4603192631587476f1db225d59e78d06565911fa0"
+      },
+      {
+        "name": "cross_pol_pattern.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/cross_pol_pattern.tif",
+        "media_type": "image/tiff",
+        "bytes": 2078,
+        "sha256": "f540c0ded3d9e0b14de49a2051845737a5e73bfc913f65feac2d9bba641be7d4"
+      },
+      {
+        "name": "display_2026-08-18_HH.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-18_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 15712,
+        "sha256": "71b0e309e6b2c2a3773b33f11688522dc6e9b33816b9d347c4de8896dfc81ecc"
+      },
+      {
+        "name": "display_2026-08-18_HV.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-18_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 15330,
+        "sha256": "3cc4190dbae1c0d7b2a0d99986fde9179992041cb5624382b0de9f499b2f50d5"
+      },
+      {
+        "name": "display_2026-08-30_HH.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-30_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 15715,
+        "sha256": "19b11e27b0d001d09100abe47deedc3694151b2430f089b7de1ccfeabe9ecb2d"
+      },
+      {
+        "name": "display_2026-08-30_HV.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-08-30_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 15340,
+        "sha256": "1e3a0737626845d7262fff9dc087fa66c088b6f6937f37e8788c737d9c0e57c1"
+      },
+      {
+        "name": "display_2026-09-11_HH.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-11_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 15756,
+        "sha256": "b1bd4d7c6eefde3de6ec47038e4e73c32b01958488966ad763bb163ac3afbe81"
+      },
+      {
+        "name": "display_2026-09-11_HV.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-11_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 15372,
+        "sha256": "4509e66ad627dd8bff2200d27b9043516c4fd11a6919245f105f4a7a3c0bccb0"
+      },
+      {
+        "name": "display_2026-09-23_HH.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-23_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 15741,
+        "sha256": "1f21938b38f2ba671d0c9a516fae4f732b4c0682a4ce0506b49139d6ea31b0e6"
+      },
+      {
+        "name": "display_2026-09-23_HV.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-09-23_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 15329,
+        "sha256": "1bc6a6b806f59b984bf41e99ec59a487f2622a22e4dee445546903236cef85de"
+      },
+      {
+        "name": "display_2026-10-05_HH.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-10-05_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 15752,
+        "sha256": "5ec54f54267694e1a1e2c8bb93fc8b00a3e502690116f31c01a295f38d02d92c"
+      },
+      {
+        "name": "display_2026-10-05_HV.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_2026-10-05_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 15328,
+        "sha256": "0509dfb239f04ac643789299664fc0b3d4b78f713a854628fb9ee08c832a9db3"
+      },
+      {
+        "name": "display_baseline_change_HH.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_baseline_change_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 16200,
+        "sha256": "a3f0a0fd8fca90dc0335bfe6597dd3b13602601aa0529ec451c8f0eb4844352f"
+      },
+      {
+        "name": "display_baseline_change_HV.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_baseline_change_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 16027,
+        "sha256": "273f2cfd33b7d4fcbeb3aa456128d0aaf7323b52e2af53ad3207d79f8a55f38e"
+      },
+      {
+        "name": "display_change_HH.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_change_HH.tif",
+        "media_type": "image/tiff",
+        "bytes": 16235,
+        "sha256": "f29ef1e35defdced956b23c37c89ec328c80eb7aaf0a484bafca30c1880af4eb"
+      },
+      {
+        "name": "display_change_HV.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_change_HV.tif",
+        "media_type": "image/tiff",
+        "bytes": 16069,
+        "sha256": "ddfa4c8c1a049bb1deeab975ba42ec9410e3fa8c63da427a1c0921363cff87a1"
+      },
+      {
+        "name": "display_cross_pol_decline_count_cross_pol_decline_count.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_cross_pol_decline_count_cross_pol_decline_count.tif",
+        "media_type": "image/tiff",
+        "bytes": 2015,
+        "sha256": "799c3b8cee7a6520f743755a112c606e537691bee90fd6bab805a74e30644165"
+      },
+      {
+        "name": "display_cross_pol_pattern_cross_pol_pattern.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/display_cross_pol_pattern_cross_pol_pattern.tif",
+        "media_type": "image/tiff",
+        "bytes": 2104,
+        "sha256": "424ade351aaaa12f96121c54993b59159f86f23391189fd5af71848f5d160955"
+      },
+      {
+        "name": "view_cross_co_ratio_change_hh_hv.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_cross_co_ratio_change_hh_hv.tif",
+        "media_type": "image/tiff",
+        "bytes": 16311,
+        "sha256": "324e45b5b01540b7d69aed0de901ed50c6854dfe0692bc71cef1247c1c55a9f1"
+      },
+      {
+        "name": "view_cross_co_ratio_hh_hv.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_cross_co_ratio_hh_hv.tif",
+        "media_type": "image/tiff",
+        "bytes": 16060,
+        "sha256": "938a0b1f2d562659314418d52d44510fc9c4f05c55d5826bb0cd9af9e46c44e0"
+      },
+      {
+        "name": "view_polarization_rgb_hh_hv.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_polarization_rgb_hh_hv.tif",
+        "media_type": "image/tiff",
+        "bytes": 45764,
+        "sha256": "1162ef2dfabe3ef9fa982a42a13b61f49772883bd1142d49aa41818c5691726c"
+      },
+      {
+        "name": "view_temporal_mad_hh.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_mad_hh.tif",
+        "media_type": "image/tiff",
+        "bytes": 16219,
+        "sha256": "a9cd056a8f38c14497a40520b646bd2f9d8a078e23a9f606bd47a002fba81e5d"
+      },
+      {
+        "name": "view_temporal_mad_hv.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_mad_hv.tif",
+        "media_type": "image/tiff",
+        "bytes": 16225,
+        "sha256": "4df892fc632f9c2719e425d47f10b1bad7f0eaf7f311f8c9abe452d956a3daf9"
+      },
+      {
+        "name": "view_temporal_median_hh.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_median_hh.tif",
+        "media_type": "image/tiff",
+        "bytes": 15481,
+        "sha256": "b04e88287afb3c614f137fe660afa7e0ec76f0ce305008415dff5c83003ffe5b"
+      },
+      {
+        "name": "view_temporal_median_hv.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_median_hv.tif",
+        "media_type": "image/tiff",
+        "bytes": 15378,
+        "sha256": "0a7bc93f4849ca7a76f945fe6965b67ea4e8430b7e4f9db8e4b4305bd6c0e4c3"
+      },
+      {
+        "name": "view_three_date_rgb_hh.tif",
+        "href": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_three_date_rgb_hh.tif",
+        "media_type": "image/tiff",
+        "bytes": 44587,
+        "sha256": "4cf55b21f9353a46edc6393c10e5d81f98110c0ef7a49c8039751ef3c8e628d1"
+      }
+    ],
+    "visualizations": [
+      {
+        "id": "view_polarization_rgb_hh_hv",
+        "recipe": "polarization_rgb",
+        "title": "Polarization RGB · HH/HV",
+        "dates": ["2026-10-05"],
+        "interpretation": "False color combines co-pol return, cross-pol return and their balance. Roughness, structure, moisture and viewing geometry can all influence these channels.",
+        "components": [
+          { "band": "R", "label": "HH dB", "polarizations": ["HH"], "display_db": [-25.0, 0.0] },
+          { "band": "G", "label": "HV dB", "polarizations": ["HV"], "display_db": [-32.0, -5.0] },
+          {
+            "band": "B",
+            "label": "HV − HH dB",
+            "polarizations": ["HV", "HH"],
+            "display_db": [-18.0, -2.0]
+          }
+        ],
+        "colormap": "rgb",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32610",
+          "bounds": [715740.0, 4982960.0, 716380.0, 4983600.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_polarization_rgb_hh_hv.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_polarization_rgb_hh_hv.tif"
+      },
+      {
+        "id": "view_cross_co_ratio_hh_hv",
+        "recipe": "cross_co_ratio",
+        "title": "Polarization balance · HV/HH",
+        "dates": ["2026-10-05"],
+        "interpretation": "Cross-pol minus co-pol in dB. A change in this balance can come from either input channel.",
+        "components": [
+          {
+            "band": "value",
+            "label": "HV − HH dB",
+            "polarizations": ["HV", "HH"],
+            "display_db": [-18.0, 0.0]
+          }
+        ],
+        "colormap": "viridis",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32610",
+          "bounds": [715740.0, 4982960.0, 716380.0, 4983600.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_cross_co_ratio_hh_hv.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_cross_co_ratio_hh_hv.tif"
+      },
+      {
+        "id": "view_cross_co_ratio_change_hh_hv",
+        "recipe": "cross_co_ratio_change",
+        "title": "Change in polarization balance · HV/HH",
+        "dates": ["2026-09-11", "2026-10-05"],
+        "interpretation": "Later cross/co log ratio minus earlier cross/co log ratio. Both channels must be supported on both dates.",
+        "components": [
+          {
+            "band": "value",
+            "label": "Later minus earlier HV/HH log ratio",
+            "polarizations": ["HV", "HH"],
+            "display_db": [-8.0, 8.0]
+          }
+        ],
+        "colormap": "RdBu_r",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32610",
+          "bounds": [715740.0, 4982960.0, 716380.0, 4983600.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_cross_co_ratio_change_hh_hv.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_cross_co_ratio_change_hh_hv.tif"
+      },
+      {
+        "id": "view_temporal_median_hh",
+        "recipe": "temporal_median",
+        "title": "Temporal median · HH",
+        "dates": ["2026-08-18", "2026-08-30", "2026-09-11", "2026-09-23", "2026-10-05"],
+        "interpretation": "Cellwise median over the listed observations on complete per-channel support.",
+        "components": [
+          {
+            "band": "value",
+            "label": "Median HH dB",
+            "polarizations": ["HH"],
+            "display_db": [-30.0, 0.0]
+          }
+        ],
+        "colormap": "gray",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32610",
+          "bounds": [715740.0, 4982960.0, 716380.0, 4983600.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_median_hh.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_median_hh.tif"
+      },
+      {
+        "id": "view_temporal_mad_hh",
+        "recipe": "temporal_mad",
+        "title": "Temporal variability · HH",
+        "dates": ["2026-08-18", "2026-08-30", "2026-09-11", "2026-09-23", "2026-10-05"],
+        "interpretation": "Scaled median absolute deviation across the listed observations. This is observed variability in dB.",
+        "components": [
+          {
+            "band": "value",
+            "label": "Scaled HH MAD",
+            "polarizations": ["HH"],
+            "display_db": [0.0, 8.0]
+          }
+        ],
+        "colormap": "magma",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32610",
+          "bounds": [715740.0, 4982960.0, 716380.0, 4983600.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_mad_hh.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_mad_hh.tif"
+      },
+      {
+        "id": "view_three_date_rgb_hh",
+        "recipe": "three_date_rgb",
+        "title": "Three-date RGB · HH",
+        "dates": ["2026-08-18", "2026-09-11", "2026-10-05"],
+        "interpretation": "False color assigns three observed dates to red, green and blue. Equal returns across dates produce gray.",
+        "components": [
+          {
+            "band": "R",
+            "label": "HH dB · 2026-08-18",
+            "polarizations": ["HH"],
+            "display_db": [-25.0, 0.0]
+          },
+          {
+            "band": "G",
+            "label": "HH dB · 2026-09-11",
+            "polarizations": ["HH"],
+            "display_db": [-25.0, 0.0]
+          },
+          {
+            "band": "B",
+            "label": "HH dB · 2026-10-05",
+            "polarizations": ["HH"],
+            "display_db": [-25.0, 0.0]
+          }
+        ],
+        "colormap": "rgb",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32610",
+          "bounds": [715740.0, 4982960.0, 716380.0, 4983600.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_three_date_rgb_hh.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_three_date_rgb_hh.tif"
+      },
+      {
+        "id": "view_temporal_median_hv",
+        "recipe": "temporal_median",
+        "title": "Temporal median · HV",
+        "dates": ["2026-08-18", "2026-08-30", "2026-09-11", "2026-09-23", "2026-10-05"],
+        "interpretation": "Cellwise median over the listed observations on complete per-channel support.",
+        "components": [
+          {
+            "band": "value",
+            "label": "Median HV dB",
+            "polarizations": ["HV"],
+            "display_db": [-30.0, 0.0]
+          }
+        ],
+        "colormap": "gray",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32610",
+          "bounds": [715740.0, 4982960.0, 716380.0, 4983600.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_median_hv.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_median_hv.tif"
+      },
+      {
+        "id": "view_temporal_mad_hv",
+        "recipe": "temporal_mad",
+        "title": "Temporal variability · HV",
+        "dates": ["2026-08-18", "2026-08-30", "2026-09-11", "2026-09-23", "2026-10-05"],
+        "interpretation": "Scaled median absolute deviation across the listed observations. This is observed variability in dB.",
+        "components": [
+          {
+            "band": "value",
+            "label": "Scaled HV MAD",
+            "polarizations": ["HV"],
+            "display_db": [0.0, 8.0]
+          }
+        ],
+        "colormap": "magma",
+        "supported_cells": 4096,
+        "total_cells": 4096,
+        "grid": {
+          "crs": "EPSG:32610",
+          "bounds": [715740.0, 4982960.0, 716380.0, 4983600.0],
+          "shape": [64, 64],
+          "posting_m": [10.0, 10.0],
+          "north_up": true
+        },
+        "bounds": [-120.26427195581289, 44.96711316192204, -120.2558910299245, 44.973062465602546],
+        "crs": "EPSG:4326",
+        "png_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_mad_hv.png",
+        "cog_url": "/v2/jobs/cb391da11d954d6d96ea33d368911561/layers/view_temporal_mad_hv.tif"
+      }
+    ],
+    "previews": [],
+    "visualization_seconds": 0.199,
+    "elapsed_seconds": 0.525
+  },
+  "error": null
+}

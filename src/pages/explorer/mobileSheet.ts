@@ -1,5 +1,7 @@
 import { MOBILE } from "@/content/copyV8";
+import type { V9LayerId } from "@/content/copyV9";
 import type { DockRow, DockRowKey } from "@/features/explore/exploreDock";
+import type { LayerOption } from "@/features/result/resultLayers";
 
 /*
  * The phone layout (SPECS-v8 §1 Mobile): which step the bottom sheet shows and how tall it is.
@@ -66,7 +68,7 @@ const PILL_LABEL: Partial<Record<DockRowKey, string>> = {
   rule: MOBILE.pillRule,
 };
 
-export type LayerPill = DockRow & { short: string };
+export type LayerPill = Omit<DockRow, "key"> & { key: string; short: string };
 
 // The dock's own rows, so pills and dock always agree. Rule shows only when the lens drew one.
 export const layerPills = (rows: DockRow[]): LayerPill[] =>
@@ -75,3 +77,14 @@ export const layerPills = (rows: DockRow[]): LayerPill[] =>
     if (short === undefined || (row.key === "rule" && !row.enabled)) return [];
     return [{ ...row, short }];
   });
+
+// v9: the legend card's layer switch as pills, with the same labels and the same disabled layers.
+export const resultPills = (options: LayerOption[], selected: V9LayerId | undefined): LayerPill[] =>
+  options.map(({ id, label, pick }) => ({
+    key: id,
+    label,
+    short: label,
+    enabled: pick !== undefined,
+    on: id === selected,
+    action: pick,
+  }));
