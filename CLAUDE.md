@@ -70,8 +70,8 @@ plus the E2E spec(s) you touched.
 that calls `GET /api/v1/places?q=` **only when the text is submitted** (Enter or the button):
 OpenStreetMap's Nominatim, which the backend proxies, forbids type-ahead autocomplete. Picking a
 place places the square there and flies the camera to its box or to the 10.24 km square
-(`placeFraming`); after "Use this square" the spot card shows the catalog's passes, and "Analyze
-this spot" asks the radar at the centre. The OpenStreetMap credit comes from the API and is always shown.
+(`placeFraming`); after "Use this square" the confirm panel shows the catalog's passes, and "Start
+analysis" asks the radar at the centre. The OpenStreetMap credit comes from the API and is always shown.
 
 ## Choosing an area
 
@@ -80,8 +80,23 @@ Since v9 there is one area: the backend's 10.24 km contract square (`AOI_SIDE_KM
 A click or tap on the globe, or a search hit, places it (step 2, `SquareBar`: "Square placed ·
 nothing runs yet", Cancel, Use this square). The camera flies to it once per placement, and
 nothing is fetched or POSTed. Dragging moves it, and so do the arrow keys when it has focus (1 km,
-Shift 5 km). "Use this square" locks it and opens the spot card, which checks coverage. A question
+Shift 5 km). "Use this square" locks it and opens the confirm panel, which checks coverage. A question
 always sends the centre as a GeoJSON `Point`, and the backend builds the exact UTM square.
+
+**Confirm panel** (v9 step 3, `src/features/confirm/`, strings from `copyV9.ts`): four phenomenon
+chips (the live lens ids; agriculture isn't one, an old `&lens=agriculture` link opens on Flood),
+the `LOOK` line, and the passes strip. Image lenses draw the dates `/coverage` chose (`plan.dates`,
+≤ 5, by their real day) with track and direction from `seriesKey`; 4 passes add a note naming the
+largest gap, 3 or fewer or none disable Start with the reason in the sticky footer. Earthquake asks
+`/insar/pairs` once per placement, the first time it is picked, groups the pairs by `seriesKey`,
+draws the newest pair's series (its 5 most recent passes, an arc per real pair, tap or arrow keys to
+choose) and offers every series plus the coherence threshold (0.1–0.9, default 0.35) under
+Advanced; the globe then draws the 5 × 5 km window it measures (`square.innerKm`,
+`INSAR_WINDOW_KM`). The footer says ONLINE or OFFLINE (`coverage.precomputedCase`) and "Computed
+live · we stop at 8 min" with no number. Nothing is POSTed until Start; Start sends the lens (plus
+`pairId` and `coherenceThreshold` for Earthquake) and never a date. Move unlocks the square, Cancel
+goes back to the cases. On phones it is the bottom sheet at 62 %, never expanded; its body scrolls.
+Pure rules: `confirmView.ts`. The full pass total and the date range (Change) wait for backend #18.
 
 - **`src/features/geo/`** is pure (no Cesium types): longitudes and the antimeridian
   (`longitude.ts`, `antimeridian.ts`), spherical measures (`measure.ts`), the square around a point
@@ -94,7 +109,8 @@ always sends the centre as a GeoJSON `Point`, and the backend builds the exact U
 - **`GlobeView`** reports `onPlace(point)` and `onMoveSquare(centre)`, and `ExplorerPage` owns the
   state.
 - **Tests:** the stub globe (`GlobeView.stub.tsx`) exposes `window.__globe.click` and
-  `window.__globe.dragSquare`, and `data-scene` carries `square: { centre, sideKm, movable }`.
+  `window.__globe.dragSquare`, and `data-scene` carries `square: { centre, sideKm, movable,
+innerKm? }`.
 
 ## The live exploration flow
 
