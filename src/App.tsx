@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 
+import { MusicController } from "@/features/music/MusicController";
 import { usePathname } from "@/lib/navigation";
 
 // Pages load on demand: the landing page must not pull in Cesium (the explorer) or vice versa.
@@ -52,8 +53,11 @@ const CurrentPage = ({ pathname }: { pathname: string }) => {
 export const App = () => {
   const pathname = usePathname();
   return (
-    <Suspense fallback={<div className="h-dvh bg-[#04070e]" aria-busy="true" />}>
-      <CurrentPage pathname={pathname} />
-    </Suspense>
+    <>
+      <MusicController />
+      <Suspense fallback={<div className="h-dvh bg-[#04070e]" aria-busy="true" />}>
+        <CurrentPage pathname={pathname} />
+      </Suspense>
+    </>
   );
 };

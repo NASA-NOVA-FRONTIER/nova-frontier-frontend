@@ -7,6 +7,8 @@ export type GlobeHooks = {
   dragSquare: (lon: number, lat: number) => void;
   hover: (lon: number, lat: number) => void;
   leave: () => void;
+  // A drag or zoom of the globe itself (not the square): what pauses the timeline.
+  interact: () => void;
   openCase: (id: string) => void;
 };
 
