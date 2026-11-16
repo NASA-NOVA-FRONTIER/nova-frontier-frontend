@@ -81,10 +81,15 @@ test.describe("Explorer: the landslide case", () => {
     await expect(panel.getByTestId("landslide-shift-HV")).toContainText("Marker pixel: +1.36 dB");
     await expect(panel.getByTestId("landslide-history")).toBeVisible();
 
-    // Technical opens the values by pass and adds the band rule.
-    await page.getByTestId("read-technical").click();
-    await expect(panel.getByTestId("landslide-table")).toHaveAttribute("open", "");
-    await expect(panel.getByTestId("landslide-outside")).toContainText("1.4826 × MAD");
+    // No toggle on a case: the values by pass wait, closed, in the technical detail at the end.
+    await expect(globe.sheet.getByTestId("read-regional")).toHaveCount(0);
+    const detail = globe.sheet.getByTestId("sheet-technical-detail");
+    await expect(detail).not.toHaveAttribute("open", "");
+    await expect(page.getByTestId("landslide-table")).toBeHidden();
+    await detail.getByText("Technical detail").click();
+    await expect(detail.getByTestId("landslide-table")).toBeVisible();
+    await expect(detail.getByTestId("landslide-table")).toContainText("2026-06-24");
+    await expect(panel.getByTestId("landslide-how")).toContainText("1.4826 × MAD");
     // A measured case has no verdict cards and no generic job steps.
     await expect(page.getByTestId("sheet-verdict-departure")).toHaveCount(0);
     await expect(globe.sheet).toContainText("Terrain shadow or layover");
