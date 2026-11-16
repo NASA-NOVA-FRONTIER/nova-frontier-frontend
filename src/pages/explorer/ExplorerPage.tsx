@@ -11,7 +11,7 @@ import { CasePanel } from "@/features/case-panel/CasePanel";
 import { PendingSummary, ResultSummary } from "@/features/case-panel/CaseSummary";
 import { ShowRealContext } from "@/features/case-panel/showReal";
 import { caseSubject, type Subject } from "@/features/case-panel/subject";
-import { VERDICT } from "@/features/case-panel/verdicts";
+import { SOURCE, VERDICT } from "@/features/case-panel/verdicts";
 import {
   CASES,
   coherenceOnlyLabel,
@@ -116,7 +116,7 @@ import { AreaGuide, type AreaIssue } from "@/pages/explorer/AreaGuide";
 import { AreaTools } from "@/pages/explorer/AreaTools";
 import { DirectionSwitch } from "@/pages/explorer/DirectionSwitch";
 import { SpotCard } from "@/pages/explorer/SpotCard";
-import { LEGEND, type DrapeKind } from "@/pages/explorer/drapeLegend";
+import { legendFor, type DrapeKind } from "@/pages/explorer/drapeLegend";
 import { LayerDock } from "@/pages/explorer/LayerDock";
 import { LiveLayerDock } from "@/pages/explorer/LiveLayerDock";
 import { MobileBar } from "@/pages/explorer/MobileBar";
@@ -910,7 +910,9 @@ export const ExplorerPage = () => {
         scene.drape === undefined
           ? undefined
           : (({ stops, scale, text }) => ({ ramp: stops, scale, text }))(
-              LEGEND[storyItem === undefined ? drapeKind : "change"],
+              storyItem === undefined
+                ? legendFor(drapeKind, item?.id)
+                : legendFor("change", storyItem.id),
             ),
       // A case's point chart and pass dates are demo; a live answer is real unless the service says
       // its result is synthetic.
@@ -920,7 +922,8 @@ export const ExplorerPage = () => {
           ? subject?.demo === true
           : item !== undefined &&
             item.coherenceOnly !== true &&
-            (item.band !== undefined || item.timeline !== undefined)),
+            (item.band !== undefined ||
+              (item.timeline !== undefined && item.timeline.realDates !== true))),
     };
     const blob = await captureGlobe(viewer, strip);
     if (blob !== null) saveBlob(blob, `nisar-${shown?.id ?? "globe"}-view.png`);
@@ -1294,6 +1297,7 @@ export const ExplorerPage = () => {
         {showDock && (
           <LayerDock
             kind={drapeKind}
+            {...(item !== undefined && { caseId: item.id })}
             opacity={opacity}
             onKind={setDrapeKind}
             onOpacity={setOpacity}
@@ -1316,7 +1320,12 @@ export const ExplorerPage = () => {
 
         {showTimeline && item.timeline !== undefined && (
           <div className="x-timeline-wrap" data-collapsed={collapsed}>
-            <PassTimeline key={item.id} data={item.timeline} />
+            <PassTimeline
+              key={item.id}
+              data={item.timeline}
+              demo={item.timeline.realDates !== true}
+              realSource={SOURCE.caseTimeline}
+            />
           </div>
         )}
 

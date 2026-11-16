@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 
 import { Icon } from "@/features/case-panel/icons";
-import { LENSES, type LensId } from "@/features/cases/cases";
+import { findLens, type CaseLensId } from "@/features/cases/cases";
 
 type CasePanelProps = {
   meta: string;
   title: string;
-  lens: LensId;
+  lens: CaseLensId;
   // Beside the kicker: the OFFLINE chip of a demo case (issue #28).
   chip?: ReactNode;
   collapsed: boolean;
@@ -33,7 +33,7 @@ export const CasePanel = ({
   children,
 }: CasePanelProps) => {
   if (collapsed) {
-    const chip = LENSES.find((item) => item.id === lens)?.chip ?? "";
+    const chip = findLens(lens)?.chip ?? "";
     return (
       <button
         type="button"

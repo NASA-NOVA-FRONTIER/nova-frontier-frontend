@@ -17,6 +17,8 @@ describe("measured cases", () => {
       "wildfire bug-fire",
       "deforestation rowe-creek",
       "agriculture skollersta",
+      // #24: the landslide case, the model's only one.
+      "landslide niscemi-aftermath",
     ]);
   });
 

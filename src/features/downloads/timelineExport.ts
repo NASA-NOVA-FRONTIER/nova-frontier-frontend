@@ -2,7 +2,8 @@ import type { Case, PassKind } from "@/features/cases/cases";
 
 /*
  * Timeline downloads (JSON and CSV). Pass dates and "% outside range" are DEMO until the backend
- * serves real acquisitions, so every row says so and the file names its source.
+ * serves real acquisitions, so every row says so and the file names its source. A case whose
+ * timeline is copied from its own series (realDates) says that instead.
  */
 
 export type PassRow = {
@@ -25,6 +26,12 @@ const ROLE: Record<PassKind, PassRow["role"]> = {
 export const TIMELINE_SOURCE =
   "NISAR Hazard Watch timeline. Pass dates (12-day spacing) and cells_outside_range_pct are DEMO until the nova-frontier-model backend serves real acquisitions; planned passes are not data.";
 
+export const REAL_TIMELINE_SOURCE =
+  "NISAR Hazard Watch timeline. Pass dates and cells_outside_range_pct are copied from the case's own nova-frontier-model series; planned passes are not data.";
+
+const sourceOf = (item: Case): string =>
+  item.timeline?.realDates === true ? REAL_TIMELINE_SOURCE : TIMELINE_SOURCE;
+
 export const CSV_COLUMNS = [
   "case",
   "lens",
@@ -43,12 +50,12 @@ export const timelineRows = (item: Case): PassRow[] =>
     role: ROLE[pass.kind],
     cells_outside_range_pct: pass.outsidePct ?? null,
     measured: pass.kind !== "plan",
-    demo: true,
+    demo: item.timeline?.realDates !== true,
   }));
 
 export const timelineJson = (item: Case): string =>
   JSON.stringify(
-    { source: TIMELINE_SOURCE, case: item.id, lens: item.lens, passes: timelineRows(item) },
+    { source: sourceOf(item), case: item.id, lens: item.lens, passes: timelineRows(item) },
     null,
     2,
   );
@@ -57,7 +64,7 @@ export const timelineCsv = (item: Case): string => {
   const lines = timelineRows(item).map((row) =>
     CSV_COLUMNS.map((column) => row[column] ?? "").join(","),
   );
-  return [`# ${TIMELINE_SOURCE}`, CSV_COLUMNS.join(","), ...lines].join("\n") + "\n";
+  return [`# ${sourceOf(item)}`, CSV_COLUMNS.join(","), ...lines].join("\n") + "\n";
 };
 
 export const saveBlob = (blob: Blob, name: string): void => {
