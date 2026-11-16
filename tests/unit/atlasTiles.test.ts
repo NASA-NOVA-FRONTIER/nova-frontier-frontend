@@ -1,15 +1,27 @@
 import { describe, expect, it } from "vitest";
 
-import { ATLAS_DEFAULT_ID, ATLAS_TILES } from "@/pages/landing/atlasTiles";
+import { ATLAS_DEFAULT_ID, ATLAS_TILE_PX, ATLAS_TILES } from "@/pages/landing/atlasTiles";
 
-// Every file under public/atlas, as Vite sees it ("/public/atlas/x.png").
-const SHIPPED = new Set(Object.keys(import.meta.glob("/public/atlas/*.png")));
+// Every file under public/atlas, as Vite sees it ("/public/atlas/x.webp").
+const SHIPPED = new Set(Object.keys(import.meta.glob("/public/atlas/*.{webp,png}")));
 
 describe("surface atlas tiles", () => {
   it("lists the seven panels of the nova-frontier-model figure, each with its crop", () => {
     expect(ATLAS_TILES).toHaveLength(7);
     expect(new Set(ATLAS_TILES.map((tile) => tile.id)).size).toBe(7);
-    for (const tile of ATLAS_TILES) expect(SHIPPED.has(`/public${tile.img}`)).toBe(true);
+    for (const tile of ATLAS_TILES) {
+      expect(SHIPPED.has(`/public${tile.img}`)).toBe(true);
+      expect(SHIPPED.has(`/public${tile.fallback}`)).toBe(true);
+    }
+  });
+
+  it("serves WebP first with a PNG fallback, both at an exact multiple of the 128-cell grid", () => {
+    for (const tile of ATLAS_TILES) {
+      expect(tile.img).toMatch(/\.webp$/);
+      expect(tile.fallback).toMatch(/\.png$/);
+    }
+    // A whole number of pixels per model cell keeps every cell a sharp, equal square.
+    expect(ATLAS_TILE_PX % 128).toBe(0);
   });
 
   it("keeps the figure's date counts and marks only its two geographic holdouts", () => {
