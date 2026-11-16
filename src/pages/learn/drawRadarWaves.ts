@@ -1,5 +1,5 @@
 // Canvas drawing for the Learn radar waves, ported from the v9 handoff `Radar Waves.dc.html`.
-// Geometry and copy come from radarWaves.ts; this file only paints. Colours are the handoff's
+// Geometry and copy come from waveModel.ts; this file only paints. Colours are the handoff's
 // canvas inks (a canvas can't read CSS tokens per stroke).
 import {
   bandById,
@@ -16,7 +16,7 @@ import {
   type PolId,
   type PulseGeometry,
   type Scene,
-} from "@/pages/learn/radarWaves";
+} from "@/pages/learn/waveModel";
 
 const TAU = Math.PI * 2;
 const INK = "#ebe9e4";
