@@ -26,9 +26,11 @@ by `pnpm i18n:extract`; the other catalogs are written by hand or with a transla
 
 After adding or changing UI text:
 
-1. `pnpm i18n:extract` regenerates `en.json` with the new keys.
-2. Add the new keys to the other catalogs (a missing key falls back to English, never to a blank).
-3. `pnpm i18n:extract --check` fails when `en.json` is stale or a catalog lacks a key or changes a `{{placeholder}}`.
+1. `pnpm i18n:wrap` wraps any plain text you left in `tr()`; the unit tests fail while some is left outside.
+2. `pnpm i18n:extract` regenerates `en.json` with the new keys.
+3. Add the new keys to the other catalogs. Until then a language shows that string in English; the unit
+   tests only fail when a translation changes a `{{placeholder}}`. `pnpm i18n:extract --check` lists what
+   is stale or missing.
 
 ## Adding a language
 
