@@ -1211,7 +1211,7 @@
   "Radar change crop from the nova-frontier-model report": "Extrait du changement radar tiré du rapport nova-frontier-model",
   "Open on the globe": "Ouvrir sur le globe",
   "MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED": "CAS MESURÉS · VRAIS PASSAGES NISAR, PRÉCALCULÉS",
-  "Four places, measured honestly.": "Quatre lieux, mesurés honnêtement.",
+  "{{count}} places, measured honestly.": "{{count}} lieux, mesurés en toute honnêteté.",
   "Each case compares real radar passes with the place's own history and, where it exists, a second witness. Numbers come from the science team's published reports. Open any case to see it on the globe.": "Chaque cas compare de vrais passages radar à l'historique propre du lieu et, lorsqu'il existe, à un second témoin. Les chiffres proviennent des rapports publiés par l'équipe scientifique. Ouvrez n'importe quel cas pour le voir sur le globe.",
   "Filter by question": "Filtrer par question",
   "No measured case asks this question yet. The lens works on any point in the explorer.": "Aucun cas mesuré ne pose encore cette question. La lentille fonctionne sur n'importe quel point de l'explorateur.",

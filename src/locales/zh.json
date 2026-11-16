@@ -1211,7 +1211,7 @@
   "Radar change crop from the nova-frontier-model report": "来自 nova-frontier-model 报告的雷达变化裁切图",
   "Open on the globe": "在地球上打开",
   "MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED": "已测量案例 · 真实 NISAR 过境，预先计算",
-  "Four places, measured honestly.": "四个地点，如实测量。",
+  "{{count}} places, measured honestly.": "{{count}} 个地点，如实测量。",
   "Each case compares real radar passes with the place's own history and, where it exists, a second witness. Numbers come from the science team's published reports. Open any case to see it on the globe.": "每个案例都将真实的雷达过境与该地自身的历史对比，并在有第二个佐证时一并对照。数字来自科学团队已发布的报告。打开任意案例，即可在地球上查看。",
   "Filter by question": "按问题筛选",
   "No measured case asks this question yet. The lens works on any point in the explorer.": "目前还没有已测量案例提出这个问题。该视角适用于探索器中的任意点位。",

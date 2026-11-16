@@ -4,6 +4,7 @@ import "@/pages/report/report.css";
 import { useEffect, useState } from "react";
 
 import { LANDSLIDE, REPORT } from "@/content/copyV8";
+import { DESIGN_VERSION } from "@/content/version";
 import { exportName } from "@/features/downloads/dataCsv";
 import { legendFor } from "@/pages/explorer/drapeLegend";
 import { SOURCE, VERDICT } from "@/features/case-panel/verdicts";
@@ -20,7 +21,6 @@ import { EMPTIES_LINE } from "@/features/live/liveQuestion";
 import { formatDay } from "@/features/timeline/timelineLayout";
 import { Link } from "@/lib/Link";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
-import { VERSION } from "@/pages/explorer/StartCard";
 import { LiveReport } from "@/pages/report/LiveReport";
 import { areaOf, reportSummary, summaryLabel } from "@/pages/report/reportSummary";
 
@@ -261,7 +261,7 @@ const Report = ({ item }: { item: Case }) => {
       <footer className="r-foot">
         <span>{tr("Nova Frontier · NASA Space Apps 2026 · Chía")}</span>
         <span>
-          {VERSION} {tr("· illustrative point series marked demo")}
+          {DESIGN_VERSION} {tr("· illustrative point series marked demo")}
         </span>
       </footer>
     </article>

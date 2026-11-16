@@ -12,6 +12,7 @@ import {
 } from "@/features/cases/cases";
 import { HazardIcon } from "@/features/cases/HazardIcon";
 import { ContrastBars } from "@/features/charts/ContrastBars";
+import { countWordCapitalized } from "@/lib/countWord";
 import { Link } from "@/lib/Link";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import {
@@ -27,7 +28,7 @@ import { useCasesMotion } from "@/pages/cases/useCasesMotion";
 import { SiteFooter } from "@/pages/site/SiteFooter";
 import { SiteNav } from "@/pages/site/SiteNav";
 
-import { tr } from "@/i18n/translate";
+import { currentLanguage, tr } from "@/i18n/translate";
 const TITLE = "Measured cases · NISAR Hazard Watch";
 
 const OPTIONS = filterOptions();
@@ -138,7 +139,12 @@ export const CasesPage = () => {
       <main id="main" className="k-main">
         <header className="k-intro" data-intro>
           <p className="k-intro__kicker">{tr("MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED")}</p>
-          <h1 className="k-intro__title">{tr("Four places, measured honestly.")}</h1>
+          {/* The v8 reference says "Four places"; counting the list keeps it true as cases ship. */}
+          <h1 className="k-intro__title">
+            {tr("{{count}} places, measured honestly.", {
+              count: currentLanguage() === "en" ? countWordCapitalized(CASES.length) : CASES.length,
+            })}
+          </h1>
           <p className="k-intro__lead">
             {tr(
               "Each case compares real radar passes with the place's own history and, where it exists, a second witness. Numbers come from the science team's published reports. Open any case to see it on the globe.",

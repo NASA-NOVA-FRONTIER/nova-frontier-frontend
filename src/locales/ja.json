@@ -1211,7 +1211,7 @@
   "Radar change crop from the nova-frontier-model report": "nova-frontier-model のレポートから切り出したレーダー変化画像",
   "Open on the globe": "地球儀で開く",
   "MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED": "計測済みのケース · 本物の NISAR パス、事前計算",
-  "Four places, measured honestly.": "4つの場所を、誠実に計測。",
+  "{{count}} places, measured honestly.": "{{count}}か所を、正直に測定しました。",
   "Each case compares real radar passes with the place's own history and, where it exists, a second witness. Numbers come from the science team's published reports. Open any case to see it on the globe.": "各ケースでは、本物のレーダーのパスを、その場所自身の過去の履歴と比較し、ある場合は第2の証言とも照らし合わせます。数値は、サイエンスチームが公開したレポートに基づきます。ケースを開くと、地球儀上で確認できます。",
   "Filter by question": "問いで絞り込む",
   "No measured case asks this question yet. The lens works on any point in the explorer.": "この問いに対応する計測済みのケースはまだありません。このレンズは、エクスプローラー上のどの地点でも使えます。",

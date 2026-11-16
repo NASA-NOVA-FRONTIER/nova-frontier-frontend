@@ -17,7 +17,7 @@ test.describe("Explorer: measured cases", () => {
     await expect(globe.caseRow("qadirabad")).toContainText("Did it flood?");
     await expect(globe.caseRow("choco")).toContainText("Coherence only · 0.247");
     await expect(globe.caseRow("choco")).not.toContainText("Pending");
-    await expect(globe.startCard).toContainText("Design v7 · 0.7.0");
+    await expect(globe.startCard).toContainText("Design v9");
     await expect(globe.startCard.getByTestId("intro-team")).toHaveAttribute("href", "/about");
   });
 

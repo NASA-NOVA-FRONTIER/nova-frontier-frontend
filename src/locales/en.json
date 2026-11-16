@@ -1211,7 +1211,7 @@
   "Radar change crop from the nova-frontier-model report": "Radar change crop from the nova-frontier-model report",
   "Open on the globe": "Open on the globe",
   "MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED": "MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED",
-  "Four places, measured honestly.": "Four places, measured honestly.",
+  "{{count}} places, measured honestly.": "{{count}} places, measured honestly.",
   "Each case compares real radar passes with the place's own history and, where it exists, a second witness. Numbers come from the science team's published reports. Open any case to see it on the globe.": "Each case compares real radar passes with the place's own history and, where it exists, a second witness. Numbers come from the science team's published reports. Open any case to see it on the globe.",
   "Filter by question": "Filter by question",
   "No measured case asks this question yet. The lens works on any point in the explorer.": "No measured case asks this question yet. The lens works on any point in the explorer.",

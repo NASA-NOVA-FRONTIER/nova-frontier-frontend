@@ -1,3 +1,4 @@
+import { DESIGN_VERSION } from "@/content/version";
 import { Icon } from "@/features/case-panel/icons";
 import { HazardIcon } from "@/features/cases/HazardIcon";
 import { CASES, coherenceOnlyLabel, findLens, type Case } from "@/features/cases/cases";
@@ -7,8 +8,6 @@ import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import type { AsyncState } from "@/lib/useAsync";
 
 import { tr } from "@/i18n/translate";
-export const VERSION = "Design v7 · 0.7.0";
-
 type StartCardProps = {
   frames: AsyncState<Frame[]> | undefined;
   onOpen: (item: Case) => void;
@@ -67,7 +66,7 @@ export const StartCard = ({ frames, onOpen, onRetryFrames, onStory, onSearch }: 
       <Link to="/about" testId="intro-team" className="x-start__team">
         {tr("Nova Frontier · Space Apps 2026")}
       </Link>
-      <span>{VERSION}</span>
+      <span>{DESIGN_VERSION}</span>
     </p>
   </section>
 );

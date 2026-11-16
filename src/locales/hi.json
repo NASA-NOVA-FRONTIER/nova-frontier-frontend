@@ -1211,7 +1211,7 @@
   "Radar change crop from the nova-frontier-model report": "nova-frontier-model रिपोर्ट से रडार परिवर्तन का क्रॉप किया हुआ अंश",
   "Open on the globe": "ग्लोब पर खोलें",
   "MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED": "मापे गए मामले · असली NISAR पास, पहले से गणना किए हुए",
-  "Four places, measured honestly.": "चार जगहें, ईमानदारी से मापी गईं।",
+  "{{count}} places, measured honestly.": "{{count}} स्थान, ईमानदारी से मापे गए।",
   "Each case compares real radar passes with the place's own history and, where it exists, a second witness. Numbers come from the science team's published reports. Open any case to see it on the globe.": "हर मामले में असली रडार पास की तुलना उस जगह के अपने इतिहास से की जाती है और, जहाँ उपलब्ध हो, एक दूसरे गवाह से भी। संख्याएँ विज्ञान टीम की प्रकाशित रिपोर्टों से ली गई हैं। किसी भी मामले को ग्लोब पर देखने के लिए खोलें।",
   "Filter by question": "सवाल के अनुसार फ़िल्टर करें",
   "No measured case asks this question yet. The lens works on any point in the explorer.": "अभी तक किसी मापे गए मामले में यह सवाल नहीं पूछा गया है। यह लेंस एक्सप्लोरर में किसी भी बिंदु पर काम करता है।",

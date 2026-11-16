@@ -1,3 +1,4 @@
+import { DESIGN_VERSION } from "@/content/version";
 import { Link } from "@/lib/Link";
 import { mapOffset } from "@/pages/site/footerMap";
 
@@ -30,8 +31,6 @@ type SiteFooterProps = {
   note?: string;
   flagStripe?: boolean;
 };
-
-export const SITE_VERSION = "Design v7 · 0.7.0";
 
 const PROJECT: FooterLink[] = localized([
   { label: "Home", href: "/" },
@@ -149,7 +148,7 @@ export const SiteFooter = ({
         <span className="s-foot__credit">
           <span>{tr("Team Nova Frontier · NASA Space Apps 2026 · Chía")}</span>
           <span className="s-foot__version" data-testid="site-version">
-            {SITE_VERSION}
+            {DESIGN_VERSION}
           </span>
         </span>
         <span className="s-foot__disclaimer">

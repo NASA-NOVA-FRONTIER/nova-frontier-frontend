@@ -1211,7 +1211,7 @@
   "Radar change crop from the nova-frontier-model report": "مقتطف لتغيّر الرادار من تقرير nova-frontier-model",
   "Open on the globe": "افتح على الكرة الأرضية",
   "MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED": "حالات مقيسة · تمريرات NISAR حقيقية، محسوبة مسبقًا",
-  "Four places, measured honestly.": "أربعة أماكن، مقيسة بأمانة.",
+  "{{count}} places, measured honestly.": "{{count}} أماكن، قِيست بأمانة.",
   "Each case compares real radar passes with the place's own history and, where it exists, a second witness. Numbers come from the science team's published reports. Open any case to see it on the globe.": "تقارن كل حالة تمريرات رادار حقيقية بتاريخ المكان نفسه، وحيثما وُجد، بشاهد ثانٍ. الأرقام مأخوذة من التقارير المنشورة للفريق العلمي. افتح أي حالة لرؤيتها على الكرة الأرضية.",
   "Filter by question": "تصفية حسب السؤال",
   "No measured case asks this question yet. The lens works on any point in the explorer.": "لا توجد حالة مقيسة تطرح هذا السؤال بعد. تعمل العدسة على أي نقطة في المستكشف.",

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { DESIGN_VERSION } from "@/content/version";
 import { FireContextCard } from "@/features/case-panel/FireContextCard";
 import { InsarCard } from "@/features/case-panel/InsarCard";
 import { NormalRangeCard } from "@/features/case-panel/NormalRangeCard";
@@ -18,7 +19,6 @@ import { absoluteApiPath, ApiError } from "@/lib/api/apiClient";
 import { Link } from "@/lib/Link";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { useAsync } from "@/lib/useAsync";
-import { VERSION } from "@/pages/explorer/StartCard";
 import { summaryLabel } from "@/pages/report/reportSummary";
 
 import { tr } from "@/i18n/translate";
@@ -370,7 +370,7 @@ export const LiveReport = ({ id }: { id: string }) => {
         <footer className="r-foot">
           <span>{tr("Nova Frontier · NASA Space Apps 2026 · Chía")}</span>
           <span>
-            {VERSION} {tr("· diagnostic evidence, not a validated classifier")}
+            {DESIGN_VERSION} {tr("· diagnostic evidence, not a validated classifier")}
           </span>
         </footer>
       </article>
