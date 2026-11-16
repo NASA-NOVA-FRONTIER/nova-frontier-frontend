@@ -139,7 +139,7 @@ Shareable explorer links: `/explore?case=qadirabad` opens a measured case;
 
 ## The explorer
 
-<img src="assets/readme/explorer-case-qadirabad.webp" alt="Explorer on the Qadirabad case: the real change crop draped on the globe, the case panel with the verdict, band chart and flagged-cell bars, the layer dock and the pass timeline" width="100%">
+<img src="assets/readme/explorer-case-qadirabad.webp" alt="Explorer on the Qadirabad case: the real change crop draped on the globe, the case panel with the verdict, band chart and flagged-cell bars, the layer dock and the pass timeline with the days between passes" width="100%">
 
 <p align="center"><b>A measured case:</b> Qadirabad, Pakistan. The verdict, the real contrast bars and the report's change crop on the globe; the band chart and timeline dates are labelled demo.</p>
 
@@ -153,11 +153,13 @@ Shareable explorer links: `/explore?case=qadirabad` opens a measured case;
 - **Layer dock:** the report's change or baseline crop draped on the globe, with an opacity slider.
 - **Pass timeline:** baseline, target, measured and planned passes, the optical lane and the next
   planned pass.
-- **Live question:** hover any land to see its NISAR frame, click to ask about it. The frame's
-  passes are fetched live from the Observation Plan and the radar answer comes from the backend: a
+- **Live question:** click any land (or search a place or coordinates) to place a 10 × 10 km
+  square; the bar says "Square placed" and nothing runs yet. "Use this square" opens the confirm
+  panel: what the radar should look for (Earthquake, Wildfire, Deforestation, Flood), the real
+  passes it will read and "Start analysis". The answer comes from the backend: a
   progress window with a countdown and NASA facts, then the verdict, the target pass against the
   normal range, the whole-area bars, the quality strip, the measured layers on the globe and the
-  real pass dates. On the ground-motion lens the user first picks one of the NISAR interferometric pairs over the spot and a coherence threshold; the answer is the pair's coherence and wrapped phase on the globe, labelled a measurement, never a verdict, with displacement always stated as not reported. On the wildfire lens an "Independent fire context" block from NASA FIRMS sits
+  real pass dates. On Earthquake (the InSAR lens) the user first picks one of the NISAR interferometric pairs over the spot and a coherence threshold; the answer is the pair's coherence and wrapped phase on the globe, labelled a measurement, never a verdict, with displacement always stated as not reported. On the wildfire lens an "Independent fire context" block from NASA FIRMS sits
   apart from the radar (counts and dates of active-fire detections, never a cause or a burned
   area), and says so when it is missing. "Keep exploring" lets the job run in the background; the band label reads
   "L-band, 24 cm.", the band every answer uses.
@@ -170,7 +172,7 @@ Shareable explorer links: `/explore?case=qadirabad` opens a measured case;
 
 <table>
   <tr>
-    <td width="50%"><img src="assets/readme/explorer-start.webp" alt="Explorer start card, What did the radar see?, listing the six measured cases over the globe with their markers"></td>
+    <td width="50%"><img src="assets/readme/explorer-start.webp" alt="Explorer start card, What did the radar see?, listing the five measured cases over the globe with their markers"></td>
     <td width="50%"><img src="assets/readme/explorer-sheet-qadirabad.webp" alt="More information sheet for Qadirabad: the question, the real nova-frontier-model report figure, how it was computed, evidence and quality, sources"></td>
   </tr>
   <tr>
@@ -178,11 +180,24 @@ Shareable explorer links: `/explore?case=qadirabad` opens a measured case;
     <td align="center"><b>More information</b><br><sub>The real report figure, how it was computed, evidence, sources</sub></td>
   </tr>
   <tr>
-    <td width="50%"><img src="assets/readme/phone-landing.webp" alt="Landing page on a phone, 390 px wide: the headline, the intro and the two buttons over the Earth" width="60%"></td>
-    <td width="50%"><img src="assets/readme/phone-explorer-case-qadirabad.webp" alt="Explorer on a phone, 390 px wide: the Qadirabad change crop on the globe, the pass timeline and the case panel as a bottom sheet" width="60%"></td>
+    <td width="50%"><img src="assets/readme/explorer-square.webp" alt="A 10 × 10 km square placed near Qadirabad, Pakistan, with Drag to move and the bar: Square placed, about 105 km², nothing runs yet, Cancel and Use this square"></td>
+    <td width="50%"><img src="assets/readme/explorer-confirm.webp" alt="Confirm panel after Use this square: What should the radar look for?, with Earthquake, Wildfire, Deforestation and Flood chips, the five passes to read from 14 Jul to 11 Nov 2026 and Start analysis"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Place a square</b><br><sub>Nothing runs until you confirm</sub></td>
+    <td align="center"><b>Confirm the analysis</b><br><sub>The phenomenon and the real passes to read</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="33%"><img src="assets/readme/phone-landing.webp" alt="Landing page on a phone, 390 px wide: the headline, the intro and the two buttons over the Earth"></td>
+    <td width="33%"><img src="assets/readme/phone-explorer-confirm.webp" alt="Confirm panel on a phone, 390 px wide: the square on the globe above a bottom sheet with the four phenomena, the five passes and Start analysis"></td>
+    <td width="33%"><img src="assets/readme/phone-explorer-case-qadirabad.webp" alt="Explorer on a phone, 390 px wide: the Qadirabad change crop on the globe, the pass timeline and the case panel as a bottom sheet"></td>
   </tr>
   <tr>
     <td align="center"><b>On a phone</b><br><sub>Landing at 390 px</sub></td>
+    <td align="center"><b>On a phone</b><br><sub>The confirm panel at 390 px</sub></td>
     <td align="center"><b>On a phone</b><br><sub>The Qadirabad case at 390 px</sub></td>
   </tr>
 </table>
