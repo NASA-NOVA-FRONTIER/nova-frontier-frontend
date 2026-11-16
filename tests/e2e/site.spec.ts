@@ -110,7 +110,7 @@ test.describe("Landing and about pages", () => {
     await page.getByTestId("nav-cases").click();
     await expect(page).toHaveURL(/\/cases$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Four places, measured honestly.",
+      "Six places, measured honestly.",
     );
 
     await page.getByTestId("nav-method").click();
