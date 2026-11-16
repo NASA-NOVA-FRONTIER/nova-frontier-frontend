@@ -213,15 +213,18 @@ export const stepView = (
   };
 };
 
-// The globe stamp (COPY-flow-v9 §5): the date part and the rest, split as the stamp draws them.
+// The globe stamp (COPY-flow-v9 §5): the date part and the rest, as the stamp draws them.
 export const stampOf = (view: StepView): { date: string; pass: string; target: boolean } => {
   const day = (iso: string) => formatDay(iso).toUpperCase();
-  const date = view.mode === "intervals" ? `${day(view.from)} → ${day(view.date)}` : day(view.date);
-  const full =
-    view.mode === "intervals"
-      ? RESULT.stampQuake(day(view.from), day(view.date), view.i, view.n, view.days ?? 0)
-      : view.days === undefined
-        ? RESULT.stampFirst(date, view.n)
-        : RESULT.stamp(date, view.i, view.n, view.days);
-  return { date, pass: full.slice(date.length + " · ".length), target: view.target };
+  if (view.mode === "intervals")
+    return {
+      date: RESULT.stampQuakeDate(day(view.from), day(view.date)),
+      pass: RESULT.stampQuakePass(view.i, view.n, view.days ?? 0),
+      target: view.target,
+    };
+  const pass =
+    view.days === undefined
+      ? RESULT.stampFirstPass(view.n)
+      : RESULT.stampPass(view.i, view.n, view.days);
+  return { date: day(view.date), pass, target: view.target };
 };
