@@ -1,0 +1,140 @@
+/* Background music (issue #36): the toggle, its first-visit hint and the About credits. */
+
+.mu-wrap {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.mu-toggle {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* The site bar's round button; the explorer keeps its own .x-icon-button look. */
+.mu-toggle--site {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: transparent;
+  transition: background-color 160ms ease-out;
+}
+
+.mu-toggle--site:hover {
+  background: rgba(235, 233, 228, 0.1);
+}
+
+.mu-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.mu-toggle[aria-pressed="true"] {
+  color: var(--gold);
+}
+
+.mu-toggle--site[aria-pressed="true"],
+.x-icon-button.mu-toggle[aria-pressed="true"] {
+  border-color: var(--gold);
+}
+
+.mu-toggle[data-state="loading"] svg {
+  opacity: 0.55;
+}
+
+.mu-toggle[data-state="error"] {
+  border-style: dashed;
+}
+
+/* First visit only: a small note under the button, which never takes a click away. */
+.mu-hint {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 5;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  background: rgba(8, 16, 31, 0.94);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: mu-hint-in 240ms ease-out both;
+}
+
+.mu-hint::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: 14px;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid var(--gold);
+  border-left: 1px solid var(--gold);
+  background: rgba(8, 16, 31, 0.94);
+  rotate: 45deg;
+}
+
+@keyframes mu-hint-in {
+  from {
+    opacity: 0;
+    translate: 0 -4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mu-hint {
+    animation: none;
+  }
+}
+
+/* Phones: a notch smaller so the mark, the toggle, Menu and the pill share one row. */
+@media (max-width: 30rem) {
+  .mu-toggle--site {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+/* About: the music credits, set quietly after the project links. */
+.mu-credits {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 0 var(--margin) clamp(4rem, 3rem + 3vw, 6rem);
+}
+
+.mu-credits__title {
+  font-size: var(--step-lead);
+  letter-spacing: -0.02em;
+}
+
+.mu-credits__note {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: var(--step-small);
+}
+
+.mu-credits__list {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: var(--step-small);
+}
+
+.mu-credits__list a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
