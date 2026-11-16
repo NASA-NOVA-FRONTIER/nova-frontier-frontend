@@ -668,6 +668,7 @@ test.describe("Explorer: live exploration", () => {
       await expect(
         globe.sheet.getByText("No image is available for this acquisition."),
       ).toBeVisible();
+      await globe.sheet.getByTestId("read-technical").click();
       await globe.sheet.getByRole("button", { name: "Run regional analysis" }).click();
       await expect(globe.sheet.getByRole("alert")).toContainText("Analysis capacity is limited");
       await expect(
