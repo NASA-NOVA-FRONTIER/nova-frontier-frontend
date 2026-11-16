@@ -1354,6 +1354,7 @@ export const ExplorerPage = () => {
             }
             view={exploredView}
             receivedAt={receivedAt}
+            runKey={runKey}
             reduceMotion={reduceMotion}
             onKeepExploring={() => setModalClosedFor(runKey)}
             onCancel={cancelAnalysis}
