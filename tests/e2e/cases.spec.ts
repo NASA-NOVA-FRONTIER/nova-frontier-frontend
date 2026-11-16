@@ -4,7 +4,7 @@ test.describe("Measured cases page", () => {
   test("filtering by a question leaves only the cases that ask it", async ({ page }) => {
     await page.goto("/cases");
     const cards = page.locator("[data-testid^=case-card-]");
-    await expect(cards).toHaveCount(5);
+    await expect(cards).toHaveCount(6);
 
     const flood = page.getByTestId("cases-filter-flood_wetland");
     await expect(flood).toHaveText(/Did it flood\?/);
@@ -18,8 +18,13 @@ test.describe("Measured cases page", () => {
     await expect(cards).toHaveCount(1);
     await expect(page.getByTestId("case-card-bug-fire")).toBeVisible();
 
+    // The landslide question has no live lens; its filter lists the one case that asks it.
+    await page.getByTestId("cases-filter-observed_dynamics").click();
+    await expect(cards).toHaveCount(1);
+    await expect(page.getByTestId("case-card-niscemi-aftermath")).toContainText("+2.17 dB");
+
     await page.getByTestId("cases-filter-all").click();
-    await expect(cards).toHaveCount(5);
+    await expect(cards).toHaveCount(6);
   });
 
   // Issue #28: one demo case per phenomenon, each marked as computed offline.

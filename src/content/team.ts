@@ -40,7 +40,7 @@ export const TEAM: TeamMember[] = [
     degree: "Systems Engineering",
     photo: "/team/andersson-sanchez.jpg",
     role: "Software developer",
-    built: "Landslide hazard module (in progress)",
+    built: "Landslide hazard module",
     github: "https://github.com/AnderssonProgramming",
     linkedin: "https://www.linkedin.com/in/anderssonsm",
   },

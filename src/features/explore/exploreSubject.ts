@@ -197,6 +197,7 @@ export const exploreSubject = (view: ExplorationView, context: Context): Subject
     fireContext,
     insar: undefined,
     compute: computeOf(view),
+    landslide: undefined,
     demo: result.isDemo,
     ...insarParts(view, result),
   };

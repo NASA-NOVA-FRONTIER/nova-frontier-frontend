@@ -1,3 +1,4 @@
+import { LANDSLIDE } from "@/content/copyV8";
 import { FireContextCard } from "@/features/case-panel/FireContextCard";
 import { Icon } from "@/features/case-panel/icons";
 import { InsarCard } from "@/features/case-panel/InsarCard";
@@ -11,6 +12,7 @@ import type { Case } from "@/features/cases/cases";
 import { BandChart } from "@/features/charts/BandChart";
 import type { ChartMode } from "@/features/charts/chartTokens";
 import { ContrastBars } from "@/features/charts/ContrastBars";
+import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
 const PANEL_CHART_PX = 108;
 
@@ -49,6 +51,12 @@ export const ResultSummary = ({ subject, mode, onMore }: SummaryProps) => {
         </p>
       )}
       {subject.reason !== undefined && <p className="x-reason">{subject.reason}</p>}
+      {subject.landslide !== undefined && (
+        <p className="x-panel__prov" data-testid="landslide-reading">
+          {LANDSLIDE.kicker}{" "}
+          <ProvenanceChip kind="experimental" source={LANDSLIDE.experimentalWhy} />
+        </p>
+      )}
       {subject.fireContext !== undefined && <FireContextCard context={subject.fireContext} />}
       <QualityStrip items={subject.quality} />
       <p className="x-panel__prov">
