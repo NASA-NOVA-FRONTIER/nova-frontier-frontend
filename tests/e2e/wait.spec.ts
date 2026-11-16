@@ -239,10 +239,10 @@ test.describe("Explorer v8: errors and limits", () => {
     await expect(globe.jobError).toHaveAttribute("data-category", "partial");
     await expect(globe.jobError).toContainText("3 of 5 passes arrived");
     await expect(globe.jobError).toContainText("2 passes couldn't be read.");
-    await expect(globe.verdict).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
     await globe.jobError.getByRole("button", { name: "Show what arrived" }).click();
     await expect(globe.jobError).toHaveCount(0);
-    await expect(globe.verdict).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
   });
 
   test.describe("the quota line on the spot card", () => {
