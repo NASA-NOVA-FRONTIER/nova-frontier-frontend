@@ -2571,10 +2571,12 @@
   color: var(--gold);
 }
 
-/* Masks the today line when the next pass sits right after it. */
+/* Above the axis, so it never meets the Target label below it when the target is the last pass
+   before Today ("TARGE NEXT"); bars stop at Today, so the planned side above the axis is free.
+   The background masks the today line when the next pass sits right after it. */
 .x-tl__planned-label {
   z-index: 1;
-  top: 49px;
+  top: 19px;
   transform: translateX(-50%);
   padding: 0 3px;
   background: #0a1222;
