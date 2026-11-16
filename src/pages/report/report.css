@@ -219,6 +219,26 @@
   print-color-adjust: exact;
 }
 
+.r-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.r-table th,
+.r-table td {
+  padding: 5px 6px;
+  border-bottom: 1px solid #dddad3;
+  text-align: right;
+}
+
+.r-table th[scope="row"],
+.r-table thead th:first-child,
+.r-table td:nth-child(2) {
+  text-align: left;
+}
+
 .r-empty {
   padding: 14px 16px;
   border-radius: 10px;

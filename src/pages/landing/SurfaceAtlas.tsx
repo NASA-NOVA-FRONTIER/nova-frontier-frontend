@@ -2,7 +2,7 @@ import "@/pages/landing/atlas.css";
 
 import { useState } from "react";
 
-import { ATLAS_DEFAULT_ID, ATLAS_TILES } from "@/pages/landing/atlasTiles";
+import { ATLAS_DEFAULT_ID, ATLAS_TILE_PX, ATLAS_TILES } from "@/pages/landing/atlasTiles";
 
 const CHIP_TITLE =
   "nova-frontier-model, global surface atlas: a fixed colour projection of a learned representation. Regional examples, not a validated classifier.";
@@ -42,7 +42,7 @@ export const SurfaceAtlas = () => {
           </span>
         </div>
         <div className="l-atlas__strip" data-reveal>
-          {ATLAS_TILES.map(({ id, name, meta, img }) => {
+          {ATLAS_TILES.map(({ id, name, meta, img, fallback }) => {
             const open = id === openId;
             const pick = () => setOpenId(id);
             return (
@@ -57,7 +57,19 @@ export const SurfaceAtlas = () => {
                 onFocus={pick}
                 onClick={pick}
               >
-                <img className="l-atlas__img" src={img} alt="" loading="lazy" />
+                <picture>
+                  <source srcSet={img} type="image/webp" />
+                  <img
+                    className="l-atlas__img"
+                    src={fallback}
+                    alt=""
+                    width={ATLAS_TILE_PX}
+                    height={ATLAS_TILE_PX}
+                    loading="lazy"
+                    decoding="async"
+                    data-testid={`atlas-img-${id}`}
+                  />
+                </picture>
                 <span className="l-atlas__label" aria-hidden={!open}>
                   <span className="l-atlas__name">{name}</span>
                   <span className="l-atlas__meta">{meta}</span>
