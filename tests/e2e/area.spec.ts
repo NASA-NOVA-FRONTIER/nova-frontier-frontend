@@ -229,6 +229,8 @@ test.describe("Explorer: dragging the square on the real globe", () => {
     "a click inside the used square reaches the globe and places a new one",
     { tag: "@globe" },
     async ({ page }) => {
+      // Place, use and place again on software Cesium: over 60 s when two globe tests share the CPU.
+      test.slow();
       const globe = new GlobePage(page);
       await globe.skipOnboarding();
       await globe.mockObservationPlan();
