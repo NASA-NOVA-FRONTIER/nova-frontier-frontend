@@ -103,6 +103,7 @@ export const STEP_2 = {
   areaSub: (posting: string, cells: number) => `${posting} grid · ${formatCount(cells)} cells`,
   waitLabel: "EXPECTED WAIT",
   // Decision 8 (docs/design/README.md) overrides fixed waits: the UI shows the backend's estimate.
+  // #25 (decision 8, v9 C7): the card shows the backend's estimate (spot.ts spotWait), not this.
   waitValue: "1–4 min",
   waitSub: "plus any queue",
   catalogLabel: (direction: string) => `IN THE CATALOG · ${direction}`,

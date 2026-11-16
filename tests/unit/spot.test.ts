@@ -5,7 +5,14 @@ import { describe, expect, it } from "vitest";
 import { CASES } from "@/features/cases/cases";
 import { greatCircleKm } from "@/features/geo/measure";
 import type { Coverage } from "@/features/spot/coverageApi";
-import { aboutKm, directionOf, longestGap, nearestCase, spotView } from "@/features/spot/spot";
+import {
+  aboutKm,
+  directionOf,
+  longestGap,
+  nearestCase,
+  spotView,
+  spotWait,
+} from "@/features/spot/spot";
 import { formatDay } from "@/features/timeline/timelineLayout";
 
 // Real answers of GET /api/v1/coverage (Nov 2026), at Qadirabad and over the South Atlantic.
@@ -65,5 +72,31 @@ describe("spotView", () => {
 
   it("turns the ocean answer into the no-data state", () => {
     expect(spotView(OCEAN)).toEqual({ state: "noCoverage" });
+  });
+});
+
+describe("spotWait (#25): the backend's own estimate before anything runs", () => {
+  it("names its p80 for a live run", () => {
+    expect(spotWait(LAND)).toEqual({
+      value: "Usually under 4 min",
+      sub: "plus any queue",
+      offline: false,
+    });
+  });
+
+  // Production after a run at the same spot answered etaSeconds 0.0 with cache "hit" (16 Nov 2026).
+  it("says a prepared answer opens at once, OFFLINE", () => {
+    expect(spotWait({ ...LAND, etaSeconds: 0, cache: "hit" })).toEqual({
+      value: "Prepared · opens in about a second",
+      sub: "OFFLINE",
+      offline: true,
+    });
+  });
+
+  it("gives no number when the backend has no estimate (v9 C7)", () => {
+    expect(spotWait({ ...LAND, etaSeconds: null }).value).toBe("Computed live · we stop at 8 min");
+    expect(spotWait({ ...LAND, etaSeconds: undefined }).value).toBe(
+      "Computed live · we stop at 8 min",
+    );
   });
 });
