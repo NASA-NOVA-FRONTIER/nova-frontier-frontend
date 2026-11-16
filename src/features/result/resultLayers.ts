@@ -1,5 +1,5 @@
 import { LAYERS, PHENOMENA, type V9LayerId, type V9LensId } from "@/content/copyV9";
-import type { LensId, TimelinePass } from "@/features/cases/cases";
+import type { CaseLensId, TimelinePass } from "@/features/cases/cases";
 import { measuredPasses, type DockPick, type DockView } from "@/features/explore/exploreDock";
 import { passLayer, type LiveLayer, type Pol } from "@/features/explore/exploreLayers";
 
@@ -8,8 +8,8 @@ import { passLayer, type LiveLayer, type Pol } from "@/features/explore/exploreL
  * so the globe drape, the stamp and the timeline keep working on T7's pick. Pure.
  */
 
-export const isV9Lens = (lens: LensId): lens is V9LensId =>
-  (PHENOMENA as readonly LensId[]).includes(lens);
+export const isV9Lens = (lens: CaseLensId): lens is V9LensId =>
+  (PHENOMENA as readonly CaseLensId[]).includes(lens);
 
 // Matched by id, never by `kind`: older answers carry kinds the backend has since corrected
 // (display_change_HH as "observed"). Ids from BE constants/explorations.py LAYER_KINDS and MD explore.py.

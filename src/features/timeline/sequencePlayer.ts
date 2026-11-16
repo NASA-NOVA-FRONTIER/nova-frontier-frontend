@@ -35,13 +35,14 @@ export type PlayerInit = { n: number; index: number; canPlay: boolean; reducedMo
 
 const clamp = (index: number, n: number): number => Math.max(0, Math.min(n - 1, index));
 
-// Autoplay starts at the first step; reduced motion opens paused where the result already is.
+// A playable sequence opens on the reference pass, playing, or paused with reduced motion (COPY-flow-v9
+// §6, the prototype's `idx: 0`). One that can't play stays where the result already is.
 export const initPlayer = ({ n, index, canPlay, reducedMotion }: PlayerInit): PlayerState => {
   const playable = canPlay && n > 1;
   const autoplay = playable && !reducedMotion;
   return {
     n,
-    index: autoplay ? 0 : clamp(index, n),
+    index: playable ? 0 : clamp(index, n),
     playing: autoplay,
     speed: 1,
     loop: true,

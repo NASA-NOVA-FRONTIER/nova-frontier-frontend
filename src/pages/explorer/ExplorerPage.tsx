@@ -11,7 +11,7 @@ import { CasePanel } from "@/features/case-panel/CasePanel";
 import { PendingSummary, ResultSummary } from "@/features/case-panel/CaseSummary";
 import { ShowRealContext } from "@/features/case-panel/showReal";
 import { caseSubject, type Subject } from "@/features/case-panel/subject";
-import { VERDICT } from "@/features/case-panel/verdicts";
+import { SOURCE, VERDICT } from "@/features/case-panel/verdicts";
 import {
   CASES,
   coherenceOnlyLabel,
@@ -23,7 +23,8 @@ import {
 } from "@/features/cases/cases";
 import type { ChartMode } from "@/features/charts/chartTokens";
 import { captureGlobe, type GlobeStrip } from "@/features/downloads/globeImage";
-import { saveBlob, timelineCsv, timelineJson } from "@/features/downloads/timelineExport";
+import { caseCsv, exportName, explorationDataCsv } from "@/features/downloads/dataCsv";
+import { saveBlob, timelineJson } from "@/features/downloads/timelineExport";
 import type { Frame, LonLat } from "@/features/frames/frame.types";
 import { findFrameAt, loadFrames } from "@/features/frames/frames";
 import { pointFromParams, pointToParams, squareFromParams } from "@/features/geo/areaLink";
@@ -45,7 +46,7 @@ import {
 import type { InsarChoice } from "@/features/insar/insarApi";
 import { InsarPairPicker } from "@/features/insar/InsarPairPicker";
 import { insarFromParams } from "@/features/insar/insarLink";
-import { explorationCsv, explorationJson } from "@/features/explore/exploreExport";
+import { explorationJson } from "@/features/explore/exploreExport";
 import {
   defaultView,
   dockRows,
@@ -114,7 +115,7 @@ import { PHONE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import { useNow } from "@/lib/useNow";
 import { DirectionSwitch } from "@/pages/explorer/DirectionSwitch";
 import { SpotCard } from "@/pages/explorer/SpotCard";
-import { LEGEND, type DrapeKind } from "@/pages/explorer/drapeLegend";
+import { legendFor, type DrapeKind } from "@/pages/explorer/drapeLegend";
 import { LayerDock } from "@/pages/explorer/LayerDock";
 import { LiveLayerDock } from "@/pages/explorer/LiveLayerDock";
 import { MobileBar } from "@/pages/explorer/MobileBar";
@@ -772,7 +773,8 @@ export const ExplorerPage = () => {
       : storyScene(storyItem, chapter, opacity);
 
   const showTimeline = item?.timeline !== undefined && item.coherenceOnly !== true && !sheetOpen;
-  const showLiveTimeline = liveTimeline !== undefined && !sheetOpen;
+  // Kept mounted under the sheet (hidden, inert, paused) so closing it returns to the same pass.
+  const showLiveTimeline = liveTimeline !== undefined;
   const showDock = item?.crops !== undefined && !sheetOpen;
   const showLiveDock = layers.length > 0 && !sheetOpen && liveV9Lens === undefined;
   const showLegend = layers.length > 0 && !sheetOpen && liveV9Lens !== undefined;
@@ -866,7 +868,9 @@ export const ExplorerPage = () => {
         scene.drape === undefined
           ? undefined
           : (({ stops, scale, text }) => ({ ramp: stops, scale, text }))(
-              LEGEND[storyItem === undefined ? drapeKind : "change"],
+              storyItem === undefined
+                ? legendFor(drapeKind, item?.id)
+                : legendFor("change", storyItem.id),
             ),
       // A case's point chart and pass dates are demo; a live answer is real unless the service says
       // its result is synthetic.
@@ -876,7 +880,8 @@ export const ExplorerPage = () => {
           ? subject?.demo === true
           : item !== undefined &&
             item.coherenceOnly !== true &&
-            (item.band !== undefined || item.timeline !== undefined)),
+            (item.band !== undefined ||
+              (item.timeline !== undefined && item.timeline.realDates !== true))),
     };
     const blob = await captureGlobe(viewer, strip);
     if (blob !== null) saveBlob(blob, `nisar-${shown?.id ?? "globe"}-view.png`);
@@ -925,23 +930,27 @@ export const ExplorerPage = () => {
     },
     {
       id: "csv",
-      label: exportsLive ? "Passes · CSV" : "Timeline data · CSV",
-      sub: exportsLive ? "One row per scene: date, role, outcome" : "Same rows, for spreadsheets",
-      disabledWhy: timelineWhy,
+      label: "Data · CSV",
+      sub: "One row per pass, with its sources and limits, for spreadsheets",
+      disabledWhy: exportsLive
+        ? undefined
+        : live !== undefined
+          ? "Wait for the answer first"
+          : item === undefined
+            ? "Open a case first"
+            : item.timeline === undefined && item.landslide === undefined
+              ? "This case has no per-pass values yet"
+              : undefined,
       onPick: () => {
         setDownloadOpen(false);
-        if (exportsLive && exploredView !== undefined) {
+        const csv = (text: string, id: string) =>
           saveBlob(
-            new Blob([explorationCsv(exploredView)], { type: "text/csv" }),
-            `nisar-exploration-${exploredView.id}-passes.csv`,
+            new Blob([text], { type: "text/csv;charset=utf-8" }),
+            exportName(id, today, "csv"),
           );
-          return;
-        }
-        if (item === undefined) return;
-        saveBlob(
-          new Blob([timelineCsv(item)], { type: "text/csv" }),
-          `nisar-${item.id}-timeline.csv`,
-        );
+        if (exportsLive && exploredView !== undefined)
+          csv(explorationDataCsv(exploredView, today), `exploration-${exploredView.id}`);
+        else if (item !== undefined) csv(caseCsv(item, today), item.id);
       },
     },
     {
@@ -1250,6 +1259,7 @@ export const ExplorerPage = () => {
         {showDock && (
           <LayerDock
             kind={drapeKind}
+            {...(item !== undefined && { caseId: item.id })}
             opacity={opacity}
             onKind={setDrapeKind}
             onOpacity={setOpacity}
@@ -1282,12 +1292,24 @@ export const ExplorerPage = () => {
 
         {showTimeline && item.timeline !== undefined && (
           <div className="x-timeline-wrap" data-collapsed={collapsed}>
-            <PassTimeline key={item.id} data={item.timeline} pauseSignal={timelinePause} />
+            <PassTimeline
+              key={item.id}
+              data={item.timeline}
+              pauseSignal={timelinePause}
+              reduceMotion={reduceMotion}
+              demo={item.timeline.realDates !== true}
+              realSource={SOURCE.caseTimeline}
+            />
           </div>
         )}
 
         {showLiveTimeline && (
-          <div className="x-timeline-wrap" data-collapsed={collapsed}>
+          <div
+            className="x-timeline-wrap"
+            data-collapsed={collapsed}
+            hidden={sheetOpen}
+            inert={sheetOpen}
+          >
             <PassTimeline
               key={runKey}
               data={liveTimeline}
@@ -1298,6 +1320,8 @@ export const ExplorerPage = () => {
               }}
               onStep={onTimelineStep}
               pauseSignal={timelinePause}
+              reduceMotion={reduceMotion}
+              hidden={sheetOpen}
             />
           </div>
         )}
@@ -1311,6 +1335,7 @@ export const ExplorerPage = () => {
             }
             view={exploredView}
             receivedAt={receivedAt}
+            runKey={runKey}
             reduceMotion={reduceMotion}
             onKeepExploring={() => setModalClosedFor(runKey)}
             onCancel={cancelAnalysis}
@@ -1476,7 +1501,7 @@ const sceneOf = (
     target: { key: item.id, box, zoom: CHIP_ZOOM },
     outline: {
       ring: ringOfBox(box),
-      label: `Processed area · ${item.chipKm} km · ${gridMetres(item.chipKm)} m grid`,
+      label: `Processed area · ${item.chipKm} km · ${item.chipGridM ?? gridMetres(item.chipKm)} m grid`,
       processing: false,
     },
     selectedCaseId: item.id,

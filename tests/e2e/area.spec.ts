@@ -195,4 +195,58 @@ test.describe("Explorer: dragging the square on the real globe", () => {
       expect(runs).toEqual([]);
     },
   );
+
+  test(
+    "with the square focused, ArrowRight nudges it east by about 1 km",
+    { tag: "@globe" },
+    async ({ page }) => {
+      const globe = new GlobePage(page);
+      await globe.skipOnboarding();
+      await globe.mockObservationPlan();
+      const runs = watchRuns(page);
+      await globe.goto();
+
+      await globe.placeSquare();
+      const before = await globe.squareCentre();
+      if (before === undefined) throw new Error("no square centre");
+      await globe.squareShape.focus();
+      // Keyboard focus shows a thicker stroke, besides the gold.
+      await expect(globe.squareShape).toHaveCSS("stroke-width", "3px");
+
+      await page.keyboard.press("ArrowRight");
+      await expect(async () => {
+        const after = await globe.squareCentre();
+        // 1 km east is about 0.01° of longitude at the square's latitude (~26°).
+        expect(after?.[0]).toBeGreaterThan(before[0]);
+        expect(after?.[0]).toBeLessThan(before[0] + 0.02);
+        expect(Math.abs((after?.[1] ?? 0) - before[1])).toBeLessThan(1e-6);
+      }).toPass({ timeout: 10_000 });
+      expect(runs).toEqual([]);
+    },
+  );
+
+  test(
+    "a click inside the used square reaches the globe and places a new one",
+    { tag: "@globe" },
+    async ({ page }) => {
+      // Place, use and place again on software Cesium: over 60 s when two globe tests share the CPU.
+      test.slow();
+      const globe = new GlobePage(page);
+      await globe.skipOnboarding();
+      await globe.mockObservationPlan();
+      await globe.mockCoverage();
+      await globe.goto();
+
+      await globe.placeSquare();
+      await globe.useSquare.click();
+      await expect(globe.square).toHaveAttribute("data-movable", "false");
+
+      // The used square only shows: a click in its middle lands on the globe underneath.
+      const box = await globe.squareShape.boundingBox();
+      if (box === null) throw new Error("the used square is not drawn");
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+      await expect(globe.square).toHaveAttribute("data-movable", "true");
+      await expect(globe.squareBar).toBeVisible();
+    },
+  );
 });

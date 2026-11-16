@@ -25,11 +25,21 @@ describe("sequence player", () => {
       speed: 1,
       loop: true,
     });
-    // Reduced motion opens paused on the pass the result is about (Cristian, T7).
+    // Reduced motion opens paused on the reference pass (COPY-flow-v9 §6).
     expect(initPlayer({ n: 5, index: 3, canPlay: true, reducedMotion: true })).toMatchObject({
-      index: 3,
+      index: 0,
       playing: false,
     });
+  });
+
+  it("Reduce motion turned on mid-play pauses on the same pass; nothing resumes it on its own", () => {
+    // usePauseWhen dispatches `pause` when the explorer's switch (or the sheet) turns on.
+    const midPlay = run(playing({ index: 0 }), { type: "tick" }, { type: "tick" });
+    const paused = run(midPlay, { type: "pause" });
+    expect(paused).toMatchObject({ index: 2, playing: false });
+    // Turning the switch off sends nothing: ticks from a stale timer can't move it either.
+    expect(run(paused, { type: "tick" }, { type: "tick" })).toBe(paused);
+    expect(run(paused, { type: "pause" })).toBe(paused);
   });
 
   it("never plays one step, or a sequence with no images of its own", () => {

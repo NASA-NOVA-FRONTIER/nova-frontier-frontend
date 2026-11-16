@@ -131,10 +131,14 @@ test.describe("Explorer v9: the result card, the legend card and the layer switc
     await expect(globe.layerRadio("sig")).toBeDisabled();
     await expect(page.getByTestId("legend-ends")).toHaveText("−30 dB0 dB");
     await expect(page.getByTestId("legend-what")).toHaveText("How strongly the ground echoes (HH)");
+    // Reduced motion opens on the reference pass (#65); HH follows the timeline pass by pass.
+    await globe.expectScene((scene) =>
+      expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-07-14_HH"),
+    );
+    await globe.timelinePass(2).click();
     await globe.expectScene((scene) =>
       expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-09-12_HH"),
     );
-    // HH follows the timeline: another pass drapes its own image.
     await globe.timelinePasses("base").first().click();
     await globe.expectScene((scene) =>
       expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-07-14_HH"),
@@ -160,6 +164,8 @@ test.describe("Explorer v9: the result card, the legend card and the layer switc
     await expect(page.getByTestId("result-evidence")).toHaveCount(0);
 
     await expect(globe.layerRadio("hv")).toHaveAttribute("aria-checked", "true");
+    // Reduced motion opens on the reference pass (#65): step to the target pass first.
+    await globe.timelinePasses("target").click();
     await globe.expectScene((scene) =>
       expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-10-24_HV"),
     );

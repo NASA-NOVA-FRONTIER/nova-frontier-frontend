@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+
 import { expect, test } from "./fixtures";
 import {
   agricultureView,
@@ -346,20 +348,23 @@ test.describe("Explorer: live exploration", () => {
     // While the job runs the footprint is a gold dash (processing); it turns solid with the answer.
     await globe.expectScene((scene) => expect(scene.outline?.processing).toBe(true));
     await expect(page.getByTestId("job-kicker")).toHaveText(/^LIVE ANALYSIS · /);
-    await expect(globe.jobModal).toContainText("Reading NISAR passes for this spot");
+    await expect(globe.jobModal).toContainText("Analysing your square");
+    await expect(page.getByTestId("job-mode")).toHaveText("ONLINE");
+    await expect(page.getByTestId("job-estimate")).toHaveText("Usually under 1 min");
     // Elapsed, never a countdown.
-    await expect(globe.jobElapsed).toHaveText(/^\d+:\d{2}$/);
+    await expect(globe.jobElapsed).toHaveText(/^\d+:\d{2} elapsed$/);
     await expect(globe.jobModal).not.toContainText(" left");
     await expect(page.getByTestId("job-band")).toHaveAttribute("data-estimated", "true");
     await expect(
       page.getByRole("progressbar", { name: "Elapsed time, 0 to 5 minutes" }),
     ).toBeVisible();
-    await expect(page.getByTestId("job-stages")).toContainText("Searching the catalog");
+    await expect(page.getByTestId("job-stages")).toContainText("Finding passes");
     await expect(page.getByTestId("job-stages")).toContainText("Reading passes");
-    await expect(page.getByTestId("fact-count")).toHaveText(/^DID YOU KNOW\? · 1 OF \d+$/);
-    await expect(page.getByTestId("fact-title")).toHaveText("Radar sees through clouds");
+    // #25: ten facts drawn for this run.
+    await expect(page.getByTestId("fact-count")).toHaveText("FACT 1 OF 10");
     await expect(page.getByTestId("fact-text")).not.toBeEmpty();
     await expect(page.getByTestId("fact-source")).toHaveAttribute("href", /^https:\/\//);
+    await expect(page.getByTestId("fact-source")).toHaveText(/^Source: /);
 
     const before = await page.getByTestId("fact-text").textContent();
     await page.getByRole("button", { name: "Next fact" }).click();
@@ -400,7 +405,10 @@ test.describe("Explorer: live exploration", () => {
     });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(page.getByTestId("job-late")).toBeVisible();
+    await expect(page.getByTestId("job-late")).toHaveText(
+      "Taking longer than the estimate. It keeps running; at 8 minutes we stop.",
+    );
+    await expect(page.getByTestId("job-estimate")).toHaveText("Estimate was under 5 s");
     await expect(page.getByTestId("job-bar")).toHaveAttribute("data-overdue", "true");
   });
 
@@ -617,6 +625,7 @@ test.describe("Explorer: live exploration", () => {
       await expect(
         globe.sheet.getByText("No image is available for this acquisition."),
       ).toBeVisible();
+      await globe.sheet.getByTestId("read-technical").click();
       await globe.sheet.getByRole("button", { name: "Run regional analysis" }).click();
       await expect(globe.sheet.getByRole("alert")).toContainText("Analysis capacity is limited");
       await expect(
@@ -635,7 +644,7 @@ test.describe("Explorer: live exploration", () => {
     await expect(page.getByTestId("source-switch")).not.toContainText("coming soon");
   });
 
-  test("the downloads carry the real answer: JSON and one CSV row per scene", async ({ page }) => {
+  test("the downloads carry the real answer: JSON and one CSV row per date", async ({ page }) => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
     await expect(globe.resultCard).toBeVisible();
@@ -649,7 +658,16 @@ test.describe("Explorer: live exploration", () => {
     await page.getByTestId("download-button").click();
     const csv = page.waitForEvent("download");
     await page.getByTestId("download-csv").click();
-    expect((await csv).suggestedFilename()).toMatch(/-passes\.csv$/);
+    const file = await csv;
+    expect(file.suggestedFilename()).toMatch(
+      /^nisar-hazard-watch_exploration-exp-[a-z0-9-]+_\d{4}-\d{2}-\d{2}\.csv$/,
+    );
+    const lines = (await readFile(await file.path(), "utf8")).split("\r\n");
+    expect(lines).toContain(
+      "date,role,status,reason,hh_point_db,hv_point_db,hh_valid_cells,hv_valid_cells,sensing_start_utc,granule_id",
+    );
+    expect(lines.some((line) => /^\d{4}-\d{2}-\d{2},target,/.test(line))).toBe(true);
+    expect(lines.some((line) => line.startsWith("# Limit: "))).toBe(true);
   });
 
   test.describe("ground motion (InSAR pair)", () => {
@@ -933,20 +951,19 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
   }) => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(globe.timelineReadout).toHaveText("Pass 3 of 5 · 12 Sep 2026");
-    // The globe drapes the selected pass's own HH image.
-    await globe.expectScene((scene) =>
-      expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-09-12_HH"),
-    );
-    await expect(globe.timelineCompare).toHaveCount(0);
-    await expect(globe.timeline).toContainText("BASELINE · 4 PASSES");
-    const first = globe.timelinePasses("base").first();
-    await first.click();
+    // Reduced motion opens paused on the reference pass (COPY-flow-v9 §6), with its own HH image.
     await expect(globe.timelineReadout).toHaveText("Pass 1 of 5 · 14 Jul 2026");
     await globe.expectScene((scene) =>
       expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-07-14_HH"),
     );
-    await page.keyboard.press("ArrowRight");
+    await expect(globe.timelineCompare).toHaveCount(0);
+    await expect(globe.timeline).toContainText("BASELINE · 4 PASSES");
+    await globe.timelinePasses("base").nth(2).click();
+    await expect(globe.timelineReadout).toHaveText("Pass 3 of 5 · 12 Sep 2026");
+    await globe.expectScene((scene) =>
+      expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-09-12_HH"),
+    );
+    await page.keyboard.press("ArrowLeft");
     await expect(globe.timelineReadout).toHaveText("Pass 2 of 5 · 19 Aug 2026");
     await globe.timelinePasses("target").click();
     await expect(globe.timelineReadout).toHaveText("Pass 5 of 5 · 11 Nov 2026");

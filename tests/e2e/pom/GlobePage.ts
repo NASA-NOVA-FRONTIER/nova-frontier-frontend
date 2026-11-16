@@ -72,6 +72,8 @@ export class GlobePage {
   readonly timeline: Locator;
   readonly timelineCompare: Locator;
   readonly timelineReadout: Locator;
+  // The readout block that carries aria-live (quiet while playing).
+  readonly timelineAnnouncer: Locator;
   readonly timelineSub: Locator;
   readonly timelinePlay: Locator;
   readonly timelinePrev: Locator;
@@ -87,11 +89,15 @@ export class GlobePage {
   readonly planPasses: Locator;
   readonly wholeGlobe: Locator;
   readonly helpButton: Locator;
+  // The explorer's own "Reduce motion" switch, in the help menu.
+  readonly motionSwitch: Locator;
   readonly squareBar: Locator;
   readonly squareCancel: Locator;
   readonly useSquare: Locator;
   // The real globe's square overlay; the stub globe draws nothing.
   readonly square: Locator;
+  // The overlay's polygon: what takes focus, the pointer and the arrow keys.
+  readonly squareShape: Locator;
   readonly searchPill: Locator;
   readonly searchMenu: Locator;
   readonly searchInput: Locator;
@@ -133,6 +139,7 @@ export class GlobePage {
     this.timeline = page.getByTestId("timeline");
     this.timelineCompare = page.getByTestId("timeline-compare");
     this.timelineReadout = page.getByTestId("timeline-readout");
+    this.timelineAnnouncer = page.getByTestId("timeline-announcer");
     this.timelineSub = page.getByTestId("timeline-sub");
     this.timelinePlay = page.getByTestId("timeline-play");
     this.timelinePrev = page.getByTestId("timeline-prev");
@@ -148,10 +155,12 @@ export class GlobePage {
     this.planPasses = page.getByTestId("plan-passes");
     this.wholeGlobe = page.getByTestId("whole-globe");
     this.helpButton = page.getByTestId("help-button");
+    this.motionSwitch = page.getByTestId("toggle-motion");
     this.squareBar = page.getByTestId("square-bar");
     this.squareCancel = page.getByTestId("square-cancel");
     this.useSquare = page.getByTestId("square-use");
     this.square = page.getByTestId("square");
+    this.squareShape = this.square.locator("polygon");
     this.searchPill = page.getByTestId("place-search");
     this.searchMenu = page.getByTestId("search-menu");
     this.searchInput = page.getByTestId("place-input");
@@ -262,12 +271,22 @@ export class GlobePage {
     return this.timeline.locator(`[data-testid^="timeline-pass-"][data-kind="${kind}"]`);
   }
 
+  // One measured pass on the track, by its order in the run (0 = the reference pass).
+  timelinePass(index: number): Locator {
+    return this.page.getByTestId(`timeline-pass-${index}`);
+  }
+
   timelinePair(index: number): Locator {
     return this.page.getByTestId(`timeline-pair-${index}`);
   }
 
   timelineSpeedOption(speed: 0.5 | 1 | 2): Locator {
     return this.page.getByTestId(`timeline-speed-${speed}`);
+  }
+
+  // The wrapper the explorer hides (and makes inert) under the More information sheet.
+  get timelineWrap(): Locator {
+    return this.page.locator(".x-timeline-wrap").filter({ has: this.timeline });
   }
 
   // "true" while the sequence player runs.

@@ -103,6 +103,7 @@ export const STEP_2 = {
   areaSub: (posting: string, cells: number) => `${posting} grid · ${formatCount(cells)} cells`,
   waitLabel: "EXPECTED WAIT",
   // Decision 8 (docs/design/README.md) overrides fixed waits: the UI shows the backend's estimate.
+  // #25 (decision 8, v9 C7): the card shows the backend's estimate (spot.ts spotWait), not this.
   waitValue: "1–4 min",
   waitSub: "plus any queue",
   catalogLabel: (direction: string) => `IN THE CATALOG · ${direction}`,
@@ -515,4 +516,86 @@ export const STEP_8 = {
   tryDirection: (direction: string) => `Try ${direction}`,
   showPartial: "Show what arrived",
   instant: "INSTANT",
+} as const;
+
+// Not in COPY-v8: Nova answered by Claude (#31). Rule-based stays the label whenever Claude isn't
+// answering, so the chat never claims more than it is.
+export const NOVA_AI = {
+  ruleLine: "Rule-based assistant · not an AI model yet",
+  aiLine: "Answers by Claude from the result on screen · check numbers against the panel",
+  aiChip: (model: string) =>
+    `Written by Claude (${model}) from the result on screen. It can be wrong: every number is on the panel with its source.`,
+  ruleChip:
+    "Rule-based answers from the data on screen. Real version: a language model that cites the case sources",
+  writing: "Nova is writing…",
+  by: "Written by Claude from the result on screen",
+  fallback: "Claude couldn't answer this, so here is the rule-based answer.",
+} as const;
+
+// Not in COPY-v8: the landslide More information panel (#24). Niscemi's passes all follow the
+// event, so the copy says what the radar measured afterwards and never what the landslide did.
+export const LANDSLIDE = {
+  kicker: "Landslide reading",
+  aftermathTitle: "Aftermath only",
+  aftermathBody: (event: string, first: string, days: number) =>
+    `Every pass is after the ${event} landslide; the first is on ${first}, ${days} days later. The radar shows how the slope behaved afterwards, not the landslide itself.`,
+  imagery: "Radar image",
+  view: "View",
+  viewPass: "One pass",
+  channel: "Channel",
+  pass: "Pass",
+  baselineRole: "baseline",
+  assessmentRole: "assessment",
+  passText: (date: string, channel: string) =>
+    `${channel} return on ${date}, fixed −30 to 0 dB gray. Left of the handle: the baseline median of the same channel.`,
+  compareLeft: "Baseline median",
+  grayScale: ["−30 dB", "0 dB"] as [string, string],
+  history: "The area's return, pass by pass",
+  historyText:
+    "Median of the 16,384 cells (solid) and the marker pixel at the case point (dashed). The shaded months are the baseline.",
+  areaHH: "Area median HH",
+  areaHV: "Area median HV",
+  pointHH: "Marker HH",
+  pointHV: "Marker HV",
+  outside: "Cells outside their own baseline band",
+  outsideText: "Share of the 16,384 cells on a fixed 0–100% axis.",
+  outsideRow: (cells: string, total: string) => `${cells} of ${total} cells`,
+  shift: (date: string) => `Shift on ${date}, against the baseline median`,
+  shiftArea: "Median change per cell",
+  shiftIqr: (range: string) => `Middle half of the cells: ${range}`,
+  shiftPoint: (value: string) => `Marker pixel: ${value}`,
+  table: "Values by pass",
+  tableDate: "Date",
+  tableRole: "Role",
+  tableArea: (channel: string) => `Area median ${channel}`,
+  tablePoint: (channel: string) => `Marker ${channel}`,
+  tableOutside: "Outside band",
+  how: "How it was measured",
+  howSteps: (series: string, baseline: string, target: string, grid: string) => [
+    `One NISAR L2 GCOV series (${series}), HH and HV, on a ${grid} grid.`,
+    `Baseline: the cell-wise median of the four passes ${baseline}.`,
+    `Target: ${target} minus that median, for every cell and at the marker.`,
+  ],
+  bandRule: "Out-of-band rule",
+  experimentalWhy:
+    "No validated landslide lens exists: these are measured returns, read as candidate evidence only.",
+} as const;
+
+// Not in COPY-v8: the printable reports and their PDF (#37).
+export const REPORT = {
+  offline: "OFFLINE · measured ahead of time",
+  online: "ONLINE · computed live from NISAR L-band scenes",
+  scientificStatus: "Diagnostic evidence, not a validated classifier",
+  imagesKicker: "The measured images",
+  changeAlt: (name: string) => `Radar change layer at ${name}`,
+  baselineAlt: (name: string) => `Radar baseline layer at ${name}`,
+  figureAlt: (name: string) => `Backend report figure for ${name}`,
+  alternatives: "Other things that change radar like this:",
+  valuesKicker: "Measured values by date, at the point",
+  valuesNote: "gamma-zero dB at the measured point; an empty cell is a masked channel, never zero.",
+  limitsAll: "Limits the radar service states for this answer",
+  retry: "Try again",
+  loadFailed: "We couldn't load this answer",
+  loadFailedBody:
+    "The server didn't answer. Try again, or ask the question again from the explorer once it is done.",
 } as const;

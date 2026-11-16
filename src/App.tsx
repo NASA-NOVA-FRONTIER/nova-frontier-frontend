@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 
+import { MusicController } from "@/features/music/MusicController";
 import { usePathname } from "@/lib/navigation";
 
 // Pages load on demand: the landing page must not pull in Cesium (the explorer) or vice versa.
@@ -25,11 +26,21 @@ const ReportPage = lazy(async () => ({
   default: (await import("@/pages/report/ReportPage")).ReportPage,
 }));
 
+// E2E stub builds only: Vite inlines the flag, so production drops this branch and its chunk
+// (`pnpm check:no-stub` fails the build if it ever ships).
+const InfoTipHarness =
+  import.meta.env.VITE_E2E_GLOBE === "stub"
+    ? lazy(async () => ({
+        default: (await import("@/pages/e2e/InfoTipHarness")).InfoTipHarness,
+      }))
+    : null;
+
 // Links shared before the landing page existed point at /?frame=..., so they still open the explorer.
 const isLegacyExplorerLink = (): boolean =>
   new URLSearchParams(window.location.search).has("frame");
 
 const CurrentPage = ({ pathname }: { pathname: string }) => {
+  if (InfoTipHarness && pathname === "/__e2e/infotip") return <InfoTipHarness />;
   if (pathname === "/explore" || isLegacyExplorerLink()) return <ExplorerPage />;
   if (pathname === "/cases") return <CasesPage />;
   if (pathname === "/method") return <MethodPage />;
@@ -42,8 +53,11 @@ const CurrentPage = ({ pathname }: { pathname: string }) => {
 export const App = () => {
   const pathname = usePathname();
   return (
-    <Suspense fallback={<div className="h-dvh bg-[#04070e]" aria-busy="true" />}>
-      <CurrentPage pathname={pathname} />
-    </Suspense>
+    <>
+      <MusicController />
+      <Suspense fallback={<div className="h-dvh bg-[#04070e]" aria-busy="true" />}>
+        <CurrentPage pathname={pathname} />
+      </Suspense>
+    </>
   );
 };

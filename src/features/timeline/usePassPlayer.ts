@@ -9,16 +9,21 @@ import {
   type PlayerState,
 } from "@/features/timeline/sequencePlayer";
 
-// Images fetched ahead stay referenced here so the browser keeps them in its cache.
-const prefetched = new Set<string>();
+// The next pass's image, fetched ahead so its drape comes from the HTTP cache. Cesium 1.146 loads a
+// SingleTileImageryProvider through a CORS XHR (blob → ImageBitmap), not through an <img>, so what it
+// reuses is the HTTP cache entry, not this element. `crossOrigin = "anonymous"` makes this a CORS request
+// too, so that entry (with its CORS headers) serves Cesium's request. The elements stay referenced
+// here so the browser doesn't drop a fetch it hasn't finished.
+const prefetched = new Map<string, HTMLImageElement>();
 
 const prefetch = (urls: string[]): void => {
   for (const url of urls) {
     if (prefetched.has(url)) continue;
-    prefetched.add(url);
     const image = new Image();
+    image.crossOrigin = "anonymous";
     image.decoding = "async";
     image.src = url;
+    prefetched.set(url, image);
   }
 };
 
@@ -49,4 +54,11 @@ export const usePassPlayer = (
   }, [state.index, nextImages]);
 
   return [state, dispatch];
+};
+
+// Pauses whenever `flag` turns on (and on mount if it starts on, a no-op when already paused).
+export const usePauseWhen = (flag: boolean, dispatch: Dispatch<PlayerEvent>): void => {
+  useEffect(() => {
+    if (flag) dispatch({ type: "pause" });
+  }, [flag, dispatch]);
 };

@@ -31,7 +31,7 @@ import {
   readoutOf,
   type LaidPass,
 } from "@/features/timeline/timelineLayout";
-import { usePassPlayer } from "@/features/timeline/usePassPlayer";
+import { usePassPlayer, usePauseWhen } from "@/features/timeline/usePassPlayer";
 import { prefersReducedMotion } from "@/lib/motion";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
@@ -49,12 +49,18 @@ export type LiveTimelineControl = {
 
 // `demo` is true for a measured case (its pass dates are illustrative) and false for a live result.
 // `onStep` labels the globe for the step in focus; a new `pauseSignal` value pauses (a globe drag).
+// `reduceMotion` is the explorer's switch (opens paused, pauses when it turns on); `hidden` keeps the
+// player alive under the More information sheet, paused, so closing it returns to the same pass.
 type PassTimelineProps = {
   data: TimelineData;
   demo?: boolean;
   live?: LiveTimelineControl;
   onStep?: (step: StepView | undefined) => void;
   pauseSignal?: number;
+  reduceMotion?: boolean;
+  hidden?: boolean;
+  // Where real dates come from, when they are not a live run's (a case's own series).
+  realSource?: string;
 };
 
 const passClass = (item: LaidPass, comparing: boolean, selected: boolean): string => {
@@ -76,6 +82,9 @@ export const PassTimeline = ({
   live,
   onStep,
   pauseSignal = 0,
+  reduceMotion = prefersReducedMotion(),
+  hidden = false,
+  realSource = SOURCE.liveTimeline,
 }: PassTimelineProps) => {
   const layout = useMemo(() => layoutTimeline(data), [data]);
   const sequence = useMemo(() => sequenceOf(data, layout), [data, layout]);
@@ -99,10 +108,13 @@ export const PassTimeline = ({
       n: steps.length,
       index: startIndex,
       canPlay: sequence.canPlay,
-      reducedMotion: prefersReducedMotion(),
+      reducedMotion: reduceMotion,
     },
     nextImages,
   );
+  // Turning either on pauses where it is; turning it off never resumes on its own.
+  usePauseWhen(reduceMotion, dispatch);
+  usePauseWhen(hidden, dispatch);
   // A live answer has no compare mode (Cristian, #20): the selected pass is always in focus.
   const [comparing, setComparing] = useState(hasTarget && live === undefined);
   const isComparing = comparing && hasTarget && live === undefined && !player.playing;
@@ -242,7 +254,11 @@ export const PassTimeline = ({
           </button>
         </div>
         {/* Announced when the user moves it, not every step while it plays. */}
-        <div className="x-tl__readout" aria-live={player.playing ? "off" : "polite"}>
+        <div
+          className="x-tl__readout"
+          aria-live={player.playing ? "off" : "polite"}
+          data-testid="timeline-announcer"
+        >
           <span className="x-tl__line" data-testid="timeline-readout">
             {readout.line}
           </span>
@@ -253,7 +269,7 @@ export const PassTimeline = ({
         {demo ? (
           <ProvenanceChip kind="demoDates" source={SOURCE.timeline} />
         ) : (
-          <Prov kind="realDates" source={SOURCE.liveTimeline} />
+          <Prov kind="realDates" source={realSource} />
         )}
         {player.canPlay && (
           <div className="x-tl__options">

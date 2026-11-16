@@ -4,7 +4,7 @@
 // `{x}` placeholders are small functions; callers pass values from the API, never invented ones.
 // Dates, coordinates and directions arrive formatted (coordinates via formatLonLat, as in copyV8).
 // Not here on purpose: per-case lines (cases are kept elsewhere), the 40 facts (facts.ts, T6b) and the
-// Radar Waves strings (radarWaves.ts, T11).
+// Radar Waves strings (waveModel.ts, T11).
 
 import { formatCount, passOf } from "@/content/copyV8";
 import type { LensId } from "@/features/cases/cases";
@@ -235,6 +235,14 @@ export const LEGEND: Record<V9LayerId, { left: string; right: string; what: stri
   phase: { left: "−π", right: "+π", what: "Fringes of change between the passes" },
 };
 
+// COPY-flow-v9 §5 stamp, split into its date and pass parts (see RESULT.stamp*).
+const stampPass = (i: number, n: number, days: number) =>
+  `${passOf(i, n)} · ${days} DAYS AFTER PASS ${i - 1}`;
+const stampFirstPass = (n: number) => `${passOf(1, n)} · REFERENCE`;
+const stampQuakeDate = (a: string, b: string) => `${a} → ${b}`;
+const stampQuakePass = (i: number, n: number, days: number) =>
+  `INTERVAL ${i} OF ${n} · ${days} DAYS`;
+
 export const RESULT = {
   online: "ONLINE",
   offline: "OFFLINE",
@@ -247,11 +255,16 @@ export const RESULT = {
   layerLabel: "Layer",
   altCoherence: "Coherence for the selected pair",
   altPhase: "Wrapped phase for the selected pair",
-  stamp: (date: string, i: number, n: number, days: number) =>
-    `${date} · ${passOf(i, n)} · ${days} DAYS AFTER PASS ${i - 1}`,
-  stampFirst: (date: string, n: number) => `${date} · ${passOf(1, n)} · REFERENCE`,
+  // The stamp draws its date and its pass part on two lines, so each string also comes as parts:
+  // `stamp*` = date + " · " + `stamp*Pass` (a verbatim split, no new wording).
+  stampPass,
+  stampFirstPass,
+  stampQuakeDate,
+  stampQuakePass,
+  stamp: (date: string, i: number, n: number, days: number) => `${date} · ${stampPass(i, n, days)}`,
+  stampFirst: (date: string, n: number) => `${date} · ${stampFirstPass(n)}`,
   stampQuake: (a: string, b: string, i: number, n: number, days: number) =>
-    `${a} → ${b} · INTERVAL ${i} OF ${n} · ${days} DAYS`,
+    `${stampQuakeDate(a, b)} · ${stampQuakePass(i, n, days)}`,
   rangeLine: (start: string, end: string, n: number) =>
     `${start} → ${end} · ${n} passes`.toUpperCase(),
   rangeLineQuake: (n: number, a: string, b: string) =>

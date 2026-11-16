@@ -198,6 +198,14 @@ describe("templates", () => {
     expect(RESULT.stampQuake("9 JUL", "21 JUL 2026", 1, 3, 12)).toBe(
       "9 JUL → 21 JUL 2026 · INTERVAL 1 OF 3 · 12 DAYS",
     );
+    // The parts the globe stamp draws on two lines join back into the same strings, byte for byte.
+    expect(`22 JUN 2026 · ${RESULT.stampPass(2, 5, 12)}`).toBe(
+      RESULT.stamp("22 JUN 2026", 2, 5, 12),
+    );
+    expect(`10 JUN 2026 · ${RESULT.stampFirstPass(5)}`).toBe(RESULT.stampFirst("10 JUN 2026", 5));
+    expect(
+      `${RESULT.stampQuakeDate("9 JUL", "21 JUL 2026")} · ${RESULT.stampQuakePass(1, 3, 12)}`,
+    ).toBe(RESULT.stampQuake("9 JUL", "21 JUL 2026", 1, 3, 12));
     expect(RESULT.rangeLine("10 Jun", "7 Nov 2026", 5)).toBe("10 JUN → 7 NOV 2026 · 5 PASSES");
     expect(RESULT.rangeLineQuake(1, "9 Jul", "21 Jul 2026")).toBe("1 PAIR · 9 JUL → 21 JUL 2026");
     expect(RESULT.originTitle("24")).toBe("NISAR, track 24");
