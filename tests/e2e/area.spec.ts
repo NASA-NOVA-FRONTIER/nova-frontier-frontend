@@ -197,6 +197,35 @@ test.describe("Explorer: dragging the square on the real globe", () => {
   );
 
   test(
+    "with the square focused, ArrowRight nudges it east by about 1 km",
+    { tag: "@globe" },
+    async ({ page }) => {
+      const globe = new GlobePage(page);
+      await globe.skipOnboarding();
+      await globe.mockObservationPlan();
+      const runs = watchRuns(page);
+      await globe.goto();
+
+      await globe.placeSquare();
+      const before = await globe.squareCentre();
+      if (before === undefined) throw new Error("no square centre");
+      await globe.squareShape.focus();
+      // Keyboard focus shows a thicker stroke, besides the gold.
+      await expect(globe.squareShape).toHaveCSS("stroke-width", "3px");
+
+      await page.keyboard.press("ArrowRight");
+      await expect(async () => {
+        const after = await globe.squareCentre();
+        // 1 km east is about 0.01° of longitude at the square's latitude (~26°).
+        expect(after?.[0]).toBeGreaterThan(before[0]);
+        expect(after?.[0]).toBeLessThan(before[0] + 0.02);
+        expect(Math.abs((after?.[1] ?? 0) - before[1])).toBeLessThan(1e-6);
+      }).toPass({ timeout: 10_000 });
+      expect(runs).toEqual([]);
+    },
+  );
+
+  test(
     "a click inside the used square reaches the globe and places a new one",
     { tag: "@globe" },
     async ({ page }) => {
