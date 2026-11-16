@@ -1068,9 +1068,12 @@
   stroke: var(--gold);
 }
 
+/* Once used, the square only shows: clicks, drags and pinches inside it reach the globe. */
 .x-square[data-movable="false"] .x-square__shape {
   stroke: var(--gold);
   stroke-dasharray: none;
+  pointer-events: none;
+  touch-action: auto;
 }
 
 .x-square__handle {

@@ -195,4 +195,27 @@ test.describe("Explorer: dragging the square on the real globe", () => {
       expect(runs).toEqual([]);
     },
   );
+
+  test(
+    "a click inside the used square reaches the globe and places a new one",
+    { tag: "@globe" },
+    async ({ page }) => {
+      const globe = new GlobePage(page);
+      await globe.skipOnboarding();
+      await globe.mockObservationPlan();
+      await globe.mockCoverage();
+      await globe.goto();
+
+      await globe.placeSquare();
+      await globe.useSquare.click();
+      await expect(globe.square).toHaveAttribute("data-movable", "false");
+
+      // The used square only shows: a click in its middle lands on the globe underneath.
+      const box = await globe.squareShape.boundingBox();
+      if (box === null) throw new Error("the used square is not drawn");
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+      await expect(globe.square).toHaveAttribute("data-movable", "true");
+      await expect(globe.squareBar).toBeVisible();
+    },
+  );
 });

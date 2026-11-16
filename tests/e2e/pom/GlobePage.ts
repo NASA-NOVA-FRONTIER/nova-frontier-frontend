@@ -82,6 +82,8 @@ export class GlobePage {
   readonly useSquare: Locator;
   // The real globe's square overlay; the stub globe draws nothing.
   readonly square: Locator;
+  // The overlay's polygon: what takes focus, the pointer and the arrow keys.
+  readonly squareShape: Locator;
   readonly searchPill: Locator;
   readonly searchMenu: Locator;
   readonly searchInput: Locator;
@@ -130,6 +132,7 @@ export class GlobePage {
     this.squareCancel = page.getByTestId("square-cancel");
     this.useSquare = page.getByTestId("square-use");
     this.square = page.getByTestId("square");
+    this.squareShape = this.square.locator("polygon");
     this.searchPill = page.getByTestId("place-search");
     this.searchMenu = page.getByTestId("search-menu");
     this.searchInput = page.getByTestId("place-input");
