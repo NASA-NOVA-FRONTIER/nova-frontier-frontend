@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { LanguageSwitcher } from "@/i18n";
+import { SoundToggle } from "@/features/music/SoundToggle";
 import { APP_NAME } from "@/lib/appName";
 import { BrandMark } from "@/lib/BrandMark";
 import { Link } from "@/lib/Link";
@@ -57,6 +58,8 @@ export const SiteNav = ({ page }: SiteNavProps) => {
         {APP_NAME}
       </Link>
       <div className="s-nav__end">
+        {/* Before Menu, so the tab order Menu → links → explorer pill stays as it was. */}
+        <SoundToggle variant="site" />
         <button
           ref={buttonRef}
           type="button"

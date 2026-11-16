@@ -72,7 +72,8 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await expect(globe.searchInput).toHaveAttribute("placeholder", "Search a place");
     await expect(globe.helpButton).toBeInViewport({ ratio: 1 });
     await expect(page.getByTestId("download-button")).toBeInViewport({ ratio: 1 });
-    expect((await box(globe.searchPill)).width).toBeGreaterThan(150);
+    // Sound and language buttons share the row; the short search keeps most of what is left.
+    expect((await box(globe.searchPill)).width).toBeGreaterThan(120);
     // Step 1 keeps its start card; no sheet handle and no layer row yet.
     await expect(page.getByTestId("sheet-handle")).toHaveCount(0);
     await expect(page.getByTestId("mobile-bar")).toHaveCount(0);

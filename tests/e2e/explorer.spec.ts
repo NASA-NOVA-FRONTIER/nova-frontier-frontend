@@ -316,9 +316,10 @@ test.describe("Explorer: v8 top bar", () => {
     // Hidden until the backend accepts a direction: a choice that isn't sent would mislead.
     await expect(page.getByTestId("direction-switch")).toHaveCount(0);
 
-    // 340 px by design; a full top row (the language button included) lets it give a little.
+    // The sound toggle (#36) and the language button (#39) share this bar. The pill is its flexible
+    // item (flex: 0 1 340px), so with a case open at 1440 px it gives up the pixels they need.
     const pill = await globe.searchPill.boundingBox();
-    expect(pill?.width).toBeGreaterThan(300);
+    expect(pill?.width).toBeGreaterThan(250);
     expect(pill?.width).toBeLessThanOrEqual(340);
 
     // The mode switch hides below 1280 px and the page links below 1120 px.

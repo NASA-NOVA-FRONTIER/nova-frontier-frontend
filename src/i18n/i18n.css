@@ -90,8 +90,25 @@ html[dir="rtl"] input[type="range"] {
 
 /* Phones: the mark, Menu, the language and the explorer pill share one row, also in German and French. */
 @media (max-width: 30rem) {
+  /* Mark, sound, Menu, language and pill: tighter gaps and paddings keep the row inside 390 px. */
+  .s-nav .s-nav__end {
+    gap: 0.25rem;
+  }
+
+  .s-nav .s-nav__menu {
+    padding-inline: 0.6em;
+  }
+
+  .s-nav .s-nav__pill {
+    padding-inline: 0.7em;
+  }
+
+  .s-nav .s-nav__mark {
+    font-size: 0.8125rem;
+  }
+
   .lang__button {
-    min-width: 2.125rem;
+    min-width: 2rem;
   }
 
   .s-nav .lang__button.s-nav__link {

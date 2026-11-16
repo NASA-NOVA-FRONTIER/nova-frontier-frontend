@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 
 import { useLanguage } from "@/i18n";
+import { MusicController } from "@/features/music/MusicController";
 import { usePathname } from "@/lib/navigation";
 
 // Pages load on demand: the landing page must not pull in Cesium (the explorer) or vice versa.
@@ -55,8 +56,11 @@ export const App = () => {
   // Subscribing here re-renders every page (none is memoized) when the language changes.
   useLanguage();
   return (
-    <Suspense fallback={<div className="h-dvh bg-[#04070e]" aria-busy="true" />}>
-      <CurrentPage pathname={pathname} />
-    </Suspense>
+    <>
+      <MusicController />
+      <Suspense fallback={<div className="h-dvh bg-[#04070e]" aria-busy="true" />}>
+        <CurrentPage pathname={pathname} />
+      </Suspense>
+    </>
   );
 };

@@ -4,6 +4,7 @@ import "@/pages/about/about.css";
 import { useEffect, useRef } from "react";
 
 import { firstName, initials, TEAM, type TeamMember } from "@/content/team";
+import { MusicCredits } from "@/features/music/MusicCredits";
 import { Link } from "@/lib/Link";
 import { useAboutMotion } from "@/pages/about/useAboutMotion";
 import { SiteFooter, type FooterColumn } from "@/pages/site/SiteFooter";
@@ -281,6 +282,8 @@ export const AboutPage = () => {
             );
           })}
         </section>
+
+        <MusicCredits />
       </main>
 
       <SiteFooter
