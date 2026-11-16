@@ -3,6 +3,7 @@ import { useEffect, useRef, type ReactNode, type Ref } from "react";
 import { TOP_BAR } from "@/content/copyV8";
 import { Icon } from "@/features/case-panel/icons";
 import type { Case } from "@/features/cases/cases";
+import { SoundToggle } from "@/features/music/SoundToggle";
 import { PlaceSearch } from "@/features/search/PlaceSearch";
 import type { Place } from "@/features/search/placesApi";
 import { BrandMark } from "@/lib/BrandMark";
@@ -149,6 +150,7 @@ export const TopBar = ({
       >
         <Icon name="globe" size={18} />
       </button>
+      <SoundToggle variant="explorer" />
       <div className="x-help" ref={helpRef}>
         <button
           type="button"
