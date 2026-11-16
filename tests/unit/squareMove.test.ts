@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { greatCircleKm } from "@/features/geo/measure";
-import { clampCentre, insideSquare, moveSquare, nudgeSquare } from "@/features/geo/squareMove";
+import { clampCentre, moveSquare, nudgeSquare } from "@/features/geo/squareMove";
 
 describe("moveSquare", () => {
   it("keeps the offset between where the square was grabbed and its centre", () => {
@@ -47,17 +47,5 @@ describe("nudgeSquare", () => {
   it("wraps across the antimeridian", () => {
     const [lon] = nudgeSquare([179.999, 0], 1, 0);
     expect(lon).toBeLessThan(-179.99);
-  });
-});
-
-describe("insideSquare", () => {
-  it("finds a point inside the 10.24 km square and misses one outside", () => {
-    expect(insideSquare([-74.75, 2.89], [-74.72, 2.92])).toBe(true);
-    expect(insideSquare([-74.75, 2.89], [-74.69, 2.89])).toBe(false);
-  });
-
-  it("works for a square straddling ±180°", () => {
-    expect(insideSquare([179.99, 0], [-179.99, 0])).toBe(true);
-    expect(insideSquare([179.99, 0], [-179.9, 0])).toBe(false);
   });
 });

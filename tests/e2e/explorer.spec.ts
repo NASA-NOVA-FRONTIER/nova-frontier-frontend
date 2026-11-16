@@ -17,7 +17,7 @@ test.describe("Explorer: measured cases", () => {
     await expect(globe.caseRow("qadirabad")).toContainText("Did it flood?");
     await expect(globe.caseRow("choco")).toContainText("Coherence only · 0.247");
     await expect(globe.caseRow("choco")).not.toContainText("Pending");
-    await expect(globe.startCard).toContainText("Design v7 · 0.7.0");
+    await expect(globe.startCard).toContainText("Design v9");
     await expect(globe.startCard.getByTestId("intro-team")).toHaveAttribute("href", "/about");
   });
 
@@ -357,6 +357,8 @@ test.describe("Explorer: confirm the square (v9 step 3)", () => {
     await expect(page.getByTestId("confirm-title")).toHaveText("What should the radar look for?");
     await expect(page.getByTestId("strip-pass")).toHaveCount(5);
     await expect(page.getByTestId("confirm-series")).toHaveText("5 passes · track 84 ASCENDING");
+    // #25: the backend's p80 for this spot (228.9 s in the recorded answer), not a fixed range.
+    await expect(page.getByTestId("confirm-wait")).toHaveText("Usually under 4 min");
     await expect(globe.placeAnalyse).toHaveText("Start analysis");
 
     await page.getByTestId("confirm-cancel").click();

@@ -17,6 +17,7 @@ import type { Case } from "@/features/cases/cases";
 import {
   arcStrip,
   chosenDates,
+  confirmWait,
   defaultPairId,
   directionWord,
   pairGroups,
@@ -148,7 +149,8 @@ export const ConfirmPanel = ({
   const pairChosen = pairs?.status === "success" ? chosen !== undefined : undefined;
   const block: StartBlock =
     covered === undefined ? "loading" : startBlock(lens, passes, pairChosen);
-  const offline = covered !== undefined && Boolean(covered.precomputedCase);
+  const wait = covered === undefined ? undefined : confirmWait(lens, block, covered);
+  const offline = wait?.offline ?? false;
 
   const chooseLens = (id: V9LensId) => {
     if (id === "insar") setAskedPairs(true);
@@ -171,14 +173,7 @@ export const ConfirmPanel = ({
                 : "ready"
           : (passes?.kind ?? "loading");
 
-  const waitLine =
-    block === "none"
-      ? CONFIRM_NOTES.noDataWait
-      : block === "few" || block === "noPair"
-        ? CONFIRM.waitLineBlocked
-        : offline
-          ? CONFIRM.waitLineOffline
-          : CONFIRM.waitLineOnline;
+  const waitLine = wait?.line ?? "";
   const reason = block === undefined || block === "loading" ? undefined : REASON[block];
 
   return (

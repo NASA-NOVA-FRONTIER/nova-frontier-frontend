@@ -1064,13 +1064,18 @@
   outline: none;
 }
 
+/* Keyboard focus reads by width too, not only by colour. */
 .x-square__shape:focus-visible {
   stroke: var(--gold);
+  stroke-width: 3;
 }
 
+/* Once used, the square only shows: clicks, drags and pinches inside it reach the globe. */
 .x-square[data-movable="false"] .x-square__shape {
   stroke: var(--gold);
   stroke-dasharray: none;
+  pointer-events: none;
+  touch-action: auto;
 }
 
 .x-square__handle {

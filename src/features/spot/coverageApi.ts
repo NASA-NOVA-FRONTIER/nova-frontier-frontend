@@ -16,6 +16,9 @@ const coverageSchema = z.object({
   areaKm2: z.number(),
   warnings: z.array(z.string()).default([]),
   precomputedCase: z.string().nullable().optional(),
+  // Backend #5: what running the default lens here would cost. Null when nothing would run.
+  etaSeconds: z.number().nullish(),
+  cache: z.enum(["miss", "hit"]).nullish(),
 });
 
 export type Coverage = z.infer<typeof coverageSchema>;

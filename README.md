@@ -1,15 +1,15 @@
 <div align="center">
 
-<img src="docs/screenshots/landing-hero.jpg" alt="NISAR Hazard Watch landing page: the headline &quot;Earth, without the clouds.&quot; over a 3D Earth, with Open the explorer and The Chenab flood buttons" width="100%">
+<img src="assets/readme/landing-hero.webp" alt="NISAR Hazard Watch landing page: the headline &quot;Earth, without the clouds.&quot; over a 3D Earth, with the Open the explorer and The Chenab flood buttons" width="100%">
 
 # NISAR Hazard Watch
 
 **Earth, without the clouds.**
 
-NASA-ISRO's NISAR radar sees the ground through cloud and at night. NISAR Hazard Watch is a
-**radar evidence explorer**: pick a place and it shows whether the radar echo there changed beyond
-that place's own normal range, checks it against a second satellite, and says plainly what the
-radar can't tell. No forecasts, no probabilities, no causes.
+NISAR Hazard Watch is a **radar evidence explorer** for NASA-ISRO's NISAR radar, which sees the
+ground through cloud and at night: pick a place and it shows whether the radar echo there changed
+beyond that place's own normal range. It checks that against a second satellite and says plainly
+what the radar can't tell: no forecasts, no probabilities, no causes.
 
 [![Live demo](https://img.shields.io/badge/live%20demo-open%20the%20explorer-c9b48b?style=for-the-badge&labelColor=04070e)](https://nova-frontier-frontend.vercel.app)
 [![Method](https://img.shields.io/badge/method-how%20it%20works-c9b48b?style=for-the-badge&labelColor=04070e)](https://nova-frontier-frontend.vercel.app/method)
@@ -25,12 +25,13 @@ radar can't tell. No forecasts, no probabilities, no causes.
 **[Live demo](https://nova-frontier-frontend.vercel.app)** ·
 **[Cases](https://nova-frontier-frontend.vercel.app/cases)** ·
 **[Method](https://nova-frontier-frontend.vercel.app/method)** ·
-**[Science backend](https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model)**
+**[Backend](https://github.com/NASA-NOVA-FRONTIER/nova-frontier-backend)** ·
+**[Model](https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model)**
 
 </div>
 
 > [!IMPORTANT]
-> **Prototype status (design v7).** The NISAR frames, the satellite passes and every number in the
+> **Prototype status (design v8).** The NISAR frames, the satellite passes and every number in the
 > measured cases are **real**: frames and passes come from NASA's NISAR Observation Plan, case
 > numbers and layer images from the science team's reports
 > ([NASA-NOVA-FRONTIER/nova-frontier-model](https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model)). Some things are still
@@ -42,6 +43,7 @@ radar can't tell. No forecasts, no probabilities, no causes.
 
 ## Contents
 
+- [Architecture](#architecture)
 - [Pages](#pages)
 - [The explorer](#the-explorer)
 - [Measured cases](#measured-cases)
@@ -53,8 +55,50 @@ radar can't tell. No forecasts, no probabilities, no causes.
 - [Testing](#testing)
 - [Deploying](#deploying)
 - [Project structure](#project-structure)
+- [What we don't claim](#what-we-dont-claim)
+- [Branches, pull requests and protection](#branches-pull-requests-and-protection)
 - [Contributing](#contributing)
-- [Credits](#credits)
+- [Credits and license](#credits-and-license)
+
+## Architecture
+
+How a question travels: the browser calls the backend on Railway, which plans the scenes and hands
+the job to the ML gateway on Modal; the gateway reads NISAR data from NASA archives and the radar
+layers come back to the globe.
+
+```mermaid
+flowchart LR
+    subgraph Vercel["Frontend · Vercel"]
+        App["Web app<br/>React + CesiumJS globe"]
+        Static["Static files<br/>frames.json, case PNGs"]
+    end
+    subgraph Railway["Backend · Railway"]
+        API["FastAPI · /api/v1<br/>explorations, coverage, InSAR pairs, places, cases, assistant"]
+        DB[("PostgreSQL<br/>jobs + 24 h result cache")]
+    end
+    subgraph Modal["ML gateway · Modal"]
+        GW["Gateway<br/>jobs, coverage, cases, layer PNGs"]
+        Worker["Worker<br/>reads NISAR, runs the lens, writes layers"]
+    end
+    App --> Static
+    App -->|"/api/v1"| API
+    App -->|tiles| Esri["Esri World Imagery"]
+    App -->|passes| ObsPlan["NISAR Observation Plan<br/>ArcGIS"]
+    API --> DB
+    API -->|scene plan| ASF["ASF Search API"]
+    API -->|wildfire lens| FIRMS["NASA FIRMS"]
+    API -->|place search| OSM["OSM Nominatim"]
+    API -->|Nova| Claude["Claude API"]
+    API -->|"/v2 jobs"| GW
+    GW --> Worker
+    Worker -->|GCOV / GUNW| DAAC["ASF DAAC<br/>NISAR L2"]
+    Worker -->|flood lens| OPERA["OPERA DSWx-HLS"]
+    GW -.->|layer PNGs| App
+```
+
+The detailed drawing, with every box traced to the code, is
+[`docs/architecture/architecture.png`](docs/architecture/architecture.png) (source
+`docs/architecture/architecture.html`, rendered with `pnpm diagram`).
 
 ## Pages
 
@@ -64,6 +108,7 @@ radar can't tell. No forecasts, no probabilities, no causes.
 | `/explore` | The explorer: a CesiumJS globe with the measured cases and every NISAR frame                                                                                                                      |
 | `/cases`   | The measured cases as cards, filterable by question                                                                                                                                               |
 | `/method`  | How it works: the NISAR satellite, the Qadirabad sequence, six steps, the band chart, the lenses, what the echo says, wavelengths, interferometry, works / fails, experimental models, colour key |
+| `/learn`   | Radar basics: an interactive wave (wavelength, polarization, incidence angle) and the challenge's learning resources                                                                              |
 | `/about`   | The team (Nova Frontier) and project links                                                                                                                                                        |
 | `/report`  | `?case=<id>` (a measured case) or `?exploration=<id>` (a live answer): a printable one-page report                                                                                                |
 
@@ -75,26 +120,26 @@ Shareable explorer links: `/explore?case=qadirabad` opens a measured case;
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/landing-compare.jpg" alt="Drag-to-compare view of North Dakota fields: NISAR radar on the left, a cloudy Sentinel-2 view on the right"></td>
-    <td width="50%"><img src="docs/screenshots/cases.jpg" alt="Cases page: Four places, measured honestly, with question filters and the Qadirabad and Chókwè cards"></td>
+    <td width="50%"><img src="assets/readme/landing-compare.webp" alt="Drag-to-compare view of North Dakota farmland: NISAR radar of 23 Aug 2025 on the left, a cloudy Sentinel-2 view of 24 Aug 2025 on the right"></td>
+    <td width="50%"><img src="assets/readme/cases.webp" alt="Cases page: the headline Four places, measured honestly, question filters and the Qadirabad and Chocó cards"></td>
   </tr>
   <tr>
     <td align="center"><b>Same fields, one day apart</b><br><sub>NISAR radar vs. Sentinel-2 over North Dakota</sub></td>
-    <td align="center"><b>Cases</b><br><sub>Four measured places and one pending event</sub></td>
+    <td align="center"><b>Cases</b><br><sub>The measured cases, filterable by question</sub></td>
   </tr>
   <tr>
-    <td width="50%"><img src="docs/screenshots/method-band.jpg" alt="Method page: the band chart in three states, changed beyond its range, within its range and not enough radar yet"></td>
-    <td width="50%"><img src="docs/screenshots/about.jpg" alt="About page: Six people, one orbit, the team around the Nova Frontier logo"></td>
+    <td width="50%"><img src="assets/readme/method-band.webp" alt="Method page: the band chart in three states, changed beyond its range, within its range and not enough radar yet, each with a Demo data chip"></td>
+    <td width="50%"><img src="assets/readme/learn-radar-waves.webp" alt="Learn page: an animated radar pulse at L-band, 24 cm, going through a tree canopy to the soil, with wavelength, polarization and incidence angle controls"></td>
   </tr>
   <tr>
     <td align="center"><b>Method</b><br><sub>Reading the band chart (demo series)</sub></td>
-    <td align="center"><b>About</b><br><sub>Team Nova Frontier</sub></td>
+    <td align="center"><b>Learn</b><br><sub>Change the wave, change what comes back</sub></td>
   </tr>
 </table>
 
 ## The explorer
 
-<img src="docs/screenshots/explorer-case.jpg" alt="Explorer on the Qadirabad case: the real change crop draped on the globe, the case panel with the verdict, band chart and contrast bars, the layer dock and the pass timeline" width="100%">
+<img src="assets/readme/explorer-case-qadirabad.webp" alt="Explorer on the Qadirabad case: the real change crop draped on the globe, the case panel with the verdict, band chart and flagged-cell bars, the layer dock and the pass timeline" width="100%">
 
 <p align="center"><b>A measured case:</b> Qadirabad, Pakistan. The verdict, the real contrast bars and the report's change crop on the globe; the band chart and timeline dates are labelled demo.</p>
 
@@ -117,26 +162,30 @@ Shareable explorer links: `/explore?case=qadirabad` opens a measured case;
   area), and says so when it is missing. "Keep exploring" lets the job run in the background; the band label reads
   "L-band, 24 cm.", the band every answer uses.
 - **Guided tour / Explore switch:** the guided story on the Chenab flood (see below).
-- **Nova:** the round button bottom right opens a chat that explains what is on screen (rule-based,
-  demo).
+- **Nova:** the round button bottom right opens a chat that explains what is on screen (Claude
+  when the backend has a key, rules otherwise; see below).
 - **Download menu:** a PNG of the globe, the case's timeline as JSON or CSV, and the PDF report.
 - **Help menu:** replay the quick tour, start the story, pages, "Show REAL labels" (hides only Real
   chips), reduce motion.
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/explorer-start.jpg" alt="Explorer start card listing the measured cases over the globe with case markers"></td>
-    <td width="50%"><img src="docs/screenshots/explorer-live.jpg" alt="A live question on track 47, frame 3: the radar's answer from the backend, the target pass against its normal range and a measured layer on the globe"></td>
+    <td width="50%"><img src="assets/readme/explorer-start.webp" alt="Explorer start card, What did the radar see?, listing the six measured cases over the globe with their markers"></td>
+    <td width="50%"><img src="assets/readme/explorer-sheet-qadirabad.webp" alt="More information sheet for Qadirabad: the question, the real nova-frontier-model report figure, how it was computed, evidence and quality, sources"></td>
   </tr>
   <tr>
     <td align="center"><b>What did the radar see?</b><br><sub>The start card and case markers</sub></td>
-    <td align="center"><b>A live question</b><br><sub>A measured answer from the backend</sub></td>
+    <td align="center"><b>More information</b><br><sub>The real report figure, how it was computed, evidence, sources</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="assets/readme/phone-landing.webp" alt="Landing page on a phone, 390 px wide: the headline, the intro and the two buttons over the Earth" width="60%"></td>
+    <td width="50%"><img src="assets/readme/phone-explorer-case-qadirabad.webp" alt="Explorer on a phone, 390 px wide: the Qadirabad change crop on the globe, the pass timeline and the case panel as a bottom sheet" width="60%"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>On a phone</b><br><sub>Landing at 390 px</sub></td>
+    <td align="center"><b>On a phone</b><br><sub>The Qadirabad case at 390 px</sub></td>
   </tr>
 </table>
-
-<img src="docs/screenshots/explorer-sheet.jpg" alt="More information sheet for Qadirabad: the question, the real report figure, how it was computed, evidence and quality, sources" width="100%">
-
-<p align="center"><b>More information:</b> the real nova-frontier-model report figure, how it was computed, evidence and quality, sources.</p>
 
 ## Measured cases
 
@@ -152,6 +201,10 @@ so the lens buttons can't turn it into a live question.
 | Bug Fire, Nevada, USA       | Did fire scar it?             | Measured, not a verdict         | 4,096 cells read on a 10 m grid, no comparator   |
 | Rowe Creek, Oregon, USA     | Did vegetation disappear?     | Measured, not a verdict         | 262,142 cells read on a 10 m grid, no comparator |
 | Sköllersta, Sweden          | Did a field change?           | Measured, not a verdict         | +1.78 dB HH step, rye trial vs its surroundings  |
+| Niscemi, Sicily, Italy      | Did the slope keep its echo?  | Measured, not a verdict         | +2.17 dB median HH, 22 Oct vs Jun–Aug passes     |
+
+Niscemi's passes all follow its 25 Jan 2026 landslide, so the radar can't compare before with
+after; its numbers are in `src/features/cases/niscemi.ts`.
 
 ## Data sources and where they are fetched
 
@@ -162,7 +215,7 @@ so the lens buttons can't turn it into a live question.
 | Basemap                                  | Esri World Imagery (`server.arcgisonline.com`), no key                                                                                                                                                                                | Cesium imagery tiles (`src/features/globe/cesium.ts`); no Cesium ion token.                                                                                                                                                                 |
 | Case numbers, verdicts, quality, sources | [NASA-NOVA-FRONTIER/nova-frontier-model](https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model) reports (`flood_pilot_summary.json`, `FLOOD_CHARACTERIZATION.md`, `TEAM_HANDOFF.md`, …)                                           | Copied into `src/features/cases/cases.ts`; each value's source is in its chip tooltip.                                                                                                                                                      |
 | Case layer crops and report figures      | nova-frontier-model report figures                                                                                                                                                                                                    | Static files in `public/cases/` (crops) and `public/cases/figures/`.                                                                                                                                                                        |
-| Experimental model metrics (Method)      | [Ch0comilo/NISAR-Models](https://github.com/Ch0comilo/NISAR-Models) model cards                                                                                                                                                       | Copied into `src/features/charts/metrics.ts` and `src/pages/method/methodContent.ts`.                                                                                                                                                       |
+| Experimental model metrics (Method)      | `Ch0comilo/NISAR-Models` model cards (repository not public on 2026-11-15; see #13)                                                                                                                                                   | Copied into `src/features/charts/metrics.ts` and `src/pages/method/methodContent.ts`.                                                                                                                                                       |
 | Landing and footer pictures              | NASA/JPL-Caltech, NASA Visible Earth, NASA HLS via Worldview, Wikimedia Commons                                                                                                                                                       | Static files in `public/landing/` and `public/footer/`, credited on the pages.                                                                                                                                                              |
 
 A live question calls the backend (`POST /api/v1/explorations`, then polling `GET
@@ -173,7 +226,7 @@ before it reaches the UI, and the measured layers are PNGs the backend redirects
 
 ## What is real and what is demo
 
-The full element-by-element list is the design handoff's `DATA_PROVENANCE.md`. In short:
+The full element-by-element list is [`docs/design/v8/DATA_PROVENANCE-v8.md`](docs/design/v8/DATA_PROVENANCE-v8.md). In short:
 
 | Real                                                                             | Demo (chip always visible)                                                   |
 | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -184,7 +237,8 @@ The full element-by-element list is the design handoff's `DATA_PROVENANCE.md`. I
 | Change and baseline crops draped on the globe, report figures in the sheet       |                                                                              |
 | Method: works / fails cards, Transformer benchmark, experimental model metrics   |                                                                              |
 
-Nova's answers are demo too (rule-based, see below), and the report's summary is a template.
+Nova's rule-based answers are demo and its Claude answers are experimental (see below); the
+report's summary is a template.
 
 **To fill:** Chocó's event facts (Servicio Geológico Colombiano) and its NISAR frame; in the guided
 story, chapter 1's areas and people affected and chapter 5's photos and news. On the measured cases HV and
@@ -192,7 +246,7 @@ HH−HV layers are not drawn at all; a live answer draws the layers the backend 
 
 ## Guided story, onboarding, Nova and reports
 
-<img src="docs/screenshots/explorer-story.jpg" alt="Guided story, chapter 3 of 6: the real Qadirabad change map on the globe, a card with the before and change crops, and Nova's caption bar along the bottom" width="100%">
+<img src="assets/readme/explorer-story.webp" alt="Guided story, chapter 3 of 6, Blue is ground that went dark: the real Qadirabad change map on the globe, a card with the before and change crops, and Nova's caption bar along the bottom" width="100%">
 
 <p align="center"><b>The guided story:</b> chapter 3 of 6, the real change map from the science team, with Nova's caption bar.</p>
 
@@ -206,12 +260,15 @@ HH−HV layers are not drawn at all; a live answer draws the layers the backend 
 - **Quick onboarding:** four spotlight steps (cases, panel, layer dock, timeline) shown once per
   browser on a plain `/explore` visit; "Seen" lives in `localStorage`. Help → "Replay the quick
   tour" shows it again; Skip or Esc closes it.
-- **Nova:** a chat that only rephrases what is on screen and cites the case's own sources, in
-  Plain or Technical mode, with suggested questions. It is **rule-based, not an AI model**, and
-  carries a Demo chip. Questions about people or damage get "No data": the radar can't answer
-  them. The whole chat goes through one function, `novaAnswer(question, context)` in
-  `src/features/nova/novaAnswer.ts`, so a real model with citations can replace it without touching
-  the UI.
+- **Nova:** a chat about the result on screen, in Plain or Technical mode, with suggested
+  questions. When the backend has a Claude key (`GET /api/v1/assistant`), **Claude answers from
+  the result on screen** (`POST /api/v1/assistant`, streamed) under an Experimental chip: "Answers
+  by Claude from the result on screen · check numbers against the panel". Claude reads only what
+  the panel, the lens card and the sheet show (`assistantContext.ts`), and the backend's prompt
+  forbids causes, probabilities, hectares, displacement and invented numbers. Without a key, or
+  whenever Claude fails, the **rule-based** `novaAnswer(question, context)` answers under a Demo
+  chip; it only rephrases what is on screen and cites the case's sources, and questions about
+  people or damage get "No data".
 - **Downloads** (top bar): "Screenshot of the globe" (PNG with a strip naming the place,
   question, dates and legend, plus a Demo flag when the view has demo values), the open case's
   pass timeline as JSON or CSV (every row flagged demo, the file names its source), and "PDF
@@ -221,10 +278,6 @@ HH−HV layers are not drawn at all; a live answer draws the layers the backend 
   evidence and quality, limits, sources) and a summary filled from a fixed template, labelled
   "Not AI-written". "Save as PDF" uses the browser's print dialog. An unknown or missing case lists
   the measured ones.
-
-<img src="docs/screenshots/explorer-nova.jpg" alt="Nova open on the Qadirabad case: a Demo chip, the rule-based assistant notice, a cited answer and a No data reply to a question about people affected" width="100%">
-
-<p align="center"><b>Nova:</b> rule-based and labelled demo; it cites the case's sources and answers "No data" about people affected.</p>
 
 **Still to fill in the story:** chapter 1's "Areas affected" and "People affected" (from the
 PMD/FFD bulletin, official figures only) and chapter 5's photos and news items. They show as
@@ -252,7 +305,8 @@ pnpm dev            # http://localhost:5173
 
 ## Configuration
 
-One optional variable, `VITE_API_BASE_URL`: the backend's origin when it is not served from the
+Names only; values live in Vercel's project settings, never in Git. One optional variable,
+`VITE_API_BASE_URL`: the backend's origin when it is not served from the
 same one. Vercel production sets it to the Railway backend, so browsers call it directly and the
 backend's rate limit sees each user's own address (the backend allows the production origin by
 CORS); previews leave it empty and use the `/api/*` rewrite of `vercel.json`, and in development
@@ -279,12 +333,14 @@ can be removed from any deployment.
 - E2E runs against the **production build** (`pnpm build && pnpm preview`) on port 5174, or on
   `E2E_PORT` when set, with reduced motion on. Headless Chromium renders Cesium with software WebGL
   (SwiftShader), so it is slow; it uses two workers.
-- **CI** (GitHub Actions): lint, format check, typecheck, unit tests and build, then E2E, on every
-  push to `main` and every pull request.
+- **CI** (GitHub Actions, `.github/workflows/ci.yml`): lint, format check, typecheck, unit tests and
+  build, then E2E, on every push to `main` and every pull request.
 
 ## Deploying
 
-The app is a static single-page build: `pnpm build` writes `dist/`. It is hosted on Vercel;
+The app is a static single-page build: `pnpm build` writes `dist/`. It is hosted on Vercel at
+<https://nova-frontier-frontend.vercel.app>: production deploys from `main`, and every pull request
+gets a preview deployment;
 `vercel.json` rewrites every path except `data/`, `cesium/` and `assets/` to `index.html`. Any
 static host works with the same fallback, provided it forwards `/api/*` to the backend (or
 `VITE_API_BASE_URL` points at it).
@@ -295,7 +351,7 @@ static host works with the same fallback, provided it forwards `/api/*` to the b
 src/
 ├── App.tsx            Page switch on the pathname (no router dependency)
 ├── pages/             landing, explorer, cases, method, about, report, and site/ (nav, footer, tokens)
-├── content/           Team, data sources, the landing's Barh example
+├── content/           Copy (copyV8), team, data sources, NASA facts
 ├── features/
 │   ├── cases/         Measured cases, lenses, demo band series, hazard icons
 │   ├── case-panel/    Case and live-question panel: verdict, quality strip, chips
@@ -304,7 +360,7 @@ src/
 │   ├── frames/        Frames snapshot, hit-testing, Observation Plan client, next planned pass
 │   ├── globe/         CesiumJS viewer, case markers, frame outlines, camera framing
 │   ├── live/          Live question: job steps, demo answer, the frame's planned passes
-│   ├── nova/          Nova chat and its rule-based answers (novaAnswer)
+│   ├── nova/          Nova chat: Claude via the backend, rule-based fallback (novaAnswer)
 │   ├── onboarding/    The 4-step quick tour
 │   ├── sheet/         "More information" sheet and compare tile
 │   ├── story/         The guided story's chapters and cards
@@ -313,8 +369,28 @@ src/
 public/                frames.json, case crops and figures, landing, footer and team pictures
 scripts/               Frames snapshot generator
 tests/                 Unit (Vitest) and E2E (Playwright, page objects, mocks)
-docs/screenshots/      README pictures
+docs/architecture/     Architecture diagram (HTML source and PNG)
+assets/readme/         README pictures (WebP)
 ```
+
+## What we don't claim
+
+The app shows measured radar evidence and says what it can't tell. It never shows a forecast, a
+probability, a cause stated as a result, "detected", hectares or flooded area, flood depth, or
+centimetres of ground motion from coherence. Every number carries its dates, polarization and
+denominator ("N of M analysis cells") and a chip: **Real**, **Demo**, **To fill**, **Hypothesis** or
+**Experimental**; only Real chips can be hidden. "No measurement" stays grey and gaps stay gaps. A
+planned pass is a promise, not data. Nova answers only about the result on screen and says "No
+data" about people or damage. Team decisions behind these rules:
+[`docs/design/README.md`](docs/design/README.md).
+
+## Branches, pull requests and protection
+
+- Branch from an up-to-date `main` (`feat/…`, `fix/…`, `docs/…`), one branch per issue.
+- Open a pull request into `main`. The **Protect main** ruleset requires the
+  **"Lint, typecheck, unit tests, build"** check and blocks force-pushes and deletion; the **Review
+  main** ruleset requires one approving review. E2E runs on the pull request too.
+- Vercel builds a preview of every pull request; merging to `main` deploys production.
 
 ## Contributing
 
@@ -326,19 +402,24 @@ docs/screenshots/      README pictures
 - Project conventions for people and AI agents: [`CLAUDE.md`](CLAUDE.md). Visual system:
   [`DESIGN.md`](DESIGN.md).
 
-## Credits
+## Credits and license
 
 - **NASA-ISRO NISAR** L2 GCOV and GUNW products, via the
   [Alaska Satellite Facility DAAC](https://search.asf.alaska.edu/).
 - **NASA NISAR Observation Plan** (frames and passes).
 - **NASA JPL OPERA** DSWx-HLS and DIST-ALERT (the optical second witness in the science reports).
-- Science backend and models: [nova-frontier-model](https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model) and
-  [NISAR-Models](https://github.com/Ch0comilo/NISAR-Models).
+- **NASA FIRMS** active-fire detections (wildfire context, through the backend) and
+  **OpenStreetMap Nominatim** place search (© OpenStreetMap contributors, shown in the app).
+- Backend and models: [nova-frontier-backend](https://github.com/NASA-NOVA-FRONTIER/nova-frontier-backend),
+  [nova-frontier-model](https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model) and
+  NISAR-Models (`Ch0comilo/NISAR-Models`, not public on 2026-11-15; see #13).
 - Landing pictures: NISAR's first image of North Dakota and the artist's concept of NISAR
   (NASA/JPL-Caltech); Blue Marble and cloud imagery (NASA Visible Earth), all public domain.
   Optical view: NASA HLS, contains modified Copernicus Sentinel-2 data (2025), via NASA Worldview.
 - Base imagery © Esri, Maxar, Earthstar Geographics. Globe by
   [CesiumJS](https://cesium.com/platform/cesiumjs/).
 - Pass timeline's next-planned-pass idea: Katheryn Guasca.
+- **License:** TODO (owner: team). This repository has no `LICENSE` file yet; each data product
+  keeps its own terms.
 
 Built by team **Nova Frontier** for the **NASA International Space Apps Challenge 2026**.

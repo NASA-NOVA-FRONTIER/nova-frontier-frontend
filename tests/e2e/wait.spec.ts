@@ -97,14 +97,10 @@ test.describe("Explorer v8: the waiting panel", () => {
     // It may already have rotated while the page loaded; it is one of the ten drawn for this run.
     await expect(page.getByTestId("fact-count")).toHaveText(/^FACT ([1-9]|10) OF 10$/);
 
-    // Some of the ten carry an image: a crop of ours, or a credited one.
-    const next = page.getByRole("button", { name: "Next fact" });
-    for (let step = 0; step < 10 && (await page.getByTestId("fact-image").count()) === 0; step += 1)
-      await next.click();
-    await expect(page.getByTestId("fact-image")).toHaveAttribute(
-      "src",
-      /^\/(landing|cases|insar)\//,
-    );
+    // Every fact carries an image, described for screen readers: ours, or a credited one.
+    const image = page.getByTestId("fact-image");
+    await expect(image).toHaveAttribute("src", /^\/(facts|cases|insar|atlas)\//);
+    await expect(image).toHaveAttribute("alt", /\S/);
   });
 
   // #25: top right, so the square in the middle of the globe stays in view; it can be collapsed.

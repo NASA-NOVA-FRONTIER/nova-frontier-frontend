@@ -110,7 +110,7 @@ test.describe("Landing and about pages", () => {
     await page.getByTestId("nav-cases").click();
     await expect(page).toHaveURL(/\/cases$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Four places, measured honestly.",
+      "Six places, measured honestly.",
     );
 
     await page.getByTestId("nav-method").click();
@@ -126,7 +126,7 @@ test.describe("Landing and about pages", () => {
   test("every site page shows the design version in the footer", async ({ page }) => {
     for (const path of ["/", "/cases", "/about"]) {
       await page.goto(path);
-      await expect(page.getByTestId("site-version")).toHaveText("Design v7 · 0.7.0");
+      await expect(page.getByTestId("site-version")).toHaveText("Design v9");
     }
   });
 
@@ -278,5 +278,56 @@ test.describe("Landing satellite hotspots", () => {
       await expect(tip).not.toHaveClass(SHOWN);
       await expect(boom).toHaveAttribute("aria-pressed", "false");
     });
+  });
+});
+
+// Issue #61: at 390 px the page links crowded the explorer pill against the right edge.
+test.describe("Site nav on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("the explorer pill sits fully on screen on every content page", async ({ page }) => {
+    for (const path of ["/", "/cases", "/method", "/learn", "/about"]) {
+      await page.goto(path);
+      const pill = page.getByTestId("nav-explore");
+      await expect(pill).toBeInViewport({ ratio: 1 });
+      await expect(pill).toHaveAccessibleName("Explore");
+      // Inside the 16 px side gutter, not pressed against the edge where wider fonts clip it.
+      const edge = await pill.evaluate((el) => el.getBoundingClientRect().right);
+      expect(edge).toBeLessThanOrEqual(390 - 16);
+      await expect(page.getByTestId("nav-menu")).toBeInViewport({ ratio: 1 });
+      // Closed, the folded links are out of sight and out of the tab order.
+      await expect(page.getByTestId("nav-links")).toBeHidden();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        390,
+      );
+    }
+  });
+
+  test("the menu opens and closes by keyboard and gives focus back", async ({ page }) => {
+    await page.goto("/learn");
+    const menu = page.getByTestId("nav-menu");
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+
+    await menu.focus();
+    await page.keyboard.press("Enter");
+    await expect(menu).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByTestId("nav-links")).toBeVisible();
+    await expect(page.getByTestId("nav-learn")).toHaveAttribute("aria-current", "page");
+
+    // Tab order follows the screen: Menu, the four links, then the explorer pill.
+    for (const id of ["nav-cases", "nav-method", "nav-learn", "nav-about", "nav-explore"]) {
+      await page.keyboard.press("Tab");
+      await expect(page.getByTestId(id)).toBeFocused();
+    }
+
+    await page.keyboard.press("Escape");
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+    await expect(page.getByTestId("nav-links")).toBeHidden();
+    await expect(menu).toBeFocused();
+
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/cases$/);
   });
 });

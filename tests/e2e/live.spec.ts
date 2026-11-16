@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+
 import { expect, test } from "./fixtures";
 import {
   agricultureView,
@@ -683,7 +685,7 @@ test.describe("Explorer: live exploration", () => {
     await expect(page.getByTestId("source-switch")).not.toContainText("coming soon");
   });
 
-  test("the downloads carry the real answer: JSON and one CSV row per scene", async ({ page }) => {
+  test("the downloads carry the real answer: JSON and one CSV row per date", async ({ page }) => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
     await expect(globe.verdict).toBeVisible();
@@ -697,7 +699,16 @@ test.describe("Explorer: live exploration", () => {
     await page.getByTestId("download-button").click();
     const csv = page.waitForEvent("download");
     await page.getByTestId("download-csv").click();
-    expect((await csv).suggestedFilename()).toMatch(/-passes\.csv$/);
+    const file = await csv;
+    expect(file.suggestedFilename()).toMatch(
+      /^nisar-hazard-watch_exploration-exp-[a-z0-9-]+_\d{4}-\d{2}-\d{2}\.csv$/,
+    );
+    const lines = (await readFile(await file.path(), "utf8")).split("\r\n");
+    expect(lines).toContain(
+      "date,role,status,reason,hh_point_db,hv_point_db,hh_valid_cells,hv_valid_cells,sensing_start_utc,granule_id",
+    );
+    expect(lines.some((line) => /^\d{4}-\d{2}-\d{2},target,/.test(line))).toBe(true);
+    expect(lines.some((line) => line.startsWith("# Limit: "))).toBe(true);
   });
 
   test.describe("ground motion (InSAR pair)", () => {

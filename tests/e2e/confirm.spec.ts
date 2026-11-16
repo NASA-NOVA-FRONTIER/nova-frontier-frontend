@@ -60,7 +60,8 @@ test.describe("Explorer v9: the confirm panel", () => {
     await expect(globe.placeCard).toContainText("PRESET · LAST 5 MONTHS");
     await expect(page.getByTestId("confirm-series")).toHaveText("5 passes · track 84 ASCENDING");
     await expect(page.getByTestId("confirm-mode")).toHaveText("ONLINE");
-    await expect(page.getByTestId("confirm-wait")).toHaveText("Computed live · we stop at 8 min");
+    // #72: the backend's p80 for the default image lens here (228.9 s in the recorded answer).
+    await expect(page.getByTestId("confirm-wait")).toHaveText("Usually under 4 min");
     await expect(globe.confirmReason).toHaveCount(0);
     await expect(globe.confirmNote).toHaveCount(0);
     await expect(globe.placeAnalyse).toBeEnabled();
@@ -107,6 +108,8 @@ test.describe("Explorer v9: the confirm panel", () => {
     await globe.phenomenon("insar").click();
     await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
     expect(globe.pairRequests).toHaveLength(1);
+    // The coverage estimate is for the image lenses; Earthquake measures one pair, so no number.
+    await expect(page.getByTestId("confirm-wait")).toHaveText("Computed live · we stop at 8 min");
     // Track 125's 5 most recent passes and the 4 real pairs between them; the newest is chosen.
     await expect(page.getByTestId("strip-pass")).toHaveCount(5);
     const arcs = page.getByTestId("strip-arc");

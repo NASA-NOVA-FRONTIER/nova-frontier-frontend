@@ -1,8 +1,9 @@
 import { TOP_BAR } from "@/content/copyV8";
-import type { V9LensId } from "@/content/copyV9";
+import { CONFIRM, CONFIRM_NOTES, type V9LensId } from "@/content/copyV9";
 import type { LensId } from "@/features/cases/cases";
 import type { InsarPair } from "@/features/insar/insarApi";
 import type { Coverage } from "@/features/spot/coverageApi";
+import { spotWait } from "@/features/spot/spot";
 
 /*
  * The confirm panel's rules (SPECS-flow-v9 §1.3 and §2), pure so the panel and the tests read the
@@ -167,4 +168,19 @@ export const startBlock = (
   if (passes.kind === "none") return "none";
   if (passes.kind === "few") return "few";
   return undefined;
+};
+
+export type ConfirmWait = { line: string; offline: boolean };
+
+// The footer's mode and wait line. #72 (backend #5): /coverage carries the p80 of comparable runs of
+// the default image lens and whether its answer is cached, so the image lenses show that estimate
+// (spotWait). Earthquake runs a different pipeline (one GUNW pair), so it gets no number (v9 C7).
+// precomputedCase doesn't say which lens it was prepared for, so it is OFFLINE for every lens.
+export const confirmWait = (lens: V9LensId, block: StartBlock, coverage: Coverage): ConfirmWait => {
+  const image = lens !== "insar";
+  const offline = Boolean(coverage.precomputedCase) || (image && coverage.cache === "hit");
+  if (block === "none") return { line: CONFIRM_NOTES.noDataWait, offline };
+  if (block === "few" || block === "noPair") return { line: CONFIRM.waitLineBlocked, offline };
+  if (offline) return { line: CONFIRM.waitLineOffline, offline };
+  return { line: image ? spotWait(coverage).value : CONFIRM.waitLineOnline, offline };
 };

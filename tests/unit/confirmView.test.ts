@@ -10,6 +10,7 @@ import {
   arcStrip,
   chosenDates,
   confirmLensOf,
+  confirmWait,
   defaultPairId,
   largestGap,
   pairGroups,
@@ -192,5 +193,42 @@ describe("startBlock", () => {
     expect(startBlock("insar", { kind: "none" }, undefined)).toBe("loading");
     expect(startBlock("insar", { kind: "none" }, false)).toBe("noPair");
     expect(startBlock("insar", { kind: "none" }, true)).toBeUndefined();
+  });
+});
+
+describe("confirmWait (#72): the backend's estimate in the footer", () => {
+  it("shows the coverage p80 for the image lenses", () => {
+    expect(confirmWait("flood_wetland", undefined, LAND)).toEqual({
+      line: "Usually under 4 min",
+      offline: false,
+    });
+    expect(confirmWait("wildfire", undefined, { ...LAND, etaSeconds: 140 }).line).toBe(
+      "Usually under 3 min",
+    );
+  });
+
+  it("gives no number without an estimate, and none for Earthquake", () => {
+    expect(confirmWait("flood_wetland", undefined, { ...LAND, etaSeconds: null }).line).toBe(
+      "Computed live · we stop at 8 min",
+    );
+    expect(confirmWait("insar", undefined, LAND).line).toBe("Computed live · we stop at 8 min");
+  });
+
+  it("is OFFLINE on a cache hit (image lenses) or a prepared case (any lens)", () => {
+    const hit = { ...LAND, etaSeconds: 0, cache: "hit" as const };
+    expect(confirmWait("flood_wetland", undefined, hit)).toEqual({
+      line: "Prepared · opens in about a second",
+      offline: true,
+    });
+    expect(confirmWait("insar", undefined, hit).offline).toBe(false);
+    expect(confirmWait("insar", undefined, { ...LAND, precomputedCase: "qadirabad" }).offline).toBe(
+      true,
+    );
+  });
+
+  it("names why nothing runs when Start is blocked", () => {
+    expect(confirmWait("flood_wetland", "none", OCEAN).line).toBe("Nothing to compute");
+    expect(confirmWait("flood_wetland", "few", LAND_3).line).toBe("Nothing to compute yet");
+    expect(confirmWait("insar", "noPair", LAND).line).toBe("Nothing to compute yet");
   });
 });

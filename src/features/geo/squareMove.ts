@@ -1,7 +1,6 @@
 import type { LonLat } from "@/features/frames/frame.types";
 import { AOI_SIDE_KM } from "@/features/geo/limits";
 import { continueLon, normalizeLon } from "@/features/geo/longitude";
-import { squareBounds } from "@/features/geo/square";
 
 /*
  * The placed square as pure maths: the globe hands in lon/lat under the pointer, this decides where
@@ -32,11 +31,4 @@ export const moveSquare = (grabCentre: LonLat, grab: LonLat, pointer: LonLat): L
 export const nudgeSquare = ([lon, lat]: LonLat, eastKm: number, northKm: number): LonLat => {
   const cosLat = Math.max(Math.cos((lat * Math.PI) / 180), POLE_COS);
   return clampCentre([lon + eastKm / (KM_PER_DEGREE * cosLat), lat + northKm / KM_PER_DEGREE]);
-};
-
-// Whether a point falls inside the square, also when the square straddles ±180°.
-export const insideSquare = (centre: LonLat, point: LonLat): boolean => {
-  const [west, south, east, north] = squareBounds(centre, AOI_SIDE_KM);
-  const lon = continueLon(centre[0], point[0]);
-  return lon >= west && lon <= east && point[1] >= south && point[1] <= north;
 };
