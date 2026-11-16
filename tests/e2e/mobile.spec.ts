@@ -6,7 +6,7 @@ import { GlobePage, LIVE_FRAME } from "./pom/GlobePage";
 const PHONE = { width: 390, height: 844 };
 const EDGE = 8;
 // The reference's sheet heights (`sheetFrac`), as in mobileSheet.ts.
-const SHEET = { spot: 0.5, wait: 0.46, result: 0.46, error: 0.56, expanded: 0.86 };
+const SHEET = { spot: 0.62, wait: 0.46, result: 0.46, error: 0.56, expanded: 0.86 };
 
 test.use({ viewport: PHONE });
 
@@ -90,10 +90,13 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await expect(globe.searchMenu).toBeInViewport();
     await globe.searchMenu.getByRole("option", { name: /Phalia Tehsil/ }).click();
     await globe.useSquare.click();
-    await expect(page.getByTestId("spot-area")).toBeVisible();
+    await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
 
     await expect(page.locator("main")).toHaveAttribute("data-sheet", "spot");
     await expectSheet(globe.placeCard, SHEET.spot);
+    // v9 confirm panel: Start stays in view in the sticky footer, and the sheet never expands.
+    await expect(globe.placeAnalyse).toBeInViewport({ ratio: 1 });
+    await expect(page.getByTestId("sheet-handle")).toHaveCount(0);
     await expectNovaAbove(page, globe.placeCard);
     await expectNoSideScroll(page);
   });
@@ -108,11 +111,11 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await globe.searchMenu.getByRole("option", { name: /Phalia Tehsil/ }).click();
     await globe.useSquare.click();
 
-    const error = page.getByTestId("spot-error");
+    const error = page.getByTestId("confirm-error");
     await expect(error).toBeVisible();
     await expectSheet(globe.placeCard, SHEET.spot);
     await error.getByRole("button", { name: "Try again" }).click();
-    await expect(page.getByTestId("spot-area")).toBeVisible();
+    await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
   });
 
   test("step 3: the waiting panel is the sheet", async ({ page }) => {

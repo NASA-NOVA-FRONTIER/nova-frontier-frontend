@@ -29,7 +29,7 @@ import type { Frame, LonLat } from "@/features/frames/frame.types";
 import { findFrameAt, loadFrames } from "@/features/frames/frames";
 import { pointFromParams, pointToParams, squareFromParams } from "@/features/geo/areaLink";
 import type { Area } from "@/features/geo/geo.types";
-import { AOI_SIDE_KM } from "@/features/geo/limits";
+import { AOI_SIDE_KM, INSAR_WINDOW_KM } from "@/features/geo/limits";
 import { boundsOf } from "@/features/geo/longitude";
 import { centreOf, ringOf } from "@/features/geo/measure";
 import { toGeoJson } from "@/features/geo/serialize";
@@ -83,6 +83,8 @@ import {
   ONBOARDING_STEPS,
 } from "@/features/onboarding/onboardingState";
 import { MoreInfoSheet } from "@/features/sheet/MoreInfoSheet";
+import { ConfirmPanel } from "@/features/confirm/ConfirmPanel";
+import { confirmLensOf } from "@/features/confirm/confirmView";
 import {
   CHAPTERS,
   LAST_CHAPTER,
@@ -106,12 +108,17 @@ import { useAsync } from "@/lib/useAsync";
 import { PHONE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import { useNow } from "@/lib/useNow";
 import { DirectionSwitch } from "@/pages/explorer/DirectionSwitch";
-import { SpotCard } from "@/pages/explorer/SpotCard";
 import { legendFor, type DrapeKind } from "@/pages/explorer/drapeLegend";
 import { LayerDock } from "@/pages/explorer/LayerDock";
 import { LiveLayerDock } from "@/pages/explorer/LiveLayerDock";
 import { MobileBar } from "@/pages/explorer/MobileBar";
-import { hasLayerPills, layerPills, sheetFraction, sheetStep } from "@/pages/explorer/mobileSheet";
+import {
+  canExpand,
+  hasLayerPills,
+  layerPills,
+  sheetFraction,
+  sheetStep,
+} from "@/pages/explorer/mobileSheet";
 import { SheetHandle } from "@/pages/explorer/SheetHandle";
 import { SourceSwitch } from "@/pages/explorer/SourceSwitch";
 import { SquareBar } from "@/pages/explorer/SquareBar";
@@ -279,6 +286,8 @@ export const ExplorerPage = () => {
   const [squareLens, setSquareLens] = useState<LensId>(
     initial.square !== undefined ? initial.lens : DEFAULT_LENS,
   );
+  // The confirm panel's phenomenon chip (v9 step 3); agriculture isn't one of them.
+  const confirmLens = confirmLensOf(squareLens);
   // The spot "Analyze this spot" ran on, so Cancel analysis can go back to it (SPECS-v8 §3).
   const [analysed, setAnalysed] = useState<Place>();
   const [collapsed, setCollapsed] = useState(false);
@@ -359,15 +368,6 @@ export const ExplorerPage = () => {
   useEffect(() => {
     framesRef.current = frames;
   }, [frames]);
-
-  // The catalog decides coverage; the frame outline is optional context.
-  const askArea = useCallback(
-    (area: Area, lens: LensId = DEFAULT_LENS) => {
-      const centre = centreOf(area);
-      ask(frameUnder(framesRef.current, centre), centre, lens, area);
-    },
-    [ask],
-  );
 
   const live = selection?.kind === "live" ? selection : undefined;
   const runKey =
@@ -730,7 +730,12 @@ export const ExplorerPage = () => {
   const scene =
     storyItem === undefined
       ? sceneOf(selection, !running, drapeKind, opacity, {
-          square: place && { place, ...placement },
+          square: place && {
+            place,
+            ...placement,
+            // Earthquake measures a 5 km window at the centre: drawn while the panel offers it.
+            inner: placement.used && confirmLens === "insar",
+          },
           liveDrape: liveLayer && { url: liveLayer.href, bounds: liveLayer.bounds },
           gridMetres: gridMetresOf(exploredView),
           stamp,
@@ -1041,7 +1046,7 @@ export const ExplorerPage = () => {
           />
         )}
 
-        {step !== undefined && (
+        {step !== undefined && canExpand(step) && (
           <SheetHandle
             expanded={expanded}
             onToggle={() => setExpandedFor(expanded ? "" : sheetKey)}
@@ -1066,21 +1071,32 @@ export const ExplorerPage = () => {
         )}
 
         {selection === undefined && !story && spot !== undefined && (
-          <SpotCard
+          <ConfirmPanel
+            key={`${spot.id}|${placement.id}`}
             place={spot}
             coverage={coverage}
+            frame={frameUnder(frames, spot.point)}
+            lens={confirmLens}
             nearest={nearest}
             quota={quota}
             limits={limits}
             now={minuteNow}
             cases={CASES}
-            onAnalyse={() => {
+            onLens={setSquareLens}
+            onRetryCoverage={retryCoverage}
+            onStart={(lens, insar) => {
               setAnalysed(spot);
-              askArea({ kind: "point", point: spot.point }, squareLens);
+              ask(
+                frameUnder(framesRef.current, spot.point),
+                spot.point,
+                lens,
+                { kind: "point", point: spot.point },
+                insar,
+              );
             }}
-            onRetry={retryCoverage}
+            onMove={() => setPlacement((previous) => ({ ...previous, used: false }))}
+            onCancel={close}
             onOpenCase={openCase}
-            onClose={close}
           />
         )}
 
@@ -1355,14 +1371,19 @@ const storyScene = (item: Case, chapter: number, opacity: number): GlobeScene =>
   };
 };
 
-type PlacedSquare = { place: Place; id: number; used: boolean };
+type PlacedSquare = { place: Place; id: number; used: boolean; inner: boolean };
 
 // The placed square: drawn at once, land or ocean. The camera flies to it once per placement (the
 // key ignores the centre), so a drag moves the square under a still camera.
-const squareScene = ({ place, id, used }: PlacedSquare, empty: GlobeScene): GlobeScene => ({
+const squareScene = ({ place, id, used, inner }: PlacedSquare, empty: GlobeScene): GlobeScene => ({
   ...empty,
   target: { key: `square|${id}`, ...placeFraming(place) },
-  square: { centre: place.point, sideKm: AOI_SIDE_KM, movable: !used },
+  square: {
+    centre: place.point,
+    sideKm: AOI_SIDE_KM,
+    movable: !used,
+    ...(inner && { innerKm: INSAR_WINDOW_KM }),
+  },
 });
 
 type SceneExtras = {

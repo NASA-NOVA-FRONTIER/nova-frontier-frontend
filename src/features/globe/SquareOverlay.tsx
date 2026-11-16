@@ -31,6 +31,8 @@ type SquareOverlayProps = {
   centre: LonLat;
   // Before "Use this square" it can be dragged and moved with the keys; after, it only shows.
   movable: boolean;
+  // The window an analysis measures at the centre (Earthquake: 5 km), drawn inside the square.
+  innerKm?: number | undefined;
   onMove: (centre: LonLat) => void;
 };
 
@@ -39,14 +41,23 @@ type SquareOverlayProps = {
  * its corners are projected every frame and written straight to the SVG, without a React render.
  * Pointer events land here, never on the canvas, so dragging the square never spins the globe.
  */
-export const SquareOverlay = ({ viewer, centre, movable, onMove }: SquareOverlayProps) => {
+export const SquareOverlay = ({ viewer, centre, movable, innerKm, onMove }: SquareOverlayProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const shapeRef = useRef<SVGPolygonElement>(null);
+  const innerRef = useRef<SVGPolygonElement>(null);
+  const innerLabelRef = useRef<HTMLParagraphElement>(null);
   const labelRef = useRef<HTMLParagraphElement>(null);
   const hintRef = useRef<HTMLParagraphElement>(null);
   // The centre being drawn: the prop, or the preview while a drag is under way.
   const centreRef = useRef(centre);
   const dragRef = useRef<Drag>(undefined);
+
+  // The draw loop reads the window through a ref; a change asks for one more frame.
+  const innerKmRef = useRef(innerKm);
+  useEffect(() => {
+    innerKmRef.current = innerKm;
+    viewer.scene.requestRender();
+  }, [innerKm, viewer]);
 
   const centreKey = centre.join(",");
   useEffect(() => {
@@ -56,6 +67,20 @@ export const SquareOverlay = ({ viewer, centre, movable, onMove }: SquareOverlay
   }, [centreKey]);
 
   useEffect(() => {
+    // The inner window, projected the same way; its label sits above its north-west corner.
+    const placeInner = () => {
+      const inner = innerRef.current;
+      const km = innerKmRef.current;
+      if (inner === null || km === undefined) return;
+      const corners = squareAround(centreRef.current, km).map(([lon, lat]) =>
+        SceneTransforms.worldToWindowCoordinates(viewer.scene, Cartesian3.fromDegrees(lon, lat)),
+      );
+      if (!corners.every((corner) => corner !== undefined)) return;
+      inner.setAttribute("points", corners.map(({ x, y }) => `${x},${y}`).join(" "));
+      const northWest = corners[3];
+      if (innerLabelRef.current !== null && northWest !== undefined)
+        innerLabelRef.current.style.transform = `translate(${northWest.x}px, ${northWest.y}px) translateY(-100%)`;
+    };
     const place = () => {
       const svg = svgRef.current;
       const shape = shapeRef.current;
@@ -65,10 +90,11 @@ export const SquareOverlay = ({ viewer, centre, movable, onMove }: SquareOverlay
       );
       const visible = corners.every((corner) => corner !== undefined);
       svg.style.visibility = visible ? "visible" : "hidden";
-      for (const element of [labelRef.current, hintRef.current])
+      for (const element of [labelRef.current, hintRef.current, innerLabelRef.current])
         if (element !== null) element.style.visibility = visible ? "visible" : "hidden";
       if (!visible) return;
       shape.setAttribute("points", corners.map(({ x, y }) => `${x},${y}`).join(" "));
+      placeInner();
       svg.querySelectorAll<SVGRectElement>("[data-handle]").forEach((handle, index) => {
         const corner = corners[index];
         if (corner === undefined) return;
@@ -168,6 +194,9 @@ export const SquareOverlay = ({ viewer, centre, movable, onMove }: SquareOverlay
           onKeyDown={onKeyDown}
           onWheel={onWheel}
         />
+        {innerKm !== undefined && (
+          <polygon ref={innerRef} className="x-square__inner" data-testid="square-inner" />
+        )}
         {movable &&
           ["sw", "se", "ne", "nw"].map((corner) => (
             <rect
@@ -183,6 +212,11 @@ export const SquareOverlay = ({ viewer, centre, movable, onMove }: SquareOverlay
       <p ref={labelRef} className="x-square__label" data-testid="square-label">
         {SQUARE.squareLabel}
       </p>
+      {innerKm !== undefined && (
+        <p ref={innerLabelRef} className="x-square__inner-label" data-testid="square-inner-label">
+          {SQUARE.insarWindow}
+        </p>
+      )}
       {movable && (
         <p ref={hintRef} className="x-square__hint">
           {SQUARE.dragHint}

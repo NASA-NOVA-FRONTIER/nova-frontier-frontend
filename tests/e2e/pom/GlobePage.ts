@@ -41,7 +41,7 @@ export type SceneJson = {
   drape?: { url: string; bounds: BBox };
   drapeAlpha: number;
   stamp?: { date: string; pass: string; target: boolean; box: BBox };
-  square?: { centre: LonLat; sideKm: number; movable: boolean };
+  square?: { centre: LonLat; sideKm: number; movable: boolean; innerKm?: number };
 };
 
 // Stub twins of the pixel clicks: same outcome as the pixel they replace on the real globe.
@@ -102,9 +102,13 @@ export class GlobePage {
   readonly searchMenu: Locator;
   readonly searchInput: Locator;
   readonly searchError: Locator;
+  // The v9 confirm panel after "Use this square" (step 3) and its Start button.
   readonly placeCard: Locator;
   readonly spotNearest: Locator;
   readonly placeAnalyse: Locator;
+  readonly confirmNote: Locator;
+  readonly confirmReason: Locator;
+  readonly passStrip: Locator;
   // Every place search the page sent, in order.
   readonly placeRequests: string[] = [];
   readonly coverageRequests: string[] = [];
@@ -163,9 +167,12 @@ export class GlobePage {
     this.searchMenu = page.getByTestId("search-menu");
     this.searchInput = page.getByTestId("place-input");
     this.searchError = page.getByTestId("place-error");
-    this.placeCard = page.getByTestId("place-card");
+    this.placeCard = page.getByTestId("confirm-panel");
     this.spotNearest = page.getByTestId("spot-nearest");
-    this.placeAnalyse = page.getByTestId("place-analyse");
+    this.placeAnalyse = page.getByTestId("confirm-start");
+    this.confirmNote = page.getByTestId("confirm-note");
+    this.confirmReason = page.getByTestId("confirm-reason");
+    this.passStrip = page.getByTestId("pass-strip");
     this.jobModal = page.getByTestId("job-modal");
     this.jobElapsed = page.getByTestId("job-elapsed");
     this.jobProgress = page.getByTestId("job-progress");
@@ -204,6 +211,28 @@ export class GlobePage {
         json: empty ? { ...INSAR_PAIRS, pairs: [] } : INSAR_PAIRS,
       });
     });
+  }
+
+  // A phenomenon chip of the confirm panel, by lens id.
+  phenomenon(id: string): Locator {
+    return this.page.getByTestId(`phenomenon-${id}`);
+  }
+
+  // Taps a pair arc of the Earthquake strip on its line (an arc's box is mostly empty space).
+  async tapArc(index: number): Promise<void> {
+    const arc = this.page.getByTestId("strip-arc").nth(index);
+    await arc.scrollIntoViewIfNeeded();
+    const point = await arc.evaluate((group) => {
+      const path = group.querySelector("path");
+      const matrix = path?.getScreenCTM();
+      if (path === null || matrix === null || matrix === undefined) return { x: 0, y: 0 };
+      const mid = path.getPointAtLength(path.getTotalLength() / 2);
+      return {
+        x: mid.x * matrix.a + mid.y * matrix.c + matrix.e,
+        y: mid.x * matrix.b + mid.y * matrix.d + matrix.f,
+      };
+    });
+    await this.page.mouse.click(point.x, point.y);
   }
 
   placeOption(index: number): Locator {
