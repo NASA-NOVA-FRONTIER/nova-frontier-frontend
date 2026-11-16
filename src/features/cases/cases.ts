@@ -42,8 +42,9 @@ export type QualityItem = { k: string; v: string; why: string };
 export type Source = { label: string; href: string };
 
 export type PassKind = "base" | "target" | "meas" | "plan";
-// A pass's own display image per channel, when the data has one (live answers today; no case yet).
+// A pass's own display image per channel, when the data has one (live answers, Niscemi, Bug Fire).
 export type PassImages = { HH?: string; HV?: string };
+export type PassChannel = keyof PassImages;
 export type TimelinePass = {
   date: string;
   kind: PassKind;

@@ -20,6 +20,7 @@ import {
   LENSES,
   type Case,
   type LensId,
+  type PassChannel,
 } from "@/features/cases/cases";
 import type { ChartMode } from "@/features/charts/chartTokens";
 import { captureGlobe, type GlobeStrip } from "@/features/downloads/globeImage";
@@ -109,7 +110,7 @@ import { StoryMode } from "@/features/story/StoryMode";
 import { PassTimeline } from "@/features/timeline/PassTimeline";
 import { stampOf, type StepView } from "@/features/timeline/sequence";
 import { formatDay } from "@/features/timeline/timelineLayout";
-import { CASE_LOCK } from "@/content/copyV8";
+import { CASE_LOCK, LANDSLIDE } from "@/content/copyV8";
 import { EMPTY_GLOBE } from "@/content/copyV9";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { useAsync } from "@/lib/useAsync";
@@ -440,6 +441,10 @@ export const ExplorerPage = () => {
   const pauseTimeline = useCallback(() => setTimelinePause((count) => count + 1), []);
   // The live timeline's step in focus, for the globe stamp; tagged with its run.
   const [timelineStep, setTimelineStep] = useState<{ runKey: string; step: StepView }>();
+  // A measured case's timeline step in focus, and whether the globe shows that pass (in which
+  // channel) or the dock's report layer; both tagged with the case so another case starts fresh.
+  const [caseStep, setCaseStep] = useState<{ caseId: string; step: StepView }>();
+  const [casePass, setCasePass] = useState<{ caseId: string; on: boolean; channel: PassChannel }>();
 
   const openCase = useCallback((item: Case) => {
     setSelection({ kind: "case", item });
@@ -756,6 +761,37 @@ export const ExplorerPage = () => {
       ? { ...stampOf(focus), box: stampBox }
       : undefined;
 
+  // v9: a case with an image per pass steps them on the globe, like a live answer, until the user
+  // picks the change or baseline report layer in the dock.
+  const caseFocus = item !== undefined && caseStep?.caseId === item.id ? caseStep.step : undefined;
+  const casePassImages = item?.timeline?.passes.some((pass) => pass.images !== undefined) === true;
+  const casePassChoice = casePass?.caseId === item?.id ? casePass : undefined;
+  const casePassOn = casePassImages && casePassChoice?.on !== false;
+  const caseChannel = casePassChoice?.channel ?? "HH";
+  const caseBox = item?.chipKm === undefined ? undefined : squareBounds(item.focus, item.chipKm);
+  const casePassUrl =
+    casePassOn && caseFocus !== undefined
+      ? item?.timeline?.passes.find((pass) => pass.date === caseFocus.date)?.images?.[caseChannel]
+      : undefined;
+  const caseDrape =
+    casePassUrl !== undefined && caseBox !== undefined
+      ? { url: casePassUrl, bounds: caseBox }
+      : undefined;
+  const caseStamp =
+    caseDrape !== undefined && caseFocus !== undefined && caseBox !== undefined
+      ? { ...stampOf(caseFocus), box: caseBox }
+      : undefined;
+  const onCaseStep = useCallback(
+    (next: StepView | undefined) => {
+      if (item === undefined) return;
+      setCaseStep(next === undefined ? undefined : { caseId: item.id, step: next });
+    },
+    [item],
+  );
+  const setCaseLayer = (on: boolean, channel: PassChannel = caseChannel) => {
+    if (item !== undefined) setCasePass({ caseId: item.id, on, channel });
+  };
+
   const tourItem = storyCase();
   const storyItem = story ? tourItem : undefined;
   const scene =
@@ -769,7 +805,8 @@ export const ExplorerPage = () => {
           },
           liveDrape: liveLayer && { url: liveLayer.href, bounds: liveLayer.bounds },
           gridMetres: gridMetresOf(exploredView),
-          stamp,
+          stamp: live === undefined ? caseStamp : stamp,
+          caseDrape,
         })
       : storyScene(storyItem, chapter, opacity);
 
@@ -868,11 +905,17 @@ export const ExplorerPage = () => {
       legend:
         scene.drape === undefined
           ? undefined
-          : (({ stops, scale, text }) => ({ ramp: stops, scale, text }))(
-              storyItem === undefined
-                ? legendFor(drapeKind, item?.id)
-                : legendFor("change", storyItem.id),
-            ),
+          : storyItem === undefined && caseDrape !== undefined && caseFocus !== undefined
+            ? {
+                ramp: ["#000000", "#ffffff"],
+                scale: [LANDSLIDE.grayScale[0], "", LANDSLIDE.grayScale[1]],
+                text: LANDSLIDE.passText(formatDay(caseFocus.date), caseChannel),
+              }
+            : (({ stops, scale, text }) => ({ ramp: stops, scale, text }))(
+                storyItem === undefined
+                  ? legendFor(drapeKind, item?.id)
+                  : legendFor("change", storyItem.id),
+              ),
       // A case's point chart and pass dates are demo; a live answer is real unless the service says
       // its result is synthetic.
       demo:
@@ -1275,8 +1318,22 @@ export const ExplorerPage = () => {
             kind={drapeKind}
             {...(item !== undefined && { caseId: item.id })}
             opacity={opacity}
-            onKind={setDrapeKind}
+            onKind={(kind) => {
+              // A report layer isn't any one pass: stop the player there (as live does).
+              pauseTimeline();
+              setCaseLayer(false);
+              setDrapeKind(kind);
+            }}
             onOpacity={setOpacity}
+            {...(casePassImages && {
+              pass: {
+                on: casePassOn,
+                channel: caseChannel,
+                date: caseFocus?.date,
+                onPass: () => setCaseLayer(true),
+                onChannel: (channel: PassChannel) => setCaseLayer(true, channel),
+              },
+            })}
           />
         )}
 
@@ -1313,6 +1370,7 @@ export const ExplorerPage = () => {
               reduceMotion={reduceMotion}
               demo={item.timeline.realDates !== true}
               realSource={SOURCE.caseTimeline}
+              onStep={onCaseStep}
             />
           </div>
         )}
@@ -1456,6 +1514,8 @@ type SceneExtras = {
   gridMetres?: number | undefined;
   // The timeline's step in focus, named under the footprint.
   stamp?: GlobeStamp | undefined;
+  // A measured case's pass image in focus, drawn instead of its report layer.
+  caseDrape?: Drape | undefined;
 };
 
 const gridMetresOf = (view: ExplorationView | undefined): number | undefined => {
@@ -1471,7 +1531,7 @@ const sceneOf = (
   opacity: number,
   extras: SceneExtras = {},
 ): GlobeScene => {
-  const { square, liveDrape, gridMetres: liveGrid, stamp } = extras;
+  const { square, liveDrape, gridMetres: liveGrid, stamp, caseDrape } = extras;
   const empty: GlobeScene = {
     target: undefined,
     outline: undefined,
@@ -1525,8 +1585,10 @@ const sceneOf = (
     },
     selectedCaseId: item.id,
     drape:
-      item.crops === undefined
+      caseDrape ??
+      (item.crops === undefined
         ? undefined
-        : { url: kind === "change" ? item.crops.change : item.crops.base, bounds: box },
+        : { url: kind === "change" ? item.crops.change : item.crops.base, bounds: box }),
+    ...(caseDrape !== undefined && { stamp }),
   };
 };
