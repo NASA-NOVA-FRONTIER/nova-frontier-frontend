@@ -568,14 +568,15 @@
 }
 
 /* Live exploration: the wait modal, its facts, the layer dock and the source switch */
+/* #25: top right, so the square in the middle of the globe stays visible; it ends above Nova's
+   bubble. Phones turn it into the bottom sheet (see the sheet rules below). */
 .x-jobmodal {
   position: absolute;
-  left: 50%;
+  right: 16px;
   top: 88px;
-  transform: translateX(-50%);
   z-index: 14;
-  width: min(440px, calc(100vw - 32px));
-  max-height: calc(100dvh - 104px);
+  width: min(400px, calc(100vw - 32px));
+  max-height: calc(100dvh - 88px - 104px);
   overflow-y: auto;
   box-sizing: border-box;
   padding: 22px;
@@ -595,6 +596,43 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.x-jobmodal__titlerow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.x-jobmodal__collapse {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.x-jobmodal__mode {
+  padding: 2px 8px;
+  border: 1px solid rgba(235, 233, 228, 0.28);
+  border-radius: 999px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+}
+
+.x-jobmodal[data-mode="offline"] .x-jobmodal__mode {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.x-jobmodal__elapsed {
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.x-jobmodal[data-collapsed="true"] {
+  gap: 10px;
+  padding: 16px 18px;
 }
 
 .x-jobmodal__title {

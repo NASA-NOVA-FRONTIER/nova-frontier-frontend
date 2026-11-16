@@ -1,19 +1,21 @@
 import { Prov } from "@/features/case-panel/Prov";
 import { SOURCE } from "@/features/case-panel/verdicts";
-import { LEGEND, type DrapeKind } from "@/pages/explorer/drapeLegend";
+import { legendFor, type DrapeKind } from "@/pages/explorer/drapeLegend";
 
 const API_SOON = "Served by the backend API soon";
 
 type LayerDockProps = {
   kind: DrapeKind;
+  // The open case, when its layers read differently from the flood reports.
+  caseId?: string;
   opacity: number;
   onKind: (kind: DrapeKind) => void;
   onOpacity: (opacity: number) => void;
 };
 
 // Only the report's real crops go on the globe; HV and HH−HV wait for the API instead of a fake.
-export const LayerDock = ({ kind, opacity, onKind, onOpacity }: LayerDockProps) => {
-  const legend = LEGEND[kind];
+export const LayerDock = ({ kind, caseId, opacity, onKind, onOpacity }: LayerDockProps) => {
+  const legend = legendFor(kind, caseId);
   return (
     <section className="x-dock x-glass" aria-label="Radar on the globe" data-testid="layer-dock">
       <p className="x-kicker">Radar on the globe</p>
@@ -70,8 +72,8 @@ export const LayerDock = ({ kind, opacity, onKind, onOpacity }: LayerDockProps) 
       </label>
       <p className="x-dock__text">{legend.text}</p>
       <p className="x-dock__prov">
-        <Prov kind="real" source={SOURCE.crop} />
-        Backend report figure
+        <Prov kind="real" source={legend.origin?.source ?? SOURCE.crop} />
+        {legend.origin?.label ?? "Backend report figure"}
       </p>
     </section>
   );

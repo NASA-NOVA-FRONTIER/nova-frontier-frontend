@@ -382,20 +382,23 @@ test.describe("Explorer: live exploration", () => {
     // While the job runs the footprint is a gold dash (processing); it turns solid with the answer.
     await globe.expectScene((scene) => expect(scene.outline?.processing).toBe(true));
     await expect(page.getByTestId("job-kicker")).toHaveText(/^LIVE ANALYSIS · /);
-    await expect(globe.jobModal).toContainText("Reading NISAR passes for this spot");
+    await expect(globe.jobModal).toContainText("Analysing your square");
+    await expect(page.getByTestId("job-mode")).toHaveText("ONLINE");
+    await expect(page.getByTestId("job-estimate")).toHaveText("Usually under 1 min");
     // Elapsed, never a countdown.
-    await expect(globe.jobElapsed).toHaveText(/^\d+:\d{2}$/);
+    await expect(globe.jobElapsed).toHaveText(/^\d+:\d{2} elapsed$/);
     await expect(globe.jobModal).not.toContainText(" left");
     await expect(page.getByTestId("job-band")).toHaveAttribute("data-estimated", "true");
     await expect(
       page.getByRole("progressbar", { name: "Elapsed time, 0 to 5 minutes" }),
     ).toBeVisible();
-    await expect(page.getByTestId("job-stages")).toContainText("Searching the catalog");
+    await expect(page.getByTestId("job-stages")).toContainText("Finding passes");
     await expect(page.getByTestId("job-stages")).toContainText("Reading passes");
-    await expect(page.getByTestId("fact-count")).toHaveText(/^DID YOU KNOW\? · 1 OF \d+$/);
-    await expect(page.getByTestId("fact-title")).toHaveText("Radar sees through clouds");
+    // #25: ten facts drawn for this run.
+    await expect(page.getByTestId("fact-count")).toHaveText("FACT 1 OF 10");
     await expect(page.getByTestId("fact-text")).not.toBeEmpty();
     await expect(page.getByTestId("fact-source")).toHaveAttribute("href", /^https:\/\//);
+    await expect(page.getByTestId("fact-source")).toHaveText(/^Source: /);
 
     const before = await page.getByTestId("fact-text").textContent();
     await page.getByRole("button", { name: "Next fact" }).click();
@@ -436,7 +439,10 @@ test.describe("Explorer: live exploration", () => {
     });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(page.getByTestId("job-late")).toBeVisible();
+    await expect(page.getByTestId("job-late")).toHaveText(
+      "Taking longer than the estimate. It keeps running; at 8 minutes we stop.",
+    );
+    await expect(page.getByTestId("job-estimate")).toHaveText("Estimate was under 5 s");
     await expect(page.getByTestId("job-bar")).toHaveAttribute("data-overdue", "true");
   });
 
