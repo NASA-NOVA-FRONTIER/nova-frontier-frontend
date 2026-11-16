@@ -1,10 +1,10 @@
-import { expect, test, type Page } from "./fixtures";
+import { expect, test } from "./fixtures";
 import { runningView, succeededView } from "./pom/explorationMock";
 import { GlobePage, LIVE_FRAME } from "./pom/GlobePage";
 
 // v8 step 3 (the waiting panel, #3) and step 8 (errors and limits, #4), with mocked polling.
 
-const pickQadirabad = async (globe: GlobePage, page: Page): Promise<void> => {
+const pickQadirabad = async (globe: GlobePage): Promise<void> => {
   await globe.searchInput.click();
   await globe.searchInput.fill("Qadirabad");
   await globe.searchInput.press("Enter");
@@ -12,7 +12,7 @@ const pickQadirabad = async (globe: GlobePage, page: Page): Promise<void> => {
   await globe.searchMenu.getByRole("option", { name: /Phalia Tehsil/ }).click();
   await globe.useSquare.click();
   await expect(globe.placeCard).toContainText("Qadirabad");
-  await expect(page.getByTestId("spot-area")).toBeVisible();
+  await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
 };
 
 test.describe("Explorer v8: the waiting panel", () => {
@@ -107,7 +107,7 @@ test.describe("Explorer v8: the waiting panel", () => {
     await globe.mockCoverage();
     const api = await globe.mockExplorations();
     await globe.goto();
-    await pickQadirabad(globe, page);
+    await pickQadirabad(globe);
 
     await globe.placeAnalyse.click();
     await expect(globe.jobModal).toBeVisible();
@@ -255,14 +255,14 @@ test.describe("Explorer v8: errors and limits", () => {
     test("is hidden above 3 left", async ({ page }) => {
       await globe.mockLimits({ remainingApp: 4, remainingClient: 9 });
       await globe.goto();
-      await pickQadirabad(globe, page);
+      await pickQadirabad(globe);
       await expect(globe.placeAnalyse).toBeVisible();
       await expect(page.getByTestId("spot-quota")).toHaveCount(0);
     });
 
     test("is hidden while the limits endpoint isn't deployed (404)", async ({ page }) => {
       await globe.goto();
-      await pickQadirabad(globe, page);
+      await pickQadirabad(globe);
       await expect(globe.placeAnalyse).toBeVisible();
       await expect(page.getByTestId("spot-quota")).toHaveCount(0);
     });
@@ -270,7 +270,7 @@ test.describe("Explorer v8: errors and limits", () => {
     test("few left: counts the tighter cap and says known cases don't count", async ({ page }) => {
       await globe.mockLimits({ remainingApp: 40, remainingClient: 2 });
       await globe.goto();
-      await pickQadirabad(globe, page);
+      await pickQadirabad(globe);
       const quota = page.getByTestId("spot-quota");
       await expect(quota).toHaveAttribute("data-category", "quotaLow");
       await expect(quota).toContainText("2 live analyses left today");
@@ -285,7 +285,7 @@ test.describe("Explorer v8: errors and limits", () => {
         resetsAt: "2099-01-01T00:00:00Z",
       });
       await globe.goto();
-      await pickQadirabad(globe, page);
+      await pickQadirabad(globe);
       const quota = page.getByTestId("spot-quota");
       await expect(quota).toHaveAttribute("data-category", "quotaOut");
       await expect(quota).toContainText("They reset at 00:00 UTC");
