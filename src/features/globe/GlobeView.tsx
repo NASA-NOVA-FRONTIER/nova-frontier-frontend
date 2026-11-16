@@ -54,8 +54,9 @@ export type CameraTarget = { key: string; box: BBox; zoom: number; seconds?: num
 
 export type { GlobeStamp };
 
-// The placed square (v9 step 2): the backend's AOI_SIDE_KM square around `centre`.
-export type GlobeSquare = { centre: LonLat; sideKm: number; movable: boolean };
+// The placed square (v9 step 2): the backend's AOI_SIDE_KM square around `centre`. `innerKm` draws
+// the smaller window an analysis measures at its centre (Earthquake: INSAR_WINDOW_KM).
+export type GlobeSquare = { centre: LonLat; sideKm: number; movable: boolean; innerKm?: number };
 
 export type GlobeScene = {
   target: CameraTarget | undefined;
@@ -353,6 +354,7 @@ export const GlobeView = ({
           viewer={viewer}
           centre={scene.square.centre}
           movable={scene.square.movable}
+          innerKm={scene.square.innerKm}
           onMove={onMoveSquare}
         />
       )}

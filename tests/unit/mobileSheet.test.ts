@@ -10,6 +10,7 @@ import {
   hasLayerPills,
   layerPills,
   sheetFraction,
+  canExpand,
   sheetStep,
   type SheetInput,
 } from "@/pages/explorer/mobileSheet";
@@ -61,10 +62,16 @@ describe("sheetStep: which step the phone sheet shows", () => {
 
 describe("sheetFraction", () => {
   it("uses the reference's height per step, and one height when expanded", () => {
-    expect(sheetFraction("spot", false)).toBe(0.5);
+    expect(sheetFraction("spot", false)).toBe(0.62);
     expect(sheetFraction("result", false)).toBe(0.46);
     expect(sheetFraction("error", false)).toBe(0.56);
     expect(sheetFraction("wait", true)).toBe(EXPANDED_FRACTION);
+  });
+
+  it("keeps the v9 confirm panel at 62 % or less, even when asked to expand", () => {
+    expect(canExpand("spot")).toBe(false);
+    expect(canExpand("result")).toBe(true);
+    expect(sheetFraction("spot", true)).toBe(0.62);
   });
 });
 
