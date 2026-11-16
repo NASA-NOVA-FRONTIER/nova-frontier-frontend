@@ -12,7 +12,7 @@ export const SUMMARY_LABEL = "Summary · written from the data above (template)"
 export const areaOf = (item: Case): string =>
   item.chipKm === undefined
     ? "No processed area yet"
-    : `${item.chipKm} km · ${gridMetres(item.chipKm)} m grid`;
+    : `${item.chipKm} km · ${item.chipGridM ?? gridMetres(item.chipKm)} m grid`;
 
 export const reportSummary = (item: Case): string => {
   const question = findLens(item.lens)?.chip ?? item.lens;

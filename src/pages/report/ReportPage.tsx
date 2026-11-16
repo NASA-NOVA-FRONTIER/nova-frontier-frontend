@@ -3,7 +3,10 @@ import "@/pages/report/report.css";
 
 import { useEffect, useState } from "react";
 
-import { LANDSLIDE } from "@/content/copyV8";
+import { LANDSLIDE, REPORT } from "@/content/copyV8";
+import { DESIGN_VERSION } from "@/content/version";
+import { exportName } from "@/features/downloads/dataCsv";
+import { legendFor } from "@/pages/explorer/drapeLegend";
 import { SOURCE, VERDICT } from "@/features/case-panel/verdicts";
 import { CASES, findCase, findLens, type Case } from "@/features/cases/cases";
 import { caseBandPasses } from "@/features/cases/demoBand";
@@ -18,7 +21,6 @@ import { EMPTIES_LINE } from "@/features/live/liveQuestion";
 import { formatDay } from "@/features/timeline/timelineLayout";
 import { Link } from "@/lib/Link";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
-import { VERSION } from "@/pages/explorer/StartCard";
 import { LiveReport } from "@/pages/report/LiveReport";
 import { areaOf, reportSummary, SUMMARY_LABEL } from "@/pages/report/reportSummary";
 
@@ -34,10 +36,11 @@ export const ReportPage = () => {
 
   useEffect(() => {
     if (exploration !== null) return;
+    // #37: "Save as PDF" names the file after the page title.
     document.title =
       item === undefined
         ? "NISAR Hazard Watch · Report"
-        : `${item.name} · NISAR Hazard Watch report`;
+        : exportName(item.id, new Date().toISOString().slice(0, 10), "");
   }, [item, exploration]);
 
   if (exploration !== null) return <LiveReport id={exploration} />;
@@ -130,6 +133,8 @@ const Report = ({ item }: { item: Case }) => {
             v={VERDICT[item.verdict].label}
           />
           <Fact k="Area" v={areaOf(item)} />
+          <Fact k="Mode" v={REPORT.offline} />
+          <Fact k="Scientific status" v={REPORT.scientificStatus} />
         </dl>
         <p className="r-line">
           {item.verdictLine}{" "}
@@ -154,6 +159,40 @@ const Report = ({ item }: { item: Case }) => {
           </div>
         )}
       </section>
+
+      {item.crops !== undefined ? (
+        <section className="r-block r-keep" data-testid="report-figures">
+          <p className="r-kicker r-kicker--split">
+            <span>{REPORT.imagesKicker}</span>
+            <ProvenanceChip
+              kind="real"
+              source={legendFor("change", item.id).origin?.source ?? SOURCE.crop}
+            />
+          </p>
+          <div className="r-figures">
+            <figure>
+              <img src={item.crops.change} alt={REPORT.changeAlt(item.name)} />
+              <figcaption>{legendFor("change", item.id).text}</figcaption>
+            </figure>
+            <figure>
+              <img src={item.crops.base} alt={REPORT.baselineAlt(item.name)} />
+              <figcaption>{legendFor("baseline", item.id).text}</figcaption>
+            </figure>
+          </div>
+        </section>
+      ) : (
+        item.figure !== undefined && (
+          <section className="r-block r-keep" data-testid="report-figures">
+            <p className="r-kicker r-kicker--split">
+              <span>{REPORT.imagesKicker}</span>
+              <ProvenanceChip kind="real" source={SOURCE.figure} />
+            </p>
+            <figure className="r-figure">
+              <img src={item.figure} alt={REPORT.figureAlt(item.name)} />
+            </figure>
+          </section>
+        )
+      )}
 
       {group !== undefined && (
         <section className="r-block r-keep">
@@ -193,6 +232,11 @@ const Report = ({ item }: { item: Case }) => {
           <p className="r-kicker">Data 5 · What this can't tell you</p>
           <p>{item.plainLimit}</p>
           <p className="r-small">{item.techLimit}</p>
+          {item.alternatives.length > 0 && (
+            <p className="r-small">
+              {REPORT.alternatives} {item.alternatives.join(", ")}.
+            </p>
+          )}
           <p className="r-mono">{EMPTIES_LINE}</p>
         </div>
       </section>
@@ -213,7 +257,7 @@ const Report = ({ item }: { item: Case }) => {
 
       <footer className="r-foot">
         <span>Nova Frontier · NASA Space Apps 2026 · Chía</span>
-        <span>{VERSION} · illustrative point series marked demo</span>
+        <span>{DESIGN_VERSION} · illustrative point series marked demo</span>
       </footer>
     </article>
   );

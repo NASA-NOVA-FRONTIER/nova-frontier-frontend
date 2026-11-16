@@ -18,7 +18,7 @@ test.describe("Explorer: measured cases", () => {
     await expect(globe.caseRow("qadirabad")).toContainText("Did it flood?");
     await expect(globe.caseRow("choco")).toContainText("Coherence only · 0.247");
     await expect(globe.caseRow("choco")).not.toContainText("Pending");
-    await expect(globe.startCard).toContainText("Design v7 · 0.7.0");
+    await expect(globe.startCard).toContainText("Design v9");
     await expect(globe.startCard.getByTestId("intro-team")).toHaveAttribute("href", "/about");
   });
 
@@ -127,7 +127,9 @@ test.describe("Explorer: measured cases", () => {
     );
     await expect(globe.panel.getByTestId("band-chart")).toHaveCount(0);
     await expect(globe.timeline).toHaveCount(0);
-    await expect(globe.panel.getByTestId("prov-todo").first()).toBeVisible();
+    // #29: the SGC update is linked, so no quality fact is left as a slot.
+    await expect(globe.panel).toContainText("Update · 10 Aug 2026");
+    await expect(globe.panel.getByTestId("prov-todo")).toHaveCount(0);
   });
 
   test("hiding REAL labels keeps every DEMO chip", async ({ page }) => {
@@ -280,9 +282,7 @@ test.describe("Explorer: live questions", () => {
     await globe.goto("?case=niscemi-aftermath");
     await expect(globe.panelTitle).toHaveText("Niscemi, Italy");
     await expect(globe.panel.getByTestId("prov-offline")).toHaveText("OFFLINE");
-    await expect(page.getByTestId("lens-locked")).toContainText(
-      "“Do the passes bracket the event?”",
-    );
+    await expect(page.getByTestId("lens-locked")).toContainText("“Did the slope keep its echo?”");
     for (const lens of [
       "flood_wetland",
       "vegetation_disturbance",
@@ -303,8 +303,8 @@ test.describe("Explorer: live questions", () => {
     await expect(list).toContainText("No earthquake detection, earthquake attribution");
     await expect(globe.panel).toContainText("Common phase");
     await expect(globe.panel).toContainText("0 cells");
-    // Only the SGC report slot is still to fill; the gateway's facts are REAL.
-    await expect(globe.panel.locator(".x-facts").getByTestId("prov-todo")).toHaveCount(1);
+    // The gateway's facts and the linked SGC update are all REAL: nothing is left to fill.
+    await expect(globe.panel.locator(".x-facts").getByTestId("prov-todo")).toHaveCount(0);
   });
 
   test("hovering land shows its NISAR frame; a click picks the spot and Analyze asks about it", async ({
@@ -395,7 +395,8 @@ test.describe("Explorer: pick a spot (step 2)", () => {
     await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
     await expect(globe.placeCard).toContainText("NEW SPOT · LIVE ANALYSIS");
     await expect(page.getByTestId("spot-area")).toHaveText(/AREA\s*10\.24 km square/);
-    await expect(page.getByTestId("spot-wait")).toContainText("1–4 min");
+    // #25: the backend's p80 for this spot (228.9 s in the recorded answer), not a fixed range.
+    await expect(page.getByTestId("spot-wait")).toContainText("Usually under 4 min");
     await expect(page.getByTestId("spot-wait")).toContainText("plus any queue");
     await expect(page.getByTestId("spot-catalog")).toContainText("IN THE CATALOG · ASCENDING");
     await expect(page.getByTestId("spot-catalog")).toContainText("LAST 5 MONTHS");

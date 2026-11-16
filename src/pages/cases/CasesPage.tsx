@@ -12,6 +12,7 @@ import {
 } from "@/features/cases/cases";
 import { HazardIcon } from "@/features/cases/HazardIcon";
 import { ContrastBars } from "@/features/charts/ContrastBars";
+import { countWordCapitalized } from "@/lib/countWord";
 import { Link } from "@/lib/Link";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import {
@@ -137,7 +138,10 @@ export const CasesPage = () => {
       <main id="main" className="k-main">
         <header className="k-intro" data-intro>
           <p className="k-intro__kicker">MEASURED CASES · REAL NISAR PASSES, PRECOMPUTED</p>
-          <h1 className="k-intro__title">Four places, measured honestly.</h1>
+          {/* The v8 reference says "Four places"; counting the list keeps it true as cases ship. */}
+          <h1 className="k-intro__title">
+            {countWordCapitalized(CASES.length)} places, measured honestly.
+          </h1>
           <p className="k-intro__lead">
             Each case compares real radar passes with the place&apos;s own history and, where it
             exists, a second witness. Numbers come from the science team&apos;s published reports.

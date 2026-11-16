@@ -1,6 +1,8 @@
+import { BUG_FIRE_EVIDENCE, bugFireTimeline } from "@/features/cases/bugFire";
 import { NISCEMI } from "@/features/cases/niscemi";
 import type { LonLat } from "@/features/frames/frame.types";
 import type { LandslideEvidence } from "@/features/landslide/landslideEvidence";
+import type { WildfireEvidence } from "@/features/wildfire/wildfireEvidence";
 
 /*
  * Measured cases from the science backend (github.com/NASA-NOVA-FRONTIER/nova-frontier-model). Every number here
@@ -63,6 +65,8 @@ export type Case = {
   region: string;
   focus: LonLat;
   chipKm?: number;
+  // The grid posting in metres when the case's grid isn't 128 cells across chipKm (gridMetres).
+  chipGridM?: number;
   when: string;
   target?: string;
   verdict: CaseVerdict;
@@ -93,6 +97,8 @@ export type Case = {
   tour?: boolean;
   // A landslide case: its per-pass series and layers for the More information panel (#24).
   landslide?: LandslideEvidence;
+  // A wildfire case: its per-pass series, lens history and layers for the More information panel (#21).
+  wildfire?: WildfireEvidence;
 };
 
 export type Lens = { id: LensId; chip: string; icon: IconId; compares: string };
@@ -372,6 +378,15 @@ export const CASES: Case[] = [
       },
       { label: "nova-frontier-backend · cases relay", href: BACKEND },
     ],
+    // #21: the model's own grid (64 × 64 cells at 10 m) and its HH layers, so the globe drapes them.
+    chipKm: 0.64,
+    chipGridM: BUG_FIRE_EVIDENCE.postingM,
+    crops: {
+      base: `${BUG_FIRE_EVIDENCE.folder}/baseline-HH.png`,
+      change: `${BUG_FIRE_EVIDENCE.folder}/change-HH.png`,
+    },
+    timeline: bugFireTimeline,
+    wildfire: BUG_FIRE_EVIDENCE,
   },
   {
     id: "para-event-02",
