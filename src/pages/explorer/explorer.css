@@ -2318,6 +2318,7 @@
 
 .x-tl__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
 }
@@ -2392,6 +2393,7 @@
   font-size: 9.5px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  touch-action: pan-y;
 }
 
 .x-tl__lane {
@@ -2669,10 +2671,6 @@
 }
 
 /* v9 sequence player (SPECS-flow-v9 §3): prev · play · next, speed and loop. */
-.x-tl__head {
-  flex-wrap: wrap;
-}
-
 .x-tl__controls {
   display: flex;
   align-items: center;
@@ -2754,10 +2752,6 @@
   transform: translateX(-50%);
   white-space: nowrap;
   color: var(--faint);
-}
-
-.x-tl__track {
-  touch-action: pan-y;
 }
 
 /* Ground motion: one bar per pass pair, stacked, the chosen one in gold. */
