@@ -244,18 +244,6 @@ export const OTHER_RADARS: OtherRadar[] = [
   },
 ];
 
-// A sine path for a wavelength, scaled so the longer L wave visibly stretches against C.
-export const wavePath = (cm: number): string => {
-  const period = cm * 6;
-  const points: string[] = [];
-  for (let x = 0; x <= 300; x += 3) {
-    points.push(`${x},${(20 + 14 * Math.sin((x / period) * Math.PI * 2)).toFixed(1)}`);
-  }
-  return `M${points.join(" L")}`;
-};
-
-export const BAND_WAVE_CM: Record<OtherRadar["band"], number> = { L: 23, C: 5.6 };
-
 // Every outbound link on the page, for tests and checks.
 export const allLearnLinks = (): string[] => [
   ...LEARN_STEPS.flatMap((step) =>

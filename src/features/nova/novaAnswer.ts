@@ -43,12 +43,15 @@ const AROUND = /surround|neighbo|around|nearby/;
 const FIRE = /fire|firms|burn|thermal/;
 const MEANING = /mean|result|verdict|explain|summar|what happened|tell me|answer|start/;
 
-const citesOf = (sources: Source[]): Citation[] =>
+export const citesOf = (sources: Source[]): Citation[] =>
   sources.slice(0, 2).map((source, index) => ({
     n: String(index + 1),
     label: source.label.split("·")[0]?.trim() ?? source.label,
     href: source.href,
   }));
+
+// Impact questions never reach a model: the radar has no such figures, whoever answers.
+export const isImpactQuestion = (question: string): boolean => IMPACT.test(question.toLowerCase());
 
 export const NO_IMPACT =
   "I don't have impact figures. Radar measures how the ground's echo changed, not what happened to people or buildings. The official report is the place to check.";
