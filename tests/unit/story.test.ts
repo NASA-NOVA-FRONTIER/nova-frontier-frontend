@@ -3,12 +3,7 @@ import { describe, expect, it } from "vitest";
 import { caseSubject } from "@/features/case-panel/subject";
 import { CASES, findCase, type Case } from "@/features/cases/cases";
 import { stripLines, STRIP_BRAND } from "@/features/downloads/globeImage";
-import {
-  CSV_COLUMNS,
-  timelineCsv,
-  timelineJson,
-  timelineRows,
-} from "@/features/downloads/timelineExport";
+import { timelineJson, timelineRows } from "@/features/downloads/timelineExport";
 import { viewInsets } from "@/features/globe/framing";
 import { NO_IMPACT, novaAnswer, suggestionsFor } from "@/features/nova/novaAnswer";
 import { CHAPTERS, chapterCount, clampChapter, storyCase } from "@/features/story/chapters";
@@ -125,15 +120,6 @@ describe("timeline downloads", () => {
       cells_outside_range_pct: 11.2,
     });
     expect(rows[0]?.cells_outside_range_pct).toBeNull();
-  });
-
-  it("writes a CSV with a source comment, the header and one line per pass", () => {
-    const lines = timelineCsv(qadirabad).trim().split("\n");
-    expect(lines[0]).toMatch(/^# .*DEMO/);
-    expect(lines[1]).toBe(CSV_COLUMNS.join(","));
-    expect(lines[1]).toBe("case,lens,date,role,cells_outside_range_pct,measured,demo");
-    expect(lines[2]).toBe("qadirabad,flood_wetland,2026-06-20,baseline,,true,true");
-    expect(lines).toHaveLength(2 + (qadirabad.timeline?.passes.length ?? 0));
   });
 
   it("writes JSON with its source and the same rows", () => {

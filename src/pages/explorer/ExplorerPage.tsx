@@ -23,7 +23,8 @@ import {
 } from "@/features/cases/cases";
 import type { ChartMode } from "@/features/charts/chartTokens";
 import { captureGlobe, type GlobeStrip } from "@/features/downloads/globeImage";
-import { saveBlob, timelineCsv, timelineJson } from "@/features/downloads/timelineExport";
+import { caseCsv, exportName, explorationDataCsv } from "@/features/downloads/dataCsv";
+import { saveBlob, timelineJson } from "@/features/downloads/timelineExport";
 import type { Frame, LonLat } from "@/features/frames/frame.types";
 import { findFrameAt, loadFrames } from "@/features/frames/frames";
 import { areaFromParams, areaToParams, pointToParams } from "@/features/geo/areaLink";
@@ -52,7 +53,7 @@ import {
 import type { InsarChoice } from "@/features/insar/insarApi";
 import { InsarPairPicker } from "@/features/insar/InsarPairPicker";
 import { insarFromParams } from "@/features/insar/insarLink";
-import { explorationCsv, explorationJson } from "@/features/explore/exploreExport";
+import { explorationJson } from "@/features/explore/exploreExport";
 import {
   defaultView,
   dockRows,
@@ -972,23 +973,27 @@ export const ExplorerPage = () => {
     },
     {
       id: "csv",
-      label: exportsLive ? "Passes · CSV" : "Timeline data · CSV",
-      sub: exportsLive ? "One row per scene: date, role, outcome" : "Same rows, for spreadsheets",
-      disabledWhy: timelineWhy,
+      label: "Data · CSV",
+      sub: "One row per pass, with its sources and limits, for spreadsheets",
+      disabledWhy: exportsLive
+        ? undefined
+        : live !== undefined
+          ? "Wait for the answer first"
+          : item === undefined
+            ? "Open a case first"
+            : item.timeline === undefined && item.landslide === undefined
+              ? "This case has no per-pass values yet"
+              : undefined,
       onPick: () => {
         setDownloadOpen(false);
-        if (exportsLive && exploredView !== undefined) {
+        const csv = (text: string, id: string) =>
           saveBlob(
-            new Blob([explorationCsv(exploredView)], { type: "text/csv" }),
-            `nisar-exploration-${exploredView.id}-passes.csv`,
+            new Blob([text], { type: "text/csv;charset=utf-8" }),
+            exportName(id, today, "csv"),
           );
-          return;
-        }
-        if (item === undefined) return;
-        saveBlob(
-          new Blob([timelineCsv(item)], { type: "text/csv" }),
-          `nisar-${item.id}-timeline.csv`,
-        );
+        if (exportsLive && exploredView !== undefined)
+          csv(explorationDataCsv(exploredView, today), `exploration-${exploredView.id}`);
+        else if (item !== undefined) csv(caseCsv(item, today), item.id);
       },
     },
     {
