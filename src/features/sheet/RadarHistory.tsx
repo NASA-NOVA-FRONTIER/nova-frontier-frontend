@@ -14,33 +14,43 @@ import {
 } from "recharts";
 
 import { CHANNEL } from "@/features/charts/chartTokens";
-import type { ExplorationResult } from "@/features/explore/exploreSchemas";
+import { pointHistory, type PointReturn } from "@/features/charts/pointHistory";
+import { SHEET_EVIDENCE_COPY } from "@/content/copyV8";
+import { RESULT } from "@/content/copyV9";
+import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
 const COLOURS = [CHANNEL.hh.color, CHANNEL.hv.color, "#bb9bce", "#75c9af"];
 const DAY = 86_400_000;
 const DISPLAY = [-30, 0] as const;
 
-type Props = {
-  observations: ExplorationResult["observations"];
+export type RadarHistoryProps = {
+  returns: readonly PointReturn[];
   date: string;
   onDate: (date: string) => void;
+  provenance: "online" | "offline";
+  source: string;
+  unavailableReason: string;
 };
 
 const shortDate = (timestamp: number) => new Date(timestamp).toISOString().slice(5, 10);
 
-export const RadarHistory = ({ observations, date, onDate }: Props) => {
-  const rows = observations
-    .map((row) => ({ date: row.date, time: Date.parse(row.date), power: row.point_db ?? {} }))
-    .filter((row) => Number.isFinite(row.time))
-    .sort((a, b) => a.time - b.time);
-  const channels = [
-    ...new Set(
-      rows.flatMap((row) =>
-        Object.keys(row.power).filter((key) => typeof row.power[key] === "number"),
-      ),
-    ),
-  ];
-  if (channels.length === 0) return null;
+export const RadarHistory = ({
+  returns,
+  date,
+  onDate,
+  provenance,
+  source,
+  unavailableReason,
+}: RadarHistoryProps) => {
+  const { rows, channels, hasBalance } = pointHistory(returns);
+  const label = RESULT[provenance];
+  const chipKind = provenance === "offline" ? "offline" : "real";
+  if (channels.length === 0)
+    return (
+      <p className="x-muted" data-testid="point-history-unavailable">
+        {unavailableReason}
+      </p>
+    );
   const pair = [
     ["HH", "HV"],
     ["VV", "VH"],
@@ -64,10 +74,13 @@ export const RadarHistory = ({ observations, date, onDate }: Props) => {
   const selected = Date.parse(date);
   return (
     <section className="x-sheet__section" aria-label="Point return history">
-      <h3 className="x-sheet__kicker">Radar return at the sampled point</h3>
+      <h3 className="x-sheet__kicker">{SHEET_EVIDENCE_COPY.pointHistory}</h3>
       <div className="x-radar__charts">
         <figure className="x-inset">
-          <figcaption>Acquisition timeline · gamma-zero dB</figcaption>
+          <figcaption>
+            Acquisition timeline · gamma-zero dB{" "}
+            <ProvenanceChip kind={chipKind} label={label} source={source} />
+          </figcaption>
           <div className="x-radar__plot">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
@@ -111,7 +124,8 @@ export const RadarHistory = ({ observations, date, onDate }: Props) => {
         {pair && (
           <figure className="x-inset">
             <figcaption>
-              Polarization trajectory · {co} and {cross}
+              Polarization trajectory · {co} and {cross}{" "}
+              <ProvenanceChip kind={chipKind} label={label} source={source} />
             </figcaption>
             <div className="x-radar__plot">
               <ResponsiveContainer width="100%" height="100%">
@@ -167,7 +181,10 @@ export const RadarHistory = ({ observations, date, onDate }: Props) => {
       </div>
       <div className="x-radar__table" role="region" aria-label="Date-by-channel heatmap">
         <table>
-          <caption>Date-by-channel heatmap · gamma-zero dB · fixed color range −30 to 0 dB</caption>
+          <caption>
+            Date-by-channel heatmap · gamma-zero dB · fixed color range −30 to 0 dB{" "}
+            <ProvenanceChip kind={chipKind} label={label} source={source} />
+          </caption>
           <thead>
             <tr>
               <th scope="col">Channel</th>
@@ -177,6 +194,7 @@ export const RadarHistory = ({ observations, date, onDate }: Props) => {
                     type="button"
                     aria-pressed={date === row.date}
                     onClick={() => onDate(row.date)}
+                    data-testid="point-history-date"
                   >
                     {row.date}
                   </button>
@@ -203,15 +221,32 @@ export const RadarHistory = ({ observations, date, onDate }: Props) => {
                           value == null ? undefined : `hsl(210 42% ${14 + 32 * fraction}%)`,
                       }}
                     >
-                      {value?.toFixed(2) ?? "—"}
+                      {value?.toFixed(2) ?? (
+                        <abbr title={SHEET_EVIDENCE_COPY.missingReturn}>—</abbr>
+                      )}
                     </td>
                   );
                 })}
               </tr>
             ))}
+            {hasBalance && (
+              <tr data-testid="point-history-balance">
+                <th scope="row">{SHEET_EVIDENCE_COPY.balance}</th>
+                {rows.map((row) => (
+                  <td key={row.date} data-selected={row.date === date}>
+                    {row.balance === null ? (
+                      <abbr title={SHEET_EVIDENCE_COPY.missingReturn}>—</abbr>
+                    ) : (
+                      `${row.balance.toFixed(2)} dB`
+                    )}
+                  </td>
+                ))}
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
+      {!hasBalance && <p className="x-muted x-small">{SHEET_EVIDENCE_COPY.balanceUnavailable}</p>}
       <p className="x-muted x-small">
         Each value represents the sampled radar cell. Acquisition support and the measured grid are
         listed with the imagery.

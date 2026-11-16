@@ -474,6 +474,19 @@ export const STEP_7 = {
   gpUnavailable: (n: number) => `Model fit (GP) unavailable: needs 6 passes, this spot has ${n}.`,
 } as const;
 
+export const SHEET_EVIDENCE_COPY = {
+  sources: "Sources",
+  sourcesUnavailable: "No source links were supplied for this result.",
+  limitations: "05 · What this can't tell you",
+  alternatives: "Other things that change radar like this:",
+  pointHistory: "Radar return at the sampled point",
+  pointHistoryUnavailable: "Point-return history is unavailable for this result.",
+  balance: "Polarization balance · HV − HH",
+  balanceUnavailable: "Polarization balance needs HH and HV from the same acquisition.",
+  missingReturn: "No measurement",
+  loading: "Loading More Information…",
+} as const;
+
 // 8 · Errors and limits (v8-data.js ERRORS). Decision 8 (docs/design/README.md): no daily number is
 // hardcoded, so the handoff's "12" sentences go and every count comes from GET /api/v1/limits.
 export const STEP_8 = {

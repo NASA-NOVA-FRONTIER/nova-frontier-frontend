@@ -600,12 +600,13 @@ test.describe("Explorer: live exploration", () => {
       };
       await globe.mockExplorations({
         first: succeededView({
+          cache: mobile ? "hit" : "miss",
           result: {
             ...result,
             observations: observations.map((row, index) => ({
               ...row,
               grid,
-              point_db: { HH: -12 - index, HV: -23 - index },
+              point_db: { HH: -12 - index, HV: index === 0 ? null : -23 - index },
               valid_pixel_count_by_pol: { HH: 96, HV: 96 },
             })),
             layers: [original, signature],
@@ -651,7 +652,14 @@ test.describe("Explorer: live exploration", () => {
       ).toBeVisible();
       await page.screenshot({ path: testInfo.outputPath("measured-sheet.png") });
       const heatmap = globe.sheet.getByRole("region", { name: "Date-by-channel heatmap" });
-      await heatmap.getByRole("button").first().click();
+      await expect(heatmap.getByText(mobile ? "OFFLINE" : "ONLINE")).toBeVisible();
+      const balance = heatmap.getByTestId("point-history-balance");
+      await expect(balance.getByRole("cell").first()).toHaveText("—");
+      await expect(balance.getByRole("cell").nth(1)).toHaveText("-11.00 dB");
+      const firstDate = heatmap.getByTestId("point-history-date").first();
+      await firstDate.focus();
+      await firstDate.press("Enter");
+      await expect(firstDate).toHaveAttribute("aria-pressed", "true");
       await expect(globe.sheet.getByRole("slider", { name: "Acquisition date" })).toHaveAttribute(
         "aria-valuetext",
         observations[0]?.date ?? "",
