@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { prefersReducedMotion } from "@/lib/motion";
+import { createHoverIntent, type HoverIntent } from "@/features/satellite/hoverIntent";
 import { createFpsMeter, createRenderLoop } from "@/features/satellite/renderLoop";
 import {
   AUTOROTATE_STEP,
@@ -22,6 +23,7 @@ import {
   orbitByDrag,
   orbitByKey,
   satellitePose,
+  type StagePose,
   tipPosition,
   toScreen,
   trackProgress,
@@ -52,6 +54,9 @@ export type NisarSatelliteProps = {
   caption?: string;
   className?: string;
   onProgress?: (progress: number) => void;
+  /** Page-driven pose for each scroll progress (the Method teardown); replaces the built-in
+   * deploy/beam/zoom mapping and adds explode and focus. Omitted, the model behaves as before. */
+  stage?: (progress: number, reduced: boolean) => StagePose;
   onPart?: (id: SatellitePartId | null) => void;
   /** Average fps over the first ~2 s of running frames, once (never under reduced motion). */
   onFps?: (fps: number) => void;
@@ -101,6 +106,16 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
   const [pinned, setPinned] = useState<SatellitePartId | null>(null);
   const tipFor = useRef<SatellitePartId | null>(null);
   const pinnedRef = useRef<SatellitePartId | null>(null);
+  // The pointer's hotspot, built on first use. Closing waits a moment, and only clears the card it
+  // opened (a focused or pinned hotspot may own it by then).
+  const intentRef = useRef<HoverIntent<SatellitePartId> | undefined>(undefined);
+  const hoverIntent = (): HoverIntent<SatellitePartId> => {
+    intentRef.current ??= createHoverIntent<SatellitePartId>((id, previous) => {
+      if (id !== null) setTip(id);
+      else if (tipFor.current === previous) setTip(pinnedRef.current);
+    });
+    return intentRef.current;
+  };
 
   // The loop reads props from a ref, so a new deploy or beam value never rebuilds the scene.
   useLayoutEffect(() => {
@@ -116,6 +131,8 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
     pinnedRef.current = pinned;
     invalidate.current();
   }, [tip, pinned]);
+
+  useEffect(() => () => intentRef.current?.cancel(), []);
 
   // Loading and ready are one phase, so becoming ready doesn't rebuild the scene.
   const phase = status === "loading" || status === "ready" ? "live" : status;
@@ -148,6 +165,7 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
         scene = createScene(canvas, {
           earth: latest.current.earth,
           onAssetLoad: () => invalidate.current(),
+          teardown: latest.current.stage !== undefined,
         });
       } catch {
         setStatus("fallback");
@@ -179,6 +197,7 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
           scrollDriven,
           progress,
           reduced,
+          stage: p.stage?.(progress, reduced),
         });
         const o = orbit.current;
         if (p.autorotate && !o.touched && !reduced) {
@@ -192,7 +211,11 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
           offsetX: p.offsetX ?? 0,
           time: reduced ? undefined : (now - t0) / 1000,
         });
-        placeHotspots(scene, (p.hotspots ?? false) && pose.deploy > HOTSPOT_MIN_DEPLOY);
+        // Taken apart, the step text names each piece, so the rings wait for the assembled model.
+        placeHotspots(
+          scene,
+          (p.hotspots ?? false) && pose.deploy > HOTSPOT_MIN_DEPLOY && pose.explode === 0,
+        );
         element.dataset.frames = String(loop.frames());
         if (!reduced && p.onFps !== undefined) {
           const avg = fps.tick(now);
@@ -243,8 +266,11 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
       );
       visibility.observe(element);
       // Without motion nothing scrubs, but the page can still follow the scroll through onProgress.
+      // A staged model changes its pose with the scroll, so it also redraws (one frame, no loop).
       const onScroll = () => {
-        if (reduced) readProgress();
+        if (!reduced) return;
+        readProgress();
+        if (latest.current.stage !== undefined) loop.invalidate();
       };
       window.addEventListener("scroll", onScroll, { passive: true });
       const onContextLost = (event: Event) => {
@@ -368,8 +394,13 @@ export const NisarSatellite = (props: NisarSatelliteProps) => {
                   aria-pressed={pinned === id}
                   tabIndex={-1}
                   data-testid={`nisar-hotspot-${id}`}
-                  onPointerEnter={() => setTip(id)}
-                  onPointerLeave={() => leave(id)}
+                  // Touch has no hover: a tap toggles the card through onClick.
+                  onPointerEnter={(event) => {
+                    if (event.pointerType !== "touch") hoverIntent().enter(id);
+                  }}
+                  onPointerLeave={(event) => {
+                    if (event.pointerType !== "touch") hoverIntent().leave(id);
+                  }}
                   onFocus={() => setTip(id)}
                   onBlur={() => leave(id)}
                   onClick={() => togglePin(id)}

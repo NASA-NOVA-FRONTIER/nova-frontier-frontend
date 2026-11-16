@@ -564,6 +564,12 @@
   text-wrap: pretty;
 }
 
+/* Claude's answer keeps its own line breaks. */
+.x-nova__ai-text {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
 .x-nova__nodata {
   gap: 6px;
   padding: 10px 12px;

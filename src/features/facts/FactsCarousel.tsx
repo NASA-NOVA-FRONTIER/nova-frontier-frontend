@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 
 import { STEP_3 } from "@/content/copyV8";
-import { getFacts } from "@/content/facts";
+import { PROCESSING } from "@/content/copyV9";
+import { getFacts, type Fact } from "@/content/facts";
+import { FACTS_PER_RUN } from "@/features/explore/exploreWait";
 
 // SPECS-v8 §3: "auto-advance every 7 s".
 const ROTATE_MS = 7000;
 
-type FactsCarouselProps = { reduceMotion: boolean };
+// `facts`: the ones drawn for this wait (#25); the whole pool when none are given.
+type FactsCarouselProps = { reduceMotion: boolean; facts?: Fact[] };
 
 // While the radar works: one sourced fact at a time. It rotates until the reader hovers or focuses
 // anywhere inside it, or presses Pause; under reduced motion it never moves on its own.
-export const FactsCarousel = ({ reduceMotion }: FactsCarouselProps) => {
-  const facts = getFacts();
+export const FactsCarousel = ({ reduceMotion, facts = getFacts() }: FactsCarouselProps) => {
   const [index, setIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -65,7 +67,9 @@ export const FactsCarousel = ({ reduceMotion }: FactsCarouselProps) => {
     >
       <div className="x-facts-carousel__head">
         <p className="x-kicker x-facts-carousel__kicker" data-testid="fact-count">
-          {STEP_3.didYouKnow(index + 1, facts.length)}
+          {facts.length === FACTS_PER_RUN
+            ? PROCESSING.factCounter(index + 1)
+            : STEP_3.didYouKnow(index + 1, facts.length)}
         </p>
         <span className="x-facts-carousel__nav">
           <button type="button" onClick={() => step(-1)} aria-label="Previous fact">
@@ -95,6 +99,11 @@ export const FactsCarousel = ({ reduceMotion }: FactsCarouselProps) => {
             data-testid="fact-image"
           />
         )}
+        {fact.image?.credit !== undefined && (
+          <p className="x-facts-carousel__credit" data-testid="fact-credit">
+            {fact.image.credit}
+          </p>
+        )}
         {fact.title !== undefined && (
           <p className="x-facts-carousel__title" data-testid="fact-title">
             {fact.title}
@@ -106,7 +115,7 @@ export const FactsCarousel = ({ reduceMotion }: FactsCarouselProps) => {
       </div>
       <p className="x-facts-carousel__source">
         <a href={fact.source.href} target="_blank" rel="noopener" data-testid="fact-source">
-          {fact.source.label}
+          {PROCESSING.factSource(fact.source.label)}
         </a>
         <span className="x-facts-carousel__dots" aria-hidden="true">
           {facts.map((item, at) => (

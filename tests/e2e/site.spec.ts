@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "./fixtures";
 
 test.describe("Landing and about pages", () => {
   test("the landing compare slider moves with the arrow keys", async ({ page }) => {
@@ -16,7 +16,14 @@ test.describe("Landing and about pages", () => {
 
   test("the landing cases carousel opens a case in the explorer", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("[data-testid^=landing-case-]")).toHaveCount(5);
+    await expect(page.locator("[data-testid^=landing-case-]")).toHaveCount(6);
+    await expect(page.getByTestId("landing-case-niscemi-aftermath")).toContainText(
+      "DID THE SLOPE KEEP ITS ECHO?",
+    );
+    await expect(page.getByTestId("landing-case-niscemi-aftermath")).toHaveAttribute(
+      "href",
+      "/explore?case=niscemi-aftermath",
+    );
     await expect(page.getByTestId("landing-chip-choco")).toHaveText("COHERENCE ONLY · 0.247");
     await expect(page.getByTestId("landing-chip-qadirabad")).toHaveText(
       "MEASURED CASE · ESRI WORLD IMAGERY",
@@ -168,5 +175,159 @@ test.describe("Landing and about pages", () => {
         photo.evaluate((img) => (img instanceof HTMLImageElement ? img.naturalWidth : 0));
       await expect.poll(width).toBe(400);
     }
+  });
+
+  // #29: the footer holds on a desktop and on a phone, with its image credits.
+  for (const screen of [
+    { width: 1440, height: 900 },
+    { width: 390, height: 844 },
+  ]) {
+    test(`the footer fits a ${screen.width} px screen on every site page`, async ({ page }) => {
+      await page.setViewportSize(screen);
+      for (const path of ["/", "/cases", "/method", "/learn", "/about"]) {
+        await page.goto(path);
+        const footer = page.getByTestId("site-footer");
+        await footer.scrollIntoViewIfNeeded();
+        await expect(footer).toContainText("Earth: NASA Blue Marble");
+        expect((await footer.boundingBox())?.width, path).toBe(screen.width);
+        const pageWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+        expect(pageWidth, path).toBe(screen.width);
+      }
+    });
+  }
+});
+
+// The mission model under reduced motion: deployed and still, so a hotspot stays where it was drawn.
+const openMissionModel = async (page: Page) => {
+  await page.goto("/");
+  const figure = page.getByTestId("mission-figure");
+  await figure.scrollIntoViewIfNeeded();
+  const model = figure.getByTestId("nisar-satellite");
+  await expect(model).toHaveAttribute("data-status", "ready");
+  await expect(model).toHaveAttribute("data-running", "false");
+  const boom = model.getByTestId("nisar-hotspot-boom");
+  await expect(boom).toHaveCSS("opacity", "1");
+  return { boom, tip: model.getByTestId("nisar-satellite-tip") };
+};
+
+const SHOWN = /s-sat__tip--shown/;
+
+test.describe("Landing satellite hotspots", () => {
+  test("hovering the boom keeps its card open while the pointer moves toward it", async ({
+    page,
+  }) => {
+    const { boom, tip } = await openMissionModel(page);
+    const box = await boom.boundingBox();
+    if (box === null) throw new Error("boom hotspot has no box");
+    // A 44 px target around the same 26 px ring.
+    expect(box.width).toBeCloseTo(44, 0);
+    await expect(boom).toHaveCSS("width", "44px");
+    expect(
+      await boom.evaluate((el) => getComputedStyle(el, "::before").getPropertyValue("width")),
+    ).toBe("26px");
+
+    const cx = box.x + box.width / 2;
+    const cy = box.y + box.height / 2;
+    await page.mouse.move(cx, cy);
+    await expect(tip).toHaveClass(SHOWN);
+    await expect(tip).toContainText("9 m boom");
+
+    // Count every time the card closes from here on: it must not blink while the pointer stays near.
+    await tip.evaluate((el) => {
+      const w = window as unknown as { tipClosed: number };
+      w.tipClosed = 0;
+      new MutationObserver(() => {
+        if (!el.classList.contains("s-sat__tip--shown")) w.tipClosed += 1;
+      }).observe(el, { attributes: true, attributeFilter: ["class"] });
+    });
+    const tipBox = await tip.boundingBox();
+    const toward = tipBox !== null && tipBox.x > cx ? 1 : -1;
+    await page.mouse.move(cx + toward * 10, cy, { steps: 10 });
+    await page.mouse.move(cx + toward * 20, cy, { steps: 10 });
+    await page.waitForTimeout(300);
+    await expect(tip).toHaveClass(SHOWN);
+    expect(await page.evaluate(() => (window as unknown as { tipClosed: number }).tipClosed)).toBe(
+      0,
+    );
+    // Hovering doesn't move the target.
+    expect(await boom.boundingBox()).toEqual(box);
+
+    // Clearly away from every dot: the card closes.
+    await page.mouse.move(cx - 150, cy - 150, { steps: 5 });
+    await expect(tip).not.toHaveClass(SHOWN);
+  });
+
+  test("keyboard focus on a hotspot shows its card and blur hides it", async ({ page }) => {
+    const { boom, tip } = await openMissionModel(page);
+    await boom.focus();
+    await expect(tip).toHaveClass(SHOWN);
+    await expect(tip).toContainText("9 m boom");
+    await boom.blur();
+    await expect(tip).not.toHaveClass(SHOWN);
+  });
+
+  test.describe("on a touch screen", () => {
+    test.use({ hasTouch: true });
+
+    test("a tap toggles the card", async ({ page }) => {
+      const { boom, tip } = await openMissionModel(page);
+      await boom.tap();
+      await expect(tip).toHaveClass(SHOWN);
+      await expect(boom).toHaveAttribute("aria-pressed", "true");
+      await boom.tap();
+      await expect(tip).not.toHaveClass(SHOWN);
+      await expect(boom).toHaveAttribute("aria-pressed", "false");
+    });
+  });
+});
+
+// Issue #61: at 390 px the page links crowded the explorer pill against the right edge.
+test.describe("Site nav on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("the explorer pill sits fully on screen on every content page", async ({ page }) => {
+    for (const path of ["/", "/cases", "/method", "/learn", "/about"]) {
+      await page.goto(path);
+      const pill = page.getByTestId("nav-explore");
+      await expect(pill).toBeInViewport({ ratio: 1 });
+      await expect(pill).toHaveAccessibleName("Explore");
+      // Inside the 16 px side gutter, not pressed against the edge where wider fonts clip it.
+      const edge = await pill.evaluate((el) => el.getBoundingClientRect().right);
+      expect(edge).toBeLessThanOrEqual(390 - 16);
+      await expect(page.getByTestId("nav-menu")).toBeInViewport({ ratio: 1 });
+      // Closed, the folded links are out of sight and out of the tab order.
+      await expect(page.getByTestId("nav-links")).toBeHidden();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        390,
+      );
+    }
+  });
+
+  test("the menu opens and closes by keyboard and gives focus back", async ({ page }) => {
+    await page.goto("/learn");
+    const menu = page.getByTestId("nav-menu");
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+
+    await menu.focus();
+    await page.keyboard.press("Enter");
+    await expect(menu).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByTestId("nav-links")).toBeVisible();
+    await expect(page.getByTestId("nav-learn")).toHaveAttribute("aria-current", "page");
+
+    // Tab order follows the screen: Menu, the four links, then the explorer pill.
+    for (const id of ["nav-cases", "nav-method", "nav-learn", "nav-about", "nav-explore"]) {
+      await page.keyboard.press("Tab");
+      await expect(page.getByTestId(id)).toBeFocused();
+    }
+
+    await page.keyboard.press("Escape");
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+    await expect(page.getByTestId("nav-links")).toBeHidden();
+    await expect(menu).toBeFocused();
+
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/cases$/);
   });
 });

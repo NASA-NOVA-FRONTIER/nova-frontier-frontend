@@ -50,8 +50,17 @@ describe("demo cases against the gateway's precomputed cases", () => {
   });
 
   it("name the gateway's first assessment pass as the target", () => {
-    for (const item of CASES.filter(({ target }) => target !== undefined))
+    for (const item of CASES.filter(
+      ({ target, lens }) => target !== undefined && lens !== "observed_dynamics",
+    ))
       expect(item.target, item.id).toBe(listed(item.id).assessmentDates[0]);
+  });
+
+  // #24: an observed_dynamics case has no lens report; its series reads every value against the
+  // last pass (series.target_date, the change layer and both readouts), so that is its target.
+  it("name the last assessment pass as the target of a descriptive (landslide) case", () => {
+    for (const item of CASES.filter(({ lens }) => lens === "observed_dynamics"))
+      expect(item.target, item.id).toBe(listed(item.id).assessmentDates.at(-1));
   });
 
   it("keep Chocó's median coherence", () => {

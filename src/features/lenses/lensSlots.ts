@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { LENS_COPY, type V8LensId } from "@/content/copyV8";
-import type { LensId } from "@/features/cases/cases";
+import type { CaseLensId } from "@/features/cases/cases";
 import type { Subject } from "@/features/case-panel/subject";
 import type { ExplorationView, LensEvaluation } from "@/features/explore/exploreSchemas";
 import type { LiveLayer } from "@/features/explore/exploreLayers";
@@ -13,7 +13,7 @@ import type { LiveLayer } from "@/features/explore/exploreLayers";
  */
 export type CardLens = V8LensId;
 
-export const isCardLens = (lens: LensId): lens is CardLens => lens in LENS_COPY;
+export const isCardLens = (lens: CaseLensId): lens is CardLens => lens in LENS_COPY;
 
 export type LensSlotContext = {
   // The whole answer (dates, scenes, layers).

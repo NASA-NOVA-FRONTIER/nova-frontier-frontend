@@ -90,3 +90,63 @@ export const apiRequest = async <T>(
     throw new ApiError(response.status, BAD_RESPONSE, "The server answered in an unexpected shape");
   return parsed.data;
 };
+
+export type StreamEvent = { event: string; data: unknown };
+
+// Server-sent events: blocks split by a blank line, each with `event:` and `data:` lines. The text
+// after the last blank line may be an unfinished block, so it is handed back to wait for more.
+export const parseEvents = (buffer: string): { events: StreamEvent[]; rest: string } => {
+  const blocks = buffer.replace(/\r\n/g, "\n").split("\n\n");
+  const rest = blocks.pop() ?? "";
+  const events = blocks.flatMap((block) => {
+    let event = "message";
+    const data: string[] = [];
+    for (const line of block.split("\n")) {
+      if (line.startsWith("event:")) event = line.slice(6).trim();
+      else if (line.startsWith("data:")) data.push(line.slice(5).trimStart());
+    }
+    if (data.length === 0) return [];
+    try {
+      return [{ event, data: JSON.parse(data.join("\n")) as unknown }];
+    } catch {
+      return [{ event, data: undefined }];
+    }
+  });
+  return { events, rest };
+};
+
+// A POST answered as a stream of server-sent events (Nova's answers). Failures before the stream
+// opens arrive as problem+json, so they become an ApiError like every other call.
+export const apiStream = async (
+  path: string,
+  body: unknown,
+  onEvent: (event: StreamEvent) => void,
+  { signal }: { signal?: AbortSignal } = {},
+): Promise<void> => {
+  let response: Response;
+  try {
+    response = await fetch(apiUrl(path), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
+      body: JSON.stringify(body),
+      ...(signal && { signal }),
+    });
+  } catch (error) {
+    if (signal?.aborted) throw error;
+    throw new ApiError(0, NETWORK_ERROR, "The server could not be reached");
+  }
+  if (!response.ok) throw await failure(response);
+  const reader = response.body?.getReader();
+  if (!response.headers.get("content-type")?.startsWith("text/event-stream") || !reader)
+    throw new ApiError(response.status, BAD_RESPONSE, "The server answered in an unexpected shape");
+  const decoder = new TextDecoder();
+  let buffer = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    buffer += decoder.decode(value, { stream: !done });
+    const parsed = parseEvents(done ? `${buffer}\n\n` : buffer);
+    buffer = parsed.rest;
+    parsed.events.forEach(onEvent);
+    if (done) return;
+  }
+};

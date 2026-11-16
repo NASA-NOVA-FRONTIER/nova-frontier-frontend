@@ -19,12 +19,40 @@ export const trackProgress = (
   viewportHeight: number,
 ): number => clamp(-rect.top / Math.max(1, rect.height - viewportHeight));
 
+/** The five pieces the Method teardown pulls apart (the L- and S-band feeds share one structure). */
+export const TEARDOWN_PARTS = ["reflector", "boom", "radars", "bus", "solar"] as const;
+export type TeardownPart = (typeof TEARDOWN_PARTS)[number];
+
+/** How far each piece travels (model units, about metres) when the model is fully exploded. The
+ * reflector rides on the boom tip, so its vector adds to the boom's. */
+export const EXPLODE_VECTORS: Record<TeardownPart, Vec3> = {
+  reflector: [1.6, 1.8, 0],
+  boom: [1.4, 1.8, 0],
+  radars: [0, 0.6, 0],
+  bus: [0, -1.8, 0],
+  solar: [-2.6, -0.8, 0],
+};
+
+/** A page-driven pose (the Method teardown): replaces the built-in scroll mapping when given. */
+export type StagePose = {
+  deploy: number;
+  beam: number;
+  zoom: number;
+  /** 0 assembled → 1 every piece moved by its explode vector. */
+  explode: number;
+  /** Opacity weight per piece (1 = as built); pieces out of focus fade. */
+  parts: Record<TeardownPart, number>;
+  /** The camera leans from one piece to the next (null = the model's centre). */
+  look: { from: TeardownPart | null; to: TeardownPart | null; t: number };
+};
+
 export type PoseInputs = {
   deploy: number;
   beam: number;
   scrollDriven: boolean;
   progress: number;
   reduced: boolean;
+  stage?: StagePose | undefined;
 };
 
 export type SatellitePose = {
@@ -37,7 +65,13 @@ export type SatellitePose = {
   dishScale: number;
   /** Reflector travel from stowed (0) to its place at the boom tip (1). */
   reflectorT: number;
+  explode: number;
+  parts: Record<TeardownPart, number>;
+  look: StagePose["look"];
 };
+
+const WHOLE: Record<TeardownPart, number> = { reflector: 1, boom: 1, radars: 1, bus: 1, solar: 1 };
+const NO_LOOK: StagePose["look"] = { from: null, to: null, t: 0 };
 
 // First-segment angle that folds the boom flat against the bus; the others fold back on each other.
 const FIRST_FOLD = 0.6435;
@@ -50,11 +84,17 @@ export const satellitePose = ({
   scrollDriven,
   progress,
   reduced,
+  stage,
 }: PoseInputs): SatellitePose => {
   let dep = reduced ? 1 : clamp(deploy);
   let bm = clamp(beam);
   let zoom = 1;
-  if (scrollDriven && !reduced) {
+  // A stage pose already respects reduced motion (it cuts between steps), so it wins as given.
+  if (stage !== undefined) {
+    dep = clamp(stage.deploy);
+    bm = clamp(stage.beam);
+    zoom = stage.zoom;
+  } else if (scrollDriven && !reduced) {
     dep = smoothstep(0.05, 0.45, progress);
     bm = smoothstep(0.55, 0.8, progress);
     zoom = 0.62 + 0.38 * smoothstep(0.05, 0.5, progress);
@@ -67,6 +107,9 @@ export const satellitePose = ({
     boomAngles: [fold * FIRST_FOLD, fold * SEGMENT_FOLD, -fold * SEGMENT_FOLD, fold * SEGMENT_FOLD],
     dishScale: 0.08 + 0.92 * smoothstep(0.62, 1, dep),
     reflectorT: smoothstep(0.5, 0.8, dep),
+    explode: clamp(stage?.explode ?? 0),
+    parts: stage?.parts ?? WHOLE,
+    look: stage?.look ?? NO_LOOK,
   };
 };
 

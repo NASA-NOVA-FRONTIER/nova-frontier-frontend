@@ -8,11 +8,13 @@ import { ContrastBars } from "@/features/charts/ContrastBars";
 import { gridMetres, GRID_CELLS } from "@/features/live/liveQuestion";
 import { NovaGlyph } from "@/features/nova/NovaGlyph";
 import { CHAPTERS, chapterCount, LAST_CHAPTER, type Chapter } from "@/features/story/chapters";
+import { STORY_NEWS } from "@/features/story/storyNews";
 import { formatDay } from "@/features/timeline/timelineLayout";
 
 const CHANGE_RAMP = "linear-gradient(90deg,#2f6db5,#f2f0eb,#c2473a)";
 const PHOTO_SLOTS = 3;
 const SLOT_SOURCE = "Left as a slot until a credited, linked item is copied from its source";
+const NEWS_SOURCE = "Each headline links to the article it comes from";
 
 type StoryModeProps = {
   item: Case;
@@ -195,13 +197,13 @@ const WhatHappened = ({ item }: { item: Case }) => {
           { k: "River", v: "Chenab, Punjab, Pakistan" },
           { k: "Bulletins", v: "PMD / FFD · 22–24 Jul 2026" },
           { k: "Surveyed flood map", v: "None supplied" },
-          { k: "Areas affected", v: "[from the PMD/FFD bulletin]", todo: true },
+          { k: "Areas affected", v: "[official PDMA/NDMA figure]", todo: true },
           { k: "People affected", v: "[official figure only]", todo: true },
         ]}
       />
       <p className="x-story__note">
-        Facts come from the PMD/FFD bulletin. Bracketed items stay empty until we copy them from the
-        source.{" "}
+        River facts come from the PMD/FFD bulletin, which reports flows, not impacts. Bracketed
+        items stay empty until PDMA or NDMA publish an official figure.{" "}
         {bulletin !== undefined && (
           <a href={bulletin.href} target="_blank" rel="noopener">
             Open the bulletin
@@ -286,7 +288,9 @@ const Witness = ({ item }: { item: Case }) => {
       {item.crops !== undefined && (
         <div className="x-story__tiles">
           <Tile src={item.crops.change} label={`NISAR change · ${targetDay(item)}`} />
-          <Tile src={item.crops.optical} label={opticalLabel} />
+          {item.crops.optical !== undefined && (
+            <Tile src={item.crops.optical} label={opticalLabel} />
+          )}
         </div>
       )}
       {group !== undefined && (
@@ -302,7 +306,8 @@ const Witness = ({ item }: { item: Case }) => {
   );
 };
 
-// Chapter 5 is all slots until credited, linked photos and articles are added (DATA_PROVENANCE).
+// Chapter 5: the photos stay slots (no freely licensed photo of this flood exists); the news links
+// to real articles (DATA_PROVENANCE).
 const OnTheGround = () => {
   const [photo, setPhoto] = useState(0);
   const step = (by: number) => setPhoto((value) => (value + by + PHOTO_SLOTS) % PHOTO_SLOTS);
@@ -337,20 +342,22 @@ const OnTheGround = () => {
       <div className="x-story__news">
         <p className="x-kicker x-kicker--split">
           <span>In the news</span>
-          <Prov kind="todo" source={SLOT_SOURCE} />
+          <Prov kind="real" source={NEWS_SOURCE} />
         </p>
         <ul>
-          {[1, 2, 3].map((n) => (
-            <li key={n} data-testid="story-news-slot">
-              <span className="x-story__slot">[Headline]</span>
-              <span className="x-story__meta">[Outlet · date]</span>
+          {STORY_NEWS.map((news) => (
+            <li key={news.href} data-testid="story-news">
+              <a href={news.href} target="_blank" rel="noopener noreferrer">
+                {news.headline}
+              </a>
+              <span className="x-story__meta">
+                {news.outlet} · {news.date}
+              </span>
             </li>
           ))}
         </ul>
       </div>
-      <p className="x-story__note">
-        Photos and articles are slots: add only credited, linked material.
-      </p>
+      <p className="x-story__note">Photos are slots: add only credited, licensed material.</p>
     </>
   );
 };

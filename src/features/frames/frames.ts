@@ -63,3 +63,8 @@ export const findFrameAt = (
       isInBBox(point, frame.bbox) &&
       frame.rings.some((ring) => isInRing(point, ring)),
   );
+
+// The frame a click or hover lands on. Ascending first, as the mission plans most science passes;
+// descending fills the gaps.
+export const frameUnder = (frames: Frame[], point: LonLat): Frame | undefined =>
+  findFrameAt(frames, point, "A") ?? findFrameAt(frames, point, "D");

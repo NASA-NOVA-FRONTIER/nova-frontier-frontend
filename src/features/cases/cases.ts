@@ -1,20 +1,19 @@
+import { NISCEMI } from "@/features/cases/niscemi";
 import type { LonLat } from "@/features/frames/frame.types";
+import type { LandslideEvidence } from "@/features/landslide/landslideEvidence";
 
 /*
  * Measured cases from the science backend (github.com/NASA-NOVA-FRONTIER/nova-frontier-model). Every number here
  * is copied from its reports; DATA_PROVENANCE in design_handoff_v7 says where each one comes from.
- * Pass dates on the timeline are DEMO (12-day spacing) until the backend serves the real ones.
+ * Pass dates on the timeline are DEMO (12-day spacing) until the backend serves the real ones,
+ * except where a case marks them `realDates` (Niscemi, copied from its series).
  */
 
-// observed_dynamics is the gateway's descriptive radar view (Niscemi); the live service has no such
-// lens, so it only ever belongs to a demo case.
 export type LensId =
-  | "flood_wetland"
-  | "vegetation_disturbance"
-  | "wildfire"
-  | "agriculture"
-  | "insar"
-  | "observed_dynamics";
+  "flood_wetland" | "vegetation_disturbance" | "wildfire" | "agriculture" | "insar";
+// A measured case can also be read without a lens of its own: the model's descriptive
+// observed_dynamics (Niscemi). It is never a live lens, so it stays out of LENSES and LensId.
+export type CaseLensId = LensId | "observed_dynamics";
 export type HazardId =
   "earthquake" | "wildfire" | "deforestation" | "flood" | "landslide" | "agriculture";
 export type IconId = HazardId;
@@ -48,13 +47,16 @@ export type TimelineData = {
   onset?: { date: string; label: string };
   optical: Array<{ date: string; label: string }>;
   opticalNote: string;
+  // The dates and "% outside range" come from the case's own series, not the 12-day demo.
+  realDates?: boolean;
 };
 
-export type Crops = { base: string; change: string; optical: string; signature: string };
+// Optical and signature exist only where the case had an optical stage (the flood cases).
+export type Crops = { base: string; change: string; optical?: string; signature?: string };
 
 export type Case = {
   id: string;
-  lens: LensId;
+  lens: CaseLensId;
   hazard: HazardId;
   name: string;
   place: string;
@@ -89,6 +91,8 @@ export type Case = {
   // Coherence only (Chocó): a measured median but no case layer, timeline or report.
   coherenceOnly?: boolean;
   tour?: boolean;
+  // A landslide case: its per-pass series and layers for the More information panel (#24).
+  landslide?: LandslideEvidence;
 };
 
 export type Lens = { id: LensId; chip: string; icon: IconId; compares: string };
@@ -124,15 +128,18 @@ export const LENSES: Lens[] = [
     icon: "earthquake",
     compares: "Where the echo kept or lost coherence between two passes",
   },
-  {
-    id: "observed_dynamics",
-    chip: "Do the passes bracket the event?",
-    icon: "landslide",
-    compares: "HH and HV change against the earlier passes, as a descriptive view",
-  },
 ];
 
-export const findLens = (id: LensId): Lens | undefined => LENSES.find((lens) => lens.id === id);
+// Docs/design/v8 PLAN-content-pages-v8 §0: "the radar checks whether passes bracket the event and
+// whether the slope kept its echo".
+export const OBSERVED_DYNAMICS = {
+  chip: "Did the slope keep its echo?",
+  icon: "landslide",
+  compares: "Every pass against the median of the first four, all after the event",
+} as const satisfies Omit<Lens, "id">;
+
+export const findLens = (id: CaseLensId): Omit<Lens, "id"> | undefined =>
+  id === "observed_dynamics" ? OBSERVED_DYNAMICS : LENSES.find((lens) => lens.id === id);
 
 // OPERA's optical classes (Okabe–Ito), so the colours match the backend legend.
 export const OPTICAL = {
@@ -289,7 +296,11 @@ export const CASES: Case[] = [
         v: "0 cells",
         why: "Common phase and correction-input support are zero, so no phase is shown.",
       },
-      { k: "SGC", v: "[Report]", why: "Servicio Geológico Colombiano report." },
+      {
+        k: "SGC",
+        v: "Update · 10 Aug 2026",
+        why: "Servicio Geológico Colombiano update on the San José del Palmar earthquake.",
+      },
     ],
     plainLimit:
       "Coherence 0.247 is low: the echo changed between the two passes, so its phase can't be read as ground motion.",
@@ -306,13 +317,16 @@ export const CASES: Case[] = [
     alternatives: [],
     empties: ["Displacement", "Magnitude", "Casualties"],
     sources: [
-      { label: "Servicio Geológico Colombiano", href: "https://www.sgc.gov.co" },
+      {
+        label: "Servicio Geológico Colombiano · San José del Palmar earthquake update",
+        href: "https://www2.sgc.gov.co/Noticias/Paginas/SGC-actualiza-la-informacion-sobre-el-sismo-ocurrido-en-San-Jose-del-Palmar-Choco.aspx",
+      },
       { label: "nova-frontier-model · event bundles", href: `${MODELING}/EVENT_BUNDLES.md` },
     ],
     coherenceOnly: true,
   },
-  // The three below come from the gateway's precomputed cases (/v2/cases, relayed by the backend at
-  // /api/v1/cases/<id>), the featured stops of the model's PHENOMENA_EXAMPLES.md. None has a
+  // The two below come from the gateway's precomputed cases (/v2/cases, relayed by the backend at
+  // /api/v1/cases/<id>), featured stops of the model's PHENOMENA_EXAMPLES.md. Neither has a
   // comparator, so there is no verdict and only the numbers the gateway returns are shown.
   {
     id: "bug-fire",
@@ -408,60 +422,8 @@ export const CASES: Case[] = [
       { label: "nova-frontier-backend · cases relay", href: BACKEND },
     ],
   },
-  {
-    id: "niscemi-aftermath",
-    lens: "observed_dynamics",
-    hazard: "landslide",
-    name: "Niscemi",
-    place: "Sicily, Italy",
-    region: "Landslide · aftermath",
-    focus: [14.38, 37.15],
-    when: "Aug 2026",
-    target: "2026-08-23",
-    verdict: "measured",
-    verdictLine:
-      "The radar read Niscemi on an 80 m grid (128 × 128 cells) on eight passes from 24 Jun to 22 Oct 2026, all months after the 25 Jan 2026 landslide.",
-    reason:
-      "The gateway reports a measured descriptive view: aftermath passes only and no comparator, so no verdict is given.",
-    stat: "8 passes",
-    statLine: "after the landslide, on an 80 m grid · no comparison score",
-    statSource:
-      "Gateway case niscemi-aftermath · baselineDates and assessmentDates, 128 × 128 grid at 80 m",
-    quality: [
-      {
-        k: "Status",
-        v: "Measured",
-        why: "measured from the gateway; scientific status diagnostic.",
-      },
-      {
-        k: "Passes",
-        v: "4 + 4",
-        why: "Baseline 24 Jun, 6 Jul, 18 Jul and 11 Aug; assessments 23 Aug, 4 Sep, 16 Sep and 22 Oct 2026.",
-      },
-      {
-        k: "Reference",
-        v: "Civil Protection",
-        why: "Landslide on 25 Jan 2026, before the first pass: aftermath only.",
-      },
-    ],
-    plainLimit:
-      "Available radar passes begin months after the January 25 landslide. The baseline and target are both aftermath observations.",
-    techLimit:
-      "Intensity is not displacement. DEM/visibility, geodetic or offset evidence is needed; the Niscemi example is aftermath-only.",
-    alternatives: [],
-    empties: ["Displacement", "Area moved", "Cause"],
-    sources: [
-      {
-        label: "Protezione Civile · Niscemi landslide",
-        href: "https://www.protezionecivile.gov.it/en/notizia/niscemi-landslide-national-service-efforts-continue/index.html",
-      },
-      {
-        label: "nova-frontier-model · phenomena examples",
-        href: `${MODELING}/PHENOMENA_EXAMPLES.md`,
-      },
-      { label: "nova-frontier-backend · cases relay", href: BACKEND },
-    ],
-  },
+  // Landslide (#24): the model's only landslide case, aftermath only.
+  NISCEMI,
 ];
 
 // PLAN-content-pages-v8 §0: name the actual state, never "Pending". The median is the case stat.

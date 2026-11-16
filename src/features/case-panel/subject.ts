@@ -1,8 +1,8 @@
 import type {
   Case,
   ContrastGroup,
+  CaseLensId,
   Crops,
-  LensId,
   Matched,
   QualityItem,
   Source,
@@ -10,6 +10,7 @@ import type {
 } from "@/features/cases/cases";
 import { caseBandPasses, type BandPass } from "@/features/cases/demoBand";
 import type { LonLat } from "@/features/frames/frame.types";
+import type { LandslideEvidence } from "@/features/landslide/landslideEvidence";
 
 /*
  * What the panel and the sheet show, whether it comes from a measured case (REAL report numbers) or
@@ -23,7 +24,7 @@ export type Subject = {
   id: string;
   name: string;
   place: string;
-  lens: LensId;
+  lens: CaseLensId;
   focus: LonLat;
   chipKm: number | undefined;
   target: string | undefined;
@@ -55,6 +56,8 @@ export type Subject = {
   fireContext: FireContextView | undefined;
   // Live results: the stages the service reported, with their seconds.
   compute: ComputeStep[] | undefined;
+  // A measured landslide case: the per-pass series and layers its panel reads (#24).
+  landslide: LandslideEvidence | undefined;
   demo: boolean;
 };
 
@@ -104,5 +107,6 @@ export const caseSubject = (item: Case): Subject => ({
   fireContext: undefined,
   insar: undefined,
   compute: undefined,
+  landslide: item.landslide,
   demo: false,
 });

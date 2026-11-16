@@ -6,11 +6,12 @@ import { VerdictGlyph } from "@/features/case-panel/Verdict";
 import { bandSentence, SOURCE, VERDICT, VERDICT_ORDER } from "@/features/case-panel/verdicts";
 import { NormalRangeCard } from "@/features/case-panel/NormalRangeCard";
 import { FireContextCard } from "@/features/case-panel/FireContextCard";
-import { findLens, OPTICAL } from "@/features/cases/cases";
+import { findLens, OPTICAL, type Crops } from "@/features/cases/cases";
 import { BandChart } from "@/features/charts/BandChart";
 import type { ChartMode } from "@/features/charts/chartTokens";
 import { ContrastBars } from "@/features/charts/ContrastBars";
 import { MatchedWhisker } from "@/features/charts/MatchedWhisker";
+import { LandslidePanel } from "@/features/landslide/LandslidePanel";
 import { EMPTIES_LINE, jobSteps } from "@/features/live/liveQuestion";
 import { NovaGlyph } from "@/features/nova/NovaGlyph";
 import { CompareSplit } from "@/features/sheet/CompareSplit";
@@ -29,6 +30,12 @@ const OPTICAL_LEGEND = [
   { color: OPTICAL.mixed, label: "Mixed or partial" },
   { color: OPTICAL.unsupported, label: "Unsupported" },
 ];
+
+// The flood cases' four report crops; a case without an optical stage has none of these tiles.
+const reportCrops = (crops: Crops | undefined) =>
+  crops?.optical === undefined || crops.signature === undefined
+    ? undefined
+    : { ...crops, optical: crops.optical, signature: crops.signature };
 
 type SheetProps = {
   subject: Subject;
@@ -54,6 +61,7 @@ export const MoreInfoSheet = ({
   const tech = mode === "technical";
   const [lon, lat] = subject.focus;
   const verdictProv = subject.kind === "live" ? SOURCE.liveVerdict : SOURCE.caseVerdict;
+  const crops = reportCrops(subject.crops);
   return (
     <div className="x-sheet" role="dialog" aria-label="More information" data-testid="sheet">
       <header className="x-sheet__head">
@@ -159,23 +167,26 @@ export const MoreInfoSheet = ({
                 />
               </div>
             )}
-            {subject.crops !== undefined && (
+            {subject.landslide !== undefined && (
+              <LandslidePanel evidence={subject.landslide} mode={mode} />
+            )}
+            {crops !== undefined && (
               <>
                 <div className="x-tiles">
                   <Tile
-                    src={subject.crops.base}
+                    src={crops.base}
                     title="Before · HH"
                     ramp={VIRIDIS}
                     scale={["−30 dB", "0 dB"]}
                     text="Median of the baseline passes."
                   />
                   <Tile
-                    src={subject.crops.signature}
+                    src={crops.signature}
                     title="Signature"
                     text="Cells meeting the declared darkening rule, both channels."
                   />
                   <Tile
-                    src={subject.crops.change}
+                    src={crops.change}
                     title="Change · HH"
                     ramp={CHANGE_RAMP}
                     scale={["−8", "+8 dB"]}
@@ -184,8 +195,8 @@ export const MoreInfoSheet = ({
                 </div>
                 <div className="x-compare x-inset">
                   <CompareSplit
-                    left={{ src: subject.crops.change, label: "Radar change" }}
-                    right={{ src: subject.crops.optical, label: "Optical classes" }}
+                    left={{ src: crops.change, label: "Radar change" }}
+                    right={{ src: crops.optical, label: "Optical classes" }}
                   />
                   <div className="x-compare__text">
                     <p className="x-compare__title">
@@ -211,7 +222,7 @@ export const MoreInfoSheet = ({
             )}
           </section>
 
-          {subject.lens !== "insar" && (
+          {subject.lens !== "insar" && subject.verdict !== "measured" && (
             <section className="x-sheet__section">
               <p className="x-sheet__kicker x-kicker--split">
                 <span>
@@ -359,37 +370,39 @@ export const MoreInfoSheet = ({
               </ol>
             </div>
           )}
-          {subject.lens !== "insar" && subject.compute === undefined && (
-            <div className="x-card">
-              <p className="x-kicker x-kicker--split">
-                <span>How this was computed</span>
-                <Prov kind="real" source={SOURCE.steps} />
-              </p>
-              <ol className="x-steps x-steps--done">
-                {jobSteps(subject.lens).map((step, index) => {
-                  // Only the measured flood cases had an optical stage; elsewhere it didn't run.
-                  const skipped = index === 5 && subject.crops === undefined;
-                  return (
-                    <li
-                      key={step.label}
-                      className="x-step"
-                      data-state={skipped ? "skipped" : "done"}
-                    >
-                      <span className="x-step__dot">
-                        <Icon name="tick" size={10} />
-                      </span>
-                      <span className="x-step__text">
-                        {skipped ? step.label.replace("Looking for", "No") : step.label}
-                        <span className="x-step__sub">
-                          {skipped ? "not used for this result" : step.sub}
+          {subject.lens !== "insar" &&
+            subject.lens !== "observed_dynamics" &&
+            subject.compute === undefined && (
+              <div className="x-card">
+                <p className="x-kicker x-kicker--split">
+                  <span>How this was computed</span>
+                  <Prov kind="real" source={SOURCE.steps} />
+                </p>
+                <ol className="x-steps x-steps--done">
+                  {jobSteps(subject.lens).map((step, index) => {
+                    // Only the measured flood cases had an optical stage; elsewhere it didn't run.
+                    const skipped = index === 5 && subject.crops?.optical === undefined;
+                    return (
+                      <li
+                        key={step.label}
+                        className="x-step"
+                        data-state={skipped ? "skipped" : "done"}
+                      >
+                        <span className="x-step__dot">
+                          <Icon name="tick" size={10} />
                         </span>
-                      </span>
-                    </li>
-                  );
-                })}
-              </ol>
-            </div>
-          )}
+                        <span className="x-step__text">
+                          {skipped ? step.label.replace("Looking for", "No") : step.label}
+                          <span className="x-step__sub">
+                            {skipped ? "not used for this result" : step.sub}
+                          </span>
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
+            )}
           <div className="x-card">
             <p className="x-kicker x-kicker--split">
               <span>Evidence and quality</span>
