@@ -8,7 +8,6 @@ import type { ChartMode } from "@/features/charts/chartTokens";
 import { MetricsChart } from "@/features/charts/MetricsChart";
 import { MODEL_SCORES } from "@/features/charts/metrics";
 import { LENSES, type Verdict } from "@/features/cases/cases";
-import { isLiveLens } from "@/features/explore/exploreApi";
 import { demoBandPasses } from "@/features/cases/demoBand";
 import { HazardIcon } from "@/features/cases/HazardIcon";
 import { EvidenceSection } from "@/pages/method/EvidenceSection";
@@ -207,8 +206,7 @@ export const MethodPage = () => {
               title="The same radar, asked five different things."
             />
             <ul className="m-lenses" data-testid="method-lenses">
-              {/* The questions anyone can ask; Niscemi's offline-only view is not one of them. */}
-              {LENSES.filter((lens) => isLiveLens(lens.id)).map((lens) => (
+              {LENSES.map((lens) => (
                 <li key={lens.id} className="m-lens" data-reveal data-testid="method-lens">
                   <div className="m-lens__who">
                     <span

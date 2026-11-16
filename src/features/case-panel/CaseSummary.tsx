@@ -1,4 +1,4 @@
-import { CASE_LIMITATIONS } from "@/content/copyV8";
+import { CASE_LIMITATIONS, LANDSLIDE } from "@/content/copyV8";
 import { FireContextCard } from "@/features/case-panel/FireContextCard";
 import { Icon } from "@/features/case-panel/icons";
 import { InsarCard } from "@/features/case-panel/InsarCard";
@@ -12,8 +12,12 @@ import type { Case } from "@/features/cases/cases";
 import { BandChart } from "@/features/charts/BandChart";
 import type { ChartMode } from "@/features/charts/chartTokens";
 import { ContrastBars } from "@/features/charts/ContrastBars";
+import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
 const PANEL_CHART_PX = 108;
+
+// A bracketed value ("[Report]") is still a slot to fill; anything else was copied from its source.
+const isSlot = (value: string): boolean => value.startsWith("[");
 
 type SummaryProps = { subject: Subject; mode: ChartMode; onMore: () => void };
 
@@ -47,6 +51,12 @@ export const ResultSummary = ({ subject, mode, onMore }: SummaryProps) => {
         </p>
       )}
       {subject.reason !== undefined && <p className="x-reason">{subject.reason}</p>}
+      {subject.landslide !== undefined && (
+        <p className="x-panel__prov" data-testid="landslide-reading">
+          {LANDSLIDE.kicker}{" "}
+          <ProvenanceChip kind="experimental" source={LANDSLIDE.experimentalWhy} />
+        </p>
+      )}
       {subject.fireContext !== undefined && <FireContextCard context={subject.fireContext} />}
       <QualityStrip items={subject.quality} />
       <p className="x-panel__prov">
@@ -90,8 +100,7 @@ export const PendingSummary = ({ item }: { item: Case }) => (
           <span>{fact.k}</span>
           <span className="x-facts__v">
             {fact.v}
-            {/* Only a bracketed slot ("[Report]") is still to fill; the rest is the gateway's. */}
-            {fact.v.startsWith("[") ? (
+            {isSlot(fact.v) ? (
               <Prov kind="todo" source={`${fact.why} ${SOURCE.todo}`} />
             ) : (
               <Prov kind="real" source={fact.why} />

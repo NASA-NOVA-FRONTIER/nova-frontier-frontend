@@ -27,7 +27,8 @@ type GatewayDetail = {
 const LIST: GatewayCase[] = gateway.cases;
 const DETAILS: Record<string, GatewayDetail | undefined> = gateway.details;
 // The model's featured stops with no comparator: the gateway returns layers, passes and a limit.
-const NO_COMPARATOR = ["bug-fire", "para-event-02", "niscemi-aftermath"];
+// Niscemi is left to its own series tests (#24): its copy comes from the model series, not /v2/cases.
+const NO_COMPARATOR = ["bug-fire", "para-event-02"];
 
 const listed = (id: string): GatewayCase => {
   const found = LIST.find((item) => item.id === id);

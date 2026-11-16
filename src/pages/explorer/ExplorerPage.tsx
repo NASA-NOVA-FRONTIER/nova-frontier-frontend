@@ -155,9 +155,7 @@ const STORY_REGION_KM = 900;
 const STORY_REGION_SECONDS = 2.2;
 const today = new Date().toISOString().slice(0, 10);
 
-// A shared link can only ask a lens the live service has (never the offline-only observed_dynamics).
-const isLens = (value: string | null): value is LensId =>
-  LENSES.some((lens) => lens.id === value && isLiveLens(lens.id));
+const isLens = (value: string | null): value is LensId => LENSES.some((lens) => lens.id === value);
 
 // Shared links: ?case=<id>, ?frame=<track-frame>[&lens=<id>] for a live question on a point,
 // ?bbox= or ?geo= (plus &lens=) for a drawn area, ?story=1. Ground motion adds &pair=<id>[&coherence=<0.1-0.9>].

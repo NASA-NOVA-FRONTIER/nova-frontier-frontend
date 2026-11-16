@@ -43,13 +43,6 @@ export const LENS_ALTERNATIVES: Record<LensId, string[]> = {
   ],
   agriculture: ["Soil moisture", "Irrigation", "Tillage", "Mixed fields", "Viewing geometry"],
   insar: ["Troposphere", "Ionosphere", "Vegetation decorrelation", "Soil moisture"],
-  // The landslide hypotheses of nova-frontier-model contracts/phenomena-catalog.json.
-  observed_dynamics: [
-    "Surface roughness change",
-    "Vegetation removal",
-    "Slope displacement",
-    "Terrain shadow or layover",
-  ],
 };
 
 // Left empty on purpose: the API reports none of these (see its `limitations`). The rule stays in

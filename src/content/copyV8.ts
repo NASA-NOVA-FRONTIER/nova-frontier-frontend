@@ -210,9 +210,8 @@ export const STEP_4 = {
   footprintMobile: (km: string, posting: string) => `${km} km · ${posting}`,
 } as const;
 
-// 5 · Lenses. Ground motion (`insar`) is not in the handoff's table (decision 2 keeps it apart);
-// observed_dynamics is offline only (Niscemi), so it never becomes a live lens card.
-export type V8LensId = Exclude<LensId, "insar" | "observed_dynamics">;
+// 5 · Lenses. Ground motion (`insar`) is not in the handoff's table (decision 2 keeps it apart).
+export type V8LensId = Exclude<LensId, "insar">;
 
 export type LensCopy = { label: string; question: string; rule: string };
 
