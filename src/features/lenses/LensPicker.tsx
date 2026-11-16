@@ -1,7 +1,7 @@
 import { CASE_LOCK, LENS_CARD, LENS_COPY, STEP_3, STEP_4 } from "@/content/copyV8";
 import { Icon } from "@/features/case-panel/icons";
 import { HazardIcon } from "@/features/cases/HazardIcon";
-import { findLens, type LensId } from "@/features/cases/cases";
+import { findLens, type CaseLensId, type LensId } from "@/features/cases/cases";
 import { countdown, formatClock } from "@/features/explore/exploreTiming";
 import type { ExplorationView } from "@/features/explore/exploreSchemas";
 import type { CardLens } from "@/features/lenses/lensSlots";
@@ -49,7 +49,8 @@ const LensRunningRow = ({ run, onCancel }: RowProps) => {
 };
 
 type Props = {
-  lens: LensId;
+  // The open case's own lens can be one no button asks (Niscemi's observed_dynamics).
+  lens: CaseLensId;
   // Tabs above a lens result; the full grid otherwise.
   tabs: boolean;
   running: LensRun | undefined;

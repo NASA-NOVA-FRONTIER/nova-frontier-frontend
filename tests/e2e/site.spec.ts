@@ -16,7 +16,14 @@ test.describe("Landing and about pages", () => {
 
   test("the landing cases carousel opens a case in the explorer", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("[data-testid^=landing-case-]")).toHaveCount(5);
+    await expect(page.locator("[data-testid^=landing-case-]")).toHaveCount(6);
+    await expect(page.getByTestId("landing-case-niscemi-aftermath")).toContainText(
+      "DID THE SLOPE KEEP ITS ECHO?",
+    );
+    await expect(page.getByTestId("landing-case-niscemi-aftermath")).toHaveAttribute(
+      "href",
+      "/explore?case=niscemi-aftermath",
+    );
     await expect(page.getByTestId("landing-chip-choco")).toHaveText("COHERENCE ONLY · 0.247");
     await expect(page.getByTestId("landing-chip-qadirabad")).toHaveText(
       "MEASURED CASE · ESRI WORLD IMAGERY",
