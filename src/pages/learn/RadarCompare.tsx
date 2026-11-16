@@ -2,6 +2,7 @@ import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 
 import { LEARN_COPY } from "@/pages/learn/learnResources";
 
+import { tr } from "@/i18n/translate";
 const KEY_STEP = 5;
 
 // Kept off the very edges so the handle never leaves the frame.
@@ -53,7 +54,7 @@ export const RadarCompare = () => {
   const value = Math.round(split);
 
   return (
-    <section className="lr-compare" aria-label="See like a radar" data-testid="learn-compare">
+    <section className="lr-compare" aria-label={tr("See like a radar")} data-testid="learn-compare">
       <div
         ref={frameRef}
         className="lr-compare__frame"
@@ -64,14 +65,14 @@ export const RadarCompare = () => {
       >
         <img
           src="/landing/radar-north-dakota.jpg"
-          alt="NISAR radar view of farmland in North Dakota"
+          alt={tr("NISAR radar view of farmland in North Dakota")}
           width={2048}
           height={1103}
           draggable={false}
         />
         <img
           src="/landing/optical-north-dakota.jpg"
-          alt="Optical view of the same farmland"
+          alt={tr("Optical view of the same farmland")}
           width={1580}
           height={851}
           draggable={false}
@@ -82,7 +83,7 @@ export const RadarCompare = () => {
             className="lr-compare__handle"
             role="slider"
             tabIndex={0}
-            aria-label="Optical and radar split"
+            aria-label={tr("Optical and radar split")}
             aria-valuemin={2}
             aria-valuemax={98}
             aria-valuenow={value}

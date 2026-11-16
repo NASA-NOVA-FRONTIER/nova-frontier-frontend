@@ -24,6 +24,7 @@ import {
 import { useAsync } from "@/lib/useAsync";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
+import { tr } from "@/i18n/translate";
 const THINK_MS = 650;
 const REDUCED_THINK_MS = 100;
 
@@ -159,17 +160,17 @@ export const NovaChat = ({
   return (
     <>
       {open && (
-        <div className="x-nova" role="dialog" aria-label="Ask Nova" data-testid="nova">
+        <div className="x-nova" role="dialog" aria-label={tr("Ask Nova")} data-testid="nova">
           <header className="x-nova__head">
             <NovaGlyph size={32} />
-            <span className="x-nova__name">Nova</span>
+            <span className="x-nova__name">{tr("Nova")}</span>
             {claude === undefined ? (
               <ProvenanceChip kind="demo" source={NOVA_AI.ruleChip} />
             ) : (
               <ProvenanceChip kind="experimental" source={NOVA_AI.aiChip(claude)} />
             )}
             <span className="x-top__fill" />
-            <div role="group" aria-label="Answer style" className="x-switch x-switch--small">
+            <div role="group" aria-label={tr("Answer style")} className="x-switch x-switch--small">
               {(["plain", "technical"] as const).map((value) => (
                 <button
                   key={value}
@@ -186,7 +187,7 @@ export const NovaChat = ({
               type="button"
               className="x-round"
               onClick={() => onOpen(false)}
-              aria-label="Close Nova"
+              aria-label={tr("Close Nova")}
               data-testid="nova-close"
             >
               <Icon name="close" size={13} />
@@ -199,7 +200,9 @@ export const NovaChat = ({
           >
             {claude === undefined ? NOVA_AI.ruleLine : NOVA_AI.aiLine}
           </p>
-          <p className="x-nova__context">Looking at · {lookingAt}</p>
+          <p className="x-nova__context">
+            {tr("Looking at · ")} {lookingAt}
+          </p>
           <div
             className="x-nova__list"
             ref={listRef}
@@ -210,8 +213,9 @@ export const NovaChat = ({
           >
             {messages.length === 0 && (
               <p className="x-nova__empty">
-                I know what's on screen: the place, the question, the passes and the result. I cite
-                a source for every answer and say so when there's no data.
+                {tr(
+                  "I know what's on screen: the place, the question, the passes and the result. I cite a source for every answer and say so when there's no data.",
+                )}
               </p>
             )}
             {messages.map((message) => (
@@ -247,12 +251,12 @@ export const NovaChat = ({
               <input
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
-                placeholder="Ask about this place or result"
-                aria-label="Ask Nova"
+                placeholder={tr("Ask about this place or result")}
+                aria-label={tr("Ask Nova")}
                 maxLength={ASSISTANT_CAPS.message}
                 data-testid="nova-input"
               />
-              <button type="submit" aria-label="Send" data-testid="nova-send">
+              <button type="submit" aria-label={tr("Send")} data-testid="nova-send">
                 <svg
                   width="14"
                   height="14"
@@ -343,7 +347,7 @@ const Reply = ({
   if (reply.kind === "nodata")
     return (
       <div className="x-nova__nodata" data-testid="nova-nodata">
-        <p className="x-kicker">No data</p>
+        <p className="x-kicker">{tr("No data")}</p>
         <p>{reply.text}</p>
         {note}
       </div>
@@ -353,7 +357,7 @@ const Reply = ({
       <p>{reply.text}</p>
       {reply.fields.length > 0 && (
         <p className="x-nova__fields" data-testid="nova-fields">
-          On screen · {reply.fields.join(" · ")}
+          {tr("On screen · ")} {reply.fields.join(" · ")}
         </p>
       )}
       {note}

@@ -12,6 +12,7 @@ import {
 } from "@/features/charts/metrics";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
+import { tr } from "@/i18n/translate";
 type MetricsChartProps = {
   models: ModelScores[];
   mode: ChartMode;
@@ -43,7 +44,7 @@ export const MetricsChart = ({ models, mode }: MetricsChartProps) => {
               : "F1 score, 0 to 1 (precision and recall where no F1 is reported)"}
           </span>
         ))}
-        <span className="c-metrics__axis">0 → 1 · same axis for every row</span>
+        <span className="c-metrics__axis">{tr("0 → 1 · same axis for every row")}</span>
       </div>
 
       {models.map((model) => (
@@ -51,7 +52,7 @@ export const MetricsChart = ({ models, mode }: MetricsChartProps) => {
           <div className="c-metrics__head">
             <p className="c-metrics__name">
               {model.name}
-              <span className="c-metrics__badge">Experimental</span>
+              <span className="c-metrics__badge">{tr("Experimental")}</span>
               <ProvenanceChip kind="real" source={model.source} />
             </p>
             <p className="c-metrics__sub">{model.sub}</p>
@@ -62,7 +63,7 @@ export const MetricsChart = ({ models, mode }: MetricsChartProps) => {
               rel="noopener noreferrer"
               className="c-metrics__card"
             >
-              Model card →
+              {tr("Model card →")}
             </a>
           </div>
           <div className="c-metrics__tests">
@@ -105,7 +106,7 @@ export const MetricsChart = ({ models, mode }: MetricsChartProps) => {
                         }
                       >
                         {value === null ? (
-                          <span className="c-metrics__none">Not reported</span>
+                          <span className="c-metrics__none">{tr("Not reported")}</span>
                         ) : (
                           <span
                             className={`c-metrics__fill c-metric--${id}`}

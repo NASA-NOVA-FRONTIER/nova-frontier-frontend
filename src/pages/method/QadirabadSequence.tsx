@@ -4,6 +4,7 @@ import { findCase } from "@/features/cases/cases";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { SEQ_FRAMES, SEQ_SOURCE } from "@/pages/method/methodContent";
 
+import { tr } from "@/i18n/translate";
 const QADIRABAD_GROUP = findCase("qadirabad")?.groups?.[0];
 
 // One real answer in five frames. With motion it is a 520 vh section whose stage sticks while the
@@ -13,7 +14,7 @@ export const QadirabadSequence = ({ mode }: { mode: ChartMode }) => (
     <div className="m-seq__stage">
       <div className="m-seq__inner">
         <p id="seq-kicker" className="m-seq__kicker">
-          One real answer · Qadirabad, Pakistan · July 2026
+          {tr("One real answer · Qadirabad, Pakistan · July 2026")}
           <ProvenanceChip
             kind="real"
             source="Report crops and cell counts · nova-frontier-model docs/FLOOD_CHARACTERIZATION.md, flood_pilot_summary.json"
@@ -43,7 +44,7 @@ export const QadirabadSequence = ({ mode }: { mode: ChartMode }) => (
                     <div className="m-seq__bars">
                       <ContrastBars group={QADIRABAD_GROUP} mode={mode} />
                       <a href={SEQ_SOURCE} target="_blank" rel="noopener noreferrer">
-                        Flood characterization report →
+                        {tr("Flood characterization report →")}
                       </a>
                     </div>
                   )

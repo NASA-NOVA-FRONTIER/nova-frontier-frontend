@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { ATLAS_DEFAULT_ID, ATLAS_TILE_PX, ATLAS_TILES } from "@/pages/landing/atlasTiles";
 
+import { tr } from "@/i18n/translate";
 const CHIP_TITLE =
   "nova-frontier-model, global surface atlas: a fixed colour projection of a learned representation. Regional examples, not a validated classifier.";
 
@@ -21,14 +22,15 @@ export const SurfaceAtlas = () => {
         <div className="l-atlas__head">
           <div className="l-atlas__intro">
             <p className="s-mono-label" data-reveal>
-              SIX CONTINENTS OF REAL NISAR DATA
+              {tr("SIX CONTINENTS OF REAL NISAR DATA")}
             </p>
             <h2 id="atlas-heading" className="l-atlas__heading" data-reveal>
-              How each place&apos;s echo behaves over time.
+              {tr("How each place's echo behaves over time.")}
             </h2>
             <p className="l-atlas__body" data-reveal>
-              Months of measured passes compressed into colour by one shared model. Similar colours
-              mean similar radar histories, not the same land cover.
+              {tr(
+                "Months of measured passes compressed into colour by one shared model. Similar colours mean similar radar histories, not the same land cover.",
+              )}
             </p>
           </div>
           {/* ProvenanceChip only says "EXPERIMENTAL"; the source name rides on the same chip style. */}
@@ -38,7 +40,7 @@ export const SurfaceAtlas = () => {
             data-testid="atlas-chip"
             data-reveal
           >
-            EXPERIMENTAL · NOVA-FRONTIER-MODEL
+            {tr("EXPERIMENTAL · NOVA-FRONTIER-MODEL")}
           </span>
         </div>
         <div className="l-atlas__strip" data-reveal>

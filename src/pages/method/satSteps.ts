@@ -14,6 +14,7 @@ import {
 import { SATELLITE_PARTS, type SatellitePartId } from "@/features/satellite/satelliteParts";
 import { SAT_STAGE } from "@/pages/method/methodContent";
 
+import { localized } from "@/i18n/localized";
 type Source = { label: string; href: string };
 type StepText = { title: string; body: string };
 
@@ -51,7 +52,7 @@ const apart = (focus: readonly TeardownPart[]): Shape => ({ ...ASSEMBLED, explod
 // the measurement, then the whole spacecraft looking sideways. Copy is the SAT_STAGE text and the
 // hotspot copy (SPECS-content-pages-v8 §1, §3) verbatim; the part kickers come from the approved
 // v5 teardown. Every step links the NASA pages its facts were checked against.
-export const SAT_STEPS: readonly SatStep[] = [
+export const SAT_STEPS: readonly SatStep[] = localized([
   {
     kicker: STOWED?.kicker ?? "",
     items: [stage(STOWED)],
@@ -94,7 +95,7 @@ export const SAT_STEPS: readonly SatStep[] = [
     sources: [ABOUT_SATELLITE, MISSION_OVERVIEW],
     shape: { ...ASSEMBLED, beam: 1, zoom: 1 },
   },
-];
+]);
 
 const LAST = SAT_STEPS.length - 1;
 

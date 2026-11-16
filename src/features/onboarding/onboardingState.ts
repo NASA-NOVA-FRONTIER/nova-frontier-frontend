@@ -1,3 +1,4 @@
+import { localized } from "@/i18n/localized";
 /*
  * Quick onboarding: four spotlight steps, shown once per browser. The "seen" flag lives in
  * localStorage, which can throw (private mode, blocked storage), so every access is guarded.
@@ -9,7 +10,7 @@ export type OnboardingStep = { target: OnboardingTarget; title: string; text: st
 
 export const ONBOARDING_KEY = "nhw-onboarding-seen";
 
-export const ONBOARDING_STEPS: OnboardingStep[] = [
+export const ONBOARDING_STEPS: OnboardingStep[] = localized([
   {
     target: "cases",
     title: "Start from a measured case",
@@ -30,7 +31,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     title: "Every pass in time",
     text: "Dots are passes. Gold rings are the two sides of the comparison. Dashed circles are planned passes: a promise, not data.",
   },
-];
+]);
 
 export const hasSeenOnboarding = (): boolean => {
   try {

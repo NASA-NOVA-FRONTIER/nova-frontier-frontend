@@ -1,3 +1,4 @@
+import { LanguageSwitcher } from "@/i18n";
 import { useEffect, useRef, type ReactNode, type Ref } from "react";
 
 import { TOP_BAR } from "@/content/copyV8";
@@ -10,6 +11,7 @@ import type { Place } from "@/features/search/placesApi";
 import { BrandMark } from "@/lib/BrandMark";
 import { Link } from "@/lib/Link";
 
+import { tr } from "@/i18n/translate";
 export type DownloadItem = {
   id: "png" | "json" | "csv" | "pdf";
   label: string;
@@ -111,7 +113,7 @@ export const TopBar = ({
       )}
       {switches}
       <span className="x-top__fill" />
-      <div role="group" aria-label="Mode" className="x-mode">
+      <div role="group" aria-label={tr("Mode")} className="x-mode">
         <button
           type="button"
           aria-pressed={story}
@@ -147,20 +149,21 @@ export const TopBar = ({
         <Icon name="globe" size={18} />
       </button>
       <SoundToggle variant="explorer" />
+      <LanguageSwitcher variant="explorer" />
       <div className="x-help" ref={helpRef}>
         <button
           type="button"
           className="x-icon-button"
           onClick={() => onHelp(!helpOpen)}
-          aria-label="Help"
-          title="Help"
+          aria-label={tr("Help")}
+          title={tr("Help")}
           aria-expanded={helpOpen}
           data-testid="help-button"
         >
           <Icon name="help" size={18} />
         </button>
         {helpOpen && (
-          <div className="x-menu" role="menu" aria-label="Help" data-testid="help-menu">
+          <div className="x-menu" role="menu" aria-label={tr("Help")} data-testid="help-menu">
             <button
               type="button"
               role="menuitem"
@@ -168,8 +171,8 @@ export const TopBar = ({
               onClick={onReplayTour}
               data-testid="replay-tour"
             >
-              Replay the quick tour
-              <span>Four steps: cases, panel, layers, timeline</span>
+              {tr("Replay the quick tour")}
+              <span>{tr("Four steps: cases, panel, layers, timeline")}</span>
             </button>
             <button
               type="button"
@@ -177,12 +180,12 @@ export const TopBar = ({
               className="x-menu__item x-menu__story"
               onClick={() => onStory(true)}
             >
-              Watch the 1-minute story
-              <span>Chenab flood, Pakistan · six chapters</span>
+              {tr("Watch the 1-minute story")}
+              <span>{tr("Chenab flood, Pakistan · six chapters")}</span>
             </button>
-            <nav className="x-menu__nav" aria-label="Pages">
-              <Link to="/cases">Cases</Link>
-              <Link to="/method">Method</Link>
+            <nav className="x-menu__nav" aria-label={tr("Pages")}>
+              <Link to="/cases">{tr("Cases")}</Link>
+              <Link to="/method">{tr("Method")}</Link>
             </nav>
             <Switch
               label="Show REAL labels (DEMO always shows)"
@@ -197,11 +200,11 @@ export const TopBar = ({
               testId="toggle-motion"
             />
             <p className="x-menu__keys">
-              <kbd>Esc</kbd> closes · <kbd>Tab</kbd> moves through the panel · <kbd>← →</kbd>{" "}
-              chapters in the story
+              <kbd>Esc</kbd> {tr("closes · ")} <kbd>Tab</kbd> {tr("moves through the panel · ")}{" "}
+              <kbd>← →</kbd> {tr("chapters in the story")}
             </p>
             <p className="x-menu__foot">
-              <span>Nova Frontier</span>
+              <span>{tr("Nova Frontier")}</span>
               <span>{DESIGN_VERSION}</span>
             </p>
           </div>
@@ -212,8 +215,8 @@ export const TopBar = ({
           type="button"
           className="x-icon-button"
           onClick={() => onDownload(!downloadOpen)}
-          aria-label="Download"
-          title="Download"
+          aria-label={tr("Download")}
+          title={tr("Download")}
           aria-expanded={downloadOpen}
           data-testid="download-button"
         >
@@ -235,10 +238,10 @@ export const TopBar = ({
           <div
             className="x-menu x-menu--download"
             role="menu"
-            aria-label="Download"
+            aria-label={tr("Download")}
             data-testid="download-menu"
           >
-            <p className="x-kicker">Download</p>
+            <p className="x-kicker">{tr("Download")}</p>
             {downloads.map((item) => (
               <button
                 key={item.id}
@@ -260,8 +263,8 @@ export const TopBar = ({
         type="button"
         className="x-icon-button x-top__fullscreen"
         onClick={toggleFullScreen}
-        aria-label="Full screen"
-        title="Full screen"
+        aria-label={tr("Full screen")}
+        title={tr("Full screen")}
       >
         <Icon name="fullscreen" size={18} />
       </button>

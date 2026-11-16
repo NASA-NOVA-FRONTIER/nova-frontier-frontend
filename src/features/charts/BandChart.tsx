@@ -22,6 +22,7 @@ import {
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { CHANNEL, type ChannelId, type ChartMode } from "@/features/charts/chartTokens";
 
+import { tr } from "@/i18n/translate";
 const Y_DOMAIN: [number, number] = [-29, -4];
 const DAY_MS = 86_400_000;
 const PAD_DAYS = 5;
@@ -131,7 +132,7 @@ const GlassTooltip = ({ active, payload, bands, mode }: TipProps) => {
             <span className="c-tip__value">{value == null ? "no data" : formatDb(value)}</span>
             {mode === "technical" && value != null && band !== undefined && (
               <span className="c-tip__sub">
-                {formatDb(value - band.median)} vs median · band ±
+                {formatDb(value - band.median)} {tr("vs median · band ±")}
                 {(band.high - band.median).toFixed(0)}
               </span>
             )}
@@ -305,7 +306,7 @@ export const BandChart = ({
         </ResponsiveContainer>
         {empty && (
           <div className="c-band__empty" data-testid="band-empty">
-            <p className="c-band__empty-title">Not enough radar yet</p>
+            <p className="c-band__empty-title">{tr("Not enough radar yet")}</p>
             <p>{emptyWhy}</p>
           </div>
         )}
@@ -318,13 +319,13 @@ export const BandChart = ({
           {!empty && (
             <span className="c-legend__item">
               <span className="c-legend__band" aria-hidden="true" />
-              Normal range
+              {tr("Normal range")}
             </span>
           )}
           {tech && !empty && (
             <span className="c-legend__item">
               <span className="c-legend__ring" aria-hidden="true" />
-              Outside range
+              {tr("Outside range")}
             </span>
           )}
         </span>

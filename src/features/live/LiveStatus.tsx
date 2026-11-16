@@ -12,6 +12,7 @@ import { formatClock } from "@/features/explore/exploreTiming";
 import { waitBar } from "@/features/explore/exploreWait";
 import { useNow } from "@/lib/useNow";
 
+import { tr } from "@/i18n/translate";
 type ProgressProps = {
   view: ExplorationView | undefined;
   receivedAt: number;
@@ -25,7 +26,7 @@ export const LiveProgress = ({ view, receivedAt, onDetails, onCancel }: Progress
   const bar = view === undefined ? undefined : waitBar(view, receivedAt, now);
   return (
     <div className="x-job" role="status" data-testid="job-progress">
-      <p className="x-kicker x-job__title">Asking the radar…</p>
+      <p className="x-kicker x-job__title">{tr("Asking the radar…")}</p>
       <p className="x-job__foot">
         {/* SPECS-v8 §3: elapsed time, never a countdown. */}
         {bar === undefined
@@ -41,7 +42,7 @@ export const LiveProgress = ({ view, receivedAt, onDetails, onCancel }: Progress
           onClick={onDetails}
           data-testid="job-details"
         >
-          Show details
+          {tr("Show details")}
         </button>
         <button
           type="button"

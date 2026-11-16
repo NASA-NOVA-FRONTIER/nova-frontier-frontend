@@ -1,3 +1,4 @@
+import { localized } from "@/i18n/localized";
 // The two report layers the globe can drape, and how their colours read.
 export type DrapeKind = "change" | "baseline";
 
@@ -11,7 +12,7 @@ export type DrapeLegend = {
   origin?: { label: string; source: string };
 };
 
-export const LEGEND: Record<DrapeKind, DrapeLegend> = {
+export const LEGEND: Record<DrapeKind, DrapeLegend> = localized({
   change: {
     ramp: "linear-gradient(90deg,#2f6db5,#f2f0eb,#c2473a)",
     stops: ["#2f6db5", "#f2f0eb", "#c2473a"],
@@ -24,7 +25,7 @@ export const LEGEND: Record<DrapeKind, DrapeLegend> = {
     scale: ["−30 dB", "", "0 dB"],
     text: "Baseline median HH, from the backend report. Dark purple is calm water or smooth ground.",
   },
-};
+});
 
 const NISCEMI_ORIGIN = {
   label: "Model's published layer",

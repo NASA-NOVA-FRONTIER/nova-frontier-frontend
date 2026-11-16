@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Icon } from "@/features/case-panel/icons";
 import { findLens, type CaseLensId } from "@/features/cases/cases";
 
+import { tr } from "@/i18n/translate";
 type CasePanelProps = {
   meta: string;
   title: string;
@@ -39,7 +40,7 @@ export const CasePanel = ({
         type="button"
         className="x-edge"
         onClick={onToggle}
-        aria-label="Open the panel"
+        aria-label={tr("Open the panel")}
         data-testid="panel-edge"
       >
         <Icon name="expand" size={14} />
@@ -71,8 +72,8 @@ export const CasePanel = ({
           type="button"
           className="x-round"
           onClick={onToggle}
-          aria-label="Collapse to the edge"
-          title="Collapse"
+          aria-label={tr("Collapse to the edge")}
+          title={tr("Collapse")}
           data-testid="panel-collapse"
         >
           <Icon name="collapse" size={14} />
@@ -81,8 +82,8 @@ export const CasePanel = ({
           type="button"
           className="x-round"
           onClick={onClose}
-          aria-label="Close"
-          title="Close (Esc)"
+          aria-label={tr("Close")}
+          title={tr("Close (Esc)")}
           data-testid="panel-close"
         >
           <Icon name="close" size={13} />

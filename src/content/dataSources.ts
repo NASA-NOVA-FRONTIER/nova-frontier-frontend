@@ -1,7 +1,8 @@
+import { localized } from "@/i18n/localized";
 // The archives and catalogues behind every number on the site (handoff v7-cases.js → DATA_SOURCES).
 export type DataSource = { tag: string; name: string; what: string; href: string };
 
-export const DATA_SOURCES: DataSource[] = [
+export const DATA_SOURCES: DataSource[] = localized([
   {
     tag: "NASA · ASF DAAC",
     name: "NISAR L2 GCOV",
@@ -32,4 +33,4 @@ export const DATA_SOURCES: DataSource[] = [
     what: "Official facts for the Chocó earthquake",
     href: "https://www.sgc.gov.co",
   },
-];
+]);

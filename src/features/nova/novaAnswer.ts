@@ -4,6 +4,7 @@ import type { Case, Source } from "@/features/cases/cases";
 import type { ChartMode } from "@/features/charts/chartTokens";
 import type { CardFacts, NovaFact } from "@/features/nova/novaFacts";
 
+import { tr } from "@/i18n/translate";
 /*
  * Nova is rule-based for now (DEMO): it only rephrases what is on screen and cites the case's own
  * sources. Ported from `answer(q)` in the v7 prototype. `novaAnswer(question, context)` is the only
@@ -144,7 +145,10 @@ const provenance = (subject: Subject): string => {
   if (subject.kind === "live")
     return "This answer was computed for this spot just now from NISAR L-band scenes: the passes, the numbers and the layers come from the radar service. It is diagnostic evidence, not a validated classifier, and the chips say what each value is.";
   const map = subject.crops === undefined ? "" : " The map on the globe is a crop of its figure.";
-  return `The verdict, percentages and cell counts for ${subject.name} come from the backend's published report.${map} The point time series, the pass dates on the timeline and their bars are demo until the backend serves them, and each carries a DEMO chip.`;
+  return tr(
+    "The verdict, percentages and cell counts for {{name}} come from the backend's published report.{{map}} The point time series, the pass dates on the timeline and their bars are demo until the backend serves them, and each carries a DEMO chip.",
+    { name: subject.name, map },
+  );
 };
 
 export const novaAnswer = (question: string, context: NovaContext): NovaReply => {

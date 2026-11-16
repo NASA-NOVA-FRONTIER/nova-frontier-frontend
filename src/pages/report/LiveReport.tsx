@@ -19,8 +19,9 @@ import { absoluteApiPath, ApiError } from "@/lib/api/apiClient";
 import { Link } from "@/lib/Link";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { useAsync } from "@/lib/useAsync";
-import { SUMMARY_LABEL } from "@/pages/report/reportSummary";
+import { summaryLabel } from "@/pages/report/reportSummary";
 
+import { tr } from "@/i18n/translate";
 type Ring = Array<[number, number]>;
 
 // The result carries the analysed area (a polygon), not the clicked point: it is named by its centre.
@@ -87,7 +88,7 @@ export const LiveReport = ({ id }: { id: string }) => {
   const heading = (
     <div className="r-actions">
       <Link to="/explore" className="r-button">
-        Back to the explorer
+        {tr("Back to the explorer")}
       </Link>
       {subject !== undefined && (
         <button
@@ -96,7 +97,7 @@ export const LiveReport = ({ id }: { id: string }) => {
           onClick={() => window.print()}
           data-testid="report-print"
         >
-          Save as PDF
+          {tr("Save as PDF")}
         </button>
       )}
     </div>
@@ -107,7 +108,7 @@ export const LiveReport = ({ id }: { id: string }) => {
       <main className="r-page" data-testid="report">
         {heading}
         <article className="r-sheet" role="status">
-          <p className="r-kicker">Loading the answer…</p>
+          <p className="r-kicker">{tr("Loading the answer…")}</p>
         </article>
       </main>
     );
@@ -116,7 +117,7 @@ export const LiveReport = ({ id }: { id: string }) => {
       <main className="r-page" data-testid="report">
         {heading}
         <article className="r-sheet" role="alert" data-testid="report-empty">
-          <p className="r-kicker">NISAR Hazard Watch · Radar evidence report</p>
+          <p className="r-kicker">{tr("NISAR Hazard Watch · Radar evidence report")}</p>
           {failed ? (
             <>
               <h1 className="r-title">{REPORT.loadFailed}</h1>
@@ -132,10 +133,14 @@ export const LiveReport = ({ id }: { id: string }) => {
             </>
           ) : (
             <>
-              <h1 className="r-title">No finished answer called “{id}”</h1>
+              <h1 className="r-title">
+                {tr("No finished answer called “")}
+                {id}”
+              </h1>
               <p>
-                The answer is missing or still running. Ask the question again from the explorer and
-                open the report once it is done.
+                {tr(
+                  "The answer is missing or still running. Ask the question again from the explorer and open the report once it is done.",
+                )}
               </p>
             </>
           )}
@@ -152,7 +157,9 @@ export const LiveReport = ({ id }: { id: string }) => {
       <article className="r-sheet">
         <header className="r-head">
           <div className="r-head__main">
-            <p className="r-kicker">NISAR Hazard Watch · Radar evidence report · live question</p>
+            <p className="r-kicker">
+              {tr("NISAR Hazard Watch · Radar evidence report · live question")}
+            </p>
             <h1 className="r-title" data-testid="report-title">
               {subject.name}
             </h1>
@@ -161,18 +168,18 @@ export const LiveReport = ({ id }: { id: string }) => {
             </p>
           </div>
           <p className="r-meta">
-            Exploration {view.id}
+            {tr("Exploration ")} {view.id}
             <br />
             {subject.place}
             <br />
-            Generated {generated}
+            {tr("Generated ")} {generated}
           </p>
         </header>
 
         <section className="r-summary" data-testid="report-summary">
           <p className="r-summary__head">
-            <span>{SUMMARY_LABEL}</span>
-            <span>Not AI-written · check every number against the data blocks</span>
+            <span>{summaryLabel()}</span>
+            <span>{tr("Not AI-written · check every number against the data blocks")}</span>
           </p>
           <p className="r-summary__text">
             {`${subject.name} (${subject.place}) was asked “${lens?.chip ?? subject.lens}” ${subject.verdict === "measured" ? "" : `Verdict: ${VERDICT[subject.verdict].label}. `}${subject.verdictLine}${subject.stat === undefined ? "" : ` ${subject.stat} ${subject.statLine ?? ""}`} ${subject.plainLimit}${subject.fireContext?.status === "available" ? ` Fire context, separate from the radar (NASA FIRMS): ${subject.fireContext.headline}.` : ""}`}
@@ -180,7 +187,7 @@ export const LiveReport = ({ id }: { id: string }) => {
         </section>
 
         <section className="r-block">
-          <p className="r-kicker">Data 1 · The question and the verdict</p>
+          <p className="r-kicker">{tr("Data 1 · The question and the verdict")}</p>
           <dl className="r-facts">
             <Fact k="Question" v={lens?.chip ?? ""} />
             <Fact
@@ -207,7 +214,7 @@ export const LiveReport = ({ id }: { id: string }) => {
         {subject.insar !== undefined && (
           <section className="r-block r-keep">
             <p className="r-kicker r-kicker--split">
-              <span>Data 2 · What the pair measured</span>
+              <span>{tr("Data 2 · What the pair measured")}</span>
               <ProvenanceChip kind="real" source={SOURCE.liveInsar} />
             </p>
             <InsarCard insar={subject.insar} heading={false} />
@@ -217,7 +224,7 @@ export const LiveReport = ({ id }: { id: string }) => {
         {subject.normalRange !== undefined && (
           <section className="r-block r-keep">
             <p className="r-kicker r-kicker--split">
-              <span>Data 2 · The target pass against the normal range</span>
+              <span>{tr("Data 2 · The target pass against the normal range")}</span>
               <ProvenanceChip kind="real" source={SOURCE.liveRange} />
             </p>
             <div className="r-dark">
@@ -229,7 +236,7 @@ export const LiveReport = ({ id }: { id: string }) => {
         {group !== undefined && (
           <section className="r-block r-keep">
             <p className="r-kicker r-kicker--split">
-              <span>Data 3 · Cells that left their normal range</span>
+              <span>{tr("Data 3 · Cells that left their normal range")}</span>
               <ProvenanceChip kind="real" source={SOURCE.liveQuality} />
             </p>
             <div className="r-dark">
@@ -244,7 +251,7 @@ export const LiveReport = ({ id }: { id: string }) => {
         {subject.fireContext !== undefined && (
           <section className="r-block r-keep">
             <p className="r-kicker r-kicker--split">
-              <span>Independent fire context · separate from the radar</span>
+              <span>{tr("Independent fire context · separate from the radar")}</span>
               {subject.fireContext.status === "available" && (
                 <ProvenanceChip kind="real" source={SOURCE.liveFire} />
               )}
@@ -284,8 +291,8 @@ export const LiveReport = ({ id }: { id: string }) => {
           <table className="r-table">
             <thead>
               <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Status</th>
+                <th scope="col">{tr("Date")}</th>
+                <th scope="col">{tr("Status")}</th>
                 {CHANNELS.map((channel) => (
                   <th key={channel} scope="col">
                     {channel}
@@ -313,7 +320,7 @@ export const LiveReport = ({ id }: { id: string }) => {
         <section className="r-cols r-keep">
           <div className="r-block">
             <p className="r-kicker r-kicker--split">
-              <span>Data 4 · Evidence and quality</span>
+              <span>{tr("Data 4 · Evidence and quality")}</span>
               <ProvenanceChip kind="real" source={SOURCE.liveQuality} />
             </p>
             <dl className="r-quality">
@@ -327,7 +334,7 @@ export const LiveReport = ({ id }: { id: string }) => {
             </dl>
           </div>
           <div className="r-block">
-            <p className="r-kicker">Data 5 · What this can't tell you</p>
+            <p className="r-kicker">{tr("Data 5 · What this can't tell you")}</p>
             <p>{subject.plainLimit}</p>
             <p className="r-small">{subject.techLimit}</p>
             <p className="r-mono">{EMPTIES_LINE}</p>
@@ -335,7 +342,7 @@ export const LiveReport = ({ id }: { id: string }) => {
         </section>
 
         <section className="r-block r-keep">
-          <p className="r-kicker">Data 6 · Scenes read</p>
+          <p className="r-kicker">{tr("Data 6 · Scenes read")}</p>
           <ul className="r-sources" data-testid="report-scenes">
             {view.result?.scenes.map((scene) => (
               <li key={scene.granuleId}>
@@ -347,7 +354,7 @@ export const LiveReport = ({ id }: { id: string }) => {
         </section>
 
         <section className="r-block r-keep">
-          <p className="r-kicker">Sources</p>
+          <p className="r-kicker">{tr("Sources")}</p>
           <ul className="r-sources">
             {subject.sources.map((source) => (
               <li key={source.href}>
@@ -361,8 +368,10 @@ export const LiveReport = ({ id }: { id: string }) => {
         </section>
 
         <footer className="r-foot">
-          <span>Nova Frontier · NASA Space Apps 2026 · Chía</span>
-          <span>{DESIGN_VERSION} · diagnostic evidence, not a validated classifier</span>
+          <span>{tr("Nova Frontier · NASA Space Apps 2026 · Chía")}</span>
+          <span>
+            {DESIGN_VERSION} {tr("· diagnostic evidence, not a validated classifier")}
+          </span>
         </footer>
       </article>
     </main>
