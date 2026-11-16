@@ -178,3 +178,14 @@
   border-style: dashed;
   color: rgba(235, 233, 228, 0.35);
 }
+
+.x-result__title[data-verdict] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.x-result__title .x-glyph {
+  margin-top: 0;
+}

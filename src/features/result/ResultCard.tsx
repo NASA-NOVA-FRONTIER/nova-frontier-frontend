@@ -3,6 +3,7 @@ import "@/features/result/result.css";
 import { STEP_6, STEP_7 } from "@/content/copyV8";
 import { RESULT, RESULT_CARD, statOf, type V9LensId } from "@/content/copyV9";
 import { Icon } from "@/features/case-panel/icons";
+import { VerdictGlyph } from "@/features/case-panel/Verdict";
 import type { Subject } from "@/features/case-panel/subject";
 import { HazardIcon } from "@/features/cases/HazardIcon";
 import { findLens, type TimelinePass } from "@/features/cases/cases";
@@ -17,8 +18,10 @@ import { FirmsWitness } from "@/features/lenses/FirmsWitness";
 import { OpticalWitness } from "@/features/lenses/OpticalWitness";
 import { witnessOf } from "@/features/lenses/opticalWitnessView";
 import { PossibleDrivers } from "@/features/lenses/PossibleDrivers";
+import { lensReasons } from "@/features/lenses/reasons";
 import { surroundingsRow } from "@/features/lenses/surroundings";
 import { SurroundingsBlock } from "@/features/lenses/SurroundingsBlock";
+import { VERDICT_LABEL } from "@/features/lenses/verdictLabel";
 import { formatLonLat } from "@/features/live/liveQuestion";
 import { originOf, rangeLineOf, resultBody, resultStat } from "@/features/result/resultStat";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
@@ -52,6 +55,9 @@ export const ResultCard = ({ lens, view, subject, point, passes, onNewSquare, on
     lens === "flood_wetland" ? witnessOf(evaluation, ACTIVE.includes(view.status)) : undefined;
   const drivers = lens === "flood_wetland" ? floodDrivers(evaluation) : undefined;
   const surroundings = surroundingsRow(evaluation);
+  // A lens the backend couldn't evaluate claims nothing: its title gives way to the v8 "Not enough
+  // data" line and its reasons. Ground motion has no verdict at all, so it never takes this path.
+  const insufficient = lens !== "insar" && subject.verdict === "insufficient";
   const hasEvidence = witness !== undefined || drivers !== undefined || surroundings !== undefined;
   return (
     <div className="x-result" data-testid="result-card" data-lens={lens}>
@@ -84,17 +90,33 @@ export const ResultCard = ({ lens, view, subject, point, passes, onNewSquare, on
       </div>
 
       <div className="x-result__head">
-        <h3 className="x-result__title" data-testid="result-title">
-          {copy.title}
-        </h3>
+        {insufficient ? (
+          <>
+            <h3 className="x-result__title" data-testid="verdict" data-verdict="insufficient">
+              <VerdictGlyph verdict="insufficient" />
+              {VERDICT_LABEL.insufficient}
+            </h3>
+            <ul className="x-lcard__reasons" data-testid="lens-reasons">
+              {lensReasons(result.lens?.reason).map((reason) => (
+                <li key={reason}>{reason}</li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <h3 className="x-result__title" data-testid="result-title">
+            {copy.title}
+          </h3>
+        )}
         {range !== undefined && (
           <p className="x-result__range" data-testid="result-range">
             {range}
           </p>
         )}
-        <p className="x-result__body" data-testid="result-body">
-          {resultBody(lens, result)}
-        </p>
+        {!insufficient && (
+          <p className="x-result__body" data-testid="result-body">
+            {resultBody(lens, result)}
+          </p>
+        )}
       </div>
 
       {stat !== undefined && (
