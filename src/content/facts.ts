@@ -1,3 +1,4 @@
+import { localized } from "@/i18n/localized";
 // #25: the pool the waiting panel draws ten facts from. Every fact has a title, a short text that its
 // source states, the source with its link, and an image with alt text. `pixel` keeps a small measured
 // layer crisp when it is scaled up. `credit` names whoever made an image that isn't ours (#29); our
@@ -24,36 +25,36 @@ const FIVE_THINGS = {
 };
 // Read 2026-11-15: 12 m reflector of gold-plated wire mesh on a 9 m boom, stowed like an umbrella,
 // used by both radars.
-export const ANTENNA = {
+export const ANTENNA = localized({
   label: "NASA Science · the antenna reflector blooms",
   href: "https://science.nasa.gov/blogs/nisar/2025/08/15/giant-radar-antenna-reflector-on-nasa-isro-satellite-in-full-bloom/",
-};
-export const LAUNCH = {
+});
+export const LAUNCH = localized({
   label: "NASA Science · NISAR lifts off",
   href: "https://science.nasa.gov/earth/earth-observatory/advanced-us-india-radar-mission-lifts-off-154617/",
-};
+});
 // Read 2026-11-14: the 24 cm L-band, and calm water appearing black as the pulse reflects away.
 // Read 2026-11-16: rough surfaces brighter; features near the wavelength's size scatter strongly;
 // buildings aligned with the flight direction very bright; SAR needs the radar moving in a line.
-export const GET_TO_KNOW_SAR = {
+export const GET_TO_KNOW_SAR = localized({
   label: "NASA Science · NISAR, get to know SAR",
   href: "https://science.nasa.gov/mission/nisar/get-to-know-sar/",
-};
+});
 // Read 2026-11-15: 12 m gold-plated wire-mesh reflector on a 9 m boom, 242 km (more than 240 km)
 // swaths, side-looking 24 cm L-SAR by JPL, 9.4 cm S-SAR by ISRO, ISRO bus, 3.5 Gbps Ka-band
 // telecom, solar arrays folded for launch, the stowed configuration.
-export const ABOUT_SATELLITE = {
+export const ABOUT_SATELLITE = localized({
   label: "NASA Science · About the NISAR satellite",
   href: "https://science.nasa.gov/mission/nisar/about-the-satellite/",
-};
+});
 // Read 2026-11-15: launched on ISRO's GSLV Mark II, 12-day exact repeat cycle, 24 / 9.4 cm.
 // Read 2026-11-16: about 6 days' average revisit with both orbit directions, 6 AM / 6 PM nodal
 // crossings, orbit control under 500 m, 3-year baseline, 3–10 m resolution, ASF and Bhoonidhi,
 // science operations from early January 2026.
-export const MISSION_OVERVIEW = {
+export const MISSION_OVERVIEW = localized({
   label: "NASA Science · NISAR mission overview",
   href: "https://science.nasa.gov/mission/nisar/mission-overview/",
-};
+});
 // Read 2026-11-14: observations repeat every 12 days. Read 2026-11-16: the fringe bands repeat every
 // half wavelength, 12 cm for L-band.
 const INTERFEROMETRY = {
@@ -131,7 +132,7 @@ const atlas = (id: string, place: string) =>
 
 // Every fact names where it comes from and says only what that page says. Nothing here is a number
 // from our own analysis.
-const FACTS: Fact[] = [
+const FACTS: Fact[] = localized([
   {
     id: "clouds",
     title: "Radar sees through clouds",
@@ -430,7 +431,7 @@ const FACTS: Fact[] = [
     ),
     source: ASF_GCOV,
   },
-];
+]);
 
 // The seam for dynamic facts later: callers only ask for a list.
 export const getFacts = (): Fact[] => FACTS;

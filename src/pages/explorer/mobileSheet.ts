@@ -1,5 +1,7 @@
 import { MOBILE } from "@/content/copyV8";
+import type { V9LayerId } from "@/content/copyV9";
 import type { DockRow, DockRowKey } from "@/features/explore/exploreDock";
+import type { LayerOption } from "@/features/result/resultLayers";
 
 /*
  * The phone layout (SPECS-v8 §1 Mobile): which step the bottom sheet shows and how tall it is.
@@ -10,9 +12,10 @@ import type { DockRow, DockRowKey } from "@/features/explore/exploreDock";
  */
 export type SheetStep = "spot" | "wait" | "lensrun" | "result" | "error" | "case";
 
-// Share of the screen height, from `Explorer v8 v2.dc.html` (`sheetFrac`).
+// Share of the screen height, from `Explorer v8 v2.dc.html` (`sheetFrac`). The spot step is the v9
+// confirm panel: at most 62 % (SPECS-flow-v9 §1.3), its footer always in view.
 export const SHEET_FRACTION: Record<SheetStep, number> = {
-  spot: 0.5,
+  spot: 0.62,
   wait: 0.46,
   lensrun: 0.44,
   result: 0.46,
@@ -48,8 +51,11 @@ export const sheetStep = (input: SheetInput): SheetStep | undefined => {
   return input.done ? "result" : "wait";
 };
 
+// The confirm panel never grows past 62 %: its body scrolls instead.
+export const canExpand = (step: SheetStep): boolean => step !== "spot";
+
 export const sheetFraction = (step: SheetStep, expanded: boolean): number =>
-  expanded ? EXPANDED_FRACTION : SHEET_FRACTION[step];
+  expanded && canExpand(step) ? EXPANDED_FRACTION : SHEET_FRACTION[step];
 
 // Steps 4–6 put the layer pills under the search.
 export const hasLayerPills = (step: SheetStep | undefined): boolean =>
@@ -62,7 +68,7 @@ const PILL_LABEL: Partial<Record<DockRowKey, string>> = {
   rule: MOBILE.pillRule,
 };
 
-export type LayerPill = DockRow & { short: string };
+export type LayerPill = Omit<DockRow, "key"> & { key: string; short: string };
 
 // The dock's own rows, so pills and dock always agree. Rule shows only when the lens drew one.
 export const layerPills = (rows: DockRow[]): LayerPill[] =>
@@ -71,3 +77,14 @@ export const layerPills = (rows: DockRow[]): LayerPill[] =>
     if (short === undefined || (row.key === "rule" && !row.enabled)) return [];
     return [{ ...row, short }];
   });
+
+// v9: the legend card's layer switch as pills, with the same labels and the same disabled layers.
+export const resultPills = (options: LayerOption[], selected: V9LayerId | undefined): LayerPill[] =>
+  options.map(({ id, label, pick }) => ({
+    key: id,
+    label,
+    short: label,
+    enabled: pick !== undefined,
+    on: id === selected,
+    action: pick,
+  }));

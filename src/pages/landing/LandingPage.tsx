@@ -20,6 +20,8 @@ import { SiteFooter, type FooterColumn } from "@/pages/site/SiteFooter";
 import { SiteNav } from "@/pages/site/SiteNav";
 import { prefersReducedMotion } from "@/pages/site/siteMotion";
 
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 const reducedMotion = prefersReducedMotion();
 
 // The story ends on the guided tour's case; its numbers come from cases.ts, never from here.
@@ -56,7 +58,7 @@ const STEPS: { when: string; what: string }[] = [
   { when: "Same day", what: "An optical satellite is asked to agree" },
 ];
 
-const MISSION: { heading: string; body: string }[] = [
+const MISSION: { heading: string; body: string }[] = localized([
   {
     heading: "Two radars, one mission",
     body: "NISAR carries an L-band radar built by NASA's JPL and an S-band radar from ISRO. It launched from Sriharikota on 30 July 2025.",
@@ -69,9 +71,9 @@ const MISSION: { heading: string; body: string }[] = [
     heading: "Open data, every pass",
     body: "Every product goes to NASA's archive at the Alaska Satellite Facility, free for anyone. NISAR Hazard Watch reads that archive and turns it into maps.",
   },
-];
+]);
 
-const FOOTER_COLUMNS: FooterColumn[] = [
+const FOOTER_COLUMNS: FooterColumn[] = localized([
   {
     title: "DATA",
     items: [
@@ -105,7 +107,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "CesiumJS", href: "https://cesium.com/platform/cesiumjs/" },
     ],
   },
-];
+]);
 
 const FOOTER_NOTE =
   "Pictures: NISAR first image of North Dakota and artist's concept of NISAR (NASA/JPL-Caltech); " +
@@ -145,13 +147,13 @@ export const LandingPage = () => {
   return (
     <div ref={root} className="site landing" data-motion={reducedMotion ? "reduced" : "full"}>
       <a href="#main" className="s-skip">
-        Skip to content
+        {tr("Skip to content")}
       </a>
 
       <SiteNav page="landing" />
 
       <main id="main">
-        <section className="l-story" aria-label="What NISAR sees">
+        <section className="l-story" aria-label={tr("What NISAR sees")}>
           <div className="l-story__stage">
             <EarthHero
               cloudCover={cloudCover}
@@ -162,31 +164,31 @@ export const LandingPage = () => {
 
             <header className="l-layer l-layer--hero" data-layer="hero">
               <h1 className="s-display" data-intro>
-                Earth, without the clouds.
+                {tr("Earth, without the clouds.")}
               </h1>
               <p className="l-hero__lead" data-intro>
-                NASA-ISRO&apos;s NISAR radar sees through cloud and at night. Pick a place: we
-                compare its latest pass with its own history, check a second satellite, and say
-                plainly what the radar can&apos;t tell.
+                {tr(
+                  "NASA-ISRO's NISAR radar sees through cloud and at night. Pick a place: we compare its latest pass with its own history, check a second satellite, and say plainly what the radar can't tell.",
+                )}
               </p>
               <div className="l-hero__actions" data-intro>
                 <Link to="/explore" className="s-button" testId="cta-explore">
-                  Open the explorer
+                  {tr("Open the explorer")}
                 </Link>
                 <Link to="/explore?story=1" className="l-hero__story" testId="cta-story">
                   <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M8 5.5v13l10.5-6.5z" fill="currentColor" />
                   </svg>
-                  The Chenab flood · 1 min
+                  {tr("The Chenab flood · 1 min")}
                 </Link>
               </div>
             </header>
 
             <div className="l-layer l-layer--a" data-layer="a">
-              <p className="s-mono-label">L-BAND · 24 CM WAVELENGTH</p>
-              <h2 className="s-head l-layer__head--a">Radar brings its own light.</h2>
+              <p className="s-mono-label">{tr("L-BAND · 24 CM WAVELENGTH")}</p>
+              <h2 className="s-head l-layer__head--a">{tr("Radar brings its own light.")}</h2>
               <p className="l-layer__body l-layer__body--a">
-                So NISAR sees the ground at night and through clouds and smoke.
+                {tr("So NISAR sees the ground at night and through clouds and smoke.")}
               </p>
             </div>
 
@@ -195,34 +197,37 @@ export const LandingPage = () => {
                 <span data-count>{reducedMotion ? 12 : 0}</span>
                 <span className="l-counter__unit">days</span>
               </p>
-              <h2 className="s-subhead">Every place, every twelve days.</h2>
+              <h2 className="s-subhead">{tr("Every place, every twelve days.")}</h2>
               <p className="l-layer__body">
-                NISAR maps almost all of Earth&apos;s land and ice on a twelve-day cycle, day or
-                night, from 747 km up.
+                {tr(
+                  "NISAR maps almost all of Earth's land and ice on a twelve-day cycle, day or night, from 747 km up.",
+                )}
               </p>
             </div>
 
             <div className="l-layer l-layer--side l-layer--c" data-layer="c">
-              <p className="s-mono-label">QADIRABAD, PAKISTAN · 26 JUL 2026</p>
-              <h2 className="s-head l-layer__head--c">When the river rose, the radar went dark.</h2>
+              <p className="s-mono-label">{tr("QADIRABAD, PAKISTAN · 26 JUL 2026")}</p>
+              <h2 className="s-head l-layer__head--c">
+                {tr("When the river rose, the radar went dark.")}
+              </h2>
               <p className="l-layer__body l-layer__body--c">
-                Calm water bounces radar away. Where an optical satellite saw new water, NISAR had
-                flagged 64% of cells; on dry land, 1%. It also flagged 17% of water that was already
-                there, and we say so.
+                {tr(
+                  "Calm water bounces radar away. Where an optical satellite saw new water, NISAR had flagged 64% of cells; on dry land, 1%. It also flagged 17% of water that was already there, and we say so.",
+                )}
               </p>
               <Link
                 to={`/explore?case=${STORY_CASE_ID}`}
                 className="s-gold-link l-layer__link"
                 testId="story-case-link"
               >
-                Open this event on the globe →
+                {tr("Open this event on the globe →")}
               </Link>
             </div>
 
             <div ref={callout} className="l-callout" aria-hidden="true">
               <div className="l-callout__marker" />
               <div className="l-callout__card">
-                <p className="l-callout__label">Cells flagged by the radar</p>
+                <p className="l-callout__label">{tr("Cells flagged by the radar")}</p>
                 {/* Fixed 0–100% track, like every share on the site. */}
                 {CALLOUT_ROWS.map(({ label, k, n, color }) => {
                   const value = percent(k, n);
@@ -242,7 +247,7 @@ export const LandingPage = () => {
                       ({ k, n }) => `${k.toLocaleString("en-US")} / ${n.toLocaleString("en-US")}`,
                     ).join(" · ")}
                   </span>
-                  <span>NOVA-FRONTIER-MODEL</span>
+                  <span>{tr("NOVA-FRONTIER-MODEL")}</span>
                 </div>
               </div>
             </div>
@@ -258,17 +263,19 @@ export const LandingPage = () => {
           <div className="s-container">
             <div className="l-compare__head">
               <h2 id="compare-heading" className="s-head" data-reveal>
-                Same fields. One day apart.
+                {tr("Same fields. One day apart.")}
               </h2>
               <p className="l-compare__lead" data-reveal>
-                Drag across the image. An optical satellite saw cloud over these fields; a day
-                earlier, NISAR&apos;s 24 cm radar waves went straight through to the ground.
+                {tr(
+                  "Drag across the image. An optical satellite saw cloud over these fields; a day earlier, NISAR's 24 cm radar waves went straight through to the ground.",
+                )}
               </p>
             </div>
             <CompareSlider reducedMotion={reducedMotion} />
             <p className="s-caption l-compare__caption">
-              Farmland along the Forest River, North Dakota. Centre-pivot fields show as gold
-              circles on the radar side. Labels by NASA.
+              {tr(
+                "Farmland along the Forest River, North Dakota. Centre-pivot fields show as gold circles on the radar side. Labels by NASA.",
+              )}
             </p>
           </div>
         </section>
@@ -280,12 +287,12 @@ export const LandingPage = () => {
         >
           <div className="s-container">
             <h2 id="pipeline-heading" className="s-head l-pipeline__heading" data-reveal>
-              From orbit to your map.
+              {tr("From orbit to your map.")}
             </h2>
             <p className="l-pipeline__lead" data-reveal>
-              Every answer needs a history: earlier passes tell us what&apos;s normal for that exact
-              spot. Then one new pass is checked against it, and a second satellite is asked to
-              agree or not.
+              {tr(
+                "Every answer needs a history: earlier passes tell us what's normal for that exact spot. Then one new pass is checked against it, and a second satellite is asked to agree or not.",
+              )}
             </p>
             <div className="l-pipeline__track">
               <div className="l-pipeline__rail" />
@@ -301,9 +308,9 @@ export const LandingPage = () => {
               </ol>
             </div>
             <p className="l-pipeline__total" data-reveal>
-              <span>An answer, with its limits</span>
+              <span>{tr("An answer, with its limits")}</span>
               <span className="l-pipeline__total-value">
-                Target: about a minute once the live API is connected
+                {tr("Target: about a minute once the live API is connected")}
               </span>
             </p>
           </div>
@@ -313,12 +320,14 @@ export const LandingPage = () => {
           <div className="l-cases__stage">
             <div className="l-cases__head">
               <h2 id="cases-heading" className="s-head">
-                Measured cases, real passes.
+                {tr("Measured cases, real passes.")}
               </h2>
               <p className="l-cases__note">
-                Each number comes from the science team&apos;s published reports, failures included.{" "}
+                {tr(
+                  "Each number comes from the science team's published reports, failures included.",
+                )}{" "}
                 <Link to="/cases" className="s-gold-link" testId="landing-all-cases">
-                  All cases →
+                  {tr("All cases →")}
                 </Link>
               </p>
             </div>
@@ -336,18 +345,18 @@ export const LandingPage = () => {
           <div className="s-container l-honesty__grid">
             <div>
               <p className="s-mono-label" data-reveal>
-                WHERE IT FAILS, IN THE OPEN
+                {tr("WHERE IT FAILS, IN THE OPEN")}
               </p>
               <h2 id="honesty-heading" className="l-honesty__heading" data-reveal>
-                We publish where the method gets it wrong.
+                {tr("We publish where the method gets it wrong.")}
               </h2>
               <p className="l-honesty__body" data-reveal>
-                At Barh, India, the rule that caught 87.5% of new water also flagged 32.6% of water
-                that was already there. A radar change is evidence, not a verdict. We never guess a
-                cause, a probability or a depth.
+                {tr(
+                  "At Barh, India, the rule that caught 87.5% of new water also flagged 32.6% of water that was already there. A radar change is evidence, not a verdict. We never guess a cause, a probability or a depth.",
+                )}
               </p>
               <Link to="/method" className="s-gold-link l-honesty__link" testId="honesty-method">
-                Where it works and where it fails →
+                {tr("Where it works and where it fails →")}
               </Link>
             </div>
             <figure className="l-honesty__card" data-reveal data-testid="honesty-bars">
@@ -376,7 +385,7 @@ export const LandingPage = () => {
         <section className="s-section l-sources" data-section aria-labelledby="sources-heading">
           <div className="s-container">
             <h2 id="sources-heading" className="s-mono-label" data-reveal>
-              THE DATA WE USE
+              {tr("THE DATA WE USE")}
             </h2>
             <ul className="l-sources__list" data-testid="data-sources">
               {DATA_SOURCES.map(({ tag, name, what, href }) => (
@@ -408,18 +417,19 @@ export const LandingPage = () => {
 
         <section className="s-section--wide l-close" data-section aria-labelledby="close-heading">
           <p className="s-mono-label" data-reveal>
-            {measuredLabel} · ANY POINT ON LAND
+            {measuredLabel} {tr("· ANY POINT ON LAND")}
           </p>
           <h2 id="close-heading" className="l-close__heading" data-reveal>
-            Ask the radar.
+            {tr("Ask the radar.")}
           </h2>
           <p className="l-close__body" data-reveal>
-            Open a measured case, or click any land to ask a live question: the radar reads NISAR
-            scenes for that spot in about a minute.
+            {tr(
+              "Open a measured case, or click any land to ask a live question: the radar reads NISAR scenes for that spot in about a minute.",
+            )}
           </p>
           <div className="l-close__action" data-reveal>
             <Link to="/explore" className="s-button s-button--large" testId="cta-band">
-              Open the explorer
+              {tr("Open the explorer")}
             </Link>
           </div>
         </section>
@@ -434,8 +444,8 @@ export const LandingPage = () => {
         photo={{
           src: "/footer/chiribiquete.jpg",
           tag: "PATRIMONIO UNESCO",
-          title: "Serranía de Chiribiquete",
-          sub: "Tepuis in the Colombian Amazon. L-band's 24 cm waves reach through the canopy.",
+          title: tr("Serranía de Chiribiquete"),
+          sub: tr("Tepuis in the Colombian Amazon. L-band's 24 cm waves reach through the canopy."),
           credit: "Photo: Carlos Castaño Uribe · CC BY-SA 3.0",
           creditHref: "https://commons.wikimedia.org/wiki/File:Chiribiquete_view.jpg",
         }}

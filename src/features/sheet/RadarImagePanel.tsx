@@ -12,6 +12,7 @@ import {
   rastersOf,
 } from "@/features/sheet/radarViews";
 
+import { tr } from "@/i18n/translate";
 type Props = {
   result: ExplorationResult;
   date: string;
@@ -75,21 +76,23 @@ export const RadarImagePanel = ({ result, date, dates, target, onDate }: Props) 
   const ramp = selected && legendStyle(selected.colormap);
 
   return (
-    <section className="x-sheet__section x-radar" aria-label="Measured imagery">
+    <section className="x-sheet__section x-radar" aria-label={tr("Measured imagery")}>
       <header className="x-kicker--split">
         <h3 className="x-sheet__kicker">{insar ? "Interferometric pair" : "Radar imagery"}</h3>
         {selected && <Prov kind="real" source={SOURCE.liveQuality} />}
       </header>
       {!insar && dates.length > 0 && (
         <label className="x-radar__date">
-          <span>Acquisition · {date}</span>
+          <span>
+            {tr("Acquisition · ")} {date}
+          </span>
           <input
             type="range"
             min={0}
             max={dates.length - 1}
             value={dates.indexOf(date)}
             disabled={dates.length < 2}
-            aria-label="Acquisition date"
+            aria-label={tr("Acquisition date")}
             aria-valuetext={date}
             onChange={(event) => onDate(dates[Number(event.target.value)] ?? date)}
           />
@@ -101,12 +104,12 @@ export const RadarImagePanel = ({ result, date, dates, target, onDate }: Props) 
       )}
       {selected === undefined ? (
         <p className="x-muted" role="status">
-          No image is available for this acquisition.
+          {tr("No image is available for this acquisition.")}
         </p>
       ) : (
         <>
           <label className="x-radar__select">
-            View
+            {tr("View")}
             <select
               value={selected.id}
               onChange={(event) => {
@@ -126,12 +129,12 @@ export const RadarImagePanel = ({ result, date, dates, target, onDate }: Props) 
           </label>
           {imageFailed ? (
             <p className="x-muted" role="status">
-              This image could not be loaded.{" "}
+              {tr("This image could not be loaded.")}{" "}
               <button
                 type="button"
                 onClick={() => setFailed((items) => items.filter((url) => url !== selected.url))}
               >
-                Retry image
+                {tr("Retry image")}
               </button>
             </p>
           ) : original !== undefined && grid != null && !failed.includes(original.url) ? (
@@ -168,35 +171,41 @@ export const RadarImagePanel = ({ result, date, dates, target, onDate }: Props) 
             {selected.detail.map((line) => (
               <span key={line}>{line}</span>
             ))}
-            {selected.dates.length > 0 && <span>Image dates · {selected.dates.join(" · ")}</span>}
+            {selected.dates.length > 0 && (
+              <span>
+                {tr("Image dates · ")} {selected.dates.join(" · ")}
+              </span>
+            )}
             {grid && <span>{gridDescription(grid)}</span>}
             <span>
-              Display bounds W, S, E, N ·{" "}
+              {tr("Display bounds W, S, E, N ·")}{" "}
               {selected.bounds.map((value) => value.toFixed(5)).join(", ")}°
             </span>
             {support !== undefined && grid && (
               <span>
                 {support.toLocaleString("en-US")} of{" "}
-                {(grid.width * grid.height).toLocaleString("en-US")} native cells have usable
-                return.
+                {(grid.width * grid.height).toLocaleString("en-US")}{" "}
+                {tr("native cells have usable return.")}
               </span>
             )}
             {overlay && original === undefined && (
-              <span>Shown separately. An aligned original is unavailable.</span>
+              <span>{tr("Shown separately. An aligned original is unavailable.")}</span>
             )}
           </div>
         </>
       )}
       {result.quality.windowTruncated === true && (
-        <p className="x-muted">The measured window covers only part of the requested area.</p>
+        <p className="x-muted">
+          {tr("The measured window covers only part of the requested area.")}
+        </p>
       )}
       {observation?.status !== undefined && observation.status !== "observed" && (
         <p className="x-muted">
-          Point return · {(observation.reason ?? observation.status).replaceAll("_", " ")}
+          {tr("Point return · ")} {(observation.reason ?? observation.status).replaceAll("_", " ")}
         </p>
       )}
       {insar && result.insar?.phaseCells === 0 && (
-        <p className="x-muted">Wrapped phase is unavailable at this coherence threshold.</p>
+        <p className="x-muted">{tr("Wrapped phase is unavailable at this coherence threshold.")}</p>
       )}
     </section>
   );

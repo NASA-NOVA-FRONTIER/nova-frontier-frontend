@@ -5,6 +5,7 @@ import {
   type LandslidePass,
 } from "@/features/landslide/landslideEvidence";
 
+import { localized } from "@/i18n/localized";
 /*
  * Niscemi (Sicily), the landslide of 25 January 2026: the model's only landslide case
  * (nova-frontier-model release events-20261115, case niscemi-aftermath, lens observed_dynamics).
@@ -39,7 +40,7 @@ const pass = (
 });
 
 // observations (marker pixel), observed_groups.all_common_cells and diagnostic_band_timeline.
-export const NISCEMI_EVIDENCE: LandslideEvidence = {
+export const NISCEMI_EVIDENCE: LandslideEvidence = localized({
   event: { date: "2026-01-25", label: "Landslide 25 Jan" },
   series: "144_A_020_2005_DHDH",
   folder: FOLDER,
@@ -155,7 +156,7 @@ export const NISCEMI_EVIDENCE: LandslideEvidence = {
     },
   ],
   source: RELEASE,
-};
+});
 
 // The timeline draws the real pass dates and out-of-band shares, with the event far before them.
 const timeline = (evidence: LandslideEvidence): TimelineData => ({
@@ -176,7 +177,7 @@ const timeline = (evidence: LandslideEvidence): TimelineData => ({
   realDates: true,
 });
 
-export const NISCEMI: Case = {
+export const NISCEMI: Case = localized({
   id: "niscemi-aftermath",
   lens: "observed_dynamics",
   hazard: "landslide",
@@ -243,4 +244,4 @@ export const NISCEMI: Case = {
   crops: { base: `${FOLDER}/baseline-HH.png`, change: `${FOLDER}/change-HH.png` },
   timeline: timeline(NISCEMI_EVIDENCE),
   landslide: NISCEMI_EVIDENCE,
-};
+});

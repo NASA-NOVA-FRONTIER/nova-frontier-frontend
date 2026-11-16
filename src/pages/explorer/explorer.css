@@ -360,7 +360,7 @@
   border: 0;
   background: transparent;
   color: inherit;
-  text-align: left;
+  text-align: start;
   font: inherit;
   display: grid;
   grid-template-columns: 1fr auto;
@@ -557,7 +557,7 @@
 
 .x-spot__nearest {
   width: 100%;
-  text-align: left;
+  text-align: start;
   font: inherit;
   color: inherit;
   cursor: pointer;
@@ -660,7 +660,7 @@
 .x-jobmodal__note {
   font-size: 13px;
   color: var(--muted);
-  text-align: right;
+  text-align: end;
 }
 
 .x-jobmodal__bar {
@@ -944,7 +944,7 @@
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
-  text-align: left;
+  text-align: start;
   font-size: 12.5px;
   color: var(--ink-3);
   cursor: pointer;
@@ -1083,6 +1083,29 @@
   pointer-events: none;
 }
 
+/* The 5 × 5 km window live Earthquake measures at the centre (v9 correction C5). */
+.x-square__inner {
+  fill: rgba(201, 180, 139, 0.1);
+  stroke: var(--gold);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  pointer-events: none;
+}
+
+.x-square__inner-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--gold);
+  text-shadow: 0 1px 4px #04070e;
+}
+
 .x-square__label,
 .x-square__hint {
   position: absolute;
@@ -1214,7 +1237,7 @@
   border: 0;
   background: transparent;
   font-size: 13.5px;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 
@@ -1319,7 +1342,7 @@
   border: 0;
   border-radius: 12px;
   background: transparent;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 
@@ -1983,7 +2006,7 @@
   background: var(--fill);
   color: var(--ink);
   font: inherit;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 
@@ -2154,7 +2177,7 @@
 
 .x-dock__opacity span {
   width: 34px;
-  text-align: right;
+  text-align: end;
   font-family: var(--mono);
   color: var(--ink-2);
 }
@@ -2203,7 +2226,7 @@
   background: transparent;
   color: var(--ink);
   font: inherit;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 
@@ -2269,7 +2292,7 @@
   border: 1px solid rgba(235, 233, 228, 0.14);
   background: transparent;
   font-size: 13px;
-  text-align: left;
+  text-align: start;
   color: var(--ink-3);
   cursor: pointer;
 }
@@ -2297,7 +2320,7 @@
   color: var(--faint);
 }
 
-/* Time-lapse stamp under the footprint (SPECS-v8 §4); positioned from the globe every frame. */
+/* The timeline step's stamp under the footprint (COPY-flow-v9 §5); positioned from the globe every frame. */
 .x-stamp {
   position: absolute;
   left: 0;
@@ -2347,6 +2370,11 @@
   left: 56px;
 }
 
+/* Under the More information sheet the live timeline stays mounted (its player keeps its pass). */
+.x-timeline-wrap[hidden] {
+  display: none !important;
+}
+
 .x-timeline {
   width: 100%;
   max-width: 680px;
@@ -2361,6 +2389,7 @@
 
 .x-tl__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
 }
@@ -2378,7 +2407,7 @@
   cursor: pointer;
 }
 
-/* v8 Play: white 38 px, desktop only; phones get the compact strip without it. */
+/* Play: white 38 px; 30 px on the phone strip. */
 .x-tl__play--v8 {
   width: 38px;
   height: 38px;
@@ -2435,6 +2464,7 @@
   font-size: 9.5px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  touch-action: pan-y;
 }
 
 .x-tl__lane {
@@ -2711,6 +2741,140 @@
   white-space: nowrap;
 }
 
+/* v9 sequence player (SPECS-flow-v9 §3): prev · play · next, speed and loop. */
+.x-tl__controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.x-tl__step {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(235, 233, 228, 0.16);
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.x-tl__step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.x-tl__options {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.x-tl__speed {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(235, 233, 228, 0.06);
+}
+
+.x-tl__speed button {
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.x-tl__speed button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--space);
+}
+
+.x-tl__loop {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(235, 233, 228, 0.16);
+  background: transparent;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.x-tl__loop[aria-pressed="true"] {
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
+/* Real gaps between passes, in days, above the radar axis. */
+.x-tl__gap {
+  position: absolute;
+  top: 24px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  color: var(--faint);
+}
+
+/* Ground motion: one bar per pass pair, stacked, the chosen one in gold. */
+.x-tl__track--pairs {
+  margin-left: 6px;
+}
+
+.x-tl__track--pairs .x-tl__month {
+  top: auto;
+  bottom: 0;
+}
+
+.x-tl__pair {
+  position: absolute;
+  height: 18px;
+  min-width: 18px;
+  box-sizing: border-box;
+  padding: 0 4px;
+  border-radius: 4px;
+  border: 1px solid rgba(235, 233, 228, 0.3);
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.x-tl__pair[aria-current="true"] {
+  border-color: var(--gold);
+  background: rgba(201, 180, 139, 0.22);
+  color: var(--ink);
+}
+
+.x-tl__event {
+  position: absolute;
+  top: 0;
+  bottom: 14px;
+  border-left: 1px dashed var(--gold);
+}
+
+.x-tl__event-label {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  padding: 0 3px;
+  background: #0a1222;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
 /* More information sheet */
 .x-sheet {
   position: absolute;
@@ -2896,12 +3060,12 @@
 .x-radar__table table {
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
+  text-align: start;
   font-variant-numeric: tabular-nums;
 }
 
 .x-radar__table caption {
-  text-align: left;
+  text-align: start;
   margin-bottom: 8px;
 }
 
@@ -3300,6 +3464,18 @@
   text-wrap: pretty;
 }
 
+.x-limits__list ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
 .x-tags {
   display: flex;
   flex-wrap: wrap;
@@ -3345,12 +3521,12 @@
 
 .x-evidence dd {
   margin: 0;
-  text-align: right;
+  text-align: end;
 }
 
 .x-evidence .x-evidence__why {
   grid-column: 1 / -1;
-  text-align: left;
+  text-align: start;
   font-size: 11.5px;
   line-height: 1.35;
   color: var(--faint);
@@ -3733,7 +3909,7 @@
     background: rgba(235, 233, 228, 0.3);
   }
 
-  /* The compact timeline: on the sheet, no Play, no lane names (the reference's mobile strip). */
+  /* The compact timeline: on the sheet, prev · play · next without speed, loop or lane names (v9 frames). */
   .x-timeline-wrap,
   .x-timeline-wrap[data-collapsed="true"] {
     left: var(--x-sheet-edge);
@@ -3753,8 +3929,9 @@
     border-radius: 16px;
   }
 
-  .x-tl__play,
   .x-tl__sub,
+  .x-tl__options,
+  .x-tl__gap,
   .x-tl__compare,
   .x-tl__legend,
   .x-tl__lane,
@@ -3773,6 +3950,21 @@
 
   .x-tl__line {
     font-size: 13px;
+  }
+
+  .x-tl__play--v8,
+  .x-tl__step {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* The square sits just above the strip: the stamp keeps its date, the strip's title says the pass. */
+  .x-stamp__date {
+    font-size: 22px;
+  }
+
+  .x-stamp__pass {
+    display: none;
   }
 
   /* One radar lane and the months: 50 px, as the reference's mobile strip. */

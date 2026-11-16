@@ -17,6 +17,7 @@ import {
 import { FactsCarousel } from "@/features/facts/FactsCarousel";
 import { useNow } from "@/lib/useNow";
 
+import { tr } from "@/i18n/translate";
 const PERCENT = 100;
 
 type JobModalProps = {
@@ -115,7 +116,7 @@ export const JobModal = ({
           <div
             className="x-jobmodal__bar"
             role="progressbar"
-            aria-label="Elapsed time, 0 to 5 minutes"
+            aria-label={tr("Elapsed time, 0 to 5 minutes")}
             aria-valuemin={0}
             aria-valuemax={5}
             aria-valuenow={Math.min(5, Math.floor(bar.elapsedSeconds / 60))}
@@ -176,7 +177,7 @@ export const JobModal = ({
           onClick={onKeepExploring}
           data-testid="job-keep"
         >
-          Keep exploring
+          {tr("Keep exploring")}
         </button>
         <button type="button" className="x-ghost" onClick={onCancel} data-testid="job-cancel">
           {PROCESSING.cancel}

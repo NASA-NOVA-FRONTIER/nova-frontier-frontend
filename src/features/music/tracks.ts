@@ -1,5 +1,5 @@
-import solaceUrl from "@/features/music/audio/solace.mp3?url";
 import starfireUrl from "@/features/music/audio/starfire.mp3?url";
+import theSpacesBetweenUrl from "@/features/music/audio/the-spaces-between.mp3?url";
 
 export type TrackId = "landing" | "globe";
 
@@ -10,6 +10,8 @@ export type Track = {
   // Name under src/features/music/audio; the size test reads it.
   file: string;
   src: string;
+  // Integrated loudness of the shipped file in LUFS (ffmpeg's ebur128), which is why the gains differ.
+  lufs: number;
   // Output level: the landing sounds fuller, the globe stays a quiet bed under the data.
   gain: number;
   licenseName: "CC BY 4.0";
@@ -31,6 +33,7 @@ export const TRACKS: Record<TrackId, Track> = {
     artist: "Scott Buckley",
     file: "starfire.mp3",
     src: starfireUrl,
+    lufs: -15.1,
     gain: 0.4,
     licenseName: "CC BY 4.0",
     licenseUrl: LICENSE_URL,
@@ -38,14 +41,15 @@ export const TRACKS: Record<TrackId, Track> = {
   },
   globe: {
     id: "globe",
-    title: "Solace",
+    title: "The Spaces Between",
     artist: "Scott Buckley",
-    file: "solace.mp3",
-    src: solaceUrl,
-    gain: 0.25,
+    file: "the-spaces-between.mp3",
+    src: theSpacesBetweenUrl,
+    lufs: -21.3,
+    gain: 0.6,
     licenseName: "CC BY 4.0",
     licenseUrl: LICENSE_URL,
-    sourceUrl: `${LIBRARY_URL}/solace/`,
+    sourceUrl: `${LIBRARY_URL}/the-spaces-between/`,
   },
 };
 

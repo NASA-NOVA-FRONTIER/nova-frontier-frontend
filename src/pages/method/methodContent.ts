@@ -1,5 +1,6 @@
 import { OPTICAL, type ContrastGroup, type LensId } from "@/features/cases/cases";
 
+import { localized } from "@/i18n/localized";
 /*
  * Method v7 copy and numbers. Every number is copied from the nova-frontier-model reports linked next to
  * it (design_handoff_v7 SPECS §7); none is computed or rounded here.
@@ -10,13 +11,13 @@ const FLOOD_EVIDENCE = `${MODELING}/docs/FLOOD_EVIDENCE.md`;
 const HOLDOUT = `${MODELING}/docs/EXPLORATION_HOLDOUT.md`;
 const BACKEND = "https://github.com/NASA-NOVA-FRONTIER/nova-frontier-backend";
 
-export const RAMP = {
+export const RAMP = localized({
   change: "linear-gradient(90deg, #2f6db5, #f2f0eb, #c2473a)",
   // HH/HV backscatter, fixed −30 → 0 dB, the same scale as Explorer v8.
   grayDb: "linear-gradient(90deg, #000, #fff)",
   // Coherence 0–1, the explorer's cividis stops (LiveLayerDock), so the scale never varies per page.
   cividis: "linear-gradient(90deg, #00224e, #35456c, #666970, #948e77, #c8b866, #fee838)",
-};
+});
 
 export type SeqFrame = {
   n: string;
@@ -29,7 +30,7 @@ export type SeqFrame = {
   ramp?: string;
 };
 
-export const SEQ_FRAMES: SeqFrame[] = [
+export const SEQ_FRAMES: SeqFrame[] = localized([
   {
     n: "01",
     title: "First, this place's normal echo.",
@@ -71,13 +72,13 @@ export const SEQ_FRAMES: SeqFrame[] = [
     tech: "proxy precision 29.7% · recall 64.3% · IoU 25.5%",
     tag: "Whole area · cell counts",
   },
-];
+]);
 
 export const SEQ_SOURCE = `${MODELING}/docs/FLOOD_CHARACTERIZATION.md`;
 
 export type PipelineStep = { n: string; title: string; body: string; tech: string };
 
-export const PIPELINE: PipelineStep[] = [
+export const PIPELINE: PipelineStep[] = localized([
   {
     n: "01",
     title: "A point and a window",
@@ -114,18 +115,18 @@ export const PIPELINE: PipelineStep[] = [
     body: "An optical satellite within four days, kept separate.",
     tech: "OPERA · ≥ 80% cell coverage · ≥ 25% joint",
   },
-];
+]);
 
 // The band chart's own sentences (Band Chart.dc.html), one per backend outcome.
-export const BAND_SENTENCE = {
+export const BAND_SENTENCE = localized({
   departure:
     "On the target pass both radar channels came back darker than in any earlier pass, outside this spot's normal range. Calm open water often does that.",
   within: "On the target pass both channels stayed inside this spot's normal range.",
   insufficient:
     "Only two usable passes in this window. The band needs at least three earlier passes, so there is no verdict.",
-};
+});
 
-export const LENS_NOTES: Record<LensId, { tag: string; limit: string }> = {
+export const LENS_NOTES: Record<LensId, { tag: string; limit: string }> = localized({
   flood_wetland: {
     tag: "flood_wetland · + OPERA DSWx-HLS",
     limit: "Stable water, wet soil, crops and shadow can darken radar too. No depth or extent.",
@@ -147,7 +148,7 @@ export const LENS_NOTES: Record<LensId, { tag: string; limit: string }> = {
     limit:
       "The phase is wrapped and not corrected for troposphere or ionosphere, so no displacement is reported.",
   },
-};
+});
 
 // One matched-cells contrast with its spatial resampling interval, in dB.
 export type Interval = { channel: "HH" | "HV"; value: number; low: number; high: number };
@@ -168,7 +169,7 @@ export type Evidence = {
   chip?: string;
 };
 
-export const EVIDENCE: Evidence[] = [
+export const EVIDENCE: Evidence[] = localized([
   {
     id: "matam",
     works: true,
@@ -254,26 +255,30 @@ export const EVIDENCE: Evidence[] = [
       "nova-frontier-backend README: Kumamoto, track 24, 21 Jul → 14 Aug 2026, 5 km window, measured 12 Nov 2026",
     chip: "REAL · KUMAMOTO · 21 JUL → 14 AUG 2026 · RUN 12 NOV 2026",
   },
-];
+]);
 
 // The whisker axis for the Timber Fire card, in dB; zero sits inside it.
-export const INTERVAL_DOMAIN: [number, number] = [-3.5, 1.5];
+export const INTERVAL_DOMAIN: [number, number] = localized([-3.5, 1.5]);
 
 export type BenchRegion = { region: string; hidden: string; rmse: [number, number, number] };
 
 // Pooled RMSE in dB from docs/results/model_benchmark_all_dates.json; lower is better.
-export const BENCH_METHODS = ["Transformer (ours)", "Temporal mean", "Interpolation"] as const;
+export const BENCH_METHODS = localized([
+  "Transformer (ours)",
+  "Temporal mean",
+  "Interpolation",
+] as const);
 export const BENCH_MAX_DB = 4;
-export const BENCH: BenchRegion[] = [
+export const BENCH: BenchRegion[] = localized([
   { region: "Amazon, Brazil", hidden: "6 passes hidden", rmse: [1.6, 1.178, 1.211] },
   { region: "Murray Basin, Australia", hidden: "14 passes hidden", rmse: [3.637, 3.007, 2.254] },
-];
+]);
 export const BENCH_SOURCE = `${MODELING}/docs/results/model_benchmark_all_dates.json`;
 
 export const MODELS_REPO = "https://github.com/Ch0comilo/NISAR-Models";
 
 // SPECS-content-pages-v8 §3 "01 The satellite" and the kicker of reference/Method v8.dc.html.
-export const SAT_STAGE = {
+export const SAT_STAGE = localized({
   kicker: "THE INSTRUMENT · NASA–ISRO, LAUNCHED 30 JULY 2025",
   steps: [
     {
@@ -301,12 +306,12 @@ export const SAT_STAGE = {
     alt: "Mission control room during NISAR's reflector deployment",
     caption: "MISSION OPERATIONS, REFLECTOR DEPLOYMENT · NASA/JPL-CALTECH",
   },
-} as const;
+} as const);
 
 export type Palette = { title: string; bar: string; left: string; right: string; note: string };
 
 // SPECS §6 data scales, in the order of reference/Method v8.dc.html §09. They never colour chrome.
-export const PALETTES: Palette[] = [
+export const PALETTES: Palette[] = localized([
   {
     title: "Change in dB",
     bar: RAMP.change,
@@ -356,7 +361,7 @@ export const PALETTES: Palette[] = [
     right: "",
     note: "Unsupported cells are grey, never white. Grey means we can't say.",
   },
-];
+]);
 
 // Position on a fixed axis as a CSS percentage, clamped so a value never draws off the track.
 export const toPercent = (value: number, [min, max]: [number, number]): number =>

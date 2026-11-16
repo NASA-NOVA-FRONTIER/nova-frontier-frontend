@@ -13,6 +13,7 @@ import {
 import { caseHits, searchRows, type SearchRow } from "@/features/search/searchRows";
 import { useAsync } from "@/lib/useAsync";
 
+import { tr } from "@/i18n/translate";
 const OSM_COPYRIGHT = "https://www.openstreetmap.org/copyright";
 
 type PlaceSearchProps = {
@@ -97,7 +98,7 @@ export const PlaceSearch = ({
           ref={inputRef}
           type="text"
           role="combobox"
-          aria-label="Search a place"
+          aria-label={tr("Search a place")}
           aria-expanded={expanded}
           aria-controls={listId}
           aria-activedescendant={expanded && active >= 0 ? optionId(active) : undefined}
@@ -116,7 +117,7 @@ export const PlaceSearch = ({
         <button
           type="button"
           className="x-search__go"
-          aria-label="Search"
+          aria-label={tr("Search")}
           disabled={!canSubmit}
           onClick={submit}
           data-testid="place-submit"
@@ -127,9 +128,12 @@ export const PlaceSearch = ({
       {shown && (
         <div className="x-menu x-menu--search" data-testid="search-menu">
           <div aria-live="polite" className="x-search__status" data-testid="place-status">
-            {state?.status === "loading" && <p>Searching…</p>}
+            {state?.status === "loading" && <p>{tr("Searching…")}</p>}
             {state?.status === "success" && rows.length === 0 && (
-              <p data-testid="place-empty">No place found for “{submitted}”.</p>
+              <p data-testid="place-empty">
+                {tr("No place found for “")}
+                {submitted}”.
+              </p>
             )}
           </div>
           {state?.status === "error" && (
@@ -137,7 +141,7 @@ export const PlaceSearch = ({
               <p>{placeSearchMessage(state.error)}</p>
               <div className="x-problem__actions">
                 <button type="button" className="x-primary x-primary--small" onClick={retry}>
-                  Try again
+                  {tr("Try again")}
                 </button>
               </div>
             </div>
@@ -145,7 +149,7 @@ export const PlaceSearch = ({
           <div
             id={listId}
             role="listbox"
-            aria-label="Places"
+            aria-label={tr("Places")}
             className="x-search__list"
             hidden={rows.length === 0}
           >

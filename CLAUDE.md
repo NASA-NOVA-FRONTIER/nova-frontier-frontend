@@ -70,8 +70,8 @@ plus the E2E spec(s) you touched.
 that calls `GET /api/v1/places?q=` **only when the text is submitted** (Enter or the button):
 OpenStreetMap's Nominatim, which the backend proxies, forbids type-ahead autocomplete. Picking a
 place places the square there and flies the camera to its box or to the 10.24 km square
-(`placeFraming`); after "Use this square" the spot card shows the catalog's passes, and "Analyze
-this spot" asks the radar at the centre. The OpenStreetMap credit comes from the API and is always shown.
+(`placeFraming`); after "Use this square" the confirm panel shows the catalog's passes, and "Start
+analysis" asks the radar at the centre. The OpenStreetMap credit comes from the API and is always shown.
 
 ## Choosing an area
 
@@ -80,8 +80,25 @@ Since v9 there is one area: the backend's 10.24 km contract square (`AOI_SIDE_KM
 A click or tap on the globe, or a search hit, places it (step 2, `SquareBar`: "Square placed ·
 nothing runs yet", Cancel, Use this square). The camera flies to it once per placement, and
 nothing is fetched or POSTed. Dragging moves it, and so do the arrow keys when it has focus (1 km,
-Shift 5 km). "Use this square" locks it and opens the spot card, which checks coverage. A question
+Shift 5 km). "Use this square" locks it and opens the confirm panel, which checks coverage. A question
 always sends the centre as a GeoJSON `Point`, and the backend builds the exact UTM square.
+
+**Confirm panel** (v9 step 3, `src/features/confirm/`, strings from `copyV9.ts`): four phenomenon
+chips (the live lens ids; agriculture isn't one, an old `&lens=agriculture` link opens on Flood),
+the `LOOK` line, and the passes strip. Image lenses draw the dates `/coverage` chose (`plan.dates`,
+≤ 5, by their real day) with track and direction from `seriesKey`; 4 passes add a note naming the
+largest gap, 3 or fewer or none disable Start with the reason in the sticky footer. Earthquake asks
+`/insar/pairs` once per placement, the first time it is picked, groups the pairs by `seriesKey`,
+draws the newest pair's series (its 5 most recent passes, an arc per real pair, tap or arrow keys to
+choose) and offers every series plus the coherence threshold (0.1–0.9, default 0.35) under
+Advanced; the globe then draws the 5 × 5 km window it measures (`square.innerKm`,
+`INSAR_WINDOW_KM`). The footer says ONLINE or OFFLINE (`coverage.precomputedCase`, or a cache
+hit for the image lenses) and the wait (`confirmWait`): for the image lenses the backend's own
+estimate from `/coverage` ("Usually under 4 min", its p80), else "Computed live · we stop at 8 min"
+with no number; Earthquake never gets a number. Nothing is POSTed until Start; Start sends the lens (plus
+`pairId` and `coherenceThreshold` for Earthquake) and never a date. Move unlocks the square, Cancel
+goes back to the cases. On phones it is the bottom sheet at 62 %, never expanded; its body scrolls.
+Pure rules: `confirmView.ts`. The full pass total and the date range (Change) wait for backend #18.
 
 - **`src/features/geo/`** is pure (no Cesium types): longitudes and the antimeridian
   (`longitude.ts`, `antimeridian.ts`), spherical measures (`measure.ts`), the square around a point
@@ -93,8 +110,37 @@ always sends the centre as a GeoJSON `Point`, and the backend builds the exact U
   (pointer capture, `touch-action: none`), and the wheel is passed on to the canvas.
 - **`GlobeView`** reports `onPlace(point)` and `onMoveSquare(centre)`, and `ExplorerPage` owns the
   state.
-- **Tests:** the stub globe (`GlobeView.stub.tsx`) exposes `window.__globe.click` and
-  `window.__globe.dragSquare`, and `data-scene` carries `square: { centre, sideKm, movable }`.
+- **Tests:** the stub globe (`GlobeView.stub.tsx`) exposes `window.__globe.click`,
+  `window.__globe.dragSquare` and `window.__globe.interact` (a globe drag or zoom, which pauses the
+  timeline), and `data-scene` carries `square: { centre, sideKm, movable,
+innerKm? }`.
+
+## The sequence timeline
+
+`src/features/timeline/` (v9, #26): `sequence.ts` (pure: one step per measured pass, or one per pair
+for ground motion; real-date ticks, gap labels, the event line only with a sourced date, readout and
+globe stamp), `sequencePlayer.ts` (pure reducer: play/pause, prev/next, seek, speed, loop, pause) and
+`usePassPlayer.ts` (timer at 1.6 s ÷ speed, pause on a hidden tab, prefetch of the next image).
+Reduced motion opens paused on the reference pass (COPY-flow-v9 §6). Each live pass drapes its own
+`display_<date>_<pol>` image; a pass without one shows nothing. A case with no image per pass (all of
+them today) can't play.
+
+## The v9 result
+
+`src/features/result/` (v9, #15/#26): a live answer of the four live lenses (`flood_wetland`,
+`wildfire`, `vegetation_disturbance`, `insar`) reads as `ResultCard` (chips ONLINE/OFFLINE from
+`cache`, MEASURED or DEMO DATA from `isDemo` · lens and place · title and the passes' real range, never an
+event date · stat "N of M" · "Could also be:" / "Not shown:" · "Place a new square" · More information).
+Below it, a closed "EVIDENCE AND QUALITY" section keeps the v8 OPERA witness, the surroundings row and
+flood's possible drivers (HYPOTHESIS). `LegendCard` replaces `LiveLayerDock` for those lenses: one radio per
+copyV9 `LAYERS` entry, the fixed v8 ramp with its two ends, and the opacity slider; on phones the
+same layers are the pills. `resultLayers.ts` maps each layer to a backend id **by id, never by kind**
+(`display_baseline_change_HH/HV`, `display_flood_signature_flags_dual_darkening`,
+`display_coherence_coherence`, `display_wrapped_phase_*`; HH/HV follow the timeline's pass), and
+`resultStat.ts` reads the stat (flood dual-darkening cells, HV decline on the last two passes only
+when `cross_pol_history` is `evaluated`, InSAR phase cells of window cells). Agriculture keeps the v8
+`LensResultCard` and `LiveLayerDock`. `result.spec.ts` scans the result for hectares, probability,
+cm, causes and "detected" (`[data-negation]`, the "Not shown:" line, is skipped).
 
 ## The live exploration flow
 
@@ -151,12 +197,17 @@ or hectares).
   copied from the science backend's reports (github.com/NASA-NOVA-FRONTIER/nova-frontier-model); layer crops and
   report figures are static files in `public/cases/`. Pass timeline dates in `cases.ts` are DEMO
   (12-day spacing) until the backend serves real ones. **One demo case per phenomenon** (issue #28,
-  `Case.hazard`): Qadirabad (flood), Chocó (earthquake), Bug Fire (wildfire), Rowe Creek
-  (vegetation) and Sköllersta (agriculture). They are copied from the gateway's precomputed cases,
-  which the backend relays at `/api/v1/cases` (52 today); the frontend doesn't fetch them at run time.
+  `Case.hazard`, the five phenomena of the issue): Qadirabad (flood, kept for the guided story),
+  Chocó (earthquake), Bug Fire (wildfire), Pará event 02 (deforestation) and Niscemi (landslide).
+  The last four are the featured stops of the model's `docs/PHENOMENA_EXAMPLES.md`. Niscemi's lens
+  is `observed_dynamics`, offline only: it is out of `V8LensId`, `QUESTION_ICONS` and the `?lens=`
+  deep link, so no live question can ask it. They are copied from the gateway's precomputed cases,
+  which the backend lists at `/api/v1/cases` (only these five; all 52 open by id); the frontend doesn't fetch them at run time.
   `tests/fixtures/gateway-cases.json` records that answer and `gatewayCases.test.ts` checks the copy
-  against it. Bug Fire, Rowe Creek and Sköllersta are `radar_evaluated` (layers, no comparator), so
-  they read "Measured, not a verdict" with only the cells, passes and limit the gateway returns. Each
+  against it. Bug Fire, Pará event 02 and Niscemi have no comparator, so they read "Measured, not a
+  verdict" with only the cells, passes and limit the gateway returns. Chocó sits on the gateway's
+  measured window, lists the gateway's `limitations` verbatim (`Case.limitations`) and has zero
+  common phase cells, so it never shows a phase. Each
   case shows the `offline` chip (OFFLINE, never hidden) and its lens is fixed: `LensPicker` gets
   `locked` with the reason and `chooseLens` never turns a case into a live question.
 - **Demo values:** the band chart series of the measured cases (`src/features/cases/demoBand.ts`,

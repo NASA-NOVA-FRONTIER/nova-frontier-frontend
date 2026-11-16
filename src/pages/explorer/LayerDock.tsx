@@ -2,6 +2,7 @@ import { Prov } from "@/features/case-panel/Prov";
 import { SOURCE } from "@/features/case-panel/verdicts";
 import { legendFor, type DrapeKind } from "@/pages/explorer/drapeLegend";
 
+import { tr } from "@/i18n/translate";
 const API_SOON = "Served by the backend API soon";
 
 type LayerDockProps = {
@@ -17,9 +18,13 @@ type LayerDockProps = {
 export const LayerDock = ({ kind, caseId, opacity, onKind, onOpacity }: LayerDockProps) => {
   const legend = legendFor(kind, caseId);
   return (
-    <section className="x-dock x-glass" aria-label="Radar on the globe" data-testid="layer-dock">
-      <p className="x-kicker">Radar on the globe</p>
-      <div role="group" aria-label="Layer" className="x-switch x-switch--full">
+    <section
+      className="x-dock x-glass"
+      aria-label={tr("Radar on the globe")}
+      data-testid="layer-dock"
+    >
+      <p className="x-kicker">{tr("Radar on the globe")}</p>
+      <div role="group" aria-label={tr("Layer")} className="x-switch x-switch--full">
         {(["change", "baseline"] as const).map((value) => (
           <button
             key={value}
@@ -32,7 +37,7 @@ export const LayerDock = ({ kind, caseId, opacity, onKind, onOpacity }: LayerDoc
           </button>
         ))}
       </div>
-      <div role="group" aria-label="Channel" className="x-chans">
+      <div role="group" aria-label={tr("Channel")} className="x-chans">
         <button type="button" aria-pressed="true" data-testid="channel-HH">
           HH
         </button>
@@ -45,7 +50,7 @@ export const LayerDock = ({ kind, caseId, opacity, onKind, onOpacity }: LayerDoc
           </button>
         )}
       </div>
-      <p className="x-dock__hint">HV and HH−HV: served by the backend API soon.</p>
+      <p className="x-dock__hint">{tr("HV and HH−HV: served by the backend API soon.")}</p>
       <div className="x-dock__legend">
         <span className="x-dock__ramp" style={{ background: legend.ramp }} />
         <span className="x-dock__scale">
@@ -55,11 +60,11 @@ export const LayerDock = ({ kind, caseId, opacity, onKind, onOpacity }: LayerDoc
         </span>
         <p className="x-dock__grey">
           <i aria-hidden="true" />
-          Grey: no measurement. White: no change.
+          {tr("Grey: no measurement. White: no change.")}
         </p>
       </div>
       <label className="x-dock__opacity">
-        Opacity
+        {tr("Opacity")}
         <input
           type="range"
           min={0}

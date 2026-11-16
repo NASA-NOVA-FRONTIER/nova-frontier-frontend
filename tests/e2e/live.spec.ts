@@ -29,17 +29,6 @@ const FIRE_AVAILABLE = {
   note: "Independent thermal evidence, separate from the radar.",
 };
 
-const CARD_ORDER = [
-  "lens-head",
-  "lens-slot-extra",
-  "lens-pixel",
-  "lens-why-two",
-  // #22: the real answer has no optical snapshot, so the OPERA witness says UNAVAILABLE.
-  "lens-slot-witness",
-  "lens-surroundings",
-  "more-info",
-];
-
 test.describe("Explorer: lens buttons and the lens result card", () => {
   let globe: GlobePage;
 
@@ -49,45 +38,17 @@ test.describe("Explorer: lens buttons and the lens result card", () => {
     await globe.mockObservationPlan();
   });
 
-  test("the flood card reads in the binding order, from the answer's own fields", async ({
+  test("the flood answer reads as the v9 result card; the v8 verdict, rule and pixel blocks stay out", async ({
     page,
   }) => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    const card = page.getByTestId("lens-card");
-    await expect(card).toBeVisible();
-    const order = await card
-      .locator(":scope > [data-rv]")
-      .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-testid")));
-    expect(order).toEqual(CARD_ORDER);
-    await expect(page.getByTestId("lens-witness")).toHaveAttribute("data-state", "unavailable");
-    await expect(page.getByTestId("lens-witness-text")).toHaveText(
-      "No OPERA snapshot with enough clear cells within 4 days of the radar dates. The radar result stands on its own.",
-    );
-    // No ready optical comparison, so no driver can be weighed.
-    await expect(page.getByTestId("lens-slot-drivers")).toHaveCount(0);
-
-    await expect(card.getByTestId("lens-head")).toContainText("LENS · FLOOD & WETLAND");
-    await expect(card.getByTestId("lens-head")).toContainText("Did water appear here?");
-    await expect(globe.verdict).toContainText("Within its usual range");
-    await expect(page.getByTestId("lens-headline")).toHaveText(
-      "No new water at the exact spot you clicked. Around it, about a tenth of the area darkened the way calm new water does.",
-    );
-    await expect(page.getByTestId("lens-rule-count")).toHaveText("208,344 of 1,048,576 cells");
-    await expect(page.getByTestId("lens-rule-caption")).toHaveText(
-      "HH fell 3 dB or more and HV 1.5 dB or more on 11 Nov 2026, against each cell's own median of 4 earlier passes. Another 128,837 cells brightened. Cells meeting a rule, not flooded area.",
-    );
-    await expect(page.getByTestId("lens-rule-thumb")).toHaveCount(0);
-    await expect(page.getByTestId("lens-rule-toggle")).toHaveCount(0);
-    await expect(page.getByTestId("lens-delta-HH")).toContainText("−1.2 dB");
-    await expect(page.getByTestId("lens-delta-HH")).toContainText("band ±3.0 dB · inside");
-    await expect(page.getByTestId("lens-delta-HV")).toContainText("−0.8 dB");
-    await expect(page.getByTestId("lens-delta-HV")).toContainText("band ±5.8 dB · inside");
-    await expect(page.getByTestId("lens-surroundings")).toContainText(
-      "The 60 m patch around your pixel did not darken more than matched cells 120–300 m away. 115 cells in the patch, compared with 115 matched cells out of 2,376 around it.",
-    );
-    await expect(page.getByTestId("lens-reasons")).toHaveCount(0);
+    await expect(globe.resultCard).toHaveAttribute("data-lens", "flood_wetland");
+    await expect(page.getByTestId("lens-card")).toHaveCount(0);
+    await expect(globe.verdict).toHaveCount(0);
+    await expect(page.getByTestId("lens-rule-count")).toHaveCount(0);
+    await expect(page.getByTestId("lens-pixel")).toHaveCount(0);
     // Tabs above the card, 400 px panel.
     await expect(page.getByTestId("lens-tabs")).toBeVisible();
     expect((await globe.panel.boundingBox())?.width).toBe(400);
@@ -143,7 +104,7 @@ test.describe("Explorer: lens buttons and the lens result card", () => {
   test("Nova answers from the lens card's visible fields and names them", async ({ page }) => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(page.getByTestId("lens-card")).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
 
     await page.getByTestId("nova-bubble").click();
     const nova = page.getByTestId("nova");
@@ -167,7 +128,7 @@ test.describe("Explorer: lens buttons and the lens result card", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(page.getByTestId("lens-card")).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
 
     const bubble = page.getByTestId("nova-bubble");
     await expect(async () => {
@@ -192,6 +153,8 @@ test.describe("Explorer: lens buttons and the lens result card", () => {
     });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
+    // v9: the OPERA witness sits in the evidence section under the result card, closed by default.
+    await page.getByTestId("result-evidence-toggle").click();
     const witness = page.getByTestId("lens-witness");
     await expect(witness).toHaveAttribute("data-state", "ready");
     await expect(page.getByTestId("lens-witness-status")).toHaveText("READY · REAL");
@@ -215,7 +178,9 @@ test.describe("Explorer: lens buttons and the lens result card", () => {
     // 5.4 % of the stayed-dry cells meet the rule and no cell is water: no driver's rule fires.
     await expect(page.getByTestId("lens-slot-drivers")).toHaveCount(0);
     await expect(page.getByTestId("prov-demo")).toHaveCount(0);
-    await expect(page.getByTestId("lens-card")).not.toContainText(/hectare|probability|caused by/i);
+    await expect(page.getByTestId("lens-slot-witness")).not.toContainText(
+      /hectare|probability|caused by/i,
+    );
 
     await globe.lens("agriculture").click();
     await expect(page.getByTestId("lens-running")).toBeVisible();
@@ -261,9 +226,8 @@ test.describe("Explorer: lens buttons and the lens result card", () => {
       running: runningView({ elapsedSeconds: 75, etaSeconds: 120 }),
     });
     await globe.goto(`?frame=${LIVE_FRAME.id}&lens=wildfire`);
-    await expect(page.getByTestId("lens-card")).toBeVisible();
-    // Wildfire's second witness (FIRMS) arrives through the witness slot.
-    await expect(page.getByTestId("lens-slot-witness").getByTestId("fire-context")).toBeVisible();
+    // Wildfire's FIRMS counts card sits in the v9 result card.
+    await expect(globe.resultCard.getByTestId("fire-context")).toBeVisible();
 
     // Date.now stands still, so the row shows the server's elapsed time exactly.
     await page.clock.setFixedTime(new Date("2026-11-13T12:00:00Z"));
@@ -280,7 +244,7 @@ test.describe("Explorer: lens buttons and the lens result card", () => {
 
     await page.clock.resume();
     api.complete();
-    await expect(page.getByTestId("lens-headline")).toContainText("No new water", {
+    await expect(page.getByTestId("result-title")).toHaveText("Parts of the square darkened", {
       timeout: 15_000,
     });
     await expect(row).toBeHidden();
@@ -291,7 +255,7 @@ test.describe("Explorer: lens buttons and the lens result card", () => {
       answers: [succeededView(), runningView({ lens: "agriculture" })],
     });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(page.getByTestId("lens-card")).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
     await globe.lens("agriculture").click();
     await page.getByTestId("lens-running-cancel").click();
     await expect(globe.jobError).toContainText("Request cancelled");
@@ -328,7 +292,9 @@ test.describe("Explorer: lens buttons and the lens result card", () => {
     });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
+    // v9: an unevaluated lens claims nothing; its title gives way to the reasons.
     await expect(globe.verdict).toContainText("Not enough data");
+    await expect(page.getByTestId("result-title")).toHaveCount(0);
     await expect(page.getByTestId("lens-reasons")).toContainText(
       "The clicked pixel has no usable value on at least one pass.",
     );
@@ -352,13 +318,11 @@ test.describe("Explorer: live exploration", () => {
     const api = await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(globe.verdict).toHaveAttribute("data-verdict", "within");
-    await expect(globe.verdict.getByTestId("prov-real")).toBeVisible();
+    await expect(page.getByTestId("result-measured")).toHaveText("MEASURED");
     // The passes are NASA's Observation Plan, the answer is the backend's.
     await expect(globe.planPasses).toContainText("39 passes in the plan");
     await expect(globe.planPasses.getByTestId("prov-real")).toBeVisible();
-    await expect(globe.normalRange).toContainText("−1.2 dB");
-    await expect(globe.normalRange).toContainText("−0.8 dB");
+    await expect(globe.resultStat).toContainText("208,344 of 1,048,576");
     await expect(globe.panel.getByTestId("prov-demo")).toHaveCount(0);
     await expect(globe.panel.getByTestId("prov-demo-dates")).toHaveCount(0);
     await expect(globe.panelMeta).toContainText(`Live question · ${LIVE_FRAME.title}`);
@@ -407,7 +371,7 @@ test.describe("Explorer: live exploration", () => {
     await expect(page.getByTestId("fact-text")).not.toHaveText(before ?? "");
 
     api.complete();
-    await expect(globe.verdict).toBeVisible({ timeout: 15_000 });
+    await expect(globe.resultCard).toBeVisible({ timeout: 15_000 });
     await expect(globe.jobModal).toBeHidden();
     await globe.expectScene((scene) => expect(scene.outline?.processing).toBe(false));
   });
@@ -431,7 +395,7 @@ test.describe("Explorer: live exploration", () => {
     await expect(globe.panel).toBeVisible();
 
     api.complete();
-    await expect(globe.verdict).toBeVisible({ timeout: 15_000 });
+    await expect(globe.resultCard).toBeVisible({ timeout: 15_000 });
     await expect(globe.jobModal).toBeHidden();
   });
 
@@ -459,7 +423,7 @@ test.describe("Explorer: live exploration", () => {
 
     await expect(globe.jobError).toContainText("Analyses are already in line");
     await globe.jobError.getByRole("button", { name: "Try again" }).click();
-    await expect(globe.verdict).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
     expect(api.posts).toHaveLength(2);
     await expect(page.getByTestId("job-error")).toBeHidden();
   });
@@ -498,33 +462,27 @@ test.describe("Explorer: live exploration", () => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(globe.verdict).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
     await expect(page.getByTestId("plan-error")).toContainText(
       "We couldn't reach the radar archive",
     );
   });
 
   test(
-    "the layers come from the answer: the pass's HH opens first, the other layers stay a click away",
+    "the layers come from the answer: the pass's HH opens first, layers outside the v9 switch stay off the globe",
     { tag: "@globe" },
     async ({ page }) => {
       await globe.mockExplorations({ first: succeededView() });
       await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-      await expect(globe.liveLayerDock).toBeVisible();
-      const hh = page.getByTestId("dock-row-hh");
-      // #21 follow-up: the brightening flags no longer open first; the newest HH image does.
-      await expect(hh).toHaveAttribute("aria-pressed", "true");
-      const signature = page.getByTestId(
-        "layer-option-display_flood_signature_flags_co_pol_brightening",
+      await expect(page.getByTestId("legend-card")).toBeVisible();
+      await expect(globe.layerRadio("hh")).toHaveAttribute("aria-checked", "true");
+      await expect(page.getByTestId("legend-what")).toHaveText(
+        "How strongly the ground echoes (HH)",
       );
-      await expect(signature).toHaveAttribute("aria-pressed", "false");
-      await expect(globe.liveLayerDock).toContainText("HH on 12 Sep 2026, fixed −30 to 0 dB gray.");
-      await signature.click();
-      await expect(signature).toHaveAttribute("aria-pressed", "true");
-      await expect(hh).toHaveAttribute("aria-pressed", "false");
-      await signature.click();
-      await expect(signature).toHaveAttribute("aria-pressed", "false");
+      // Brightening is not the darkening signature: it is never offered as one.
+      await expect(globe.layerRadio("sig")).toBeDisabled();
+      await expect(page.getByTestId("legend-card")).not.toContainText("brightening");
     },
   );
 
@@ -688,7 +646,7 @@ test.describe("Explorer: live exploration", () => {
   test("the downloads carry the real answer: JSON and one CSV row per date", async ({ page }) => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(globe.verdict).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
 
     await page.getByTestId("download-button").click();
     await expect(page.getByTestId("download-json")).toContainText("Result data · JSON");
@@ -721,7 +679,7 @@ test.describe("Explorer: live exploration", () => {
       const api = await globe.mockExplorations({ first: succeededView() });
       await globe.mockInsarPairs();
       await globe.goto(`?frame=${LIVE_FRAME.id}`);
-      await expect(globe.verdict).toBeVisible();
+      await expect(globe.resultCard).toBeVisible();
       api.posts.length = 0;
 
       await globe.lens("insar").click();
@@ -749,13 +707,11 @@ test.describe("Explorer: live exploration", () => {
       await expect(page.getByTestId("coherence-value")).toHaveText("0.50");
       await globe.pairMeasure.click();
 
-      await expect(globe.verdict).toHaveAttribute("data-verdict", "measured");
-      await expect(globe.verdict).toContainText("Measured, not a verdict");
-      await expect(globe.insarCard).toContainText("Median coherence");
-      await expect(globe.insarCard).toContainText("0.43");
-      await expect(globe.insarCard).toContainText("Wrapped phase at the point");
-      await expect(page.getByTestId("insar-displacement")).toContainText("Not reported");
-      await expect(page.getByTestId("panel-stat")).toContainText("63.3%");
+      // v9: a measurement with no verdict; what it can't show is said, never a displacement.
+      await expect(globe.resultCard).toHaveAttribute("data-lens", "insar");
+      await expect(globe.verdict).toHaveCount(0);
+      await expect(globe.resultStat).toContainText("39,584 of 62,500");
+      await expect(page.getByTestId("result-not-shown")).toContainText("displacement in cm");
       await expect(globe.panel.getByTestId("prov-demo")).toHaveCount(0);
       await expect(globe.panel.getByTestId("prov-demo-dates")).toHaveCount(0);
       await expect(globe.normalRange).toHaveCount(0);
@@ -773,20 +729,22 @@ test.describe("Explorer: live exploration", () => {
     });
 
     test(
-      "the globe offers the coherence and the wrapped phase, and the phase says its colours repeat",
+      "the globe offers the coherence and the wrapped phase on their fixed scales",
       { tag: "@globe" },
       async ({ page }) => {
         await globe.mockExplorations({ first: insarView() });
         await globe.mockInsarPairs();
         await globe.goto(`?frame=${LIVE_FRAME.id}&lens=insar&pair=${NEWEST_PAIR}`);
-        await expect(globe.verdict).toBeVisible();
+        await expect(globe.resultCard).toBeVisible();
 
-        await expect(globe.liveLayerDock).toContainText("Interferometric coherence");
-        await expect(globe.liveLayerDock).toContainText("Wrapped phase");
-        await page.getByTestId("layer-option-display_wrapped_phase_rad_wrapped_phase_rad").click();
+        await expect(globe.layerRadio("coh")).toHaveText("Coherence");
+        await expect(globe.layerRadio("phase")).toHaveText("Wrapped phase");
+        await globe.layerRadio("phase").click();
 
-        await expect(page.getByTestId("phase-note")).toContainText("repeat every 2π");
-        await expect(page.getByTestId("layer-scale")).toHaveText("−π to +π rad");
+        await expect(page.getByTestId("legend-ends")).toHaveText("−π+π");
+        await expect(page.getByTestId("legend-what")).toHaveText(
+          "Fringes of change between the passes",
+        );
       },
     );
 
@@ -795,7 +753,7 @@ test.describe("Explorer: live exploration", () => {
       await globe.mockInsarPairs();
       await globe.goto(`?frame=${LIVE_FRAME.id}&lens=insar&pair=${NEWEST_PAIR}&coherence=0.6`);
 
-      await expect(globe.verdict).toHaveAttribute("data-verdict", "measured");
+      await expect(globe.resultCard).toHaveAttribute("data-lens", "insar");
       await expect(globe.pairPicker).toHaveCount(0);
       expect(globe.pairRequests).toEqual([]);
       expect(api.posts).toEqual([
@@ -826,39 +784,18 @@ test.describe("Explorer: live exploration", () => {
   });
 
   test.describe("wildfire card", () => {
-    test("the real Seattle answer: headline, HV rule rows, pixel line and FIRMS as the second witness", async ({
+    test("the real Seattle answer: the v9 card, no stat without a repeated count, FIRMS counts beside it", async ({
       page,
     }) => {
       await globe.mockExplorations({ first: wildfireView() });
       await globe.goto(`?frame=${LIVE_FRAME.id}&lens=wildfire`);
 
-      const card = page.getByTestId("lens-card");
+      const card = globe.resultCard;
       await expect(card).toHaveAttribute("data-lens", "wildfire");
-      const order = await card
-        .locator(":scope > [data-rv]")
-        .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-testid")));
-      expect(order).toEqual([
-        "lens-head",
-        "lens-slot-extra",
-        "lens-pixel",
-        "lens-why-two",
-        "lens-slot-witness",
-        "more-info",
-      ]);
-      await expect(card.getByTestId("lens-head")).toContainText("LENS · WILDFIRE");
-      await expect(page.getByTestId("lens-headline")).toHaveText(
-        "This lens needs at least two passes after the baseline. This spot has one.",
+      await expect(page.getByTestId("result-title")).toHaveText(
+        "HV stayed low after the fire in part of the square",
       );
-      await expect(page.getByTestId("lens-rule")).toContainText("WHAT THIS LENS COMPARES");
-      await expect(page.getByTestId("lens-rule-count")).toHaveText("96,043 of 1,048,312 cells");
-      await expect(page.getByTestId("lens-rule-row")).toContainText(
-        "with HV below its band on 24 Oct 2026",
-      );
-      await expect(page.getByTestId("lens-rule-caption")).toContainText(
-        "At your pixel: HV below its band on 0 of 1 pass after the baseline.",
-      );
-      await expect(page.getByTestId("lens-rule-toggle")).toBeVisible();
-      await expect(page.getByTestId("lens-why-two")).toContainText("Burning removes the canopy");
+      await expect(globe.resultStat).toHaveCount(0);
 
       const witness = page.getByTestId("lens-witness");
       await expect(witness).toContainText("SECOND WITNESS · NASA FIRMS");
@@ -866,9 +803,8 @@ test.describe("Explorer: live exploration", () => {
       await expect(witness).toContainText("No active-fire detections between the two passes");
       await expect(witness).toContainText("does not rule a fire out");
 
-      // FIRMS never feeds the verdict; no burned area, hectares or cause anywhere on the card.
-      // "burned area" only appears negated, like flood's "not flooded area".
-      await expect(card).not.toContainText(/hectare|(?<!not )burned area|caused by|probability/i);
+      // FIRMS never feeds the answer (result.spec scans the whole card for claims).
+      await expect(witness).not.toContainText(/burned area|caused by|probability|hectare/i);
       await expect(page.getByTestId("lens-slot-drivers")).toHaveCount(0);
       await expect(globe.panel.getByTestId("prov-demo")).toHaveCount(0);
     });
@@ -879,7 +815,7 @@ test.describe("Explorer: live exploration", () => {
       await globe.mockExplorations({ first: withFireContext("wildfire", FIRE_AVAILABLE) });
       await globe.goto(`?frame=${LIVE_FRAME.id}&lens=wildfire`);
 
-      await expect(globe.verdict).toHaveAttribute("data-verdict", "within");
+      await expect(globe.resultCard).toHaveAttribute("data-lens", "wildfire");
       const fire = globe.panel.getByTestId("fire-context");
       await expect(page.getByTestId("lens-witness")).toContainText("SECOND WITNESS · NASA FIRMS");
       await expect(fire).toContainText("3 active-fire detections between the two passes");
@@ -917,14 +853,14 @@ test.describe("Explorer: live exploration", () => {
       await expect(fire).toContainText("radar-only");
       await expect(globe.panel.getByTestId("lens-witness-status")).toHaveText("UNAVAILABLE");
       await expect(globe.panel.getByTestId("lens-witness").getByTestId("prov-real")).toHaveCount(0);
-      await expect(globe.verdict).toHaveAttribute("data-verdict", "within");
+      await expect(globe.resultCard).toHaveAttribute("data-lens", "wildfire");
     });
 
     test("other lenses show no fire context", async () => {
       await globe.mockExplorations({ first: succeededView() });
       await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-      await expect(globe.verdict).toBeVisible();
+      await expect(globe.resultCard).toBeVisible();
       await expect(globe.panel.getByTestId("fire-context")).toHaveCount(0);
     });
   });
@@ -1014,138 +950,34 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
   }) => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
 
-    await expect(globe.timelineReadout).toHaveText("12 Sep 2026 · baseline · pass 3 of 5");
-    // The globe drapes the selected pass's own HH image.
-    await globe.expectScene((scene) =>
-      expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-09-12_HH"),
-    );
-    await expect(globe.timelineCompare).toHaveCount(0);
-    await expect(globe.timeline).toContainText("BASELINE · 4 PASSES");
-    const first = globe.timelinePasses("base").first();
-    await first.click();
-    await expect(globe.timelineReadout).toHaveText("14 Jul 2026 · baseline · pass 1 of 5");
+    // Reduced motion opens paused on the reference pass (COPY-flow-v9 §6), with its own HH image.
+    await expect(globe.timelineReadout).toHaveText("Pass 1 of 5 · 14 Jul 2026");
     await globe.expectScene((scene) =>
       expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-07-14_HH"),
     );
-    await page.keyboard.press("ArrowRight");
-    await expect(globe.timelineReadout).toHaveText("19 Aug 2026 · baseline · pass 2 of 5");
-    await globe.timelinePasses("target").click();
-    await expect(globe.timelineReadout).toHaveText("11 Nov 2026 · target · pass 5 of 5");
-  });
-
-  test("the dock follows the pass: a missing image is disabled and an empty tile, never another date", async ({
-    page,
-  }) => {
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
-
-    await expect(page.getByTestId("raw-kicker")).toHaveText(
-      "RAW RADAR · 12 SEP 2026 · PASS 3 OF 5",
+    await expect(globe.timelineCompare).toHaveCount(0);
+    await expect(globe.timeline).toContainText("BASELINE · 4 PASSES");
+    await globe.timelinePasses("base").nth(2).click();
+    await expect(globe.timelineReadout).toHaveText("Pass 3 of 5 · 12 Sep 2026");
+    await globe.expectScene((scene) =>
+      expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-09-12_HH"),
     );
-    await expect(page.getByTestId("raw-thumbs").getByTestId("prov-real-dates")).toBeVisible();
-    await expect(page.getByTestId("dock-row-hh")).toBeEnabled();
-    await expect(page.getByTestId("dock-row-hv")).toBeDisabled();
-    await expect(page.getByTestId("dock-row-hv")).toContainText("No HV image for this pass");
-    await expect(page.getByTestId("raw-empty-hv")).toHaveText("No image");
-    await expect(page.getByTestId("dock-row-change")).toBeDisabled();
-    await expect(page.getByTestId("dock-row-rule")).toBeDisabled();
-    await expect(page.getByTestId("dock-row-coherence")).toContainText("NO PAIR");
-    await expect(page.getByTestId("dock-row-landCover")).toBeDisabled();
-    await expect(page.getByTestId("dock-row-landCover").getByTestId("prov-todo")).toBeVisible();
-
-    await globe.timelinePasses("base").nth(3).click();
-    await expect(page.getByTestId("dock-row-hh")).toBeDisabled();
-    await expect(page.getByTestId("dock-row-hv")).toBeDisabled();
-    await expect(page.getByTestId("raw-empty-hh")).toBeVisible();
-    await expect(globe.liveLayerDock.getByTestId("prov-demo")).toHaveCount(0);
-    await expect(globe.liveLayerDock.getByTestId("prov-demo-dates")).toHaveCount(0);
+    await page.keyboard.press("ArrowLeft");
+    await expect(globe.timelineReadout).toHaveText("Pass 2 of 5 · 19 Aug 2026");
+    await globe.timelinePasses("target").click();
+    await expect(globe.timelineReadout).toHaveText("Pass 5 of 5 · 11 Nov 2026");
   });
 
-  test("the Coherence row with no pair opens the ground-motion pair picker", async ({ page }) => {
-    await globe.mockInsarPairs();
+  test("a manual pass pick stops the player and keeps that pass", async () => {
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-
-    await page.getByTestId("dock-row-coherence").click();
-    await expect(page).toHaveURL(/lens=insar/);
-  });
-
-  test(
-    "Play runs the five passes every 1.1 s and stops on the target; the stamp shows each date",
-    { tag: "@globe" },
-    async ({ page }) => {
-      await globe.goto(`?frame=${LIVE_FRAME.id}`);
-      await globe.timelinePasses("base").first().click();
-      await expect(globe.timelineReadout).toHaveText("14 Jul 2026 · baseline · pass 1 of 5");
-
-      // Real time, not page.clock: a fake clock also drives requestAnimationFrame, so every tick made
-      // Cesium render dozens of SwiftShader frames and slow CI ran out of time. The page records every
-      // render where the readout, the stamp or the Play label changed, so nothing is missed however
-      // slowly the test itself runs.
-      await page.evaluate(() => {
-        const text = (id: string) =>
-          document.querySelector(`[data-testid="${id}"]`)?.textContent ?? "";
-        const label = () =>
-          document.querySelector('[data-testid="timeline-play"]')?.getAttribute("aria-label") ?? "";
-        const now = () => ({
-          line: text("timeline-readout"),
-          stamp: text("timelapse-stamp"),
-          play: label(),
-          at: performance.now(),
-        });
-        const steps = [now()];
-        new MutationObserver(() => {
-          const step = now();
-          const last = steps.at(-1);
-          if (last?.line !== step.line || last.stamp !== step.stamp || last.play !== step.play)
-            steps.push(step);
-        }).observe(document.body, {
-          subtree: true,
-          childList: true,
-          characterData: true,
-          attributes: true,
-        });
-        Object.assign(window, { lapseSteps: steps });
-      });
-      type Step = { line: string; stamp: string; play: string; at: number };
-      const recorded = () =>
-        page.evaluate(() => (window as unknown as { lapseSteps: Step[] }).lapseSteps);
-
-      await page.getByTestId("timeline-play").click();
-      // Four steps of 1.1 s plus the one that ends on the target; generous for slow software WebGL.
-      await expect.poll(async () => (await recorded()).length, { timeout: 30_000 }).toBe(7);
-
-      const PLAY = "Play the 5 passes";
-      const PAUSE = "Pause time-lapse";
-      const steps = await recorded();
-      expect(steps.map(({ line, stamp, play }) => [line, stamp, play])).toEqual([
-        ["14 Jul 2026 · baseline · pass 1 of 5", "", PLAY],
-        ["14 Jul 2026 · baseline · pass 1 of 5", "14 JUL 2026PASS 1 OF 5 · BASELINE", PAUSE],
-        ["19 Aug 2026 · baseline · pass 2 of 5", "19 AUG 2026PASS 2 OF 5 · BASELINE", PAUSE],
-        ["12 Sep 2026 · baseline · pass 3 of 5", "12 SEP 2026PASS 3 OF 5 · BASELINE", PAUSE],
-        ["18 Oct 2026 · baseline · pass 4 of 5", "18 OCT 2026PASS 4 OF 5 · BASELINE", PAUSE],
-        ["11 Nov 2026 · target · pass 5 of 5", "11 NOV 2026PASS 5 OF 5 · TARGET", PAUSE],
-        ["11 Nov 2026 · target · pass 5 of 5", "", PLAY],
-      ]);
-      // A timer never fires early: from Play on, each step comes at least one step after the last.
-      for (let index = 2; index < steps.length; index += 1) {
-        const gap = (steps[index]?.at ?? 0) - (steps[index - 1]?.at ?? 0);
-        expect(gap).toBeGreaterThanOrEqual(1000);
-      }
-      // 18 Oct and 11 Nov have no image: the HH row is off, nothing else is drawn in their place.
-      await expect(page.getByTestId("dock-row-hh")).toBeDisabled();
-    },
-  );
-
-  test("a manual pass pick stops the time-lapse and keeps that pass", async ({ page }) => {
-    await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    const play = page.getByTestId("timeline-play");
-    await play.click();
-    await expect(play).toHaveAttribute("aria-label", "Pause time-lapse");
+    await globe.timelinePlay.click();
+    await expect(globe.timelinePlay).toHaveAttribute("aria-label", "Pause");
     await globe.timelinePasses("base").nth(1).click();
-    await expect(play).toHaveAttribute("aria-label", "Play the 5 passes");
-    await expect(globe.timelineReadout).toHaveText("19 Aug 2026 · baseline · pass 2 of 5");
-    // Stopped: no stamp on the globe, and the picked pass stays draped.
+    await expect(globe.timelinePlay).toHaveAttribute("aria-label", "Play");
+    await expect(globe.timelineReadout).toHaveText("Pass 2 of 5 · 19 Aug 2026");
+    // Stopped on the picked pass: it stays draped and the stamp names it.
     await globe.expectScene((scene) => {
-      expect(scene.stamp).toBeUndefined();
+      expect(scene.stamp?.date).toBe("19 AUG 2026");
       expect(layerIdOf(scene.drape?.url ?? "")).toBe("display_2026-08-19_HH");
     });
   });
@@ -1154,20 +986,26 @@ test.describe("Explorer: raw passes, layer dock and the time-lapse (#20)", () =>
     "under reduced motion the globe swaps layers with no crossfade",
     { tag: "@globe" },
     async ({ page }) => {
-      await globe.goto(`?frame=${LIVE_FRAME.id}`);
-      await expect(page.getByTestId("dock-row-hh")).toHaveAttribute("aria-pressed", "true");
+      await globe.mockExplorations({ first: wildfireView() });
+      await globe.goto(`?frame=${LIVE_FRAME.id}&lens=wildfire`);
+      await expect(globe.layerRadio("hv")).toHaveAttribute("aria-checked", "true");
 
-      await globe.timelinePasses("base").first().click();
-      await page.getByTestId("dock-row-hv").click();
-      await expect(page.getByTestId("dock-row-hv")).toHaveAttribute("aria-pressed", "true");
+      await globe.layerRadio("hvdrop").click();
+      await expect(globe.layerRadio("hvdrop")).toHaveAttribute("aria-checked", "true");
       await expect(page.getByTestId("globe")).not.toHaveAttribute("data-crossfade", "on");
     },
   );
 
-  test("on a phone there is no Play button", async ({ page }) => {
+  test("on a phone the strip keeps previous, play and next, without speed or loop", async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(globe.verdict).toBeVisible();
-    await expect(page.getByTestId("timeline-play")).toBeHidden();
+    await expect(globe.resultCard).toBeVisible();
+    await expect(page.getByTestId("timeline-play")).toBeVisible();
+    await expect(page.getByTestId("timeline-prev")).toBeVisible();
+    await expect(page.getByTestId("timeline-step-next")).toBeVisible();
+    await expect(page.getByTestId("timeline-speed")).toBeHidden();
+    await expect(page.getByTestId("timeline-loop")).toBeHidden();
   });
 });

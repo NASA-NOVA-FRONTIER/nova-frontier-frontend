@@ -58,7 +58,7 @@
     system-ui,
     sans-serif;
   text-wrap: pretty;
-  text-align: left;
+  text-align: start;
   pointer-events: none;
   animation: s-infotip-in 120ms ease-out;
 }

@@ -48,7 +48,7 @@
   border-radius: 12px;
   background: transparent;
   font-size: 14px;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 
@@ -167,7 +167,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  text-align: right;
+  text-align: end;
 }
 
 .x-story__slot {

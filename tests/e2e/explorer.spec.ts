@@ -133,7 +133,7 @@ test.describe("Explorer: measured cases", () => {
     );
     await globe.timelinePasses("meas").first().click();
     await expect(globe.timelineCompare).toHaveAttribute("aria-pressed", "false");
-    await expect(globe.timelineReadout).toHaveText("7 Aug 2026 · measured pass");
+    await expect(globe.timelineReadout).toHaveText("Pass 5 of 8 · 7 Aug 2026");
   });
 
   test("Chocó shows its coherence only, no chart and no timeline", async () => {
@@ -209,7 +209,7 @@ test.describe("Explorer: live questions", () => {
     await expect(page.getByTestId("plan-error")).toContainText(
       "We couldn't reach the radar archive",
     );
-    await expect(globe.verdict).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
     await page.getByTestId("plan-error").getByRole("button", { name: "Try again" }).click();
     await expect(globe.planPasses).toContainText("39 passes in the plan");
   });
@@ -257,8 +257,8 @@ test.describe("Explorer: live questions", () => {
     const api = await globe.mockExplorations({ first: succeededView() });
     const LOCKED = [
       ["bug-fire", "wildfire", "Bug Fire, USA"],
-      ["rowe-creek", "vegetation_disturbance", "Rowe Creek, USA"],
-      ["skollersta", "agriculture", "Sköllersta, Sweden"],
+      // Issue #28: Pará event 02 is the deforestation case (Niscemi is covered in landslide.spec).
+      ["para-event-02", "vegetation_disturbance", "Pará event 02, Brazil"],
     ] as const;
     for (const [id, lens, title] of LOCKED) {
       await globe.goto(`?case=${id}`);
@@ -269,6 +269,18 @@ test.describe("Explorer: live questions", () => {
       await expect(page.getByTestId("lens-locked")).toBeVisible();
     }
     expect(api.posts).toHaveLength(0);
+  });
+
+  // Issue #28: Chocó lists the gateway's limitations and has no common phase cell to show.
+  test("Chocó lists the gateway's limitations and never offers a phase", async ({ page }) => {
+    const globe = new GlobePage(page);
+    await globe.mockObservationPlan();
+    await globe.goto("?case=choco");
+    const list = globe.panel.getByTestId("case-limitations");
+    await expect(list.getByRole("listitem")).toHaveCount(6);
+    await expect(list).toContainText("No earthquake detection, earthquake attribution");
+    await expect(globe.panel).toContainText("Common phase");
+    await expect(globe.panel).toContainText("0 cells");
   });
 
   test(
@@ -289,7 +301,7 @@ test.describe("Explorer: live questions", () => {
       await expect(globe.tooltip).toContainText("click to ask the radar");
 
       const before = await globe.panelTitle.textContent();
-      // The click places the square; "Use this square" checks the catalog; nothing runs until Analyze.
+      // The click places the square; "Use this square" checks the catalog; nothing runs until Start.
       await globe.clickLand();
       await globe.useSquare.click();
       await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
@@ -322,10 +334,10 @@ test.describe("Explorer: v8 top bar", () => {
     // Hidden until the backend accepts a direction: a choice that isn't sent would mislead.
     await expect(page.getByTestId("direction-switch")).toHaveCount(0);
 
-    // The sound toggle (#36) shares this bar. The pill is its flexible item (flex: 0 1 340px), so
-    // with a case open at 1440 px it gives up the few pixels the toggle needs.
+    // The sound toggle (#36) and the language button (#39) share this bar. The pill is its flexible
+    // item (flex: 0 1 340px), so with a case open at 1440 px it gives up the pixels they need.
     const pill = await globe.searchPill.boundingBox();
-    expect(pill?.width).toBeGreaterThanOrEqual(300);
+    expect(pill?.width).toBeGreaterThan(250);
     expect(pill?.width).toBeLessThanOrEqual(340);
 
     // The mode switch hides below 1280 px and the page links below 1120 px.
@@ -343,7 +355,7 @@ test.describe("Explorer: v8 top bar", () => {
   });
 });
 
-test.describe("Explorer: pick a spot (step 2)", () => {
+test.describe("Explorer: confirm the square (v9 step 3)", () => {
   let globe: GlobePage;
 
   test.beforeEach(async ({ page }) => {
@@ -352,7 +364,7 @@ test.describe("Explorer: pick a spot (step 2)", () => {
     await globe.mockObservationPlan();
   });
 
-  test("a land spot shows the catalog's real dates, the 36-day gap and the expected wait", async ({
+  test("a land square opens the confirm panel with its real passes; Cancel goes back to the cases", async ({
     page,
   }) => {
     await globe.mockCoverage();
@@ -362,26 +374,21 @@ test.describe("Explorer: pick a spot (step 2)", () => {
     await globe.useSquare.click();
 
     await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
-    await expect(globe.placeCard).toContainText("NEW SPOT · LIVE ANALYSIS");
-    await expect(page.getByTestId("spot-area")).toHaveText(/AREA\s*10\.24 km square/);
+    await expect(globe.placeCard).toContainText("CONFIRM THE ANALYSIS");
+    await expect(page.getByTestId("confirm-title")).toHaveText("What should the radar look for?");
+    await expect(page.getByTestId("strip-pass")).toHaveCount(5);
+    await expect(page.getByTestId("confirm-series")).toHaveText("5 passes · track 84 ASCENDING");
     // #25: the backend's p80 for this spot (228.9 s in the recorded answer), not a fixed range.
-    await expect(page.getByTestId("spot-wait")).toContainText("Usually under 4 min");
-    await expect(page.getByTestId("spot-wait")).toContainText("plus any queue");
-    await expect(page.getByTestId("spot-catalog")).toContainText("IN THE CATALOG · ASCENDING");
-    await expect(page.getByTestId("spot-catalog")).toContainText("LAST 5 MONTHS");
-    await expect(page.getByTestId("spot-catalog").getByRole("listitem")).toHaveCount(5);
-    await expect(page.getByTestId("spot-gap")).toContainText(
-      "The 36-day gap after 14 Jul is real.",
-    );
-    await expect(globe.placeAnalyse).toHaveText(/Analyze this spot/);
+    await expect(page.getByTestId("confirm-wait")).toHaveText("Usually under 4 min");
+    await expect(globe.placeAnalyse).toHaveText("Start analysis");
 
-    await page.getByTestId("spot-cases").click();
+    await page.getByTestId("confirm-cancel").click();
     await expect(globe.placeCard).toBeHidden();
     await expect(globe.startCard).toBeVisible();
   });
 
   test(
-    "an ocean click shows No NISAR data here and the nearest known case",
+    "an ocean click says NISAR hasn't measured the square and offers the nearest case",
     { tag: "@globe" },
     async ({ page }) => {
       // Every click now flies the camera to its square, and close-up tiles render slowly in software WebGL.
@@ -391,16 +398,13 @@ test.describe("Explorer: pick a spot (step 2)", () => {
       await globe.clickOcean();
       await globe.useSquare.click();
 
-      await expect(globe.placeCard).toHaveAttribute("data-state", "noCoverage");
-      await expect(globe.placeCard).toContainText("CLICKED POINT · NO COVERAGE");
-      await expect(page.getByTestId("place-title")).toHaveText("No NISAR data here");
-      await expect(page.getByTestId("spot-nodata")).toHaveText(
-        "The catalog has no compatible passes at this point. Over open ocean NISAR data isn't analyzed here.",
-      );
-      await expect(globe.spotNearest).toContainText(/Nearest known case · about [\d,]+ km/);
+      await expect(globe.placeCard).toHaveAttribute("data-state", "none");
+      await expect(globe.confirmNote).toContainText("NISAR hasn't measured this square yet");
+      await expect(globe.placeAnalyse).toBeDisabled();
+      await expect(globe.spotNearest).toHaveText("Open a measured case");
       expect(globe.coverageRequests).toHaveLength(1);
 
-      await page.getByTestId("spot-another").click();
+      await page.getByTestId("confirm-cancel").click();
       await expect(globe.placeCard).toBeHidden();
       await expect(globe.startCard).toBeVisible();
 
@@ -419,10 +423,10 @@ test.describe("Explorer: pick a spot (step 2)", () => {
     await globe.searchInput.press("Enter");
     await globe.useSquare.click();
 
-    await expect(page.getByTestId("spot-error")).toContainText(
+    await expect(page.getByTestId("confirm-error")).toContainText(
       "We couldn't reach the radar archive",
     );
-    await page.getByTestId("spot-error").getByRole("button", { name: "Try again" }).click();
+    await page.getByTestId("confirm-error").getByRole("button", { name: "Try again" }).click();
     await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
     expect(globe.coverageRequests).toHaveLength(2);
   });

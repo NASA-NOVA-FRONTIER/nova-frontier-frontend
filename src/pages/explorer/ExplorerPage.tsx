@@ -29,7 +29,7 @@ import type { Frame, LonLat } from "@/features/frames/frame.types";
 import { findFrameAt, loadFrames } from "@/features/frames/frames";
 import { pointFromParams, pointToParams, squareFromParams } from "@/features/geo/areaLink";
 import type { Area } from "@/features/geo/geo.types";
-import { AOI_SIDE_KM } from "@/features/geo/limits";
+import { AOI_SIDE_KM, INSAR_WINDOW_KM } from "@/features/geo/limits";
 import { boundsOf } from "@/features/geo/longitude";
 import { centreOf, ringOf } from "@/features/geo/measure";
 import { toGeoJson } from "@/features/geo/serialize";
@@ -51,10 +51,7 @@ import {
   defaultView,
   dockRows,
   measuredPasses,
-  nextStep,
-  playStart,
   shownLayer,
-  timeLapseSteps,
   type DockPick,
 } from "@/features/explore/exploreDock";
 import { liveLayers } from "@/features/explore/exploreLayers";
@@ -74,6 +71,14 @@ import { LiveProblem, LiveProgress } from "@/features/live/LiveStatus";
 import { LensPicker, type LensRun } from "@/features/lenses/LensPicker";
 import { LensResultCard } from "@/features/lenses/LensResultCard";
 import { isCardLens } from "@/features/lenses/lensSlots";
+import { LegendCard } from "@/features/result/LegendCard";
+import { ResultCard } from "@/features/result/ResultCard";
+import {
+  defaultResultView,
+  isV9Lens,
+  layerOptions,
+  selectedOption,
+} from "@/features/result/resultLayers";
 import { PlanState } from "@/features/live/LiveSummary";
 import { useFramePlan } from "@/features/live/useFramePlan";
 import { NovaChat } from "@/features/nova/NovaChat";
@@ -86,6 +91,8 @@ import {
   ONBOARDING_STEPS,
 } from "@/features/onboarding/onboardingState";
 import { MoreInfoSheet } from "@/features/sheet/MoreInfoSheet";
+import { ConfirmPanel } from "@/features/confirm/ConfirmPanel";
+import { confirmLensOf } from "@/features/confirm/confirmView";
 import {
   CHAPTERS,
   LAST_CHAPTER,
@@ -100,26 +107,34 @@ import { fetchCoverage } from "@/features/spot/coverageApi";
 import { nearestCase } from "@/features/spot/spot";
 import { StoryMode } from "@/features/story/StoryMode";
 import { PassTimeline } from "@/features/timeline/PassTimeline";
+import { stampOf, type StepView } from "@/features/timeline/sequence";
 import { formatDay } from "@/features/timeline/timelineLayout";
-import { CASE_LOCK, STEP_4, passOf } from "@/content/copyV8";
+import { CASE_LOCK } from "@/content/copyV8";
 import { EMPTY_GLOBE } from "@/content/copyV9";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { useAsync } from "@/lib/useAsync";
 import { PHONE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import { useNow } from "@/lib/useNow";
 import { DirectionSwitch } from "@/pages/explorer/DirectionSwitch";
-import { SpotCard } from "@/pages/explorer/SpotCard";
 import { legendFor, type DrapeKind } from "@/pages/explorer/drapeLegend";
 import { LayerDock } from "@/pages/explorer/LayerDock";
 import { LiveLayerDock } from "@/pages/explorer/LiveLayerDock";
 import { MobileBar } from "@/pages/explorer/MobileBar";
-import { hasLayerPills, layerPills, sheetFraction, sheetStep } from "@/pages/explorer/mobileSheet";
+import {
+  canExpand,
+  hasLayerPills,
+  layerPills,
+  resultPills,
+  sheetFraction,
+  sheetStep,
+} from "@/pages/explorer/mobileSheet";
 import { SheetHandle } from "@/pages/explorer/SheetHandle";
 import { SourceSwitch } from "@/pages/explorer/SourceSwitch";
 import { SquareBar } from "@/pages/explorer/SquareBar";
 import { HintPill, StartCard } from "@/pages/explorer/StartCard";
 import { TopBar, type DownloadItem } from "@/pages/explorer/TopBar";
 
+import { tr } from "@/i18n/translate";
 type Selection =
   | { kind: "case"; item: Case }
   | {
@@ -142,8 +157,6 @@ const CHIP_ZOOM = 3.2;
 const REGION_KM = 240;
 const REGION_ZOOM = 1;
 const DEFAULT_OPACITY = 85;
-// SPECS-v8 §4: the time-lapse advances one pass every 1.1 s.
-const TIME_LAPSE_MS = 1100;
 // Chapter 1 shows the Punjab plains around the Chenab (SPECS §5: ~2,600 km altitude).
 const STORY_REGION_KM = 900;
 const STORY_REGION_SECONDS = 2.2;
@@ -283,6 +296,8 @@ export const ExplorerPage = () => {
   const [squareLens, setSquareLens] = useState<LensId>(
     initial.square !== undefined ? initial.lens : DEFAULT_LENS,
   );
+  // The confirm panel's phenomenon chip (v9 step 3); agriculture isn't one of them.
+  const confirmLens = confirmLensOf(squareLens);
   // The spot "Analyze this spot" ran on, so Cancel analysis can go back to it (SPECS-v8 §3).
   const [analysed, setAnalysed] = useState<Place>();
   const [collapsed, setCollapsed] = useState(false);
@@ -364,15 +379,6 @@ export const ExplorerPage = () => {
     framesRef.current = frames;
   }, [frames]);
 
-  // The catalog decides coverage; the frame outline is optional context.
-  const askArea = useCallback(
-    (area: Area, lens: LensId = DEFAULT_LENS) => {
-      const centre = centreOf(area);
-      ask(frameUnder(framesRef.current, centre), centre, lens, area);
-    },
-    [ask],
-  );
-
   const live = selection?.kind === "live" ? selection : undefined;
   const runKey =
     live === undefined
@@ -429,8 +435,11 @@ export const ExplorerPage = () => {
     pick: DockPick;
     date: string | undefined;
   }>();
-  // The run whose time-lapse is playing; any other run (or none) means stopped.
-  const [lapseFor, setLapseFor] = useState("");
+  // Bumped to pause the timeline's player: a globe drag, the sheet, another lens or layer.
+  const [timelinePause, setTimelinePause] = useState(0);
+  const pauseTimeline = useCallback(() => setTimelinePause((count) => count + 1), []);
+  // The live timeline's step in focus, for the globe stamp; tagged with its run.
+  const [timelineStep, setTimelineStep] = useState<{ runKey: string; step: StepView }>();
 
   const openCase = useCallback((item: Case) => {
     setSelection({ kind: "case", item });
@@ -648,12 +657,12 @@ export const ExplorerPage = () => {
   ]);
 
   const openSheet = () => {
-    setLapseFor("");
+    pauseTimeline();
     setSheetOpen(true);
   };
 
   const chooseLens = (lens: LensId) => {
-    setLapseFor("");
+    pauseTimeline();
     // Issue #28: a demo case keeps the analysis it was computed with; it never becomes a live question.
     if (selection === undefined || selection.kind === "case") return;
     if (lens === selection.lens) return;
@@ -680,8 +689,17 @@ export const ExplorerPage = () => {
           })
         : undefined;
   // Live answers of the four lenses read as the v8 lens result; cases and ground motion keep v7.
+  // v9 (#15): the four live lenses read as the v9 result card; agriculture keeps the v8 lens card.
+  const resultLens =
+    subject?.kind === "live" && exploredView !== undefined && isV9Lens(subject.lens)
+      ? subject.lens
+      : undefined;
   const showLensCard =
-    subject?.kind === "live" && exploredView !== undefined && isCardLens(subject.lens);
+    subject?.kind === "live" &&
+    exploredView !== undefined &&
+    isCardLens(subject.lens) &&
+    resultLens === undefined;
+  const resultPanel = showLensCard || resultLens !== undefined;
   const lensRun: LensRun | undefined =
     live !== undefined && live.lensSwitch && liveRuns && running && isCardLens(live.lens)
       ? { lens: live.lens, view: exploredView, receivedAt }
@@ -698,79 +716,70 @@ export const ExplorerPage = () => {
     [phase, exploredView, framePlan.plan],
   );
   const livePasses = useMemo(() => measuredPasses(liveTimeline?.passes ?? []), [liveTimeline]);
-  const dockDefault = useMemo(() => defaultView(layers, livePasses), [layers, livePasses]);
+  // The v9 layer switch: a run starts on its lens's first layer, so a lens change resets it.
+  const liveV9Lens = live !== undefined && isV9Lens(live.lens) ? live.lens : undefined;
+  const resultOptions = useMemo(
+    () => (liveV9Lens === undefined ? [] : layerOptions(liveV9Lens, layers)),
+    [liveV9Lens, layers],
+  );
+  const dockDefault = useMemo(
+    () =>
+      liveV9Lens === undefined
+        ? defaultView(layers, livePasses)
+        : defaultResultView(liveV9Lens, layers, livePasses),
+    [liveV9Lens, layers, livePasses],
+  );
   const dockView = dockChoice?.runKey === runKey ? dockChoice : dockDefault;
   const liveLayer = shownLayer(layers, dockView.pick, dockView.date);
   const layerId = liveLayer?.id;
-  const lapsePlaying = lapseFor !== "" && lapseFor === runKey;
-  const stopLapse = () => setLapseFor("");
   const setDock = (pick: DockPick, date: string | undefined = dockView.date) =>
     setDockChoice({ runKey, pick, date });
-  // Any pick of a layer that is not a pass channel stops the time-lapse; HH ↔ HV keeps it going.
+  // Any pick of a layer that is not a pass channel stops the player; HH ↔ HV keeps it going.
   const pickDock = (pick: DockPick) => {
-    if (pick?.kind !== "pass") stopLapse();
+    if (pick?.kind !== "pass") pauseTimeline();
     setDock(pick);
   };
-  const pickPass = (date: string) => {
-    stopLapse();
-    setDock(dockView.pick, date);
-  };
-  const lapsePol = dockView.pick?.kind === "pass" ? dockView.pick.pol : "HH";
-  const lapseSteps = useMemo(
-    () => timeLapseSteps(livePasses, layers, lapsePol),
-    [livePasses, layers, lapsePol],
+  const pickPass = (date: string) => setDock(dockView.pick, date);
+  const onTimelineStep = useCallback(
+    (step: StepView | undefined) =>
+      setTimelineStep(step === undefined ? undefined : { runKey, step }),
+    [runKey],
   );
-  const lapseIndex = lapseSteps.findIndex((step) => step.date === dockView.date);
-  const togglePlay = () => {
-    if (lapsePlaying) {
-      stopLapse();
-      return;
-    }
-    const start = lapseSteps[playStart(lapseIndex, lapseSteps.length)];
-    if (start === undefined) return;
-    setDock({ kind: "pass", pol: lapsePol }, start.date);
-    setLapseFor(runKey);
-  };
-  // One step every 1.1 s; the step after the target ends the time-lapse on the target.
-  useEffect(() => {
-    if (!lapsePlaying) return;
-    const timer = window.setTimeout(() => {
-      const next = nextStep(lapseIndex, lapseSteps.length);
-      const step = next === undefined ? undefined : lapseSteps[next];
-      if (step === undefined) setLapseFor("");
-      else setDockChoice({ runKey, pick: { kind: "pass", pol: lapsePol }, date: step.date });
-    }, TIME_LAPSE_MS);
-    return () => window.clearTimeout(timer);
-  }, [lapsePlaying, lapseIndex, lapseSteps, lapsePol, runKey]);
-  const lapseStep = lapsePlaying ? lapseSteps[lapseIndex] : undefined;
-  // Under the footprint the user asked about, which is the box the images cover.
-  const lapseBox = live === undefined ? undefined : boundsOf(ringOf(live.area));
+  // v9: the stamp always names the step in focus, under the footprint the images cover. Only over a
+  // pass image or the pair's layers: a change map isn't any one pass.
+  const stampBox = live === undefined ? undefined : boundsOf(ringOf(live.area));
+  const focus = timelineStep?.runKey === runKey ? timelineStep.step : undefined;
+  const stamp =
+    focus !== undefined &&
+    stampBox !== undefined &&
+    (focus.mode === "intervals" || dockView.pick?.kind === "pass")
+      ? { ...stampOf(focus), box: stampBox }
+      : undefined;
 
   const tourItem = storyCase();
   const storyItem = story ? tourItem : undefined;
   const scene =
     storyItem === undefined
       ? sceneOf(selection, !running, drapeKind, opacity, {
-          square: place && { place, ...placement },
+          square: place && {
+            place,
+            ...placement,
+            // Earthquake measures a 5 km window at the centre: drawn while the panel offers it.
+            inner: placement.used && confirmLens === "insar",
+          },
           liveDrape: liveLayer && { url: liveLayer.href, bounds: liveLayer.bounds },
           gridMetres: gridMetresOf(exploredView),
-          stamp: lapseStep &&
-            lapseBox && {
-              date: formatDay(lapseStep.date).toUpperCase(),
-              pass:
-                lapseStep.role === undefined
-                  ? passOf(lapseStep.k, lapseStep.n)
-                  : STEP_4.playStampPass(lapseStep.k, lapseStep.n, lapseStep.role),
-              target: lapseStep.role === "TARGET",
-              box: lapseBox,
-            },
+          stamp,
         })
       : storyScene(storyItem, chapter, opacity);
 
   const showTimeline = item?.timeline !== undefined && item.coherenceOnly !== true && !sheetOpen;
-  const showLiveTimeline = liveTimeline !== undefined && !sheetOpen;
+  // Kept mounted under the sheet (hidden, inert, paused) so closing it returns to the same pass.
+  const showLiveTimeline = liveTimeline !== undefined;
   const showDock = item?.crops !== undefined && !sheetOpen;
-  const showLiveDock = layers.length > 0 && !sheetOpen;
+  const showLiveDock = layers.length > 0 && !sheetOpen && liveV9Lens === undefined;
+  const showLegend = layers.length > 0 && !sheetOpen && liveV9Lens !== undefined;
+  const selectedLayer = selectedOption(resultOptions, dockView.pick)?.id;
 
   // Phones: the bottom sheet of steps 2–6 and 8, the layer pills and the timeline above them.
   const failed =
@@ -792,9 +801,11 @@ export const ExplorerPage = () => {
   const sheetKey = step === undefined ? "" : `${step}|${runKey}|${place?.id ?? ""}`;
   const expanded = sheetKey !== "" && expandedFor === sheetKey;
   const pills =
-    hasLayerPills(step) && layers.length > 0
-      ? layerPills(dockRows(layers, dockView.date, dockView.pick))
-      : [];
+    !hasLayerPills(step) || layers.length === 0
+      ? []
+      : liveV9Lens === undefined
+        ? layerPills(dockRows(layers, dockView.date, dockView.pick))
+        : resultPills(resultOptions, selectedLayer);
   const sheetStyle = {
     "--x-sheet-f": step === undefined ? "0" : String(sheetFraction(step, expanded)),
   } as CSSProperties;
@@ -803,7 +814,7 @@ export const ExplorerPage = () => {
   const lensChip = lensId === undefined ? "" : (findLens(lensId)?.chip ?? "");
   // Nova reads the v8 lens card through the same pure functions the card draws with.
   const cardFacts =
-    showLensCard && subject !== undefined && exploredView !== undefined
+    resultPanel && subject !== undefined && exploredView !== undefined
       ? cardFactsOf(subject, exploredView)
       : undefined;
   const novaContext: NovaContext = {
@@ -890,8 +901,8 @@ export const ExplorerPage = () => {
   const downloads: DownloadItem[] = [
     {
       id: "png",
-      label: "Screenshot of the globe",
-      sub: "PNG of this view, with its place, dates and legend",
+      label: tr("Screenshot of the globe"),
+      sub: tr("PNG of this view, with its place, dates and legend"),
       disabledWhy: unavailable ? "The 3D globe isn't available in this browser" : undefined,
       onPick: () => void downloadPng(),
     },
@@ -920,8 +931,8 @@ export const ExplorerPage = () => {
     },
     {
       id: "csv",
-      label: "Data · CSV",
-      sub: "One row per pass, with its sources and limits, for spreadsheets",
+      label: tr("Data · CSV"),
+      sub: tr("One row per pass, with its sources and limits, for spreadsheets"),
       disabledWhy: exportsLive
         ? undefined
         : live !== undefined
@@ -945,8 +956,8 @@ export const ExplorerPage = () => {
     },
     {
       id: "pdf",
-      label: "PDF report",
-      sub: "Data blocks plus a template summary, ready to print",
+      label: tr("PDF report"),
+      sub: tr("Data blocks plus a template summary, ready to print"),
       disabledWhy: exportsLive
         ? undefined
         : live !== undefined
@@ -982,7 +993,9 @@ export const ExplorerPage = () => {
       >
         {unavailable ? (
           <div className="x-nogl" data-testid="no-webgl">
-            <p className="x-nogl__pill">3D globe unavailable in this browser · panels still work</p>
+            <p className="x-nogl__pill">
+              {tr("3D globe unavailable in this browser · panels still work")}
+            </p>
           </div>
         ) : (
           <GlobeView
@@ -995,6 +1008,7 @@ export const ExplorerPage = () => {
             onOpenCase={onGlobeOpenCase}
             onPlace={onGlobePlace}
             onMoveSquare={moveSquare}
+            onInteract={pauseTimeline}
             onUnavailable={() => setUnavailable(true)}
             onViewer={(viewer) => {
               viewerRef.current = viewer;
@@ -1069,7 +1083,7 @@ export const ExplorerPage = () => {
           />
         )}
 
-        {step !== undefined && (
+        {step !== undefined && canExpand(step) && (
           <SheetHandle
             expanded={expanded}
             onToggle={() => setExpandedFor(expanded ? "" : sheetKey)}
@@ -1094,21 +1108,32 @@ export const ExplorerPage = () => {
         )}
 
         {selection === undefined && !story && spot !== undefined && (
-          <SpotCard
+          <ConfirmPanel
+            key={`${spot.id}|${placement.id}`}
             place={spot}
             coverage={coverage}
+            frame={frameUnder(frames, spot.point)}
+            lens={confirmLens}
             nearest={nearest}
             quota={quota}
             limits={limits}
             now={minuteNow}
             cases={CASES}
-            onAnalyse={() => {
+            onLens={setSquareLens}
+            onRetryCoverage={retryCoverage}
+            onStart={(lens, insar) => {
               setAnalysed(spot);
-              askArea({ kind: "point", point: spot.point }, squareLens);
+              ask(
+                frameUnder(framesRef.current, spot.point),
+                spot.point,
+                lens,
+                { kind: "point", point: spot.point },
+                insar,
+              );
             }}
-            onRetry={retryCoverage}
+            onMove={() => setPlacement((previous) => ({ ...previous, used: false }))}
+            onCancel={close}
             onOpenCase={openCase}
-            onClose={close}
           />
         )}
 
@@ -1131,11 +1156,11 @@ export const ExplorerPage = () => {
             lens={item?.lens ?? live?.lens ?? DEFAULT_LENS}
             chip={item !== undefined && <ProvenanceChip kind="offline" />}
             collapsed={collapsed || sheetOpen}
-            result={showLensCard}
+            result={resultPanel}
             picker={
               <LensPicker
                 lens={item?.lens ?? live?.lens ?? DEFAULT_LENS}
-                tabs={showLensCard}
+                tabs={resultPanel}
                 running={lensRun}
                 locked={item && CASE_LOCK.note(findLens(item.lens)?.chip ?? item.lens)}
                 onLens={chooseLens}
@@ -1143,7 +1168,7 @@ export const ExplorerPage = () => {
               />
             }
             onToggle={() => {
-              stopLapse();
+              pauseTimeline();
               if (sheetOpen) setSheetOpen(false);
               else setCollapsed(!collapsed);
             }}
@@ -1169,7 +1194,21 @@ export const ExplorerPage = () => {
                 onMore={openSheet}
               />
             )}
-            {subject !== undefined && !showLensCard && (
+            {resultLens !== undefined &&
+              live !== undefined &&
+              subject !== undefined &&
+              exploredView !== undefined && (
+                <ResultCard
+                  lens={resultLens}
+                  view={exploredView}
+                  subject={subject}
+                  point={live.point}
+                  passes={livePasses}
+                  onNewSquare={close}
+                  onMore={openSheet}
+                />
+              )}
+            {subject !== undefined && !resultPanel && (
               <ResultSummary subject={subject} mode={mode} onMore={openSheet} />
             )}
             {live !== undefined && needsPair && (
@@ -1224,7 +1263,7 @@ export const ExplorerPage = () => {
               )}
             {subject?.kind === "live" && exploredView?.status === "partial" && (
               <p className="x-reason" data-testid="partial-note">
-                Partial answer: only some of the planned passes could be measured.
+                {tr("Partial answer: only some of the planned passes could be measured.")}
               </p>
             )}
             {live !== undefined && <PlanState framePlan={framePlan} today={today} />}
@@ -1237,6 +1276,16 @@ export const ExplorerPage = () => {
             {...(item !== undefined && { caseId: item.id })}
             opacity={opacity}
             onKind={setDrapeKind}
+            onOpacity={setOpacity}
+          />
+        )}
+
+        {showLegend && (
+          <LegendCard
+            options={resultOptions}
+            selected={selectedLayer}
+            opacity={opacity}
+            onPick={pickDock}
             onOpacity={setOpacity}
           />
         )}
@@ -1260,6 +1309,8 @@ export const ExplorerPage = () => {
             <PassTimeline
               key={item.id}
               data={item.timeline}
+              pauseSignal={timelinePause}
+              reduceMotion={reduceMotion}
               demo={item.timeline.realDates !== true}
               realSource={SOURCE.caseTimeline}
             />
@@ -1267,17 +1318,24 @@ export const ExplorerPage = () => {
         )}
 
         {showLiveTimeline && (
-          <div className="x-timeline-wrap" data-collapsed={collapsed}>
+          <div
+            className="x-timeline-wrap"
+            data-collapsed={collapsed}
+            hidden={sheetOpen}
+            inert={sheetOpen}
+          >
             <PassTimeline
               key={runKey}
               data={liveTimeline}
               demo={false}
               live={{
                 date: dockView.date,
-                playing: lapsePlaying,
                 onPick: pickPass,
-                onPlay: togglePlay,
               }}
+              onStep={onTimelineStep}
+              pauseSignal={timelinePause}
+              reduceMotion={reduceMotion}
+              hidden={sheetOpen}
             />
           </div>
         )}
@@ -1372,14 +1430,19 @@ const storyScene = (item: Case, chapter: number, opacity: number): GlobeScene =>
   };
 };
 
-type PlacedSquare = { place: Place; id: number; used: boolean };
+type PlacedSquare = { place: Place; id: number; used: boolean; inner: boolean };
 
 // The placed square: drawn at once, land or ocean. The camera flies to it once per placement (the
 // key ignores the centre), so a drag moves the square under a still camera.
-const squareScene = ({ place, id, used }: PlacedSquare, empty: GlobeScene): GlobeScene => ({
+const squareScene = ({ place, id, used, inner }: PlacedSquare, empty: GlobeScene): GlobeScene => ({
   ...empty,
   target: { key: `square|${id}`, ...placeFraming(place) },
-  square: { centre: place.point, sideKm: AOI_SIDE_KM, movable: !used },
+  square: {
+    centre: place.point,
+    sideKm: AOI_SIDE_KM,
+    movable: !used,
+    ...(inner && { innerKm: INSAR_WINDOW_KM }),
+  },
 });
 
 type SceneExtras = {
@@ -1389,7 +1452,7 @@ type SceneExtras = {
   liveDrape?: Drape | undefined;
   // Posting the service reported for the live result, in metres.
   gridMetres?: number | undefined;
-  // The time-lapse stamp, while it plays.
+  // The timeline's step in focus, named under the footprint.
   stamp?: GlobeStamp | undefined;
 };
 

@@ -4,8 +4,9 @@ import { NisarSatellite } from "@/features/satellite/NisarSatellite";
 import { Link } from "@/lib/Link";
 import { missionFallback } from "@/features/satellite/mobileFallback";
 
+import { localized } from "@/i18n/localized";
 // SPECS-content-pages-v8 §2 "08 Mission"; the link text is the reference's (Landing v8.dc.html).
-const MISSION_COPY = {
+const MISSION_COPY = localized({
   heading: "Twelve metres of gold mesh.",
   modelCaption:
     "Interactive model built to NASA/JPL published dimensions. The gold strip is the radar's swath on the ground.",
@@ -13,7 +14,7 @@ const MISSION_COPY = {
   photoAlt:
     "Artist's concept of NISAR above Earth, its 12 m gold mesh reflector open on a long boom",
   link: "See how it works →",
-} as const;
+} as const);
 
 const hasWebGL = (): boolean => {
   try {

@@ -16,6 +16,7 @@ import {
 import { CHANNEL } from "@/features/charts/chartTokens";
 import type { ExplorationResult } from "@/features/explore/exploreSchemas";
 
+import { tr } from "@/i18n/translate";
 const COLOURS = [CHANNEL.hh.color, CHANNEL.hv.color, "#bb9bce", "#75c9af"];
 const DAY = 86_400_000;
 const DISPLAY = [-30, 0] as const;
@@ -63,11 +64,11 @@ export const RadarHistory = ({ observations, date, onDate }: Props) => {
   const span = Math.max(DAY, (rows.at(-1)?.time ?? start) - start);
   const selected = Date.parse(date);
   return (
-    <section className="x-sheet__section" aria-label="Point return history">
-      <h3 className="x-sheet__kicker">Radar return at the sampled point</h3>
+    <section className="x-sheet__section" aria-label={tr("Point return history")}>
+      <h3 className="x-sheet__kicker">{tr("Radar return at the sampled point")}</h3>
       <div className="x-radar__charts">
         <figure className="x-inset">
-          <figcaption>Acquisition timeline · gamma-zero dB</figcaption>
+          <figcaption>{tr("Acquisition timeline · gamma-zero dB")}</figcaption>
           <div className="x-radar__plot">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
@@ -111,7 +112,7 @@ export const RadarHistory = ({ observations, date, onDate }: Props) => {
         {pair && (
           <figure className="x-inset">
             <figcaption>
-              Polarization trajectory · {co} and {cross}
+              {tr("Polarization trajectory · ")} {co} and {cross}
             </figcaption>
             <div className="x-radar__plot">
               <ResponsiveContainer width="100%" height="100%">
@@ -159,18 +160,21 @@ export const RadarHistory = ({ observations, date, onDate }: Props) => {
               </ResponsiveContainer>
             </div>
             <p className="x-muted x-small">
-              Blue to gold follows elapsed time. White marks the selected date. Each dot uses a
-              paired point return.
+              {tr(
+                "Blue to gold follows elapsed time. White marks the selected date. Each dot uses a paired point return.",
+              )}
             </p>
           </figure>
         )}
       </div>
-      <div className="x-radar__table" role="region" aria-label="Date-by-channel heatmap">
+      <div className="x-radar__table" role="region" aria-label={tr("Date-by-channel heatmap")}>
         <table>
-          <caption>Date-by-channel heatmap · gamma-zero dB · fixed color range −30 to 0 dB</caption>
+          <caption>
+            {tr("Date-by-channel heatmap · gamma-zero dB · fixed color range −30 to 0 dB")}
+          </caption>
           <thead>
             <tr>
-              <th scope="col">Channel</th>
+              <th scope="col">{tr("Channel")}</th>
               {rows.map((row) => (
                 <th scope="col" key={row.date}>
                   <button
@@ -213,8 +217,9 @@ export const RadarHistory = ({ observations, date, onDate }: Props) => {
         </table>
       </div>
       <p className="x-muted x-small">
-        Each value represents the sampled radar cell. Acquisition support and the measured grid are
-        listed with the imagery.
+        {tr(
+          "Each value represents the sampled radar cell. Acquisition support and the measured grid are listed with the imagery.",
+        )}
       </p>
     </section>
   );

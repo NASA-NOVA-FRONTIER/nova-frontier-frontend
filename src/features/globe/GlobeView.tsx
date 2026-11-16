@@ -54,8 +54,9 @@ export type CameraTarget = { key: string; box: BBox; zoom: number; seconds?: num
 
 export type { GlobeStamp };
 
-// The placed square (v9 step 2): the backend's AOI_SIDE_KM square around `centre`.
-export type GlobeSquare = { centre: LonLat; sideKm: number; movable: boolean };
+// The placed square (v9 step 2): the backend's AOI_SIDE_KM square around `centre`. `innerKm` draws
+// the smaller window an analysis measures at its centre (Earthquake: INSAR_WINDOW_KM).
+export type GlobeSquare = { centre: LonLat; sideKm: number; movable: boolean; innerKm?: number };
 
 export type GlobeScene = {
   target: CameraTarget | undefined;
@@ -83,6 +84,8 @@ export type GlobeViewProps = {
   // A drag released, or an arrow key: the square's new centre.
   onMoveSquare: (centre: LonLat) => void;
   onUnavailable: () => void;
+  // The user grabbed or zoomed the globe: the timeline's player pauses.
+  onInteract?: () => void;
   // Hands the viewer out for the PNG download; undefined once it is destroyed.
   onViewer?: (viewer: Viewer | undefined) => void;
 };
@@ -100,6 +103,7 @@ export const GlobeView = ({
   onPlace,
   onMoveSquare,
   onUnavailable,
+  onInteract,
   onViewer,
 }: GlobeViewProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -109,9 +113,9 @@ export const GlobeView = ({
   const hadTarget = useRef(false);
 
   // Cesium handlers are registered once, so they read the latest props through a ref.
-  const latest = useRef({ frames, cases, onOpenCase, onPlace, reduceMotion });
+  const latest = useRef({ frames, cases, onOpenCase, onPlace, onInteract, reduceMotion });
   useEffect(() => {
-    latest.current = { frames, cases, onOpenCase, onPlace, reduceMotion };
+    latest.current = { frames, cases, onOpenCase, onPlace, onInteract, reduceMotion };
   });
 
   useEffect(() => {
@@ -179,9 +183,14 @@ export const GlobeView = ({
       const point = pickLonLat(viewer, position);
       if (point !== undefined) latest.current.onPlace(point);
     }, ScreenSpaceEventType.LEFT_CLICK);
-    // Any manual navigation stops the idle spin for good.
-    handler.setInputAction(() => setIsSpinning(false), ScreenSpaceEventType.LEFT_DOWN);
-    handler.setInputAction(() => setIsSpinning(false), ScreenSpaceEventType.WHEEL);
+    // Any manual navigation stops the idle spin for good, and pauses the timeline's player.
+    const grabbed = () => {
+      setIsSpinning(false);
+      latest.current.onInteract?.();
+    };
+    handler.setInputAction(grabbed, ScreenSpaceEventType.LEFT_DOWN);
+    handler.setInputAction(grabbed, ScreenSpaceEventType.WHEEL);
+    handler.setInputAction(grabbed, ScreenSpaceEventType.PINCH_START);
     return () => handler.destroy();
   }, [viewer]);
 
@@ -345,6 +354,7 @@ export const GlobeView = ({
           viewer={viewer}
           centre={scene.square.centre}
           movable={scene.square.movable}
+          innerKm={scene.square.innerKm}
           onMove={onMoveSquare}
         />
       )}

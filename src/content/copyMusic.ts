@@ -1,5 +1,6 @@
+import { localized } from "@/i18n/localized";
 // Background music (issue #36): the toggle, its first-visit hint and the credits.
-export const MUSIC_COPY = {
+export const MUSIC_COPY = localized({
   toggleLabel: "Background music",
   titleOff: "Music is off. Press to turn it on.",
   titleOn: "Music is on. Press to turn it off.",
@@ -12,4 +13,4 @@ export const MUSIC_COPY = {
     "Background music by Scott Buckley, free to use under a Creative Commons Attribution license.",
   creditsChange: "Trimmed to a loop and re-encoded for the web.",
   licenseLink: "CC BY 4.0 license",
-} as const;
+} as const);

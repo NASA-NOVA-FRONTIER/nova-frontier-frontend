@@ -9,42 +9,44 @@
 import { formatCount, passOf } from "@/content/copyV8";
 import type { LensId } from "@/features/cases/cases";
 
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 // C1: the four live lenses; agriculture stays out of the selector and there is no landslide lens.
 export type V9LensId = Exclude<LensId, "agriculture">;
 
 // COPY order: Earthquake · Wildfire · Deforestation · Flood.
-export const PHENOMENA: readonly V9LensId[] = [
+export const PHENOMENA: readonly V9LensId[] = localized([
   "insar",
   "wildfire",
   "vegetation_disturbance",
   "flood_wetland",
-];
+]);
 
 // C1: Deforestation is the vegetation_disturbance lens, Flood is flood_wetland.
-export const PHENOMENON_LABEL: Record<V9LensId, string> = {
+export const PHENOMENON_LABEL: Record<V9LensId, string> = localized({
   insar: "Earthquake",
   wildfire: "Wildfire",
   vegetation_disturbance: "Deforestation",
   flood_wetland: "Flood",
-};
+});
 
 const plural = (n: number, one: string, many: string): string => (n === 1 ? one : many);
 
 // Prototype: the ⓘ button's aria-label (T2).
-export const INFO_TIP = { label: "What is this?" } as const;
+export const INFO_TIP = localized({ label: "What is this?" } as const);
 
 // §1 Empty globe
-export const EMPTY_GLOBE = {
+export const EMPTY_GLOBE = localized({
   hintDesktop: "Click any land to place a 10 × 10 km square",
   hintPhone: "Tap any land to place a square",
-  casesKicker: (n: number) => `${formatCount(n)} MEASURED CASES`,
+  casesKicker: (n: number) => tr("{{n}} MEASURED CASES", { n: formatCount(n) }),
   casesTitle: "Start with a measured case",
   casesBody: "Prepared from real NISAR passes. Opens in about a second.",
   moreCases: "MORE MEASURED CASES",
-} as const;
+} as const);
 
 // §2 Square placed
-export const SQUARE = {
+export const SQUARE = localized({
   dragHint: "Drag to move",
   squareLabel: "10 × 10 KM · 105 KM²",
   placedTitle: "Square placed",
@@ -54,19 +56,19 @@ export const SQUARE = {
   // C5: live InSAR measures a 5 km window at the centre of the square (BE constants/insar.py).
   insarWindow: "Measured: 5 × 5 km at the centre",
   basemapAlt: "Satellite basemap around the square",
-} as const;
+} as const);
 
 // C2 + C11 + decision 15 Nov: "Last 5 months" for every GCOV lens until an event catalogue exists;
 // the event presets ("Event ± 60 days", "45 days before, 90 after", "The pairs around the event") never ship.
-export const PRESET_NAME: Record<V9LensId, string> = {
+export const PRESET_NAME: Record<V9LensId, string> = localized({
   flood_wetland: "Last 5 months",
   wildfire: "Last 5 months",
   vegetation_disturbance: "Last 5 months",
   insar: "The 5 most recent passes",
-};
+});
 
 // §3 Confirm panel
-export const CONFIRM = {
+export const CONFIRM = localized({
   kicker: "CONFIRM THE ANALYSIS",
   title: "What should the radar look for?",
   area: "10 × 10 km square · 105 km²",
@@ -79,12 +81,20 @@ export const CONFIRM = {
   // Prototype: the strip's label depends on the lens.
   stripLabel: (lens: V9LensId) =>
     lens === "insar" ? "Which passes to compare" : "Which passes to read",
-  preset: (name: string) => `PRESET · ${name.toUpperCase()}`,
+  preset: (name: string) => tr("PRESET · {{toUpperCase}}", { toUpperCase: name.toUpperCase() }),
   customRange: "CUSTOM RANGE",
   passLine: (total: number, inRange: number, track: string, direction: string) =>
-    `${formatCount(total)} NISAR passes here · ${formatCount(inRange)} in range · 5 will be read · track ${track} ${direction}`,
+    tr(
+      "{{total}} NISAR passes here · {{inRange}} in range · 5 will be read · track {{track}} {{direction}}",
+      { total: formatCount(total), inRange: formatCount(inRange), track, direction },
+    ),
   passLineShort: (total: number, inRange: number, track: string, direction: string) =>
-    `${formatCount(total)} NISAR passes here · ${formatCount(inRange)} in range · track ${track} ${direction}`,
+    tr("{{total}} NISAR passes here · {{inRange}} in range · track {{track}} {{direction}}", {
+      total: formatCount(total),
+      inRange: formatCount(inRange),
+      track,
+      direction,
+    }),
   paramsLabel: "Settings",
   noParams: "No settings needed for this phenomenon.",
   // C7: before Start the backend sends no estimate, so the ONLINE line carries no number.
@@ -99,10 +109,10 @@ export const CONFIRM = {
   startAnalysis: "Start analysis",
   startCase: "Show the result",
   cancel: "Cancel",
-} as const;
+} as const);
 
 // §3 Passes strip
-export const PASS_STRIP = {
+export const PASS_STRIP = localized({
   title: "NISAR PASSES OVER THIS SQUARE",
   legendPass: "Pass",
   legendWillBeRead: "Will be read",
@@ -111,68 +121,88 @@ export const PASS_STRIP = {
   legendOtherPair: "Other pair you can pick",
   pickFirst: "Pick the first pass to include:",
   pickLast: "Pick the last pass to include:",
-  resetPreset: (name: string) => `Reset to preset · ${name}`,
-} as const;
+  resetPreset: (name: string) => tr("Reset to preset · {{name}}", { name }),
+} as const);
 
 // §3 Settings: only what POST /explorations accepts (pairId, coherenceThreshold).
 // C12: PTIP.event / ref / fire / ctx and the event options are not shipped.
-export const EARTHQUAKE_SETTINGS = {
+export const EARTHQUAKE_SETTINGS = localized({
   pairName: "Pass pair",
   pairHelp: "Two NISAR passes compared with each other, newest first.",
   thresholdName: "Coherence threshold",
   thresholdHelp: "Cells below it are left out of the phase.",
-  thresholdDefault: (value: string) => `${value} · default`,
+  thresholdDefault: (value: string) => tr("{{value}} · default", { value }),
   pairOption: (a: string, b: string, days: number) => `${a} → ${b} · ${days} d`,
   noPairInRange: "No pair in this range",
   pairLine: (a: string, b: string, days: number) =>
-    `Pair ${a} → ${b} · ${days} days · tap an arc to change`,
-  advanced: (threshold: string) => `Advanced · threshold ${threshold}`,
+    tr("Pair {{a}} → {{b}} · {{days}} days · tap an arc to change", { a, b, days }),
+  advanced: (threshold: string) => tr("Advanced · threshold {{threshold}}", { threshold }),
   hideAdvanced: "Hide advanced",
-  summary: (a: string, b: string, threshold: string) => `Pair ${a} → ${b} · threshold ${threshold}`,
-  summaryNoPair: (threshold: string) => `No pair yet · threshold ${threshold}`,
-} as const;
+  summary: (a: string, b: string, threshold: string) =>
+    tr("Pair {{a}} → {{b}} · threshold {{threshold}}", { a, b, threshold }),
+  summaryNoPair: (threshold: string) => tr("No pair yet · threshold {{threshold}}", { threshold }),
+} as const);
 
 // §3 Notes
-export const CONFIRM_NOTES = {
+export const CONFIRM_NOTES = localized({
   noDataTitle: "NISAR hasn't measured this square yet",
   noDataBody: (date: string, track: string, direction: string) =>
-    `No passes in the archive for this square. The Observation Plan schedules the next one on ${date} (track ${track}, ${direction}).`,
+    tr(
+      "No passes in the archive for this square. The Observation Plan schedules the next one on {{date}} (track {{track}}, {{direction}}).",
+      { date, track, direction },
+    ),
   noDataAction: "Open a measured case",
   noDataWait: "Nothing to compute",
   fourTitle: "4 passes in this range",
   fourBody: (a: string, b: string) =>
-    `The sequence will show 4 measured passes with their real gaps, not 5. NISAR has no pass here between ${a} and ${b}.`,
+    tr(
+      "The sequence will show 4 measured passes with their real gaps, not 5. NISAR has no pass here between {{a}} and {{b}}.",
+      { a, b },
+    ),
   fewTitle: "Not enough history here",
   fewBody: (n: number) =>
-    `Only ${n} ${plural(n, "pass", "passes")} fall in this range. An analysis needs at least 4 to compare against the place's own history.`,
-  widen: (start: string, end: string, k: number) => `Widen to ${start} → ${end} (${k} passes)`,
+    tr(
+      "Only {{n}} {{n2}} fall in this range. An analysis needs at least 4 to compare against the place's own history.",
+      { n, n2: plural(n, "pass", "passes") },
+    ),
+  widen: (start: string, end: string, k: number) =>
+    tr("Widen to {{start}} → {{end}} ({{k}} passes)", { start, end, k }),
   noPairTitle: "No pass pair in this range",
   noPairBody: (n: number) =>
-    `Only ${n} ${plural(n, "pass", "passes")} in this range. A pair needs two passes from the same orbit.`,
+    tr("Only {{n}} {{n2}} in this range. A pair needs two passes from the same orbit.", {
+      n,
+      n2: plural(n, "pass", "passes"),
+    }),
   noPairAction: "Reset to the preset",
-} as const;
+} as const);
 
 // §3 Measured case (phenomenon locked)
-export const MEASURED_CASE = {
-  kicker: (place: string) => `MEASURED CASE · ${place.toUpperCase()}`,
+export const MEASURED_CASE = localized({
+  kicker: (place: string) =>
+    tr("MEASURED CASE · {{toUpperCase}}", { toUpperCase: place.toUpperCase() }),
   lockedWhy:
     "This case was measured for one phenomenon. Place your own square to look for another.",
   // C2: the straddle tail only for a case with a sourced event date.
   passLine: (n: number, track: string, direction: string) =>
-    `${n} passes · track ${track} ${direction}`,
+    tr("{{n}} passes · track {{track}} {{direction}}", { n, track, direction }),
   passLineEvent: (n: number, track: string, direction: string, k: number) =>
-    `${n} passes · track ${track} ${direction} · ${k} pairs straddle the event`,
-} as const;
+    tr("{{n}} passes · track {{track}} {{direction}} · {{k}} pairs straddle the event", {
+      n,
+      track,
+      direction,
+      k,
+    }),
+} as const);
 
 // §4 Processing
-export const PROCESSING = {
+export const PROCESSING = localized({
   titleOnline: "Analysing your square",
   titleOffline: "Opening the prepared result",
   elapsedLabel: "elapsed",
   // C7: the backend sends one p80 (`etaSeconds`); the band ends at it. Was "Usually {from}–{to} min".
-  estimate: (p80: string) => `Usually under ${p80}`,
+  estimate: (p80: string) => tr("Usually under {{p80}}", { p80 }),
   // C7: was "Estimate was {from}–{to} min".
-  estimateExceeded: (p80: string) => `Estimate was under ${p80}`,
+  estimateExceeded: (p80: string) => tr("Estimate was under {{p80}}", { p80 }),
   // C8: a stopped job has no result, so "and show what is ready" is dropped.
   lateBody: "Taking longer than the estimate. It keeps running; at 8 minutes we stop.",
   offlineEstimate: "Prepared ahead of time",
@@ -181,24 +211,24 @@ export const PROCESSING = {
   stepsHeading: "What is happening",
   steps: ["Finding passes", "Reading passes", "Measuring change", "Drawing the layers"],
   stepPasses: (n: number, direction: string, first: string, last: string) =>
-    `${n} passes · ${direction} · ${first} → ${last}`,
-  stepPair: (a: string, b: string) => `Reading the pair ${a} → ${b}`,
-  stepRead: (k: number, n: number) => `${k} of ${n} read`,
+    tr("{{n}} passes · {{direction}} · {{first}} → {{last}}", { n, direction, first, last }),
+  stepPair: (a: string, b: string) => tr("Reading the pair {{a}} → {{b}}", { a, b }),
+  stepRead: (k: number, n: number) => tr("{{k}} of {{n}} read", { k, n }),
   inProgress: "In progress",
   waiting: "Waiting",
   done: "Done",
   collapse: "Collapse",
   expand: "Expand",
-  factCounter: (i: number) => `FACT ${i} OF 10`,
+  factCounter: (i: number) => tr("FACT {{i}} OF 10", { i }),
   nextFact: "Next fact",
-  factSource: (label: string) => `Source: ${label}`,
+  factSource: (label: string) => tr("Source: {{label}}", { label }),
   cancel: "Cancel analysis",
-} as const;
+} as const);
 
 // §5 Result: layers per lens. Prototype ids; the first one is the default.
 export type V9LayerId = "hh" | "change" | "sig" | "hv" | "hvdrop" | "coh" | "phase";
 
-export const LAYERS: Record<V9LensId, readonly { id: V9LayerId; label: string }[]> = {
+export const LAYERS: Record<V9LensId, readonly { id: V9LayerId; label: string }[]> = localized({
   flood_wetland: [
     { id: "hh", label: "HH" },
     // C9: the change layer is target − baseline median. Was "Change since first" / "Change vs first".
@@ -217,10 +247,10 @@ export const LAYERS: Record<V9LensId, readonly { id: V9LayerId; label: string }[
     { id: "coh", label: "Coherence" },
     { id: "phase", label: "Wrapped phase" },
   ],
-};
+});
 
 // Legend card: the ramp's two ends and a one-line "what am I seeing".
-export const LEGEND: Record<V9LayerId, { left: string; right: string; what: string }> = {
+export const LEGEND: Record<V9LayerId, { left: string; right: string; what: string }> = localized({
   hh: { left: "−30 dB", right: "0 dB", what: "How strongly the ground echoes (HH)" },
   hv: { left: "−30 dB", right: "0 dB", what: "How strongly vegetation echoes (HV)" },
   // C9: was "… than the first pass".
@@ -233,25 +263,38 @@ export const LEGEND: Record<V9LayerId, { left: string; right: string; what: stri
   sig: { left: "No signal", right: "Signal met", what: "Cells where HH and HV both darkened" },
   coh: { left: "0 · changed", right: "1 · alike", what: "How alike the two passes are" },
   phase: { left: "−π", right: "+π", what: "Fringes of change between the passes" },
-};
+});
 
-export const RESULT = {
+// COPY-flow-v9 §5 stamp, split into its date and pass parts (see RESULT.stamp*).
+const stampPass = (i: number, n: number, days: number) =>
+  tr("{{i}} · {{days}} DAYS AFTER PASS {{v2}}", { i: passOf(i, n), days, v2: i - 1 });
+const stampFirstPass = (n: number) => tr("{{n}} · REFERENCE", { n: passOf(1, n) });
+const stampQuakeDate = (a: string, b: string) => `${a} → ${b}`;
+const stampQuakePass = (i: number, n: number, days: number) =>
+  tr("INTERVAL {{i}} OF {{n}} · {{days}} DAYS", { i, n, days });
+
+export const RESULT = localized({
   online: "ONLINE",
   offline: "OFFLINE",
   measured: "MEASURED",
   modeTitleOnline: "Computed live for your square",
   modeTitleOffline: "Prepared ahead of time",
   // C6: the prototype hardcodes "NISAR, track 24".
-  originTitle: (track: string) => `NISAR, track ${track}`,
-  placeYourSquare: (coordinates: string) => `Your square · ${coordinates}`,
+  originTitle: (track: string) => tr("NISAR, track {{track}}", { track }),
+  placeYourSquare: (coordinates: string) => tr("Your square · {{coordinates}}", { coordinates }),
   layerLabel: "Layer",
   altCoherence: "Coherence for the selected pair",
   altPhase: "Wrapped phase for the selected pair",
-  stamp: (date: string, i: number, n: number, days: number) =>
-    `${date} · ${passOf(i, n)} · ${days} DAYS AFTER PASS ${i - 1}`,
-  stampFirst: (date: string, n: number) => `${date} · ${passOf(1, n)} · REFERENCE`,
+  // The stamp draws its date and its pass part on two lines, so each string also comes as parts:
+  // `stamp*` = date + " · " + `stamp*Pass` (a verbatim split, no new wording).
+  stampPass,
+  stampFirstPass,
+  stampQuakeDate,
+  stampQuakePass,
+  stamp: (date: string, i: number, n: number, days: number) => `${date} · ${stampPass(i, n, days)}`,
+  stampFirst: (date: string, n: number) => `${date} · ${stampFirstPass(n)}`,
   stampQuake: (a: string, b: string, i: number, n: number, days: number) =>
-    `${a} → ${b} · INTERVAL ${i} OF ${n} · ${days} DAYS`,
+    `${stampQuakeDate(a, b)} · ${stampQuakePass(i, n, days)}`,
   rangeLine: (start: string, end: string, n: number) =>
     `${start} → ${end} · ${n} passes`.toUpperCase(),
   rangeLineQuake: (n: number, a: string, b: string) =>
@@ -259,7 +302,7 @@ export const RESULT = {
   couldBeLabel: "Could also be:",
   notShownLabel: "Not shown:",
   newSquare: "Place a new square",
-} as const;
+} as const);
 
 // C3: every stat is N of M from the API; the prototype's case numbers never ship.
 export const statOf = (k: number, n: number): string => `${formatCount(k)} of ${formatCount(n)}`;
@@ -285,7 +328,7 @@ export const RESULT_CARD: Record<
     body: { pair: (a: string, b: string) => string; event: (k: number, date: string) => string };
     statLabel: (threshold: string) => string;
   };
-} = {
+} = localized({
   flood_wetland: {
     phen: "FLOOD · BOTH POLARIZATIONS",
     // C10: no event date in the title (COPY had "after {event date}").
@@ -325,31 +368,39 @@ export const RESULT_CARD: Record<
     body: {
       // C2: the default body names the pair; the event version only for a case with a sourced event date.
       pair: (a: string, b: string) =>
-        `The pair ${a} → ${b} kept its phase in parts of the square. ${QUAKE_TAIL}`,
+        tr("The pair {{a}} → {{b}} kept its phase in parts of the square. {{QUAKE_TAIL}}", {
+          a,
+          b,
+          QUAKE_TAIL,
+        }),
       event: (k: number, date: string) =>
-        `${k} pass pairs straddle the ${date} event. ${QUAKE_TAIL}`,
+        tr("{{k}} pass pairs straddle the {{date}} event. {{QUAKE_TAIL}}", { k, date, QUAKE_TAIL }),
     },
     // C14 + decision 15 Nov: live InSAR counts phase / window cells (BE models/insar_summary.py).
     // Was "common phase cells met the correction-input checks".
-    statLabel: (threshold: string) => `window cells with phase above ${threshold}`,
+    statLabel: (threshold: string) =>
+      tr("window cells with phase above {{threshold}}", { threshold }),
     couldBe: "atmosphere between the passes, or unwrapping error.",
     notShown: "displacement in cm, magnitude, probability.",
     // C13: the 12 cm line moved to the phase layer's ⓘ (TIPS.layer.phase).
     limits: ["No displacement, magnitude or probability is shown."],
   },
-};
+});
 
 // §5 Timeline
-export const TIMELINE = {
-  title: (i: number, n: number, date: string) => `Pass ${i} of ${n} · ${date}`,
+export const TIMELINE = localized({
+  title: (i: number, n: number, date: string) =>
+    tr("Pass {{i}} of {{n}} · {{date}}", { i, n, date }),
   sub: (n: number, start: string, end: string, track: string, direction: string) =>
     `${n} MEASURED PASSES · ${start} → ${end} · TRACK ${track} ${direction}`.toUpperCase(),
-  titleQuake: (i: number, n: number, a: string, b: string) => `Pair ${i} of ${n} · ${a} → ${b}`,
-  subQuake: (n: number) => `${n} MEASURED ${plural(n, "PAIR", "PAIRS")} · NEWEST FIRST`,
+  titleQuake: (i: number, n: number, a: string, b: string) =>
+    tr("Pair {{i}} of {{n}} · {{a}} → {{b}}", { i, n, a, b }),
+  subQuake: (n: number) =>
+    tr("{{n}} MEASURED {{n2}} · NEWEST FIRST", { n, n2: plural(n, "PAIR", "PAIRS") }),
   // C2: Kumamoto is a chain of intervals; was "{n} MEASURED PAIRS · ALL STRADDLE THE EVENT".
-  subQuakeCase: (n: number) => `${n} MEASURED ${plural(n, "PAIR", "PAIRS")}`,
+  subQuakeCase: (n: number) => tr("{{n}} MEASURED {{n2}}", { n, n2: plural(n, "PAIR", "PAIRS") }),
   // C2: only for a case with a sourced event date.
-  eventMarker: (date: string) => `EVENT · ${date.toUpperCase()}`,
+  eventMarker: (date: string) => tr("EVENT · {{toUpperCase}}", { toUpperCase: date.toUpperCase() }),
   straddle: "Only a pair whose two passes fall on either side of the event can show it.",
   gap: (days: number) => `${days} D`,
   play: "Play",
@@ -360,22 +411,27 @@ export const TIMELINE = {
   speeds: ["0.5×", "1×", "2×"],
   loop: "Loop",
   fewer: (i: number, gap: string, a: string, b: string) =>
-    `Pass ${i} of 4 · 4 MEASURED PASSES · ${gap} with no pass between ${a} and ${b}`,
-  passAria: (i: number, date: string) => `Pass ${i}, ${date}`,
-  pairAria: (i: number, a: string, b: string) => `Pair ${i}: ${a} to ${b}`,
-} as const;
+    tr("Pass {{i}} of 4 · 4 MEASURED PASSES · {{gap}} with no pass between {{a}} and {{b}}", {
+      i,
+      gap,
+      a,
+      b,
+    }),
+  passAria: (i: number, date: string) => tr("Pass {{i}}, {{date}}", { i, date }),
+  pairAria: (i: number, a: string, b: string) => tr("Pair {{i}}: {{a}} to {{b}}", { i, a, b }),
+} as const);
 
 // Prototype LOOK: the fixed line under the phenomenon chips.
-export const LOOK: Record<V9LensId, string> = {
+export const LOOK: Record<V9LensId, string> = localized({
   flood_wetland: "Looks for spots that darken in both HH and HV, the way new open water does.",
   wildfire: "Looks for HV dropping and staying low across several passes.",
   vegetation_disturbance:
     "Looks for HV declining across passes, the way it does when canopy is removed.",
   insar: "Compares the phase of two passes to see where the ground kept its echo.",
-};
+});
 
 // Prototype TIPS: the ⓘ texts (SPECS §4 placement).
-export const TIPS = {
+export const TIPS = localized({
   phen: "Each phenomenon reads the radar differently: floods look for darkening in both polarizations, fires and forest loss for a drop in HV, earthquakes compare the phase of two passes. Pick what you suspect happened here.",
   dates: {
     gcov: "NISAR passes over each place about every 12 days. Pick a range and we read 5 passes spread evenly across it, then play them in order.",
@@ -423,10 +479,10 @@ export const TIPS = {
     insarCase:
       "Each bar is a pair of NISAR passes. Press play to step through the pairs, or click one.",
   },
-} as const;
+} as const);
 
 // Prototype PTIP: only the settings the backend accepts (C12).
-export const PARAM_TIPS = {
+export const PARAM_TIPS = localized({
   pair: "The two NISAR passes we compare. If the ground moved between them, the fringes show it. Pick a pair whose dates enclose the moment you care about. Shorter pairs (12 days) keep more of the ground recognisable; longer ones mix in more unrelated change.",
   thr: "Coherence measures how alike the two echoes are, from 0 (nothing alike) to 1 (identical). Pixels below this number are too noisy to trust, so they are left out of the fringes.",
-} as const;
+} as const);

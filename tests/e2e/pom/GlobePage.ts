@@ -41,7 +41,7 @@ export type SceneJson = {
   drape?: { url: string; bounds: BBox };
   drapeAlpha: number;
   stamp?: { date: string; pass: string; target: boolean; box: BBox };
-  square?: { centre: LonLat; sideKm: number; movable: boolean };
+  square?: { centre: LonLat; sideKm: number; movable: boolean; innerKm?: number };
 };
 
 // Stub twins of the pixel clicks: same outcome as the pixel they replace on the real globe.
@@ -72,11 +72,25 @@ export class GlobePage {
   readonly timeline: Locator;
   readonly timelineCompare: Locator;
   readonly timelineReadout: Locator;
+  // The readout block that carries aria-live (quiet while playing).
+  readonly timelineAnnouncer: Locator;
+  readonly timelineSub: Locator;
+  readonly timelinePlay: Locator;
+  readonly timelinePrev: Locator;
+  readonly timelineStepNext: Locator;
+  readonly timelineLoop: Locator;
+  readonly timelineSpeed: Locator;
+  readonly timelineTrack: Locator;
+  readonly timelineGaps: Locator;
+  readonly timelineEvent: Locator;
+  readonly stamp: Locator;
   readonly dock: Locator;
   readonly jobError: Locator;
   readonly planPasses: Locator;
   readonly wholeGlobe: Locator;
   readonly helpButton: Locator;
+  // The explorer's own "Reduce motion" switch, in the help menu.
+  readonly motionSwitch: Locator;
   readonly squareBar: Locator;
   readonly squareCancel: Locator;
   readonly useSquare: Locator;
@@ -88,9 +102,13 @@ export class GlobePage {
   readonly searchMenu: Locator;
   readonly searchInput: Locator;
   readonly searchError: Locator;
+  // The v9 confirm panel after "Use this square" (step 3) and its Start button.
   readonly placeCard: Locator;
   readonly spotNearest: Locator;
   readonly placeAnalyse: Locator;
+  readonly confirmNote: Locator;
+  readonly confirmReason: Locator;
+  readonly passStrip: Locator;
   // Every place search the page sent, in order.
   readonly placeRequests: string[] = [];
   readonly coverageRequests: string[] = [];
@@ -99,6 +117,8 @@ export class GlobePage {
   readonly jobProgress: Locator;
   readonly normalRange: Locator;
   readonly liveLayerDock: Locator;
+  readonly resultCard: Locator;
+  readonly resultStat: Locator;
   readonly pairPicker: Locator;
   readonly pairMeasure: Locator;
   readonly insarCard: Locator;
@@ -123,11 +143,23 @@ export class GlobePage {
     this.timeline = page.getByTestId("timeline");
     this.timelineCompare = page.getByTestId("timeline-compare");
     this.timelineReadout = page.getByTestId("timeline-readout");
+    this.timelineAnnouncer = page.getByTestId("timeline-announcer");
+    this.timelineSub = page.getByTestId("timeline-sub");
+    this.timelinePlay = page.getByTestId("timeline-play");
+    this.timelinePrev = page.getByTestId("timeline-prev");
+    this.timelineStepNext = page.getByTestId("timeline-step-next");
+    this.timelineLoop = page.getByTestId("timeline-loop");
+    this.timelineSpeed = page.getByTestId("timeline-speed");
+    this.timelineTrack = page.getByTestId("timeline-track");
+    this.timelineGaps = page.getByTestId("timeline-gap");
+    this.timelineEvent = page.getByTestId("timeline-event");
+    this.stamp = page.getByTestId("timelapse-stamp");
     this.dock = page.getByTestId("layer-dock");
     this.jobError = page.getByTestId("job-error");
     this.planPasses = page.getByTestId("plan-passes");
     this.wholeGlobe = page.getByTestId("whole-globe");
     this.helpButton = page.getByTestId("help-button");
+    this.motionSwitch = page.getByTestId("toggle-motion");
     this.squareBar = page.getByTestId("square-bar");
     this.squareCancel = page.getByTestId("square-cancel");
     this.useSquare = page.getByTestId("square-use");
@@ -137,14 +169,19 @@ export class GlobePage {
     this.searchMenu = page.getByTestId("search-menu");
     this.searchInput = page.getByTestId("place-input");
     this.searchError = page.getByTestId("place-error");
-    this.placeCard = page.getByTestId("place-card");
+    this.placeCard = page.getByTestId("confirm-panel");
     this.spotNearest = page.getByTestId("spot-nearest");
-    this.placeAnalyse = page.getByTestId("place-analyse");
+    this.placeAnalyse = page.getByTestId("confirm-start");
+    this.confirmNote = page.getByTestId("confirm-note");
+    this.confirmReason = page.getByTestId("confirm-reason");
+    this.passStrip = page.getByTestId("pass-strip");
     this.jobModal = page.getByTestId("job-modal");
     this.jobElapsed = page.getByTestId("job-elapsed");
     this.jobProgress = page.getByTestId("job-progress");
     this.normalRange = page.getByTestId("normal-range");
     this.liveLayerDock = page.getByTestId("live-layer-dock");
+    this.resultCard = page.getByTestId("result-card");
+    this.resultStat = page.getByTestId("result-stat");
     this.pairPicker = page.getByTestId("pair-picker");
     this.pairMeasure = page.getByTestId("pair-measure");
     this.insarCard = page.getByTestId("insar-card");
@@ -178,6 +215,28 @@ export class GlobePage {
         json: empty ? { ...INSAR_PAIRS, pairs: [] } : INSAR_PAIRS,
       });
     });
+  }
+
+  // A phenomenon chip of the confirm panel, by lens id.
+  phenomenon(id: string): Locator {
+    return this.page.getByTestId(`phenomenon-${id}`);
+  }
+
+  // Taps a pair arc of the Earthquake strip on its line (an arc's box is mostly empty space).
+  async tapArc(index: number): Promise<void> {
+    const arc = this.page.getByTestId("strip-arc").nth(index);
+    await arc.scrollIntoViewIfNeeded();
+    const point = await arc.evaluate((group) => {
+      const path = group.querySelector("path");
+      const matrix = path?.getScreenCTM();
+      if (path === null || matrix === null || matrix === undefined) return { x: 0, y: 0 };
+      const mid = path.getPointAtLength(path.getTotalLength() / 2);
+      return {
+        x: mid.x * matrix.a + mid.y * matrix.c + matrix.e,
+        y: mid.x * matrix.b + mid.y * matrix.d + matrix.f,
+      };
+    });
+    await this.page.mouse.click(point.x, point.y);
   }
 
   placeOption(index: number): Locator {
@@ -228,12 +287,50 @@ export class GlobePage {
     return this.page.getByTestId(`case-row-${id}`);
   }
 
+  // v9 legend card: one radio per layer of the lens (copyV9 LAYERS ids).
+  layerRadio(id: string): Locator {
+    return this.page.getByTestId(`layer-radio-${id}`);
+  }
+
   lens(id: string): Locator {
     return this.page.getByTestId(`lens-${id}`);
   }
 
   timelinePasses(kind: "base" | "target" | "meas" | "plan"): Locator {
     return this.timeline.locator(`[data-testid^="timeline-pass-"][data-kind="${kind}"]`);
+  }
+
+  // One measured pass on the track, by its order in the run (0 = the reference pass).
+  timelinePass(index: number): Locator {
+    return this.page.getByTestId(`timeline-pass-${index}`);
+  }
+
+  timelinePair(index: number): Locator {
+    return this.page.getByTestId(`timeline-pair-${index}`);
+  }
+
+  timelineSpeedOption(speed: 0.5 | 1 | 2): Locator {
+    return this.page.getByTestId(`timeline-speed-${speed}`);
+  }
+
+  // The wrapper the explorer hides (and makes inert) under the More information sheet.
+  get timelineWrap(): Locator {
+    return this.page.locator(".x-timeline-wrap").filter({ has: this.timeline });
+  }
+
+  // "true" while the sequence player runs.
+  async expectTimelinePlaying(playing: boolean): Promise<void> {
+    await expect(this.timeline).toHaveAttribute("data-playing", String(playing));
+  }
+
+  // A zoom of the globe itself (not the square), which pauses the timeline.
+  async grabGlobe(): Promise<void> {
+    if (this.stub) {
+      await this.page.evaluate(() => window.__globe?.interact());
+      return;
+    }
+    await this.page.mouse.move(FREE_CENTRE.x, FREE_CENTRE.y);
+    await this.page.mouse.wheel(0, 120);
   }
 
   // Answers every plan query with frame 47-3's dates; `failures` HTTP errors come first.

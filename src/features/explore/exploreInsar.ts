@@ -4,6 +4,8 @@ import { formatPercent } from "@/features/cases/cases";
 import type { ExplorationResult, ExplorationView } from "@/features/explore/exploreSchemas";
 import { formatDay } from "@/features/timeline/timelineLayout";
 
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 const INK = "#ebe9e4";
 const GOLD = "#c9b48b";
 const PERCENT = 100;
@@ -16,7 +18,7 @@ const NO_DATA_REASON: Record<string, string> = {
   no_focused_coherence: "The pair holds no focused coherence in the window.",
 };
 
-export const INSAR_SOURCES: Source[] = [
+export const INSAR_SOURCES: Source[] = localized([
   {
     label: "ASF DAAC · NISAR L2 GUNW interferograms",
     href: "https://asf.alaska.edu/data-sets/sar-data-sets/nisar/",
@@ -25,7 +27,7 @@ export const INSAR_SOURCES: Source[] = [
     label: "nova-frontier-model · InSAR exploration",
     href: "https://github.com/NASA-NOVA-FRONTIER/nova-frontier-model/blob/main/docs/EXPLORE_API.md",
   },
-];
+]);
 
 export const NO_DISPLACEMENT =
   "Not reported: the phase is wrapped and not corrected for troposphere or ionosphere.";
@@ -40,10 +42,16 @@ const two = (value: number | null): string => (value === null ? "—" : value.to
 
 const lineOf = (status: string, label: string): string => {
   if (status === "complete")
-    return `Coherence and wrapped phase of one NISAR pair (${label}). No displacement is reported.`;
+    return tr(
+      "Coherence and wrapped phase of one NISAR pair ({{label}}). No displacement is reported.",
+      { label },
+    );
   if (status === "partial")
-    return `This pair kept some coherence (${label}), but no cell reaches the phase threshold. No displacement is reported.`;
-  return `No usable coherence for this pair (${label}) at this point.`;
+    return tr(
+      "This pair kept some coherence ({{label}}), but no cell reaches the phase threshold. No displacement is reported.",
+      { label },
+    );
+  return tr("No usable coherence for this pair ({{label}}) at this point.", { label });
 };
 
 const groupOf = (insar: NonNullable<ExplorationResult["insar"]>): ContrastGroup[] => {

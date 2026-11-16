@@ -6,6 +6,7 @@ import { archiveError, splitPlan } from "@/features/live/liveQuestion";
 import type { FramePlan } from "@/features/live/useFramePlan";
 import { formatDay } from "@/features/timeline/timelineLayout";
 
+import { tr } from "@/i18n/translate";
 const SHOWN_PAST = 3;
 const SHOWN_UPCOMING = 2;
 
@@ -24,11 +25,11 @@ export const PlanPasses = ({ passes, today }: PassListProps) => {
   return (
     <div className="x-panel__block" data-testid="plan-passes">
       <p className="x-kicker x-kicker--split">
-        <span>Passes over this frame</span>
+        <span>{tr("Passes over this frame")}</span>
         <Prov kind="real" source={SOURCE.plan} />
       </p>
       <p className="x-plan__count">
-        {passes.length} passes in the plan · {upcoming.length} still to come
+        {passes.length} {tr("passes in the plan · ")} {upcoming.length} {tr("still to come")}
       </p>
       <ul className="x-plan">
         {rows.map((item) => (
@@ -57,10 +58,10 @@ export const PlanState = ({ framePlan: { plan, retry }, today }: PlanStateProps)
     const copy = archiveError(plan.error);
     return (
       <div className="x-panel__block" role="status" data-testid="plan-error">
-        <p className="x-kicker">Passes over this frame</p>
+        <p className="x-kicker">{tr("Passes over this frame")}</p>
         <p className="x-plan__count">{copy.title}.</p>
         <button type="button" className="x-text" onClick={retry}>
-          Try again
+          {tr("Try again")}
         </button>
       </div>
     );
@@ -69,8 +70,10 @@ export const PlanState = ({ framePlan: { plan, retry }, today }: PlanStateProps)
   if (plan.data.length === 0)
     return (
       <div className="x-panel__block" role="status" data-testid="plan-empty">
-        <p className="x-kicker">Passes over this frame</p>
-        <p className="x-plan__count">The Observation Plan lists no passes for this frame.</p>
+        <p className="x-kicker">{tr("Passes over this frame")}</p>
+        <p className="x-plan__count">
+          {tr("The Observation Plan lists no passes for this frame.")}
+        </p>
       </div>
     );
   return <PlanPasses passes={plan.data} today={today} />;

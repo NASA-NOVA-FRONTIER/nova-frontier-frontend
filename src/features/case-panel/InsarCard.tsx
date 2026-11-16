@@ -2,6 +2,7 @@ import { Prov } from "@/features/case-panel/Prov";
 import type { InsarView } from "@/features/case-panel/subject";
 import { SOURCE } from "@/features/case-panel/verdicts";
 
+import { tr } from "@/i18n/translate";
 type CardProps = {
   insar: InsarView;
   // The report page brings its own heading.
@@ -13,7 +14,7 @@ export const InsarCard = ({ insar, heading = true }: CardProps) => (
   <div className="x-panel__block c-insar" data-testid="insar-card">
     {heading && (
       <p className="x-kicker x-kicker--split">
-        <span>What the pair measured</span>
+        <span>{tr("What the pair measured")}</span>
         <Prov kind="real" source={SOURCE.liveInsar} />
       </p>
     )}
@@ -26,7 +27,7 @@ export const InsarCard = ({ insar, heading = true }: CardProps) => (
       ))}
     </dl>
     <p className="c-insar__displacement" data-testid="insar-displacement">
-      <strong>Displacement</strong> {insar.displacement}
+      <strong>{tr("Displacement")}</strong> {insar.displacement}
     </p>
   </div>
 );

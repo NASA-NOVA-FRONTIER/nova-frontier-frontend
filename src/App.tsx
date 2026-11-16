@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 
+import { useLanguage } from "@/i18n";
 import { MusicController } from "@/features/music/MusicController";
 import { usePathname } from "@/lib/navigation";
 
@@ -52,6 +53,8 @@ const CurrentPage = ({ pathname }: { pathname: string }) => {
 
 export const App = () => {
   const pathname = usePathname();
+  // Subscribing here re-renders every page (none is memoized) when the language changes.
+  useLanguage();
   return (
     <>
       <MusicController />

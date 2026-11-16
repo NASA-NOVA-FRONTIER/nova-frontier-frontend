@@ -6,7 +6,7 @@ import { GlobePage, LIVE_FRAME } from "./pom/GlobePage";
 const PHONE = { width: 390, height: 844 };
 const EDGE = 8;
 // The reference's sheet heights (`sheetFrac`), as in mobileSheet.ts.
-const SHEET = { spot: 0.5, wait: 0.46, result: 0.46, error: 0.56, expanded: 0.86 };
+const SHEET = { spot: 0.62, wait: 0.46, result: 0.46, error: 0.56, expanded: 0.86 };
 
 test.use({ viewport: PHONE });
 
@@ -72,7 +72,8 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await expect(globe.searchInput).toHaveAttribute("placeholder", "Search a place");
     await expect(globe.helpButton).toBeInViewport({ ratio: 1 });
     await expect(page.getByTestId("download-button")).toBeInViewport({ ratio: 1 });
-    expect((await box(globe.searchPill)).width).toBeGreaterThan(150);
+    // Sound and language buttons share the row; the short search keeps most of what is left.
+    expect((await box(globe.searchPill)).width).toBeGreaterThan(120);
     // Step 1 keeps its start card; no sheet handle and no layer row yet.
     await expect(page.getByTestId("sheet-handle")).toHaveCount(0);
     await expect(page.getByTestId("mobile-bar")).toHaveCount(0);
@@ -90,10 +91,13 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await expect(globe.searchMenu).toBeInViewport();
     await globe.searchMenu.getByRole("option", { name: /Phalia Tehsil/ }).click();
     await globe.useSquare.click();
-    await expect(page.getByTestId("spot-area")).toBeVisible();
+    await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
 
     await expect(page.locator("main")).toHaveAttribute("data-sheet", "spot");
     await expectSheet(globe.placeCard, SHEET.spot);
+    // v9 confirm panel: Start stays in view in the sticky footer, and the sheet never expands.
+    await expect(globe.placeAnalyse).toBeInViewport({ ratio: 1 });
+    await expect(page.getByTestId("sheet-handle")).toHaveCount(0);
     await expectNovaAbove(page, globe.placeCard);
     await expectNoSideScroll(page);
   });
@@ -108,11 +112,11 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await globe.searchMenu.getByRole("option", { name: /Phalia Tehsil/ }).click();
     await globe.useSquare.click();
 
-    const error = page.getByTestId("spot-error");
+    const error = page.getByTestId("confirm-error");
     await expect(error).toBeVisible();
     await expectSheet(globe.placeCard, SHEET.spot);
     await error.getByRole("button", { name: "Try again" }).click();
-    await expect(page.getByTestId("spot-area")).toBeVisible();
+    await expect(globe.placeCard).toHaveAttribute("data-state", "ready");
   });
 
   test("step 3: the waiting panel is the sheet", async ({ page }) => {
@@ -131,34 +135,29 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
   }) => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(page.getByTestId("lens-card")).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
 
     await expect(page.locator("main")).toHaveAttribute("data-sheet", "result");
     await expectSheet(globe.panel, SHEET.result);
 
-    // The real answer has no rule layer, so its pill stays away (the unit test covers Rule).
+    // v9: the pills are the legend card's layer switch, with the layers this answer lacks disabled.
     const pills = page.getByTestId("layer-pills");
-    await expect(pills.getByRole("button")).toHaveText(["HH", "HV", "Δ dB"]);
+    await expect(pills.getByRole("button")).toHaveText([
+      "HH",
+      "Change vs baseline median",
+      "Darkening signature",
+    ]);
     await expect(page.getByTestId("layer-pill-hh")).toHaveAttribute("aria-pressed", "true");
     expect((await box(pills)).y).toBeGreaterThan((await box(globe.searchPill)).y);
-    // Same rows as the dock: the answer has no change layer and no HV image on its target pass.
     await expect(page.getByTestId("layer-pill-change")).toBeDisabled();
-    const hv = page.getByTestId("layer-pill-hv");
-    await expect(hv).toBeDisabled();
-    await expect(hv).toHaveAttribute("title", "No HV image for this pass");
-    // 14 Jul has both channels, so HV can be picked there.
-    await globe.timelinePasses("base").first().click();
-    await expect(globe.timelineReadout).toContainText("14 Jul 2026");
-    await expect(hv).toBeEnabled();
-    await hv.click();
-    await expect(hv).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByTestId("layer-pill-hh")).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByTestId("layer-pill-sig")).toBeDisabled();
 
-    // The compact strip sits on the sheet, without the time-lapse button.
+    // The compact strip sits on the sheet: previous, play and next, no speed or loop (v9 frames).
     await expect(globe.timeline).toBeVisible();
     const strip = await box(globe.timeline);
     expect(strip.y + strip.height).toBeLessThanOrEqual((await box(globe.panel)).y);
-    await expect(page.getByTestId("timeline-play")).toBeHidden();
+    await expect(page.getByTestId("timeline-play")).toBeVisible();
+    await expect(page.getByTestId("timeline-speed")).toBeHidden();
     await expectNovaAbove(page, globe.timeline);
     await expectNoSideScroll(page);
   });
@@ -168,7 +167,7 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
   }) => {
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(page.getByTestId("lens-card")).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
 
     const handle = page.getByTestId("sheet-handle");
     await expect(handle).toHaveAttribute("aria-expanded", "false");
@@ -203,18 +202,18 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
 test.describe("Explorer v8 on a desktop: no phone layout", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test("keeps the side panel, the dock and the time-lapse", async ({ page }) => {
+  test("keeps the side panel, the legend card and the time-lapse", async ({ page }) => {
     const globe = new GlobePage(page);
     await globe.skipOnboarding();
     await globe.mockObservationPlan();
     await globe.mockExplorations({ first: succeededView() });
     await globe.goto(`?frame=${LIVE_FRAME.id}`);
-    await expect(page.getByTestId("lens-card")).toBeVisible();
+    await expect(globe.resultCard).toBeVisible();
 
     await expect(page.locator("main")).toHaveAttribute("data-sheet", "none");
     await expect(page.getByTestId("mobile-bar")).toHaveCount(0);
     await expect(page.getByTestId("sheet-handle")).toHaveCount(0);
-    await expect(globe.liveLayerDock).toBeVisible();
+    await expect(page.getByTestId("legend-card")).toBeVisible();
     await expect(page.getByTestId("timeline-play")).toBeVisible();
   });
 });

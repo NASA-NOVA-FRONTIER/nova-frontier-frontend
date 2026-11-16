@@ -1,0 +1,356 @@
+/*
+ * v9 confirm panel (x-confirm, SPECS-flow-v9 §1.3): 400 px glass card, its body scrolls and the
+ * footer with Start stays in view; on phones it is the bottom sheet (≤ 62 %, mobileSheet.ts).
+ * Its own file so the explorer stylesheet's other owners don't collide with it.
+ */
+
+.x-confirm.x-place {
+  --x-panel-w: 400px;
+  max-height: calc(100dvh - 88px);
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+.x-confirm__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 20px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.x-confirm__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.x-confirm__title {
+  margin: 4px 0 2px;
+  font-size: 24px;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.x-confirm__block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.x-confirm__chips {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.x-confirm__chip {
+  min-height: 40px;
+  padding: 6px 4px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--fill);
+  font-size: 13px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.x-confirm__chip[aria-checked="true"] {
+  border-color: var(--gold);
+  color: var(--ink);
+  background: rgba(201, 180, 139, 0.12);
+}
+
+.x-confirm__chip:focus-visible,
+.x-confirm__arc:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.x-confirm__look,
+.x-confirm__line {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.x-confirm__line {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+}
+
+.x-confirm__strip {
+  padding: 10px 10px 8px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--fill);
+}
+
+.x-confirm__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.x-confirm__band {
+  fill: rgba(201, 180, 139, 0.1);
+}
+
+.x-confirm__axis {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.x-confirm__read-line {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 2;
+}
+
+.x-confirm__dot {
+  fill: var(--ink-3);
+}
+
+.x-confirm__dot--read {
+  fill: var(--gold);
+  stroke: #04070e;
+  stroke-width: 1.5;
+}
+
+.x-confirm__arc {
+  cursor: pointer;
+  outline: none;
+}
+
+.x-confirm__arc-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 14;
+}
+
+.x-confirm__arc-line {
+  fill: none;
+  stroke: rgba(235, 233, 228, 0.35);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+
+.x-confirm__arc:hover .x-confirm__arc-line {
+  stroke: var(--ink);
+}
+
+.x-confirm__arc[data-chosen="true"] .x-confirm__arc-line {
+  stroke: var(--gold);
+  stroke-width: 2.5;
+  stroke-dasharray: none;
+}
+
+.x-confirm__ends,
+.x-confirm__legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 4px 0 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--faint);
+}
+
+.x-confirm__legend {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.x-confirm__key::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+  background: var(--gold);
+}
+
+.x-confirm__key--band::before {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(201, 180, 139, 0.25);
+}
+
+.x-confirm__key--other::before {
+  background: rgba(235, 233, 228, 0.45);
+}
+
+.x-confirm__note {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px dashed rgba(235, 233, 228, 0.22);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.x-confirm__note p {
+  margin: 0;
+}
+
+.x-confirm__note-title {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.x-confirm__advanced {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.x-confirm__settings {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.x-confirm__threshold,
+.x-confirm__pairs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.x-confirm__threshold input {
+  width: 100%;
+  accent-color: var(--gold);
+}
+
+.x-confirm__threshold small,
+.x-confirm__pairs small {
+  color: var(--faint);
+  font-size: 12px;
+}
+
+.x-confirm__setting-name {
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.x-confirm__group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.x-confirm__pair {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.x-confirm__pair input {
+  accent-color: var(--gold);
+}
+
+/* Sticky footer: outside the scrolling body, so Start never scrolls away. */
+.x-confirm__foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.x-confirm__mode {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.x-confirm__mode-chip {
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--gold);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+}
+
+.x-confirm__mode-chip[data-mode="offline"] {
+  border-color: rgba(235, 233, 228, 0.35);
+  color: var(--ink-2);
+}
+
+/* The block reason: orange, as SPECS-flow-v9 §1.3 asks. */
+.x-confirm__reason {
+  margin: 0;
+  font-size: 12.5px;
+  color: #f0a35e;
+}
+
+.x-confirm__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.x-confirm__actions .x-confirm__start {
+  flex: 1 1 auto;
+}
+
+.x-confirm__actions .x-ghost,
+.x-confirm__actions .x-text {
+  flex: none;
+  width: auto;
+}
+
+@media (max-width: 760px) {
+  .explorer:not([data-sheet="none"]) .x-confirm.x-place {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .x-confirm__body {
+    padding: 28px 16px 10px;
+  }
+
+  .x-confirm__foot {
+    padding: 10px 16px 14px;
+  }
+
+  .x-confirm__chip {
+    font-size: 12.5px;
+  }
+}
+
+.x-confirm__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

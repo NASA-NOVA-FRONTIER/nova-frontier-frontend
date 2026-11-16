@@ -59,7 +59,7 @@ test.describe("Explorer: place search", () => {
     await expect(globe.searchMenu).toBeHidden();
     await globe.useSquare.click();
     await expect(globe.placeCard).toContainText("Qadirabad");
-    await expect(page.getByTestId("spot-area")).toContainText("10.24 km square");
+    await expect(page.getByTestId("confirm-place")).toContainText("32.30° N, 73.50° E");
     await expect(globe.startCard).toBeHidden();
 
     await globe.placeAnalyse.click();
@@ -68,9 +68,7 @@ test.describe("Explorer: place search", () => {
     await expect(page).toHaveURL(/frame=84-18/);
   });
 
-  test("a place with no catalog coverage shows the no-data state, not Analyze", async ({
-    page,
-  }) => {
+  test("a place with no catalog coverage shows the no-data note and Start stays off", async () => {
     // Registered after beforeEach's land answer, so this one wins.
     await globe.mockCoverage({ mock: "coverage-open-ocean" });
     await globe.mockPlaces({ mock: "places-open-ocean" });
@@ -81,9 +79,9 @@ test.describe("Explorer: place search", () => {
     await globe.placeOption(0).click();
     await globe.useSquare.click();
 
-    await expect(globe.placeCard).toHaveAttribute("data-state", "noCoverage");
-    await expect(page.getByTestId("place-title")).toHaveText("No NISAR data here");
-    await expect(globe.placeAnalyse).toHaveCount(0);
+    await expect(globe.placeCard).toHaveAttribute("data-state", "none");
+    await expect(globe.confirmNote).toContainText("NISAR hasn't measured this square yet");
+    await expect(globe.placeAnalyse).toBeDisabled();
   });
 
   test("catalog coverage allows analysis outside the frame snapshot", async ({ page }) => {
@@ -156,7 +154,7 @@ test.describe("Explorer: place search", () => {
     await globe.placeOption(0).click();
     await globe.useSquare.click();
     await expect(globe.placeCard).toBeVisible();
-    await page.getByTestId("place-close").click();
+    await page.getByTestId("confirm-cancel").click();
     await expect(globe.placeCard).toBeHidden();
     await expect(globe.startCard).toBeVisible();
   });

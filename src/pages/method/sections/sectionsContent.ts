@@ -1,3 +1,5 @@
+import { tr } from "@/i18n/translate";
+import { localized } from "@/i18n/localized";
 /*
  * Copy and drawing data for Method §04 (echo simulator), §05 (wavelengths) and §06 (interferometry), verbatim from
  * docs/design reference "Method v8.dc.html" (its `S`, `waves` and `insar` objects), with the orchestrator's science
@@ -24,9 +26,9 @@ export type Surface = {
   rays: readonly Ray[];
 };
 
-export const SURFACE_IDS: readonly SurfaceId[] = ["water", "forest", "field", "city"];
+export const SURFACE_IDS: readonly SurfaceId[] = localized(["water", "forest", "field", "city"]);
 
-export const SURFACES: Record<SurfaceId, Surface> = {
+export const SURFACES: Record<SurfaceId, Surface> = localized({
   water: {
     label: "Calm water",
     mech: "SPECULAR · MIRROR",
@@ -106,9 +108,9 @@ export const SURFACES: Record<SurfaceId, Surface> = {
       ["M318 200 L92 58", "#6fb3e8", 1.4, 0.55],
     ],
   },
-};
+});
 
-export const ECHO_COPY = {
+export const ECHO_COPY = localized({
   kicker: "04 · WHAT THE ECHO SAYS",
   title: "Every surface sends the pulse back differently.",
   lead: "Pick a surface. HH is the echo sent and received horizontally; HV comes back twisted, which mostly happens inside leaves and branches.",
@@ -118,9 +120,12 @@ export const ECHO_COPY = {
   chip: "TYPICAL VALUES · ILLUSTRATIVE",
   chipTitle: "Typical L-band backscatter for each surface type, rounded; not from a specific scene",
   diagramKicker: (label: string): string =>
-    `${label.toUpperCase()} · L-BAND PULSE IN GOLD · HH ORANGE · HV BLUE`,
-  diagramAria: (label: string): string => `Diagram: radar pulse over ${label.toLowerCase()}`,
-} as const;
+    tr("{{toUpperCase}} · L-BAND PULSE IN GOLD · HH ORANGE · HV BLUE", {
+      toUpperCase: label.toUpperCase(),
+    }),
+  diagramAria: (label: string): string =>
+    tr("Diagram: radar pulse over {{toLowerCase}}", { toLowerCase: label.toLowerCase() }),
+} as const);
 
 export const HH_COLOUR = "#e8894a";
 export const HV_COLOUR = "#6fb3e8";
@@ -136,7 +141,7 @@ export type Wave = {
   loopSeconds: number;
 };
 
-export const WAVES: readonly Wave[] = [
+export const WAVES: readonly Wave[] = localized([
   {
     band: "L-band",
     len: "24 cm",
@@ -164,15 +169,15 @@ export const WAVES: readonly Wave[] = [
     who: "Sentinel-1 · RADARSAT Constellation",
     loopSeconds: 4,
   },
-];
+]);
 
-export const WAVES_COPY = {
+export const WAVES_COPY = localized({
   kicker: "05 · THE LENGTH OF THE WAVE",
   title: "Longer waves reach deeper.",
   lead: "NISAR carries two radars. Drawn here at the same scale, next to the C-band wave used by Sentinel-1 and Canada's RADARSAT Constellation.",
   footnote:
     "Wavelengths: L-band 24 cm (1.26 GHz) and S-band 9.4 cm (3.2 GHz), from NASA's NISAR mission page; C-band about 5.6 cm (5.4 GHz). Argentina's SAOCOM also flies an L-band radar.",
-} as const;
+} as const);
 
 export type InsarFigure = {
   id: "phase" | "coherence";
@@ -187,7 +192,7 @@ export type InsarFigure = {
 
 // Interim crops of nova-frontier-model docs/images/interferometry.png (≈ 20 × 20 km, not the 5 km stat window) until
 // the science team sends clean exports. The coherence crop keeps the report's magma colours, so its legend is magma.
-export const INSAR_FIGURES: readonly InsarFigure[] = [
+export const INSAR_FIGURES: readonly InsarFigure[] = localized([
   {
     id: "phase",
     img: "/insar/kumamoto-wrapped-phase.png",
@@ -209,9 +214,9 @@ export const INSAR_FIGURES: readonly InsarFigure[] = [
     caption:
       "How alike the two echoes are. Fields and towns stay bright; water and steep forest go dark. Report figure colours.",
   },
-];
+]);
 
-export const INSAR_COPY = {
+export const INSAR_COPY = localized({
   kicker: "06 · TWO PASSES, ONE PHASE",
   title: "Fringes draw how the radar's path changed.",
   lead: "Interferometry compares the phase of two echoes from the same orbit. Each fringe is about 12 cm of change in the radar's path length: half of the 24 cm wave, because the pulse travels there and back. The path changes when the ground moves and when the air between ground and satellite changes, so the explorer shows coherence and wrapped phase, measured as they are.",
@@ -223,4 +228,4 @@ export const INSAR_COPY = {
     "nova-frontier-backend README: Kumamoto, track 24, 21 Jul → 14 Aug 2026, 5 km window, measured 12 Nov 2026",
   footnote:
     "Kumamoto, Japan, 21 Jul → 14 Aug 2026, a pair that brackets the 28 July earthquake. Figure crops from nova-frontier-model's interferometry report.",
-} as const;
+} as const);

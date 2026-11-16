@@ -4,7 +4,7 @@ test.describe("Measured cases page", () => {
   test("filtering by a question leaves only the cases that ask it", async ({ page }) => {
     await page.goto("/cases");
     const cards = page.locator("[data-testid^=case-card-]");
-    await expect(cards).toHaveCount(6);
+    await expect(cards).toHaveCount(5);
 
     const flood = page.getByTestId("cases-filter-flood_wetland");
     await expect(flood).toHaveText(/Did it flood\?/);
@@ -17,6 +17,9 @@ test.describe("Measured cases page", () => {
     await page.getByTestId("cases-filter-wildfire").click();
     await expect(cards).toHaveCount(1);
     await expect(page.getByTestId("case-card-bug-fire")).toBeVisible();
+    await page.getByTestId("cases-filter-vegetation_disturbance").click();
+    await expect(cards).toHaveCount(1);
+    await expect(page.getByTestId("case-card-para-event-02")).toBeVisible();
 
     // The landslide question has no live lens; its filter lists the one case that asks it.
     await page.getByTestId("cases-filter-observed_dynamics").click();
@@ -24,13 +27,13 @@ test.describe("Measured cases page", () => {
     await expect(page.getByTestId("case-card-niscemi-aftermath")).toContainText("+2.17 dB");
 
     await page.getByTestId("cases-filter-all").click();
-    await expect(cards).toHaveCount(6);
+    await expect(cards).toHaveCount(5);
   });
 
   // Issue #28: one demo case per phenomenon, each marked as computed offline.
   test("each demo case carries the OFFLINE chip", async ({ page }) => {
     await page.goto("/cases");
-    for (const id of ["qadirabad", "choco", "bug-fire", "rowe-creek", "skollersta"]) {
+    for (const id of ["qadirabad", "choco", "bug-fire", "para-event-02", "niscemi-aftermath"]) {
       const chip = page.getByTestId(`case-card-${id}`).getByTestId("prov-offline");
       await expect(chip).toHaveText("OFFLINE");
       await expect(chip).toHaveAttribute("title", /analysis is fixed/);

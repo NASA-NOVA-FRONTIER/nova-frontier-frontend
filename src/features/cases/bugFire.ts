@@ -5,6 +5,7 @@ import {
   type WildfirePass,
 } from "@/features/wildfire/wildfireEvidence";
 
+import { localized } from "@/i18n/localized";
 /*
  * Bug Fire (Nevada), ignited 8 Aug 2026: the wildfire demo case (#21, #28). Every number is copied
  * from the model's case bug-fire (nova-frontier-model release events-20261115, asset
@@ -46,7 +47,7 @@ const pass = (
 
 // series.json: observations (marker pixel), observed_groups.all_common_cells and
 // diagnostic_band_timeline.
-export const BUG_FIRE_EVIDENCE: WildfireEvidence = {
+export const BUG_FIRE_EVIDENCE: WildfireEvidence = localized({
   series: "042_D_068_4005_DHDH",
   folder: FOLDER,
   passes: [
@@ -192,14 +193,14 @@ export const BUG_FIRE_EVIDENCE: WildfireEvidence = {
   limitation:
     "A perimeter can enclose unburned cells. Dated severity mapping and vegetation or field observations would help interpret the departures.",
   source: RELEASE,
-};
+});
 
 // The timeline draws the five real passes and their out-of-band shares, with the ignition between
 // the last baseline pass and the first assessment. The case's target stays the first assessment
 // (28 Aug), as the gateway lists it; the lens reads its change on the last pass (9 Sep).
 const FIRST_ASSESSMENT = BUG_FIRE_EVIDENCE.passes.find((item) => item.role === "assessment")?.date;
 
-export const bugFireTimeline: TimelineData = {
+export const bugFireTimeline: TimelineData = localized({
   passes: BUG_FIRE_EVIDENCE.passes.map((item) => {
     if (item.role === "baseline") return { date: item.date, kind: "base" as const };
     const kind = item.date === FIRST_ASSESSMENT ? ("target" as const) : ("meas" as const);
@@ -214,4 +215,4 @@ export const bugFireTimeline: TimelineData = {
   optical: [],
   opticalNote: "Radar only · NASA FIRMS detections are not in this case yet",
   realDates: true,
-};
+});
