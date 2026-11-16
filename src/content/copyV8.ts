@@ -580,3 +580,22 @@ export const LANDSLIDE = {
   experimentalWhy:
     "No validated landslide lens exists: these are measured returns, read as candidate evidence only.",
 } as const;
+
+// Not in COPY-v8: the printable reports and their PDF (#37).
+export const REPORT = {
+  offline: "OFFLINE · measured ahead of time",
+  online: "ONLINE · computed live from NISAR L-band scenes",
+  scientificStatus: "Diagnostic evidence, not a validated classifier",
+  imagesKicker: "The measured images",
+  changeAlt: (name: string) => `Radar change layer at ${name}`,
+  baselineAlt: (name: string) => `Radar baseline layer at ${name}`,
+  figureAlt: (name: string) => `Backend report figure for ${name}`,
+  alternatives: "Other things that change radar like this:",
+  valuesKicker: "Measured values by date, at the point",
+  valuesNote: "gamma-zero dB at the measured point; an empty cell is a masked channel, never zero.",
+  limitsAll: "Limits the radar service states for this answer",
+  retry: "Try again",
+  loadFailed: "We couldn't load this answer",
+  loadFailedBody:
+    "The server didn't answer. Try again, or ask the question again from the explorer once it is done.",
+} as const;
