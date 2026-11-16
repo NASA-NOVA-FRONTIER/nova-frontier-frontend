@@ -974,8 +974,8 @@ export const ExplorerPage = () => {
     },
     {
       id: "csv",
-      label: "Data · CSV",
-      sub: "One row per pass, with its sources and limits, for spreadsheets",
+      label: tr("Data · CSV"),
+      sub: tr("One row per pass, with its sources and limits, for spreadsheets"),
       disabledWhy: exportsLive
         ? undefined
         : live !== undefined

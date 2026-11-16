@@ -22,7 +22,7 @@ import { Link } from "@/lib/Link";
 import { ProvenanceChip } from "@/lib/ProvenanceChip";
 import { VERSION } from "@/pages/explorer/StartCard";
 import { LiveReport } from "@/pages/report/LiveReport";
-import { areaOf, reportSummary, SUMMARY_LABEL } from "@/pages/report/reportSummary";
+import { areaOf, reportSummary, summaryLabel } from "@/pages/report/reportSummary";
 
 import { tr } from "@/i18n/translate";
 const REPORT_CHART_PX = 220;
@@ -118,7 +118,7 @@ const Report = ({ item }: { item: Case }) => {
 
       <section className="r-summary" data-testid="report-summary">
         <p className="r-summary__head">
-          <span>{SUMMARY_LABEL}</span>
+          <span>{summaryLabel()}</span>
           <span>{tr("Not AI-written · check every number against the data blocks")}</span>
         </p>
         <p className="r-summary__text">{reportSummary(item)}</p>
