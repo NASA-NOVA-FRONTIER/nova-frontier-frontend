@@ -22,6 +22,7 @@ import {
 import type { ScienceProducts } from "@/features/explore/scienceProducts";
 import { gridDescription } from "@/features/sheet/radarViews";
 import { absoluteApiPath, apiRequest, ApiError } from "@/lib/api/apiClient";
+import { ProvenanceChip } from "@/lib/ProvenanceChip";
 
 import { tr } from "@/i18n/translate";
 type Run = { view?: ExplorationView; error?: string; starting?: boolean };
@@ -330,7 +331,10 @@ export const RegionalAnalysisPanel = ({ explorationId }: { explorationId: string
   };
   return (
     <section className="x-sheet__section x-radar__regional" aria-label={tr("Regional analysis")}>
-      <h3 className="x-sheet__kicker">{tr("Regional analysis")}</h3>
+      <h3 className="x-sheet__kicker x-kicker--split">
+        <span>{tr("Regional analysis")}</span>
+        <ProvenanceChip kind="experimental" />
+      </h3>
       <p className="x-muted">
         {tr(
           "Read a separate radar history for regional averages, candidate periods and historical fits. Archive reads can take several minutes.",
@@ -363,5 +367,30 @@ export const RegionalAnalysisPanel = ({ explorationId }: { explorationId: string
       )}
       {products != null && <RegionalCharts products={products} />}
     </section>
+  );
+};
+
+// The live result's technical extras. They mount on the first Technical view and then stay mounted
+// (hidden and inert in Plain), so a regional run keeps its state and Plain never fires its request.
+export const LiveTechnicalBlock = ({
+  technical,
+  view,
+}: {
+  technical: boolean;
+  view: ExplorationView;
+}) => {
+  const [opened, setOpened] = useState(technical);
+  if (technical && !opened) setOpened(true);
+  if (!opened) return null;
+  const result = view.result;
+  return (
+    <div hidden={!technical} inert={!technical} data-testid="sheet-technical">
+      {result?.products && <PublishedFiles products={result.products} />}
+      {result?.insar == null &&
+        view.plan?.seriesKey &&
+        ["succeeded", "partial"].includes(view.status) && (
+          <RegionalAnalysisPanel explorationId={view.id} />
+        )}
+    </div>
   );
 };

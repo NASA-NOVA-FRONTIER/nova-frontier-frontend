@@ -6,7 +6,6 @@ import type { Subject } from "@/features/case-panel/subject";
 import type { ExplorationView } from "@/features/explore/exploreSchemas";
 import { RadarHistory } from "@/features/sheet/RadarHistory";
 import { RadarImagePanel } from "@/features/sheet/RadarImagePanel";
-import { PublishedFiles, RegionalAnalysisPanel } from "@/features/sheet/RegionalAnalysisPanel";
 
 import { tr } from "@/i18n/translate";
 const count = z.number().int().nonnegative();
@@ -213,12 +212,6 @@ export const LiveSciencePanel = ({
           )}
         </details>
       )}
-      {result.products && <PublishedFiles products={result.products} />}
-      {result.insar == null &&
-        view.plan?.seriesKey &&
-        ["succeeded", "partial"].includes(view.status) && (
-          <RegionalAnalysisPanel explorationId={view.id} />
-        )}
     </>
   );
 };
