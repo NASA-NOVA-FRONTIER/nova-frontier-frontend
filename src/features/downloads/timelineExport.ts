@@ -1,7 +1,7 @@
 import type { Case, PassKind } from "@/features/cases/cases";
 
 /*
- * Timeline downloads (JSON and CSV). Pass dates and "% outside range" are DEMO until the backend
+ * Timeline download (JSON). Pass dates and "% outside range" are DEMO until the backend
  * serves real acquisitions, so every row says so and the file names its source. A case whose
  * timeline is copied from its own series (realDates) says that instead.
  */
@@ -32,16 +32,6 @@ export const REAL_TIMELINE_SOURCE =
 const sourceOf = (item: Case): string =>
   item.timeline?.realDates === true ? REAL_TIMELINE_SOURCE : TIMELINE_SOURCE;
 
-export const CSV_COLUMNS = [
-  "case",
-  "lens",
-  "date",
-  "role",
-  "cells_outside_range_pct",
-  "measured",
-  "demo",
-] as const;
-
 export const timelineRows = (item: Case): PassRow[] =>
   (item.timeline?.passes ?? []).map((pass) => ({
     case: item.id,
@@ -59,13 +49,6 @@ export const timelineJson = (item: Case): string =>
     null,
     2,
   );
-
-export const timelineCsv = (item: Case): string => {
-  const lines = timelineRows(item).map((row) =>
-    CSV_COLUMNS.map((column) => row[column] ?? "").join(","),
-  );
-  return [`# ${sourceOf(item)}`, CSV_COLUMNS.join(","), ...lines].join("\n") + "\n";
-};
 
 export const saveBlob = (blob: Blob, name: string): void => {
   const url = URL.createObjectURL(blob);

@@ -8,5 +8,9 @@
   },
   "areaKm2": 104.89,
   "warnings": [],
-  "precomputedCase": null
+  "precomputedCase": null,
+  "lens": "flood_wetland",
+  "etaSeconds": 228.9,
+  "cache": "miss",
+  "grid": null
 }

@@ -24,7 +24,7 @@ import {
   waveAmp,
   wavePx,
   type BandId,
-} from "@/pages/learn/radarWaves";
+} from "@/pages/learn/waveModel";
 
 const DESKTOP = buildScene(700, 438);
 const PHONE = buildScene(318, 199);
