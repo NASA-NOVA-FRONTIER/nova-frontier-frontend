@@ -141,8 +141,11 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await expect(pills.getByRole("button")).toHaveText(["HH", "HV", "Δ dB"]);
     await expect(page.getByTestId("layer-pill-hh")).toHaveAttribute("aria-pressed", "true");
     expect((await box(pills)).y).toBeGreaterThan((await box(globe.searchPill)).y);
-    // Same rows as the dock: the answer has no change layer and no HV image on its target pass.
+    // Same rows as the dock: the answer has no change layer and no HV image on 12 Sep. Reduced
+    // motion opens on the reference pass (14 Jul), so go to 12 Sep first.
     await expect(page.getByTestId("layer-pill-change")).toBeDisabled();
+    await globe.timelinePass(2).click();
+    await expect(globe.timelineReadout).toContainText("12 Sep 2026");
     const hv = page.getByTestId("layer-pill-hv");
     await expect(hv).toBeDisabled();
     await expect(hv).toHaveAttribute("title", "No HV image for this pass");
@@ -154,11 +157,12 @@ test.describe("Explorer v8 on a phone: the bottom sheet", () => {
     await expect(hv).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("layer-pill-hh")).toHaveAttribute("aria-pressed", "false");
 
-    // The compact strip sits on the sheet, without the time-lapse button.
+    // The compact strip sits on the sheet: previous, play and next, no speed or loop (v9 frames).
     await expect(globe.timeline).toBeVisible();
     const strip = await box(globe.timeline);
     expect(strip.y + strip.height).toBeLessThanOrEqual((await box(globe.panel)).y);
-    await expect(page.getByTestId("timeline-play")).toBeHidden();
+    await expect(page.getByTestId("timeline-play")).toBeVisible();
+    await expect(page.getByTestId("timeline-speed")).toBeHidden();
     await expectNovaAbove(page, globe.timeline);
     await expectNoSideScroll(page);
   });

@@ -93,8 +93,19 @@ always sends the centre as a GeoJSON `Point`, and the backend builds the exact U
   (pointer capture, `touch-action: none`), and the wheel is passed on to the canvas.
 - **`GlobeView`** reports `onPlace(point)` and `onMoveSquare(centre)`, and `ExplorerPage` owns the
   state.
-- **Tests:** the stub globe (`GlobeView.stub.tsx`) exposes `window.__globe.click` and
-  `window.__globe.dragSquare`, and `data-scene` carries `square: { centre, sideKm, movable }`.
+- **Tests:** the stub globe (`GlobeView.stub.tsx`) exposes `window.__globe.click`,
+  `window.__globe.dragSquare` and `window.__globe.interact` (a globe drag or zoom, which pauses the
+  timeline), and `data-scene` carries `square: { centre, sideKm, movable }`.
+
+## The sequence timeline
+
+`src/features/timeline/` (v9, #26): `sequence.ts` (pure: one step per measured pass, or one per pair
+for ground motion; real-date ticks, gap labels, the event line only with a sourced date, readout and
+globe stamp), `sequencePlayer.ts` (pure reducer: play/pause, prev/next, seek, speed, loop, pause) and
+`usePassPlayer.ts` (timer at 1.6 s ÷ speed, pause on a hidden tab, prefetch of the next image).
+Reduced motion opens paused on the reference pass (COPY-flow-v9 §6). Each live pass drapes its own
+`display_<date>_<pol>` image; a pass without one shows nothing. A case with no image per pass (all of
+them today) can't play.
 
 ## The live exploration flow
 

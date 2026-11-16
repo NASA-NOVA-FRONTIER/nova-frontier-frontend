@@ -127,7 +127,7 @@ test.describe("Explorer: measured cases", () => {
     );
     await globe.timelinePasses("meas").first().click();
     await expect(globe.timelineCompare).toHaveAttribute("aria-pressed", "false");
-    await expect(globe.timelineReadout).toHaveText("7 Aug 2026 · measured pass");
+    await expect(globe.timelineReadout).toHaveText("Pass 5 of 8 · 7 Aug 2026");
   });
 
   test("Chocó shows its coherence only, no chart and no timeline", async () => {
