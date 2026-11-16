@@ -285,6 +285,62 @@ test.describe("Sequence timeline: controls", () => {
     await expect(globe.stamp).toHaveText("21 JUL 2026 → 14 AUG 2026INTERVAL 1 OF 1 · 24 DAYS");
   });
 
+  test("Niscemi steps its own pass images on the globe, with the stamp; the dock picks HH, HV or a report layer", async ({
+    page,
+  }) => {
+    await globe.goto("?case=niscemi-aftermath");
+
+    // Reduced motion: paused on the reference pass, with Play, speed and Loop offered.
+    await globe.expectTimelinePlaying(false);
+    await expect(globe.timelineReadout).toHaveText("Pass 1 of 8 · 24 Jun 2026");
+    await expect(globe.timelinePlay).toBeVisible();
+    await expect(globe.timelineSpeed).toBeVisible();
+    await expect(globe.timelineLoop).toBeVisible();
+    await expect(globe.stamp).toHaveText("24 JUN 2026PASS 1 OF 8 · REFERENCE");
+    await globe.expectScene((scene) =>
+      expect(scene.drape?.url).toBe("/cases/niscemi/2026-06-24-HH.png"),
+    );
+    // The event marker stays.
+    await expect(globe.timeline).toContainText("Landslide 25 Jan");
+
+    await globe.timelinePass(0).focus();
+    await page.keyboard.press("End");
+    await expect(globe.timelineReadout).toHaveText("Pass 8 of 8 · 22 Oct 2026");
+    await expect(globe.stamp).toHaveText("22 OCT 2026PASS 8 OF 8 · 36 DAYS AFTER PASS 7");
+    await page.keyboard.press("ArrowLeft");
+    await expect(globe.timelineReadout).toHaveText("Pass 7 of 8 · 16 Sep 2026");
+    await globe.expectScene((scene) =>
+      expect(scene.drape?.url).toBe("/cases/niscemi/2026-09-16-HH.png"),
+    );
+    await page.keyboard.press("ArrowRight");
+    await globe.expectScene((scene) =>
+      expect(scene.drape?.url).toBe("/cases/niscemi/2026-10-22-HH.png"),
+    );
+
+    await expect(globe.dock.getByTestId("layer-pass")).toHaveAttribute("aria-pressed", "true");
+    await globe.dock.getByTestId("channel-HV").click();
+    await globe.expectScene((scene) =>
+      expect(scene.drape?.url).toBe("/cases/niscemi/2026-10-22-HV.png"),
+    );
+    await globe.timelinePrev.click();
+    await globe.expectScene((scene) =>
+      expect(scene.drape?.url).toBe("/cases/niscemi/2026-09-16-HV.png"),
+    );
+
+    // A report layer isn't one pass: no stamp over it. "One pass" brings the sequence back.
+    await globe.dock.getByTestId("layer-change").click();
+    await globe.expectScene((scene) =>
+      expect(scene.drape?.url).toBe("/cases/niscemi/change-HH.png"),
+    );
+    await expect(globe.stamp).toHaveCount(0);
+    await globe.dock.getByTestId("layer-pass").click();
+    await expect(globe.stamp).toHaveText("16 SEP 2026PASS 7 OF 8 · 12 DAYS AFTER PASS 6");
+
+    // The compare mode is still one click away.
+    await globe.timelineCompare.click();
+    await expect(globe.timelineReadout).toContainText("Baseline (4 passes");
+  });
+
   test("a case with no image per pass keeps its change map and offers no play", async () => {
     await globe.goto("?case=qadirabad");
 

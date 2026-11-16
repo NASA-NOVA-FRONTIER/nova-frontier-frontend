@@ -1,5 +1,6 @@
 import type { TimelineData } from "@/features/cases/cases";
 import {
+  passImage,
   sharePercent,
   type WildfireEvidence,
   type WildfirePass,
@@ -202,11 +203,16 @@ const FIRST_ASSESSMENT = BUG_FIRE_EVIDENCE.passes.find((item) => item.role === "
 
 export const bugFireTimeline: TimelineData = localized({
   passes: BUG_FIRE_EVIDENCE.passes.map((item) => {
-    if (item.role === "baseline") return { date: item.date, kind: "base" as const };
+    // Every pass ships both channels (public/cases/bug-fire), so the sequence player can step them.
+    const images = {
+      HH: passImage(BUG_FIRE_EVIDENCE, item.date, "HH"),
+      HV: passImage(BUG_FIRE_EVIDENCE, item.date, "HV"),
+    };
+    if (item.role === "baseline") return { date: item.date, kind: "base" as const, images };
     const kind = item.date === FIRST_ASSESSMENT ? ("target" as const) : ("meas" as const);
     return item.outsideCells === undefined
-      ? { date: item.date, kind }
-      : { date: item.date, kind, outsidePct: sharePercent(item.outsideCells, CELLS) };
+      ? { date: item.date, kind, images }
+      : { date: item.date, kind, outsidePct: sharePercent(item.outsideCells, CELLS), images };
   }),
   start: "2026-06-15",
   end: "2026-11-25",

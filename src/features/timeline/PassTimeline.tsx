@@ -116,8 +116,9 @@ export const PassTimeline = ({
   // Turning either on pauses where it is; turning it off never resumes on its own.
   usePauseWhen(reduceMotion, dispatch);
   usePauseWhen(hidden, dispatch);
-  // A live answer has no compare mode (Cristian, #20): the selected pass is always in focus.
-  const [comparing, setComparing] = useState(hasTarget && live === undefined);
+  // A live answer has no compare mode (Cristian, #20): the selected pass is always in focus. A case
+  // with an image per pass opens on the v9 sequence too; "Baseline ↔ Target" still opens the compare.
+  const [comparing, setComparing] = useState(hasTarget && live === undefined && !sequence.canPlay);
   const isComparing = comparing && hasTarget && live === undefined && !player.playing;
   const step = steps[player.index];
   const currentPass = step?.passIndex ?? -1;

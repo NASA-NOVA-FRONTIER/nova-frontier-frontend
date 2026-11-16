@@ -1,6 +1,7 @@
 import type { Case, TimelineData } from "@/features/cases/cases";
 import {
   outsidePercent,
+  passImage,
   type LandslideEvidence,
   type LandslidePass,
 } from "@/features/landslide/landslideEvidence";
@@ -164,9 +165,14 @@ const timeline = (evidence: LandslideEvidence): TimelineData => ({
     const kind =
       item.role === "baseline" ? "base" : item.date === evidence.target ? "target" : "meas";
     const share = outsidePercent(item, evidence.cells);
+    // Every pass ships both channels (public/cases/niscemi), so the sequence player can step them.
+    const images = {
+      HH: passImage(evidence, item.date, "HH"),
+      HV: passImage(evidence, item.date, "HV"),
+    };
     return share === undefined
-      ? { date: item.date, kind }
-      : { date: item.date, kind, outsidePct: share };
+      ? { date: item.date, kind, images }
+      : { date: item.date, kind, outsidePct: share, images };
   }),
   start: "2026-01-15",
   end: "2026-11-25",
