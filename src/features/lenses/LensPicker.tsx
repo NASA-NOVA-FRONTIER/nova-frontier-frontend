@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import { CASE_LOCK, LENS_CARD, LENS_COPY, STEP_3, STEP_4 } from "@/content/copyV8";
 import { Icon } from "@/features/case-panel/icons";
 import { HazardIcon } from "@/features/cases/HazardIcon";
@@ -67,6 +69,21 @@ export const LensPicker = ({ lens, tabs, running, locked, onLens, onCancel }: Pr
   // A locked picker never offers another lens: a demo case can't turn into a live question.
   const off = (id: LensId) => locked !== undefined && id !== lens;
   const why = (id: LensId) => (off(id) ? CASE_LOCK.buttonWhy : undefined);
+  // On a phone the tabs are one scrolling row: bring the active tab into it (ground motion is last).
+  // Scrolls the row only, never the sheet or the page, as scrollIntoView would.
+  const rowRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const row = rowRef.current;
+    if (row === null) return;
+    const active = row.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (active === null) return;
+    const box = row.getBoundingClientRect();
+    const tab = active.getBoundingClientRect();
+    // The fade and the padding cover 32 px at the end; keep the tab clear of them.
+    const edge = 32;
+    if (tab.right > box.right - edge) row.scrollLeft += tab.right - (box.right - edge);
+    else if (tab.left < box.left) row.scrollLeft -= box.left - tab.left;
+  }, [lens, tabs]);
   const ground = (
     <button
       type="button"
@@ -84,7 +101,13 @@ export const LensPicker = ({ lens, tabs, running, locked, onLens, onCancel }: Pr
   );
   if (tabs)
     return (
-      <div role="group" aria-label={tr("Lens")} className="x-ltabs" data-testid="lens-tabs">
+      <div
+        ref={rowRef}
+        role="group"
+        aria-label={tr("Lens")}
+        className="x-ltabs"
+        data-testid="lens-tabs"
+      >
         {CARD_LENSES.map((id) => (
           <button
             key={id}

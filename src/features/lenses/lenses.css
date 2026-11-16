@@ -164,16 +164,27 @@
   color: var(--faint);
 }
 
-/* Tabs above a lens result: one scrolling row, so 390 px never overflows the page. */
-/* flex: none, or the panel's scrolling column squeezes the scrollable row to zero height. */
+/* Tabs above a lens result: the desktop panel wraps them so no tab hides past its edge ("Wilc…"). */
+/* flex: none, or the panel's scrolling column squeezes the row to zero height. */
 .x-ltabs {
   flex: none;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  margin: 0 -18px;
-  padding: 0 18px;
+}
+
+/* Phone: one scrolling row keeps the bottom sheet short, so 390 px never overflows the page. The
+   right fade says there is more; the end padding lets the last tab scroll clear of it, and the
+   4 px above and below keep the focus ring inside the scroller. */
+@media (max-width: 760px) {
+  .x-ltabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 0 -18px;
+    padding: 4px 32px 4px 18px;
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
 }
 
 .x-ltab {
@@ -204,6 +215,22 @@
 
 .x-ltab--ground .x-lground__note {
   font-size: 9.5px;
+}
+
+/* Desktop: the ground-motion tab (question + note) is wider than the panel on one line, so it may
+   break onto two lines inside its pill instead of running past the panel edge. */
+@media (min-width: 761px) {
+  .x-ltab--ground {
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    max-width: 100%;
+    height: auto;
+    min-height: 32px;
+    padding: 5px 11px;
+    row-gap: 0;
+    border-radius: 16px;
+    white-space: normal;
+  }
 }
 
 /* Card */
