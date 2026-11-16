@@ -1,0 +1,93 @@
+/*
+ * The v9 ⓘ button and its popover (SPECS-flow-v9 §4). Shared across pages, so `s-` prefix. The
+ * popover is portalled to <body>, outside `.site`, so every token carries its site.css value as a
+ * fallback.
+ */
+
+.s-infotip {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(235, 233, 228, 0.35);
+  background: transparent;
+  color: var(--ink-2, #d4d2cc);
+  font:
+    600 11px/1 "Albert Sans",
+    system-ui,
+    sans-serif;
+  cursor: pointer;
+}
+
+/* A 44 px touch target around the 20 px circle the design draws. */
+.s-infotip::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+}
+
+.s-infotip[aria-expanded="true"] {
+  border-color: var(--gold, #c9b48b);
+  background: var(--gold, #c9b48b);
+  color: var(--gold-ink, #16120a);
+}
+
+.s-infotip:focus-visible {
+  outline: 2px solid var(--gold, #c9b48b);
+  outline-offset: 2px;
+}
+
+.s-infotip-pop {
+  position: fixed;
+  /* Above every explorer layer (highest is 50). */
+  z-index: 60;
+  box-sizing: border-box;
+  max-width: 280px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(201, 180, 139, 0.45);
+  background: var(--night, #0e1930);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  color: var(--ink, #ebe9e4);
+  font:
+    400 13px/1.5 "Albert Sans",
+    system-ui,
+    sans-serif;
+  text-wrap: pretty;
+  text-align: left;
+  pointer-events: none;
+  animation: s-infotip-in 120ms ease-out;
+}
+
+.s-infotip-pop[data-placed="false"] {
+  visibility: hidden;
+}
+
+.s-infotip-pop__title {
+  margin: 0 0 4px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold, #c9b48b);
+}
+
+.s-infotip-pop__text {
+  margin: 0;
+}
+
+@keyframes s-infotip-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s-infotip-pop {
+    animation: none;
+  }
+}
