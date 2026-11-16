@@ -3,11 +3,17 @@ import "@/pages/report/report.css";
 
 import { useEffect, useState } from "react";
 
+import { LANDSLIDE } from "@/content/copyV8";
 import { SOURCE, VERDICT } from "@/features/case-panel/verdicts";
 import { CASES, findCase, findLens, type Case } from "@/features/cases/cases";
 import { caseBandPasses } from "@/features/cases/demoBand";
 import { BandChart } from "@/features/charts/BandChart";
 import { ContrastBars } from "@/features/charts/ContrastBars";
+import {
+  CHANNELS,
+  outsidePercent,
+  type LandslideEvidence,
+} from "@/features/landslide/landslideEvidence";
 import { EMPTIES_LINE } from "@/features/live/liveQuestion";
 import { formatDay } from "@/features/timeline/timelineLayout";
 import { Link } from "@/lib/Link";
@@ -136,7 +142,9 @@ const Report = ({ item }: { item: Case }) => {
 
       <section className="r-block r-keep">
         <p className="r-kicker">Data 2 · The measurement at the point</p>
-        {bandPasses === undefined ? (
+        {item.landslide !== undefined ? (
+          <LandslideTable evidence={item.landslide} />
+        ) : bandPasses === undefined ? (
           <p className="r-empty">
             No point time series for this lens yet. Nothing is drawn rather than a made-up line.
           </p>
@@ -210,6 +218,57 @@ const Report = ({ item }: { item: Case }) => {
     </article>
   );
 };
+
+// A landslide case's own series: every pass at the marker and across the area, REAL values, read as
+// landslide evidence only EXPERIMENTALLY.
+const LandslideTable = ({ evidence }: { evidence: LandslideEvidence }) => (
+  <>
+    <p className="r-line">
+      {LANDSLIDE.kicker} <ProvenanceChip kind="experimental" source={LANDSLIDE.experimentalWhy} />{" "}
+      <ProvenanceChip kind="real" source={evidence.source.label} />
+    </p>
+    <table className="r-table" data-testid="report-landslide">
+      <thead>
+        <tr>
+          <th scope="col">{LANDSLIDE.tableDate}</th>
+          <th scope="col">{LANDSLIDE.tableRole}</th>
+          {CHANNELS.map((key) => (
+            <th key={`a${key}`} scope="col">
+              {LANDSLIDE.tableArea(key)}
+            </th>
+          ))}
+          {CHANNELS.map((key) => (
+            <th key={`p${key}`} scope="col">
+              {LANDSLIDE.tablePoint(key)}
+            </th>
+          ))}
+          <th scope="col">{LANDSLIDE.tableOutside}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {evidence.passes.map((pass) => {
+          const share = outsidePercent(pass, evidence.cells);
+          return (
+            <tr key={pass.date}>
+              <th scope="row">{pass.date}</th>
+              <td>
+                {pass.role === "baseline" ? LANDSLIDE.baselineRole : LANDSLIDE.assessmentRole}
+              </td>
+              {CHANNELS.map((key) => (
+                <td key={`a${key}`}>{pass.area[key].median.toFixed(2)} dB</td>
+              ))}
+              {CHANNELS.map((key) => (
+                <td key={`p${key}`}>{pass.point[key].toFixed(2)} dB</td>
+              ))}
+              <td>{share === undefined ? "—" : `${share.toFixed(1)}%`}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+    <p className="r-small">{evidence.band}</p>
+  </>
+);
 
 const Fact = ({ k, v }: { k: string; v: string }) => (
   <div>

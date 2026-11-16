@@ -516,3 +516,52 @@ export const STEP_8 = {
   showPartial: "Show what arrived",
   instant: "INSTANT",
 } as const;
+
+// Not in COPY-v8: the landslide More information panel (#24). Niscemi's passes all follow the
+// event, so the copy says what the radar measured afterwards and never what the landslide did.
+export const LANDSLIDE = {
+  kicker: "Landslide reading",
+  aftermathTitle: "Aftermath only",
+  aftermathBody: (event: string, first: string, days: number) =>
+    `Every pass is after the ${event} landslide; the first is on ${first}, ${days} days later. The radar shows how the slope behaved afterwards, not the landslide itself.`,
+  imagery: "Radar image",
+  view: "View",
+  viewPass: "One pass",
+  channel: "Channel",
+  pass: "Pass",
+  baselineRole: "baseline",
+  assessmentRole: "assessment",
+  passText: (date: string, channel: string) =>
+    `${channel} return on ${date}, fixed −30 to 0 dB gray. Left of the handle: the baseline median of the same channel.`,
+  compareLeft: "Baseline median",
+  grayScale: ["−30 dB", "0 dB"] as [string, string],
+  history: "The area's return, pass by pass",
+  historyText:
+    "Median of the 16,384 cells (solid) and the marker pixel at the case point (dashed). The shaded months are the baseline.",
+  areaHH: "Area median HH",
+  areaHV: "Area median HV",
+  pointHH: "Marker HH",
+  pointHV: "Marker HV",
+  outside: "Cells outside their own baseline band",
+  outsideText: "Share of the 16,384 cells on a fixed 0–100% axis.",
+  outsideRow: (cells: string, total: string) => `${cells} of ${total} cells`,
+  shift: (date: string) => `Shift on ${date}, against the baseline median`,
+  shiftArea: "Median change per cell",
+  shiftIqr: (range: string) => `Middle half of the cells: ${range}`,
+  shiftPoint: (value: string) => `Marker pixel: ${value}`,
+  table: "Values by pass",
+  tableDate: "Date",
+  tableRole: "Role",
+  tableArea: (channel: string) => `Area median ${channel}`,
+  tablePoint: (channel: string) => `Marker ${channel}`,
+  tableOutside: "Outside band",
+  how: "How it was measured",
+  howSteps: (series: string, baseline: string, target: string, grid: string) => [
+    `One NISAR L2 GCOV series (${series}), HH and HV, on a ${grid} grid.`,
+    `Baseline: the cell-wise median of the four passes ${baseline}.`,
+    `Target: ${target} minus that median, for every cell and at the marker.`,
+  ],
+  bandRule: "Out-of-band rule",
+  experimentalWhy:
+    "No validated landslide lens exists: these are measured returns, read as candidate evidence only.",
+} as const;
