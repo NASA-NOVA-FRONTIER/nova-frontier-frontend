@@ -15,6 +15,7 @@ import { EMPTIES_LINE, jobSteps } from "@/features/live/liveQuestion";
 import { NovaGlyph } from "@/features/nova/NovaGlyph";
 import { CompareSplit } from "@/features/sheet/CompareSplit";
 import { LiveSciencePanel } from "@/features/sheet/LiveSciencePanel";
+import { LiveTechnicalBlock } from "@/features/sheet/RegionalAnalysisPanel";
 import type { ExplorationView } from "@/features/explore/exploreSchemas";
 import { formatDay } from "@/features/timeline/timelineLayout";
 
@@ -220,6 +221,10 @@ export const MoreInfoSheet = ({
               </>
             )}
           </section>
+
+          {subject.kind === "live" && exploration !== undefined && (
+            <LiveTechnicalBlock technical={tech} view={exploration} />
+          )}
 
           {subject.lens !== "insar" && subject.verdict !== "measured" && (
             <section className="x-sheet__section">
